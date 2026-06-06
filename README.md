@@ -2,7 +2,7 @@
 
 > 鸣潮工具箱(?)
 
-[English](./README_en.md) | [日本語](./README_ja.md) | 简体中文
+[English](WwTool/docs/README_en.md) | [日本語](WwTool/docs/README_ja.md) | 简体中文
 
 ## 简介
 
