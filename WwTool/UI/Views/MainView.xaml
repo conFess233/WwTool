@@ -121,6 +121,13 @@
             </ItemsControl>
         </Border>
 
+        <!--  应用内弹窗层  -->
+        <Grid Panel.ZIndex="800" Visibility="{Binding UIStateService.IsDialogVisible, Converter={StaticResource BoolToVis}}">
+            <!--  半透明背景遮罩，拦截所有点击  -->
+            <Border Background="#4D000000" />
+            <ContentControl HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding UIStateService.CurrentDialogView}" />
+        </Grid>
+
         <!--  加载遮罩层  -->
         <Grid Panel.ZIndex="1000" Background="#4D000000" Visibility="{Binding UIStateService.IsLoading, Converter={StaticResource BoolToVis}}">
             <Border

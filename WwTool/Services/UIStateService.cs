@@ -34,6 +34,25 @@ namespace WwTool.Services
             private set => SetProperty(ref _loadingMessage, value);
         }
 
+        private bool _isDialogVisible;
+        /// <summary>
+        /// 是否显示应用内弹窗层
+        /// </summary>
+        public bool IsDialogVisible
+        {
+            get => _isDialogVisible;
+            private set => SetProperty(ref _isDialogVisible, value);
+        }
+        private object? _currentDialogView;
+        /// <summary>
+        /// 当前应用内弹窗视图
+        /// </summary>
+        public object? CurrentDialogView
+        {
+            get => _currentDialogView;
+            private set => SetProperty(ref _currentDialogView, value);
+        }
+
         /// <summary>
         /// 弹窗列表
         /// </summary>
@@ -89,6 +108,30 @@ namespace WwTool.Services
             Application.Current.Dispatcher.Invoke(() =>
             {
                 Notifications.Remove(notification);
+            });
+        }
+
+        /// <summary>
+        /// 显示应用内弹窗
+        /// </summary>
+        /// <param name="view">弹窗视图对象</param>
+        public void ShowDialog(object view)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                CurrentDialogView = view;
+                IsDialogVisible = true;
+            });
+        }
+        /// <summary>
+        /// 关闭应用内弹窗
+        /// </summary>
+        public void CloseDialog()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                IsDialogVisible = false;
+                CurrentDialogView = null;
             });
         }
     }

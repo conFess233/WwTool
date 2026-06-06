@@ -188,6 +188,7 @@ namespace WwTool
 
 
             containerRegistry.RegisterSingleton<IUIStateService, UIStateService>();
+            containerRegistry.RegisterSingleton<IDialogService, MyDialogService>();
         }
     }
 

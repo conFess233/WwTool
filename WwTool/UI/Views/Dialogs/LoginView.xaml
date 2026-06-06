@@ -10,6 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    prism:ViewModelLocator.AutoWireViewModel="True"
     mc:Ignorable="d">
 
     <prism:Dialog.WindowStyle>
@@ -164,7 +165,12 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" Margin="0,0,0,20" Padding="0,0,0,10" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+            <Border
+                Grid.Row="0"
+                Margin="0,0,0,20"
+                Padding="0,0,0,10"
+                BorderBrush="{DynamicResource UnderLineBrush}"
+                BorderThickness="0,0,0,2">
                 <Grid>
                     <TextBlock
                         VerticalAlignment="Center"
@@ -282,19 +288,19 @@
                         <Button
                             Grid.Column="0"
                             Height="32"
+                            MinWidth="120"
                             Margin="0,0,8,0"
                             Command="{Binding CancelCommand}"
                             Content="{Binding Path=[Common_Cancel], Source={x:Static utils:LanguageManager.Instance}}"
-                            MinWidth="120"
                             IsEnabled="{Binding IsNotBusy}"
                             Style="{StaticResource CancelButtonStyle}" />
 
                         <Button
                             Grid.Column="1"
                             Height="32"
+                            MinWidth="120"
                             Margin="8,0,0,0"
                             Content="{Binding Path=[Common_Login], Source={x:Static utils:LanguageManager.Instance}}"
-                            MinWidth="120"
                             IsEnabled="{Binding IsNotBusy}"
                             Style="{StaticResource OkButtonStyle}" />
                     </Grid>

@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    prism:ViewModelLocator.AutoWireViewModel="True"
     mc:Ignorable="d">
 
     <prism:Dialog.WindowStyle>
