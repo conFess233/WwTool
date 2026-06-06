@@ -1,0 +1,305 @@
+<UserControl
+    x:Class="WwTool.UI.Views.Dialogs.LoginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="clr-namespace:WwTool.Common.Behaviors"
+    xmlns:cv="clr-namespace:WwTool.Common.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
+    xmlns:local="clr-namespace:WwTool.UI.Views.Dialogs"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    mc:Ignorable="d">
+
+    <prism:Dialog.WindowStyle>
+        <Style TargetType="Window">
+            <Setter Property="SizeToContent" Value="WidthAndHeight" />
+            <Setter Property="ResizeMode" Value="NoResize" />
+            <Setter Property="WindowStyle" Value="None" />
+            <Setter Property="AllowsTransparency" Value="True" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </prism:Dialog.WindowStyle>
+
+    <UserControl.Resources>
+        <cv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+
+        <Style x:Key="GlassPasswordBoxStyle" TargetType="{x:Type PasswordBox}">
+            <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TextBoxStrokeBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="MinWidth" Value="150" />
+            <Setter Property="CaretBrush" Value="{DynamicResource PrimaryBrush}" />
+            <Setter Property="PasswordChar" Value="●" />
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type PasswordBox}">
+                        <Grid>
+                            <Border
+                                x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                SnapsToDevicePixels="True" />
+
+                            <Border
+                                x:Name="hoverBorder"
+                                BorderBrush="{DynamicResource PrimaryHoverBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                IsHitTestVisible="False"
+                                Opacity="0"
+                                SnapsToDevicePixels="True" />
+
+                            <Border
+                                x:Name="focusBorder"
+                                BorderBrush="{DynamicResource PrimaryBrush}"
+                                BorderThickness="1.5"
+                                CornerRadius="6"
+                                IsHitTestVisible="False"
+                                Opacity="0"
+                                SnapsToDevicePixels="True" />
+
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                Focusable="False"
+                                HorizontalScrollBarVisibility="Hidden"
+                                VerticalScrollBarVisibility="Hidden" />
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="hoverBorder"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="1"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="hoverBorder"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="0"
+                                                Duration="0:0:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="IsFocused" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="focusBorder"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="1"
+                                                Duration="0:0:0.3" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="focusBorder"
+                                                Storyboard.TargetProperty="Opacity"
+                                                To="0"
+                                                Duration="0:0:0.3" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledBgBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border
+        Width="360"
+        Padding="28,24,28,24"
+        Background="{DynamicResource CardBgBrush}"
+        BorderBrush="{DynamicResource StrokeBrush}"
+        BorderThickness="1"
+        CornerRadius="12">
+
+        <Border.Effect>
+            <DropShadowEffect
+                BlurRadius="35"
+                Opacity="0.25"
+                ShadowDepth="6"
+                Color="{DynamicResource ShadowDarkColor}" />
+        </Border.Effect>
+
+        <i:Interaction.Behaviors>
+            <b:DragWindowBehavior />
+        </i:Interaction.Behaviors>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Margin="0,0,0,20" Padding="0,0,0,10" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+                <Grid>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Style="{StaticResource TitleTextStyle}"
+                        Text="{Binding Title}" />
+
+                    <Button
+                        Width="24"
+                        Height="24"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Command="{Binding CancelCommand}"
+                        Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="Transparent">
+                                                <Path
+                                                    x:Name="ClosePath"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Data="M2,2 L14,14 M2,14 L14,2"
+                                                    Stroke="{DynamicResource TextSubBrush}"
+                                                    StrokeThickness="1.5" />
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="ClosePath" Property="Stroke" Value="{DynamicResource CancelButtonBgBrush}" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="1" Orientation="Vertical">
+                <TextBlock
+                    Margin="0,0,0,6"
+                    FontSize="12"
+                    Foreground="{DynamicResource TextSubBrush}"
+                    Style="{StaticResource SubtitleTextStyle}"
+                    Text="{Binding Path=[Login_Email], Source={x:Static utils:LanguageManager.Instance}}" />
+                <TextBox
+                    Height="36"
+                    Margin="0,0,0,16"
+                    Padding="8,0"
+                    VerticalContentAlignment="Center"
+                    IsEnabled="{Binding IsNotBusy}"
+                    Style="{StaticResource {x:Type TextBox}}"
+                    Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock
+                    Margin="0,0,0,6"
+                    FontSize="12"
+                    Foreground="{DynamicResource TextSubBrush}"
+                    Style="{StaticResource SubtitleTextStyle}"
+                    Text="{Binding Path=[Login_Password], Source={x:Static utils:LanguageManager.Instance}}" />
+                <PasswordBox
+                    x:Name="PasswordBoxControl"
+                    Height="36"
+                    Margin="0,0,0,12"
+                    Padding="10,0"
+                    VerticalContentAlignment="Center"
+                    IsEnabled="{Binding IsNotBusy}"
+                    PasswordChanged="PasswordBox_PasswordChanged"
+                    Style="{StaticResource GlassPasswordBoxStyle}" />
+            </StackPanel>
+
+            <Grid Grid.Row="2" MinHeight="20" Margin="0,0,0,16">
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="#FFEC7063"
+                    Text="{Binding ErrorMessage}"
+                    TextWrapping="Wrap">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                                <Trigger Property="Text" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Vertical">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button
+                            Grid.Column="0"
+                            Height="32"
+                            Margin="0,0,8,0"
+                            Command="{Binding CancelCommand}"
+                            Content="{Binding Path=[Common_Cancel], Source={x:Static utils:LanguageManager.Instance}}"
+                            MinWidth="120"
+                            IsEnabled="{Binding IsNotBusy}"
+                            Style="{StaticResource CancelButtonStyle}" />
+
+                        <Button
+                            Grid.Column="1"
+                            Height="32"
+                            Margin="8,0,0,0"
+                            Content="{Binding Path=[Common_Login], Source={x:Static utils:LanguageManager.Instance}}"
+                            MinWidth="120"
+                            IsEnabled="{Binding IsNotBusy}"
+                            Style="{StaticResource OkButtonStyle}" />
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

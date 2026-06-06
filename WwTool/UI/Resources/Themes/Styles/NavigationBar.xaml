@@ -1,0 +1,228 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cv="clr-namespace:WwTool.Common.Converters"
+    xmlns:local="clr-namespace:WwTool.UI.Components">
+
+    <cv:ResourceImageConverter x:Key="ResourceImageConverter" />
+
+    <Style x:Key="Bar" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
+        <Setter Property="Margin" Value="0,3,3,3" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Effect" Value="{DynamicResource NavBarShadow}" />
+    </Style>
+
+    <Style x:Key="Rectangle" TargetType="{x:Type Border}">
+        <Setter Property="Width" Value="35" />
+        <Setter Property="Height" Value="35" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Background" Value="{DynamicResource ActiveBgBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="6,18,0,0" />
+        <Setter Property="Effect" Value="{DynamicResource ShadowSm}" />
+    </Style>
+
+    <Style x:Key="Name" TargetType="{x:Type TextBlock}">
+        <Setter Property="Text" Value="{Binding Title}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=local:NavigationBar}, Path=IsMouseOver}" Value="True">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2">
+                                <DoubleAnimation.EasingFunction>
+                                    <PowerEase EasingMode="EaseInOut" Power="2" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+                <DataTrigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.15">
+                                <DoubleAnimation.EasingFunction>
+                                    <PowerEase EasingMode="EaseInOut" Power="2" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.ExitActions>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="NavBarItem" TargetType="ListBoxItem">
+        <Setter Property="DockPanel.Dock" Value="Top" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Grid Margin="8,20,0,0" Background="{TemplateBinding Background}">
+                        <Border
+                            x:Name="hover"
+                            Width="{Binding RelativeSource={RelativeSource AncestorType=local:NavigationBar}, Path=HighlightWidth}"
+                            Height="35"
+                            Margin="-6,-3,0,0"
+                            Background="{DynamicResource HoverBgBrush}"
+                            CornerRadius="12"
+                            Opacity="0" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid
+                                Grid.Column="0"
+                                Width="30"
+                                Height="30"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <Grid.RenderTransform>
+                                    <TranslateTransform X="0" />
+                                </Grid.RenderTransform>
+
+                                <Rectangle x:Name="iconBase" Fill="{DynamicResource TextMainBrush}">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{Binding Icon, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+
+                                <Rectangle x:Name="iconActive" Fill="{DynamicResource ActiveTextBrush}" Opacity="0">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{Binding Icon, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                            </Grid>
+
+                            <Grid Grid.Column="1" Margin="3,0,0,0">
+                                <Grid.RenderTransform>
+                                    <TranslateTransform X="0" />
+                                </Grid.RenderTransform>
+
+                                <Border>
+                                    <TextBlock x:Name="titleBase" Foreground="{DynamicResource TextMainBrush}" Style="{StaticResource Name}" />
+                                </Border>
+                                <Border x:Name="titleActiveContainer" Opacity="0">
+                                    <TextBlock x:Name="titleActive" Foreground="{DynamicResource ActiveTextBrush}" Style="{StaticResource Name}" />
+                                </Border>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="hover"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="hover"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <Trigger Property="IsSelected" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="iconActive"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.2" />
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="titleActiveContainer"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="iconActive"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.2" />
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="titleActiveContainer"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <DataTrigger Binding="{Binding IsBottomItem}" Value="True">
+                            <Setter Property="DockPanel.Dock" Value="Bottom" />
+                            <Setter Property="Margin" Value="0,0,0,10" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style TargetType="{x:Type local:NavigationBar}">
+        <Setter Property="ItemContainerStyle" Value="{StaticResource NavBarItem}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Width" Value="50" />
+        <Setter Property="Height" Value="auto" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:NavigationBar}">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Border HorizontalAlignment="Stretch" Style="{StaticResource Bar}" />
+                        <Canvas>
+                            <Border x:Name="PART_Rectangle" Style="{StaticResource Rectangle}">
+                                <Border.RenderTransform>
+                                    <TranslateTransform x:Name="PART_Transform" />
+                                </Border.RenderTransform>
+                            </Border>
+                        </Canvas>
+                        <ItemsPresenter HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <DockPanel LastChildFill="False" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,28 @@
+<prism:PrismApplication
+    x:Class="WwTool.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WwTool"
+    xmlns:prism="http://prismlibrary.com/">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Typography.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Colors/GlassTheme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Images/Icons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/NavigationBar.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ButtonStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ExpanderStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ProgressBarStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ScrollBarStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/TabControlStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/TextBlockStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/TextBoxStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ToggleButtonStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ListBoxStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ToolTipStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ComboBoxStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</prism:PrismApplication>

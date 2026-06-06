@@ -1,0 +1,353 @@
+<UserControl
+    x:Class="WwTool.UI.Views.ExplorationDataView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    d:DesignHeight="770.581"
+    d:DesignWidth="912.952"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </UserControl.Resources>
+
+    <UserControl.RenderTransform>
+        <ScaleTransform x:Name="PageTransform" ScaleX="0.8" ScaleY="0.8" />
+    </UserControl.RenderTransform>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="UserControl.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation
+                        Storyboard.TargetProperty="Opacity"
+                        From="0"
+                        To="1"
+                        Duration="0:0:0.35" />
+                    <DoubleAnimation
+                        Storyboard.TargetName="PageTransform"
+                        Storyboard.TargetProperty="ScaleY"
+                        From="0.8"
+                        To="1"
+                        Duration="0:0:0.4">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseInOut" />
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation
+                        Storyboard.TargetName="PageTransform"
+                        Storyboard.TargetProperty="ScaleX"
+                        From="0.8"
+                        To="1"
+                        Duration="0:0:0.4">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseInOut" />
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </UserControl.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+            <Grid>
+                <TextBlock Margin="20,15" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Exploration_Title], Source={x:Static utils:LanguageManager.Instance}}" />
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <ComboBox Height="30" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="{Binding Uid}" />
+                                    <TextBlock Margin="5,0,0,0" Style="{StaticResource BaseTextBlockStyle}" Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button
+                        Height="32"
+                        Margin="20,0,0,0"
+                        HorizontalAlignment="Right"
+                        Command="{Binding RefreshLocalAccountCommand}"
+                        Content="{Binding Path=[Action_RefreshRoleList], Source={x:Static utils:LanguageManager.Instance}}"
+                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Tag="{StaticResource RefreshImage}" />
+                    <Button
+                        Height="32"
+                        Margin="10,0,0,0"
+                        HorizontalAlignment="Right"
+                        Command="{Binding RefreshCommand}"
+                        Content="{Binding Path=[Action_RefreshLocalData], Source={x:Static utils:LanguageManager.Instance}}"
+                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Style="{StaticResource OkButtonStyle}"
+                        Tag="{StaticResource RefreshImage}" />
+                    <Button
+                        Height="32"
+                        Margin="10,0,20,0"
+                        HorizontalAlignment="Right"
+                        Command="{Binding SyncDataCommand}"
+                        Content="{Binding Path=[Action_GetCloudData], Source={x:Static utils:LanguageManager.Instance}}"
+                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Style="{StaticResource OkButtonStyle}"
+                        Tag="{StaticResource CloudImage}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+
+            <StackPanel
+                Width="720"
+                MaxWidth="720"
+                Margin="24,16,24,24"
+                HorizontalAlignment="Center">
+
+                <Border
+                    Margin="0,0,0,16"
+                    Background="{DynamicResource CardBgBrush}"
+                    BorderBrush="{DynamicResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid Margin="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Orientation="Horizontal">
+                            <Image Width="30" Height="30" Source="{StaticResource SoundBoxImage}" />
+                            <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Exploration_SonanceCasketProgress], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="36"
+                                FontWeight="Bold"
+                                Foreground="{DynamicResource TextMainBrush}"
+                                Text="{Binding RoleDetail.Base.SoundBox, FallbackValue=0}"
+                                TextAlignment="Right" />
+                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Exploration_Collected], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Border
+                    Background="{DynamicResource CardBgBrush}"
+                    BorderBrush="{DynamicResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Margin="20">
+                        <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Exploration_Boxes], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+
+                        <UniformGrid Columns="4">
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="30" Height="30" Fill="{DynamicResource TextMainBrush}">
+                                        <Rectangle.OpacityMask>
+                                            <ImageBrush ImageSource="{StaticResource Chest1Image}" Stretch="Uniform" />
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Exploration_BoxPlain], Source={x:Static utils:LanguageManager.Instance}}" />
+                                </StackPanel>
+
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.Boxes[1], FallbackValue=0}" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image
+                                        Width="30"
+                                        Height="30"
+                                        ClipToBounds="True"
+                                        Source="{StaticResource Chest2Image}" />
+                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Exploration_BoxBasic], Source={x:Static utils:LanguageManager.Instance}}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.Boxes[2], FallbackValue=0}" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image
+                                        Width="30"
+                                        Height="30"
+                                        ClipToBounds="True"
+                                        Source="{StaticResource Chest3Image}" />
+                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Exploration_BoxAdvanced], Source={x:Static utils:LanguageManager.Instance}}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.Boxes[3], FallbackValue=0}" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image
+                                        Width="30"
+                                        Height="30"
+                                        ClipToBounds="True"
+                                        Source="{StaticResource Chest4Image}" />
+                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Exploration_BoxPremium], Source={x:Static utils:LanguageManager.Instance}}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.Boxes[4], FallbackValue=0}" />
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="0,15,0,16"
+                    Background="{DynamicResource CardBgBrush}"
+                    BorderBrush="{DynamicResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Margin="20">
+                        <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Exploration_BasicBoxes], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+
+                        <UniformGrid Columns="4">
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="30" Height="30" Fill="{DynamicResource TextMainBrush}">
+                                        <Rectangle.OpacityMask>
+                                            <ImageBrush ImageSource="{StaticResource Chest1Image}" Stretch="Uniform" />
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Exploration_BoxPlain], Source={x:Static utils:LanguageManager.Instance}}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.BasicBoxes[1], FallbackValue=0}" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image
+                                        Width="30"
+                                        Height="30"
+                                        ClipToBounds="True"
+                                        Source="{StaticResource Chest2Image}" />
+                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Exploration_BoxBasic], Source={x:Static utils:LanguageManager.Instance}}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.BasicBoxes[2], FallbackValue=0}" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image
+                                        Width="30"
+                                        Height="30"
+                                        ClipToBounds="True"
+                                        Source="{StaticResource Chest3Image}" />
+                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Exploration_BoxAdvanced], Source={x:Static utils:LanguageManager.Instance}}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.BasicBoxes[3], FallbackValue=0}" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image
+                                        Width="30"
+                                        Height="30"
+                                        ClipToBounds="True"
+                                        Source="{StaticResource Chest4Image}" />
+                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Exploration_BoxPremium], Source={x:Static utils:LanguageManager.Instance}}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.BasicBoxes[4], FallbackValue=0}" />
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="0,0,0,16"
+                    Background="{DynamicResource CardBgBrush}"
+                    BorderBrush="{DynamicResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Margin="20">
+                        <TextBlock Margin="0,0,0,16" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Exploration_PhantomBoxes], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+
+                        <UniformGrid Columns="3">
+                            <StackPanel HorizontalAlignment="Center">
+                                <Image Width="40" Height="40" Source="{StaticResource Phantom1Image}" />
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.PhantomBoxes[1], FallbackValue=0}" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Center">
+                                <Image Width="40" Height="40" Source="{StaticResource Phantom2Image}" />
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.PhantomBoxes[2], FallbackValue=0}" />
+                            </StackPanel>
+
+                            <StackPanel HorizontalAlignment="Center">
+                                <Image Width="40" Height="40" Source="{StaticResource Phantom3Image}" />
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Text="{Binding RoleDetail.Base.PhantomBoxes[3], FallbackValue=0}" />
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>

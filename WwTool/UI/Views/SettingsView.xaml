@@ -1,0 +1,395 @@
+<UserControl
+    x:Class="WwTool.UI.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WwTool.UI.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    xmlns:converters="clr-namespace:WwTool.Common.Converters"
+    d:DesignHeight="1696.25"
+    d:DesignWidth="747.5"
+    mc:Ignorable="d">
+
+    <UserControl.RenderTransform>
+        <ScaleTransform x:Name="PageTransform" ScaleX="0.8" ScaleY="0.8" />
+    </UserControl.RenderTransform>
+
+    <UserControl.Resources>
+        <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+    </UserControl.Resources>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="UserControl.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation
+                        Storyboard.TargetProperty="Opacity"
+                        From="0"
+                        To="1"
+                        Duration="0:0:0.35" />
+                    <DoubleAnimation
+                        Storyboard.TargetName="PageTransform"
+                        Storyboard.TargetProperty="ScaleY"
+                        From="0.8"
+                        To="1"
+                        Duration="0:0:0.4">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseInOut" />
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation
+                        Storyboard.TargetName="PageTransform"
+                        Storyboard.TargetProperty="ScaleX"
+                        From="0.8"
+                        To="1"
+                        Duration="0:0:0.4">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseInOut" />
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </UserControl.Triggers>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+            <StackPanel>
+                <TextBlock Margin="20" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Settings_Title], Source={x:Static utils:LanguageManager.Instance}}" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel
+                MinWidth="720"
+                Margin="24,16,24,24"
+                HorizontalAlignment="Center">
+
+                <Border
+                    Margin="0,0,0,16"
+                    Background="{DynamicResource CardBgBrush}"
+                    BorderBrush="{DynamicResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Margin="16">
+                        <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Settings_General], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_GamePath], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox
+                                    Height="34"
+                                    Padding="8,4"
+                                    IsReadOnly="True"
+                                    Text="{Binding User.GamePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button
+                                    Grid.Column="1"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding SelectGamePathCommand}"
+                                    Content="{Binding Path=[Action_SelectPath], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Tag="{StaticResource FolderImage}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16">
+
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_DefaultUid], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Margin="5,0"
+                                    ItemsSource="{Binding Users}"
+                                    SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Center" Style="{StaticResource BaseTextBlockStyle}" Text="{Binding Uid}" />
+                                                <TextBlock
+                                                    Margin="5,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Style="{StaticResource BaseTextBlockStyle}"
+                                                    Text="{Binding Name}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <Button
+                                    Height="25"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding RefreshLocalAccountCommand}"
+                                    Content="{Binding Path=[Action_Refresh], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Tag="{StaticResource RefreshImage}" />
+                                <Button
+                                    Height="25"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding DeleteLocalAccountCommand}"
+                                    Content="{Binding Path=[Action_Delete], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Foreground="{DynamicResource ButtonTextBrush}"
+                                    Style="{StaticResource CancelButtonStyle}"
+                                    Tag="{StaticResource TrashImage}" />
+                            </StackPanel>
+
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_UidHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock
+                                Margin="0,0,5,0"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_AutoLoad], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <ToggleButton Margin="10,0,0,0" IsChecked="{Binding User.AutoLoadLocalData, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SwitchToggleButtonStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="0,0,0,16"
+                    Background="{DynamicResource CardBgBrush}"
+                    BorderBrush="{DynamicResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Margin="16">
+                        <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Settings_UI], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock
+                                Margin="0,0,0,12"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_Language], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <ComboBox ItemsSource="{Binding LanguageTypes}" SelectedItem="{Binding AppLanguage}" MinWidth="200" HorizontalAlignment="Left" Height="34">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock
+                                Margin="0,0,0,12"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_Theme], Source={x:Static utils:LanguageManager.Instance}}" />
+
+                            <ListBox SelectedValue="{Binding User.CurrentTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Style="{StaticResource ThemePickerStyle}">
+                                <ListBoxItem Background="#0F172A" Content="{Binding Path=[Theme_Dark], Source={x:Static utils:LanguageManager.Instance}}" Tag="DarkTheme" />
+                                <ListBoxItem Background="#F3F4F6" Content="{Binding Path=[Theme_Light], Source={x:Static utils:LanguageManager.Instance}}" Tag="LightTheme" />
+                                <ListBoxItem Background="#E11D48" Content="{Binding Path=[Theme_Red], Source={x:Static utils:LanguageManager.Instance}}" Tag="RedTheme" />
+                                <ListBoxItem Background="#059669" Content="{Binding Path=[Theme_Green], Source={x:Static utils:LanguageManager.Instance}}" Tag="GreenTheme" />
+                                <ListBoxItem Background="#2563EB" Content="{Binding Path=[Theme_Blue], Source={x:Static utils:LanguageManager.Instance}}" Tag="BlueTheme" />
+                                <ListBoxItem Background="#EA580C" Content="{Binding Path=[Theme_Orange], Source={x:Static utils:LanguageManager.Instance}}" Tag="OrangeTheme" />
+                                <ListBoxItem Background="#D97706" Content="{Binding Path=[Theme_Yellow], Source={x:Static utils:LanguageManager.Instance}}" Tag="YellowTheme" />
+                                <ListBoxItem Background="#7C3AED" Content="{Binding Path=[Theme_Purple], Source={x:Static utils:LanguageManager.Instance}}" Tag="PurpleTheme" />
+                                <ListBoxItem Content="{Binding Path=[Theme_Glass], Source={x:Static utils:LanguageManager.Instance}}" Tag="GlassTheme">
+                                    <ListBoxItem.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Offset="0.0" Color="#CCFFFFFF" />
+                                            <GradientStop Offset="1.0" Color="#33FFFFFF" />
+                                        </LinearGradientBrush>
+                                    </ListBoxItem.Background>
+                                </ListBoxItem>
+                            </ListBox>
+
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_GlassHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16" VerticalAlignment="Center" Orientation="Horizontal">
+                            <StackPanel>
+                                <TextBlock FontSize="{StaticResource FontSizeBase}" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_EnableGlass], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_EnableGlassHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                            </StackPanel>
+                            <Border Margin="10,0,0,0" HorizontalAlignment="Right">
+                                <ToggleButton IsChecked="{Binding User.IsGlassEffectEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SwitchToggleButtonStyle}" />
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="0,0,0,16"
+                    Background="{DynamicResource CardBgBrush}"
+                    BorderBrush="{DynamicResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Margin="16">
+                        <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Settings_Network], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_LogApiKeyword], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBox Height="34" Padding="8,4" Text="{Binding User.SearchGachaApiUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_LogApiHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_GeetestPort], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBox
+                                MinWidth="120"
+                                Height="34"
+                                Padding="8,4"
+                                HorizontalAlignment="Left"
+                                Text="{Binding GeetestPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_GeetestPortHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+                        <StackPanel Margin="0,10,0,0">
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_RetryConfig], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock HorizontalAlignment="Left" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_RetryCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <TextBox MinWidth="60" Margin="10,0,0,0" Text="{Binding MaxRetries, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock
+                                    Margin="20,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    Style="{StaticResource CaptionTextStyle}"
+                                    Text="{Binding Path=[Settings_RetryDelay], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <TextBox MinWidth="60" Margin="10,0,0,0" Text="{Binding DelayMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_RetryHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Background="{DynamicResource CardBgBrush}"
+                    BorderBrush="{DynamicResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <StackPanel Margin="16">
+                        <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Settings_Log], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+
+                        <StackPanel Margin="0,0,0,16" VerticalAlignment="Center" Orientation="Horizontal">
+                            <StackPanel>
+                                <TextBlock FontSize="{StaticResource FontSizeBase}" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_EnableLog], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_EnableLogHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                            </StackPanel>
+                            <Border Margin="10,0,0,0" HorizontalAlignment="Right">
+                                <ToggleButton IsChecked="{Binding EnableFileLogging, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SwitchToggleButtonStyle}" />
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_LogDir], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox
+                                    Height="34"
+                                    Padding="8,4"
+                                    IsReadOnly="True"
+                                    Text="{Binding LogFolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button
+                                    Grid.Column="1"
+                                    Height="34"
+                                    Margin="8,0,0,0"
+                                    Command="{Binding SelectLogPathCommand}"
+                                    Content="{Binding Path=[Action_SelectPath], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Tag="{StaticResource FolderImage}" />
+                            </Grid>
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_LogDirHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_LogDays], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBox
+                                MinWidth="120"
+                                Height="34"
+                                Padding="8,4"
+                                HorizontalAlignment="Left"
+                                Text="{Binding LogRetentionDays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_LogDaysHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_LogSize], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBox
+                                MinWidth="120"
+                                Height="34"
+                                Padding="8,4"
+                                HorizontalAlignment="Left"
+                                Text="{Binding LogMaxSizeBytesMb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_LogSizeHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+
+                        <StackPanel>
+                            <TextBlock
+                                Margin="0,0,0,6"
+                                FontSize="{StaticResource FontSizeBase}"
+                                Style="{StaticResource SubtitleTextStyle}"
+                                Text="{Binding Path=[Settings_LogCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBox
+                                MinWidth="120"
+                                Height="34"
+                                Padding="8,4"
+                                HorizontalAlignment="Left"
+                                Text="{Binding LogMaxFileCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_LogCountHint2], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button
+                Margin="10"
+                Padding="10,5"
+                Command="{Binding SaveCommand}"
+                Content="{Binding Path=[Action_SaveSettings], Source={x:Static utils:LanguageManager.Instance}}"
+                FontSize="{StaticResource FontSizeLg}"
+                Foreground="{DynamicResource ButtonTextBrush}"
+                Style="{StaticResource OkButtonStyle}"
+                Tag="{StaticResource SaveImage}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

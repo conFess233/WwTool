@@ -1,0 +1,3159 @@
+{
+  "21010074": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "纹秋",
+      "en": "Autumntrace",
+      "ja": "秋の名残",
+      "ko": "가을의 무늬"
+    }
+  },
+  "21020074": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "飞景",
+      "en": "Lumingloss",
+      "ja": "万象変遷",
+      "ko": "천공의 광경"
+    }
+  },
+  "21030074": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "奔雷",
+      "en": "Thunderbolt",
+      "ja": "迸る雷霆",
+      "ko": "뇌전"
+    }
+  },
+  "21040074": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "金掌",
+      "en": "Stonard",
+      "ja": "黄金の拳",
+      "ko": "황금 권갑"
+    }
+  },
+  "21050074": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "清音",
+      "en": "Augment",
+      "ja": "清らかな音",
+      "ko": "청음"
+    }
+  },
+  "21010024": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "异响空灵",
+      "en": "Discord",
+      "ja": "霊感ディスコード",
+      "ko": "기묘한 울림"
+    }
+  },
+  "21020024": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "行进序曲",
+      "en": "Overture",
+      "ja": "行進オーバーチュア",
+      "ko": "행진의 서곡"
+    }
+  },
+  "21030024": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "华彩乐段",
+      "en": "Cadenza",
+      "ja": "華麗カテンツァ",
+      "ko": "화려한 악곡"
+    }
+  },
+  "21040024": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "呼啸重音",
+      "en": "Marcato",
+      "ja": "狂乱マルカート",
+      "ko": "바람의 악센트"
+    }
+  },
+  "21050024": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "奇幻变奏",
+      "en": "Variation",
+      "ja": "奇妙バリエーション",
+      "ko": "판타지 변주"
+    }
+  },
+  "21010013": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "暗夜长刃·玄明",
+      "en": "Broadblade of Night",
+      "ja": "暗夜の長刃・玄明",
+      "ko": "흑야의 대검 · 현명"
+    }
+  },
+  "21020013": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "暗夜迅刀·黑闪",
+      "en": "Sword of Night",
+      "ja": "暗夜の迅刀・黒閃",
+      "ko": "흑야의 직검 · 흑뢰"
+    }
+  },
+  "21030013": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "暗夜佩枪·暗星",
+      "en": "Pistols of Night",
+      "ja": "暗夜の拳銃・闇星",
+      "ko": "흑야의 권총 · 흑성"
+    }
+  },
+  "21040013": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "暗夜臂铠·夜芒",
+      "en": "Gauntlets of Night",
+      "ja": "暗夜の手甲・夜灯",
+      "ko": "흑야의 권갑 · 흑빛"
+    }
+  },
+  "21050013": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "暗夜矩阵·暝光",
+      "en": "Rectifier of Night",
+      "ja": "暗夜の増幅器・冥光",
+      "ko": "흑야의 증폭기 · 흑광"
+    }
+  },
+  "21010012": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "原初长刃·朴石",
+      "en": "Tyro Broadblade",
+      "ja": "原初の長刃・岩塊",
+      "ko": "태초의 대검"
+    }
+  },
+  "21020012": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "原初迅刀·鸣雨",
+      "en": "Tyro Sword",
+      "ja": "原初の迅刀・雨鳴",
+      "ko": "태초의 직검"
+    }
+  },
+  "21030012": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "原初佩枪·穿林",
+      "en": "Tyro Pistols",
+      "ja": "原初の拳銃・深森",
+      "ko": "태초의 권총"
+    }
+  },
+  "21040012": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "原初臂铠·磐岩",
+      "en": "Tyro Gauntlets",
+      "ja": "原初の手甲・磐石",
+      "ko": "태초의 권갑"
+    }
+  },
+  "21050012": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "原初音感仪·听浪",
+      "en": "Tyro Rectifier",
+      "ja": "原初の増幅器・波音",
+      "ko": "태초의 증폭기"
+    }
+  },
+  "21010011": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "教学长刃",
+      "en": "Training Broadblade",
+      "ja": "稽古用長刃",
+      "ko": "견습용 대검"
+    }
+  },
+  "21020011": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "教学迅刀",
+      "en": "Training Sword",
+      "ja": "稽古用迅刀",
+      "ko": "견습용 직검"
+    }
+  },
+  "21030011": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "教学佩枪",
+      "en": "Training Pistols",
+      "ja": "稽古用拳銃",
+      "ko": "견습용 권총"
+    }
+  },
+  "21040011": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "教学臂铠",
+      "en": "Training Gauntlets",
+      "ja": "稽古用手甲",
+      "ko": "견습용 권갑"
+    }
+  },
+  "21050011": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "教学音感仪",
+      "en": "Training Rectifier",
+      "ja": "稽古用増幅器",
+      "ko": "견습용 증폭기"
+    }
+  },
+  "21010023": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "源能长刃·测壹",
+      "en": "Originite: Type I",
+      "ja": "本源長刃・試作壱",
+      "ko": "원능의 대검 · 견습I"
+    }
+  },
+  "21020023": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "源能迅刀·测贰",
+      "en": "Originite: Type II",
+      "ja": "本源迅刀・試作弐",
+      "ko": "원능의 직검 · 견습II"
+    }
+  },
+  "21030023": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "源能佩枪·测叁",
+      "en": "Originite: Type III",
+      "ja": "本源拳銃・試作参",
+      "ko": "원능의 권총 · 견습III"
+    }
+  },
+  "21040023": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "源能臂铠·测肆",
+      "en": "Originite: Type IV",
+      "ja": "本源手甲・試作肆",
+      "ko": "원능의 권갑 · 견습IV"
+    }
+  },
+  "21050023": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "源能音感仪·测五",
+      "en": "Originite: Type V",
+      "ja": "本源増幅器・試作伍",
+      "ko": "원능의 증폭기 · 견습V"
+    }
+  },
+  "21010034": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "重破刃-41型",
+      "en": "Broadblade#41",
+      "ja": "重破刃＃41",
+      "ko": "41형 대검 · 무거운 책임"
+    }
+  },
+  "21020034": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "瞬斩刀-18型",
+      "en": "Sword#18",
+      "ja": "瞬斬刀＃18",
+      "ko": "18형 직검 · 순간의 칼빛"
+    }
+  },
+  "21030034": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "穿击枪-26型",
+      "en": "Pistols#26",
+      "ja": "穿撃銃＃26",
+      "ko": "26형 권총 · 맹렬한 돌격"
+    }
+  },
+  "21040034": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "钢影拳-21丁型",
+      "en": "Gauntlets#21D",
+      "ja": "鋼影拳＃21・四番",
+      "ko": "21형 권갑 · 아이언 팬텀"
+    }
+  },
+  "21050034": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "鸣动仪-25型",
+      "en": "Rectifier#25",
+      "ja": "鳴動機＃25",
+      "ko": "25형 증폭기 · 울림의 멜로디"
+    }
+  },
+  "21010044": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "永夜长明",
+      "en": "Dauntless Evernight",
+      "ja": "長夜の灯火",
+      "ko": "장야의 불빛"
+    }
+  },
+  "21020044": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "不归孤军",
+      "en": "Commando of Conviction",
+      "ja": "決死の一人戦",
+      "ko": "야귀의 신념"
+    }
+  },
+  "21030044": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "无眠烈火",
+      "en": "Undying Flame",
+      "ja": "燃え尽きぬ焔",
+      "ko": "불멸의 성화"
+    }
+  },
+  "21040044": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "袍泽之固",
+      "en": "Amity Accord",
+      "ja": "金鉄の志",
+      "ko": "전우의 의리"
+    }
+  },
+  "21050044": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "今州守望",
+      "en": "Jinzhou Keeper",
+      "ja": "今州の衛士",
+      "ko": "금주의 수호"
+    }
+  },
+  "21010043": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "远行者长刃·辟路",
+      "en": "Broadblade of Voyager",
+      "ja": "探索者長刃・開拓",
+      "ko": "수행자의 대검 · 벽로"
+    }
+  },
+  "21020043": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "远行者迅刀·旅迹",
+      "en": "Sword of Voyager",
+      "ja": "探索者迅刀・旅路",
+      "ko": "수행자의 직검 · 행적"
+    }
+  },
+  "21030043": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "远行者佩枪·洞察",
+      "en": "Pistols of Voyager",
+      "ja": "探索者拳銃・洞察",
+      "ko": "수행자의 권총 · 통찰"
+    }
+  },
+  "21040043": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "远行者臂铠·破障",
+      "en": "Gauntlets of Voyager",
+      "ja": "探索者手甲・排除",
+      "ko": "수행자의 권갑 · 파괴"
+    }
+  },
+  "21050043": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "远行者矩阵·探幽",
+      "en": "Rectifier of Voyager",
+      "ja": "探索者増幅器・発見",
+      "ko": "수행자의 증폭기 · 탐색"
+    }
+  },
+  "21010053": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "戍关长刃·定军",
+      "en": "Guardian Broadblade",
+      "ja": "辺守長刃・統率",
+      "ko": "수호자의 대검 · 근성"
+    }
+  },
+  "21020053": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "戍关迅刀·镇海",
+      "en": "Guardian Sword",
+      "ja": "辺守迅刀・鎮護",
+      "ko": "수호자의 직검 · 기민"
+    }
+  },
+  "21030053": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "戍关佩枪·平云",
+      "en": "Guardian Pistols",
+      "ja": "辺守拳銃・平定",
+      "ko": "수호자의 권총 · 용맹"
+    }
+  },
+  "21040053": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "戍关臂铠·拔山",
+      "en": "Guardian Gauntlets",
+      "ja": "辺守手甲・造設",
+      "ko": "수호자의 권갑 · 강력"
+    }
+  },
+  "21050053": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "戍关音感仪·留光",
+      "en": "Guardian Rectifier",
+      "ja": "辺守増幅器・伝承",
+      "ko": "수호자의 증폭기 · 모략"
+    }
+  },
+  "21010064": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "东落",
+      "en": "Helios Cleaver",
+      "ja": "逆行の星",
+      "ko": "저무는 동녘"
+    }
+  },
+  "21020064": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "西升",
+      "en": "Lunar Cutter",
+      "ja": "倒錯の星",
+      "ko": "상승의 서녘"
+    }
+  },
+  "21030064": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "飞逝",
+      "en": "Novaburst",
+      "ja": "疾走の星",
+      "ko": "천공의 순간"
+    }
+  },
+  "21040064": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "骇行",
+      "en": "Hollow Mirage",
+      "ja": "驚異の星",
+      "ko": "천공의 역행"
+    }
+  },
+  "21050064": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "异度",
+      "en": "Comet Flare",
+      "ja": "変化の星",
+      "ko": "굉음"
+    }
+  },
+  "21010015": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "浩境粼光",
+      "en": "Lustrous Razor",
+      "ja": "仙境の湖光",
+      "ko": "푸른물결의 빛"
+    }
+  },
+  "21020015": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "千古洑流",
+      "en": "Emerald of Genesis",
+      "ja": "千古の湖水",
+      "ko": "천년의 회류"
+    }
+  },
+  "21030015": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "停驻之烟",
+      "en": "Static Mist",
+      "ja": "不変の湖煙",
+      "ko": "부동의 안개"
+    }
+  },
+  "21040015": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "擎渊怒涛",
+      "en": "Abyss Surges",
+      "ja": "怒涛の湖音",
+      "ko": "물결의 파동"
+    }
+  },
+  "21050015": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漪澜浮录",
+      "en": "Cosmic Ripples",
+      "ja": "栄枯の湖岸",
+      "ko": "파도의 기록"
+    }
+  },
+  "21010016": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "苍鳞千嶂",
+      "en": "Verdant Summit",
+      "ja": "蒼鱗連峰",
+      "ko": "청룡의 천장"
+    }
+  },
+  "21050016": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "掣傀之手",
+      "en": "Stringmaster",
+      "ja": "糸繰りの奇術",
+      "ko": "꼭두각시의 손"
+    }
+  },
+  "21010026": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "时和岁稔",
+      "en": "Ages of Harvest",
+      "ja": "歳華調和",
+      "ko": "태평성대"
+    }
+  },
+  "21020016": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "赫奕流明",
+      "en": "Blazing Brilliance",
+      "ja": "赫く燃ゆる流光",
+      "ko": "솟아오르는 화염"
+    }
+  },
+  "21010063": {
+    "type": "Weapon",
+    "qualityLevel": 3,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "钧天正音",
+      "en": "Beguiling Melody",
+      "ja": "天上の仙楽",
+      "ko": "천상의 음률"
+    }
+  },
+  "21050026": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "琼枝冰绡",
+      "en": "Rime-Draped Sprouts",
+      "ja": "氷華の雅印",
+      "ko": "옥수 비단"
+    }
+  },
+  "21040016": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "诸方玄枢",
+      "en": "Verity's Handle",
+      "ja": "万端の枢機",
+      "ko": "팔방의 천추"
+    }
+  },
+  "21050036": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "星序协响",
+      "en": "Stellar Symphony",
+      "ja": "星々のコンチェルト",
+      "ko": "뭇별의 교향곡"
+    }
+  },
+  "21010084": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "凋亡频移",
+      "en": "Waning Redshift",
+      "ja": "破滅に迫る赤方偏移",
+      "ko": "멸망의 주파수"
+    }
+  },
+  "21020084": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "永续坍缩",
+      "en": "Endless Collapse",
+      "ja": "永遠を砕く重力崩壊",
+      "ko": "영원의 붕괴"
+    }
+  },
+  "21030084": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "悖论喷流",
+      "en": "Relativistic Jet",
+      "ja": "悖理を説く宇宙ジェット",
+      "ko": "역설의 격류"
+    }
+  },
+  "21040084": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "尘云旋臂",
+      "en": "Celestial Spiral",
+      "ja": "星屑が捩れる渦巻腕",
+      "ko": "천상의 나선"
+    }
+  },
+  "21050084": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "核熔星盘",
+      "en": "Fusion Accretion",
+      "ja": "コアが溶融する降着円盤",
+      "ko": "융합의 원반"
+    }
+  },
+  "21020017": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "心之锚",
+      "en": "Somnoire Anchor",
+      "ja": "心の錨",
+      "ko": "마음의 닻"
+    }
+  },
+  "21020026": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "裁春",
+      "en": "Red Spring",
+      "ja": "春裁ち",
+      "ko": "날카로운 봄"
+    }
+  },
+  "21050017": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "渊海回声",
+      "en": "Call of the Abyss",
+      "ja": "海淵のリフレイン",
+      "ko": "심해의 메아리"
+    }
+  },
+  "21010094": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "容赦的沉思录",
+      "en": "Meditations on Mercy",
+      "ja": "寛恕のタ・エイス・ヘアウトン",
+      "ko": "용서의 명상록"
+    }
+  },
+  "21020094": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "风流的寓言诗",
+      "en": "Fables of Wisdom",
+      "ja": "風刺のファブリオー",
+      "ko": "풍류의 우화시"
+    }
+  },
+  "21030094": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "叙别的罗曼史",
+      "en": "Romance in Farewell",
+      "ja": "別れのメロス",
+      "ko": "작별의 로맨스"
+    }
+  },
+  "21040094": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "酩酊的英雄志",
+      "en": "Legend of Drunken Hero",
+      "ja": "酩酊のエポス",
+      "ko": "만취의 영웅지"
+    }
+  },
+  "21050094": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "虚饰的华尔兹",
+      "en": "Waltz in Masquerade",
+      "ja": "虚飾のワルツ",
+      "ko": "허위의 왈츠"
+    }
+  },
+  "21040026": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "悲喜剧",
+      "en": "Tragicomedy",
+      "ja": "トラジコメーディア",
+      "ko": "희비극"
+    }
+  },
+  "21030016": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "死与舞",
+      "en": "The Last Dance",
+      "ja": "ラストダンス",
+      "ko": "죽음과 춤"
+    }
+  },
+  "21020036": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "不灭航路",
+      "en": "Unflickering Valor",
+      "ja": "エンドレスボヤージュ",
+      "ko": "흔들리지 않는 용기"
+    }
+  },
+  "21050046": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "和光回唱",
+      "en": "Luminous Hymn",
+      "ja": "光のハルモニア",
+      "ko": "광휘의 찬송가"
+    }
+  },
+  "21050027": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "大海的馈赠",
+      "en": "Ocean's Gift",
+      "ja": "海の恩恵",
+      "ko": "바다의 선물"
+    }
+  },
+  "21050056": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "海的呢喃",
+      "en": "Whispers of Sirens",
+      "ja": "深海の囁き",
+      "ko": "바다의 속삭임"
+    }
+  },
+  "21020046": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "血誓盟约",
+      "en": "Bloodpact's Pledge",
+      "ja": "血の盟約",
+      "ko": "혈맹의 약속"
+    }
+  },
+  "21040036": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "焰光裁定",
+      "en": "Blazing Justice",
+      "ja": "焔光の裁き",
+      "ko": "불빛의 심판"
+    }
+  },
+  "21030026": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "林间的咏叹调",
+      "en": "Woodland Aria",
+      "ja": "森のアリア",
+      "ko": "숲속의 아리아"
+    }
+  },
+  "21020056": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "不屈命定之冠",
+      "en": "Defier's Thorn",
+      "ja": "定めを覆す荊冠",
+      "ko": "숙명에 맞서는 관"
+    }
+  },
+  "21010036": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "焰痕",
+      "en": "Wildfire Mark",
+      "ja": "闘炎の爪痕",
+      "ko": "불길"
+    }
+  },
+  "21050066": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "幽冥的忘忧章",
+      "en": "Lethean Elegy",
+      "ja": "幽冥の忘憂曲",
+      "ko": "잊혀진 피안의 슬픈 악장"
+    }
+  },
+  "21040046": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "万物持存的注释",
+      "en": "Moongazer's Sigil",
+      "ja": "万物を書き留める月相",
+      "ko": "세상 만물의 진리"
+    }
+  },
+  "21010046": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "驭冕铸雷之权",
+      "en": "Thunderflare Dominion",
+      "ja": "雷霆を統べし王剣",
+      "ko": "천둥벼락을 다스리는 권능"
+    }
+  },
+  "21010104": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "金穹",
+      "en": "Aureate Zenith",
+      "ja": "金の天穹",
+      "ko": "금빛 하늘"
+    }
+  },
+  "21020104": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "翼锋",
+      "en": "Feather Edge",
+      "ja": "鋭利な翼",
+      "ko": "예리한 날개깃"
+    }
+  },
+  "21030104": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "阳焰",
+      "en": "Solar Flame",
+      "ja": "紅炎",
+      "ko": "태양 불꽃"
+    }
+  },
+  "21040104": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "凌空",
+      "en": "Aether Strike",
+      "ja": "舞い上がる大空",
+      "ko": "거침없는 비상"
+    }
+  },
+  "21050104": {
+    "type": "Weapon",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "曜光",
+      "en": "Radiant Dawn",
+      "ja": "弾む輝き",
+      "ko": "눈부신 빛"
+    }
+  },
+  "21030036": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "光影双生",
+      "en": "Lux & Umbra",
+      "ja": "ルクス＆アンブラ",
+      "ko": "얽혀진 빛과 그림자"
+    }
+  },
+  "21020066": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "裁竹",
+      "en": "Emerald Sentence",
+      "ja": "破敵の鋭竹",
+      "ko": "푸른 의지"
+    }
+  },
+  "21010056": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "昙切",
+      "en": "Kumokiri",
+      "ja": "曇斬",
+      "ko": "쿠모키리(曇斬)"
+    }
+  },
+  "21030046": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "溢彩荧辉",
+      "en": "Spectrum Blaster",
+      "ja": "スペクトル・ブラスター",
+      "ko": "스펙트럼 블래스터"
+    }
+  },
+  "21010066": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "宙算仪轨",
+      "en": "Starfield Calibrator",
+      "ja": "スターキャリブレーター",
+      "ko": "별하늘 연산 측정기"
+    }
+  },
+  "21010045": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "源能机锋",
+      "en": "Radiance Cleaver",
+      "ja": "ラディアンスの切っ先",
+      "ko": "에너지 절단"
+    }
+  },
+  "21020045": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "镭射切变",
+      "en": "Laser Shearer",
+      "ja": "レーザーの鋭剣",
+      "ko": "레이저 변형"
+    }
+  },
+  "21030045": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "相位涟漪",
+      "en": "Phasic Homogenizer",
+      "ja": "フェーズのさざ波",
+      "ko": "위상의 파동"
+    }
+  },
+  "21040045": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "脉冲协臂",
+      "en": "Pulsation Bracer",
+      "ja": "パルスの機腕",
+      "ko": "격동의 조력"
+    }
+  },
+  "21050045": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "玻色星仪",
+      "en": "Boson Astrolabe",
+      "ja": "ボゾンの観測器",
+      "ko": "보손 관측기"
+    }
+  },
+  "21020076": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "永远的启明星",
+      "en": "Everbright Polestar",
+      "ja": "とこしえの明星",
+      "ko": "영원한 샛별"
+    }
+  },
+  "21040056": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "白昼之脊",
+      "en": "Daybreaker's Spine",
+      "ja": "デイブレイカースパイン",
+      "ko": "한낮의 의지"
+    }
+  },
+  "21040066": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "昭日译注",
+      "en": "Solsworn Ciphers",
+      "ja": "ソル・スウォーンの注釈",
+      "ko": "솔스원의 해석"
+    }
+  },
+  "21050076": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "赝作的矮星",
+      "en": "Forged Dwarf Star",
+      "ja": "偽物の矮星",
+      "ko": "위조된 작은별"
+    }
+  },
+  "21020086": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "灼霜",
+      "en": "Frostburn",
+      "ja": "灼霜",
+      "ko": "서린 불꽃"
+    }
+  },
+  "1102": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "散华",
+      "en": "Sanhua",
+      "ja": "散華",
+      "ko": "산화"
+    }
+  },
+  "1103": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "白芷",
+      "en": "Baizhi",
+      "ja": "白芷",
+      "ko": "설지"
+    }
+  },
+  "1106": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "釉瑚",
+      "en": "Youhu",
+      "ja": "釉瑚",
+      "ko": "유호"
+    }
+  },
+  "1202": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "炽霞",
+      "en": "Chixia",
+      "ja": "熾霞",
+      "ko": "치샤"
+    }
+  },
+  "1204": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "莫特斐",
+      "en": "Mortefi",
+      "ja": "モルトフィー",
+      "ko": "모르테피"
+    }
+  },
+  "1303": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "渊武",
+      "en": "Yuanwu",
+      "ja": "淵武",
+      "ko": "연무"
+    }
+  },
+  "1402": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "秧秧",
+      "en": "Yangyang",
+      "ja": "秧秧",
+      "ko": "양양"
+    }
+  },
+  "1403": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "秋水",
+      "en": "Aalto",
+      "ja": "アールト",
+      "ko": "알토"
+    }
+  },
+  "1504": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "灯灯",
+      "en": "Lumi",
+      "ja": "灯灯",
+      "ko": "루미"
+    }
+  },
+  "1601": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "桃祈",
+      "en": "Taoqi",
+      "ja": "桃祈",
+      "ko": "도기"
+    }
+  },
+  "1602": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "丹瑾",
+      "en": "Danjin",
+      "ja": "丹瑾",
+      "ko": "단근"
+    }
+  },
+  "1104": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "凌阳",
+      "en": "Lingyang",
+      "ja": "凌陽",
+      "ko": "능양"
+    }
+  },
+  "1203": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "安可",
+      "en": "Encore",
+      "ja": "アンコ",
+      "ko": "앙코"
+    }
+  },
+  "1301": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "卡卡罗",
+      "en": "Calcharo",
+      "ja": "カカロ",
+      "ko": "카카루"
+    }
+  },
+  "1405": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "鉴心",
+      "en": "Jianxin",
+      "ja": "鑑心",
+      "ko": "감심"
+    }
+  },
+  "1503": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "维里奈",
+      "en": "Verina",
+      "ja": "ヴェリーナ",
+      "ko": "벨리나"
+    }
+  },
+  "1108": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "绯雪",
+      "en": "Hiyuki",
+      "ja": "緋雪",
+      "ko": "히유키"
+    }
+  },
+  "1409": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "卡提希娅",
+      "en": "Cartethyia",
+      "ja": "カルテジア",
+      "ko": "카르티시아"
+    }
+  },
+  "1506": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "菲比",
+      "en": "Phoebe",
+      "ja": "フィービー",
+      "ko": "페비"
+    }
+  },
+  "1408": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漂泊者·气动",
+      "en": "Rover: Aero",
+      "ja": "漂泊者・気動",
+      "ko": "방랑자 · 기류"
+    }
+  },
+  "1410": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "尤诺",
+      "en": "Iuno",
+      "ja": "ユーノ",
+      "ko": "유노"
+    }
+  },
+  "1603": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "椿",
+      "en": "Camellya",
+      "ja": "ツバキ",
+      "ko": "카멜리아"
+    }
+  },
+  "1604": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漂泊者·湮灭",
+      "en": "Rover: Havoc",
+      "ja": "漂泊者・消滅",
+      "ko": "방랑자 · 인멸"
+    }
+  },
+  "1605": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漂泊者·湮灭",
+      "en": "Rover: Havoc",
+      "ja": "漂泊者・消滅",
+      "ko": "방랑자 · 인멸"
+    }
+  },
+  "1606": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "洛可可",
+      "en": "Roccia",
+      "ja": "ロココ",
+      "ko": "로코코"
+    }
+  },
+  "1607": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "坎特蕾拉",
+      "en": "Cantarella",
+      "ja": "カンタ레라",
+      "ko": "칸타렐라"
+    }
+  },
+  "1608": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "弗洛洛",
+      "en": "Phrolova",
+      "ja": "フローヴァ",
+      "ko": "플로로"
+    }
+  },
+  "1105": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "折枝",
+      "en": "Zhezhi",
+      "ja": "折枝",
+      "ko": "절지"
+    }
+  },
+  "1107": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "珂莱塔",
+      "en": "Carlotta",
+      "ja": "カルロッタ",
+      "ko": "카를로타"
+    }
+  },
+  "1302": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "吟霖",
+      "en": "Yinlin",
+      "ja": "吟霖",
+      "ko": "음림"
+    }
+  },
+  "1304": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "今汐",
+      "en": "Jinhsi",
+      "ja": "今汐",
+      "ko": "금희"
+    }
+  },
+  "1305": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "相里要",
+      "en": "Xiangli Yao",
+      "ja": "相里要",
+      "ko": "상리요"
+    }
+  },
+  "1306": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "奥古斯塔",
+      "en": "Augusta",
+      "ja": "オーガスタ",
+      "ko": "아우구스타"
+    }
+  },
+  "1501": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漂泊者·衍射",
+      "en": "Rover: Spectro",
+      "ja": "漂泊者・回折",
+      "ko": "방랑자 · 회절"
+    }
+  },
+  "1502": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漂泊者·衍射",
+      "en": "Rover: Spectro",
+      "ja": "漂泊者・回折",
+      "ko": "방랑자"
+    }
+  },
+  "1505": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "守岸人",
+      "en": "Shorekeeper",
+      "ja": "ショアキーパー",
+      "ko": "파수인"
+    }
+  },
+  "1507": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "赞妮",
+      "en": "Zani",
+      "ja": "ザンニー",
+      "ko": "젠니"
+    }
+  },
+  "1205": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "长离",
+      "en": "Changli",
+      "ja": "長離",
+      "ko": "장리"
+    }
+  },
+  "1206": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "布兰特",
+      "en": "Brant",
+      "ja": "ブラント",
+      "ko": "브렌트"
+    }
+  },
+  "1207": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "露帕",
+      "en": "Lupa",
+      "ja": "ルパ",
+      "ko": "루파"
+    }
+  },
+  "1404": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "忌炎",
+      "en": "Jiyan",
+      "ja": "忌炎",
+      "ko": "기염"
+    }
+  },
+  "1406": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漂泊者·气动",
+      "en": "Rover: Aero",
+      "ja": "漂泊者・気動",
+      "ko": "방랑자 · 기류"
+    }
+  },
+  "1407": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "夏空",
+      "en": "Ciaccona",
+      "ja": "シャコンヌ",
+      "ko": "샤콘"
+    }
+  },
+  "1211": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "达妮娅",
+      "en": "Denia",
+      "ja": "ダーニャ",
+      "ko": "데니아"
+    }
+  },
+  "1509": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "琳奈",
+      "en": "Lynae",
+      "ja": "リンネー",
+      "ko": "린네"
+    }
+  },
+  "1209": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "莫宁",
+      "en": "Mornye",
+      "ja": "モーニエ",
+      "ko": "모니에"
+    }
+  },
+  "1510": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "陆·赫斯",
+      "en": "Luuk Herssen",
+      "ja": "リューク・ヘルセン",
+      "ko": "루크 · 헤르센"
+    }
+  },
+  "1210": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "爱弥斯",
+      "en": "Aemeath",
+      "ja": "エイメス",
+      "ko": "에이메스"
+    }
+  },
+  "1411": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "仇远",
+      "en": "Qiuyuan",
+      "ja": "仇遠",
+      "ko": "구원"
+    }
+  },
+  "1307": {
+    "type": "Character",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "卜灵",
+      "en": "Buling",
+      "ja": "卜霊",
+      "ko": "복링"
+    }
+  },
+  "1208": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "嘉贝莉娜",
+      "en": "Galbrena",
+      "ja": "ガルブレーナ",
+      "ko": "갈브레나"
+    }
+  },
+  "1508": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "千咲",
+      "en": "Chisa",
+      "ja": "千咲",
+      "ko": "치사"
+    }
+  },
+  "1412": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isUp": true,
+    "names": {
+      "zh-Hans": "西格莉卡",
+      "en": "Sigrika",
+      "ja": "シグリカ",
+      "ko": "시그리카"
+    }
+  },
+  "89400001": {
+    "type": "MotorFrame",
+    "qualityLevel": 0,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "崭新出厂",
+      "en": "Factory New",
+      "ja": "ブランニュー",
+      "ko": "신상 출하"
+    }
+  },
+  "89400002": {
+    "type": "MotorFrame",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "远航星",
+      "en": "Voyaging Star",
+      "ja": "旅立つ星",
+      "ko": "먼 길을 떠나는 별"
+    }
+  },
+  "89400003": {
+    "type": "MotorFrame",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "「霁」",
+      "en": "Crystal Sky",
+      "ja": "「雪晴れ」",
+      "ko": "「눈이 갠 뒤」"
+    }
+  },
+  "89101001": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "布要上学！",
+      "en": "Student Abby!",
+      "ja": "このアブ様も学校行きたいっ！",
+      "ko": "포포도 학교 갈래!"
+    }
+  },
+  "89102001": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "布要上学！",
+      "en": "Student Abby!",
+      "ja": "このアブ様も学校行きたいっ！",
+      "ko": "포포도 학교 갈래!"
+    }
+  },
+  "89103001": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "布要上学！",
+      "en": "Student Abby!",
+      "ja": "このアブ様も学校行きたいっ！",
+      "ko": "포포도 학교 갈래!"
+    }
+  },
+  "89103002": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "旅鼠冲击",
+      "en": "Lemming Charge",
+      "ja": "レミングストライク",
+      "ko": "레밍 쇼크"
+    }
+  },
+  "89101999": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漆黑",
+      "en": "Ink Black",
+      "ja": "漆黒",
+      "ko": "잉크 블랙"
+    }
+  },
+  "89101998": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "靛蓝",
+      "en": "Blue Indigo",
+      "ja": "群青",
+      "ko": "인디고 블루"
+    }
+  },
+  "89101996": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "深紫",
+      "en": "Deep Purple",
+      "ja": "紫紺",
+      "ko": "딥 퍼플"
+    }
+  },
+  "89101995": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "朱红",
+      "en": "Vermilion",
+      "ja": "真朱",
+      "ko": "버밀리온 레드"
+    }
+  },
+  "89101994": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "亮黄",
+      "en": "Bright Yellow",
+      "ja": "日黄",
+      "ko": "레몬 옐로우"
+    }
+  },
+  "89102999": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漆黑",
+      "en": "Ink Black",
+      "ja": "漆黒",
+      "ko": "잉크 블랙"
+    }
+  },
+  "89102998": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "靛蓝",
+      "en": "Blue Indigo",
+      "ja": "群青",
+      "ko": "인디고 블루"
+    }
+  },
+  "89102996": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "深紫",
+      "en": "Deep Purple",
+      "ja": "紫紺",
+      "ko": "딥 퍼플"
+    }
+  },
+  "89102995": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "朱红",
+      "en": "Vermilion",
+      "ja": "真朱",
+      "ko": "버밀리온 레드"
+    }
+  },
+  "89102994": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "亮黄",
+      "en": "Bright Yellow",
+      "ja": "日黄",
+      "ko": "레몬 옐로우"
+    }
+  },
+  "89103999": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "漆黑",
+      "en": "Ink Black",
+      "ja": "漆黒",
+      "ko": "잉크 블랙"
+    }
+  },
+  "89103998": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "靛蓝",
+      "en": "Blue Indigo",
+      "ja": "群青",
+      "ko": "인디고 블루"
+    }
+  },
+  "89103996": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "深紫",
+      "en": "Deep Purple",
+      "ja": "紫紺",
+      "ko": "딥 퍼플"
+    }
+  },
+  "89103995": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "朱红",
+      "en": "Vermilion",
+      "ja": "真朱",
+      "ko": "버밀리온 레드"
+    }
+  },
+  "89103994": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "亮黄",
+      "en": "Bright Yellow",
+      "ja": "日黄",
+      "ko": "레몬 옐로우"
+    }
+  },
+  "89101002": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "随心色彩",
+      "en": "Carefree Rainbow",
+      "ja": "フリーペイント",
+      "ko": "프리 페인팅"
+    }
+  },
+  "89101003": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "挥别昨日",
+      "en": "Farewell to Yesterday",
+      "ja": "昨日にサヨナラ",
+      "ko": "그리운 어제여, 안녕"
+    }
+  },
+  "89102002": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "随心色彩",
+      "en": "Carefree Rainbow",
+      "ja": "フリーペイント",
+      "ko": "프리 페인팅"
+    }
+  },
+  "89102003": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "挥别昨日",
+      "en": "Farewell to Yesterday",
+      "ja": "昨日にサヨナラ",
+      "ko": "그리운 어제여, 안녕"
+    }
+  },
+  "89103003": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "随心色彩",
+      "en": "Carefree Rainbow",
+      "ja": "フリーペイント",
+      "ko": "프리 페인팅"
+    }
+  },
+  "89103004": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "挥别昨日",
+      "en": "Farewell to Yesterday",
+      "ja": "昨日にサヨナラ",
+      "ko": "그리운 어제여, 안녕"
+    }
+  },
+  "89103005": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "立方达人",
+      "en": "Cube Expert",
+      "ja": "キューブマスター",
+      "ko": "큐브 마스터"
+    }
+  },
+  "89103006": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "啾啾！啾噜？",
+      "en": "Chuu! Chuluu?",
+      "ja": "チュチュ！チュル！",
+      "ko": "츄츄! 츄르?"
+    }
+  },
+  "89103007": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "相随",
+      "en": "Companionship",
+      "ja": "伴走",
+      "ko": "동행"
+    }
+  },
+  "89103008": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "车手一号",
+      "en": "No. 1 Biker",
+      "ja": "ライダーNo.1",
+      "ko": "라이더 No.1"
+    }
+  },
+  "89103010": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "日灵大家族",
+      "en": "Happy Soliskin Family",
+      "ja": "太陽の精霊大家族",
+      "ko": "태양의 정령 대가족"
+    }
+  },
+  "89103011": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "日灵学习中",
+      "en": "Studious Soliskin",
+      "ja": "レッスン中の精霊",
+      "ko": "태양의 정령 공부 중"
+    }
+  },
+  "89103012": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "已燃尽",
+      "en": "Low Fuel",
+      "ja": "バーンアウト",
+      "ko": "번아웃"
+    }
+  },
+  "89103013": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "吃饱喝足",
+      "en": "Repletion",
+      "ja": "満腹",
+      "ko": "배부름"
+    }
+  },
+  "89103014": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "德莉珐的微笑",
+      "en": "Dhalifa's Smile",
+      "ja": "ディリファの微笑み",
+      "ko": "달리파의 미소"
+    }
+  },
+  "89103015": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "危险拂光",
+      "en": "The Shimmer Comes",
+      "ja": "危ういシマー",
+      "ko": "위태로운 희미한 빛"
+    }
+  },
+  "89103016": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "结城理",
+      "en": "Makoto Yuki",
+      "ja": "結城理",
+      "ko": "유키 마코토"
+    }
+  },
+  "89103017": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "埃癸斯",
+      "en": "Aigis",
+      "ja": "アイギス",
+      "ko": "아이기스"
+    }
+  },
+  "89103018": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "JOKER",
+      "en": "Joker",
+      "ja": "ジョーカー",
+      "ko": "JOKER"
+    }
+  },
+  "89103019": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "MONA",
+      "en": "Mona",
+      "ja": "モナ",
+      "ko": "MONA"
+    }
+  },
+  "89103020": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "索尼克",
+      "en": "Sonic",
+      "ja": "ソニック",
+      "ko": "소닉"
+    }
+  },
+  "89103021": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "夏特",
+      "en": "Shadow",
+      "ja": "シャドウ",
+      "ko": "섀도우"
+    }
+  },
+  "89103022": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "滑行中的好奇心",
+      "en": "Curiosity Takes Flight",
+      "ja": "コース上の好奇心",
+      "ko": "활주 도중의 호기심"
+    }
+  },
+  "89103023": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "温暖小憩",
+      "en": "A Cozy Break",
+      "ja": "あったか休憩タイム",
+      "ko": "따스한 휴식 시간"
+    }
+  },
+  "89103024": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "阿布暖烘烘",
+      "en": "Warmed Up Abby",
+      "ja": "ぽかぽかアブ",
+      "ko": "포근한 포포"
+    }
+  },
+  "89103025": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "飞驰邂逅",
+      "en": "A Fleeting Encounter",
+      "ja": "駆け抜ける出会い",
+      "ko": "스쳐가는 만남"
+    }
+  },
+  "89101004": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "隧者与少女",
+      "en": "Girl with Exostrider",
+      "ja": "エクソストライダーと少女と",
+      "ko": "엑소스트라이더와 소녀"
+    }
+  },
+  "89102004": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "隧者与少女",
+      "en": "Girl with Exostrider",
+      "ja": "エクソストライダーと少女と",
+      "ko": "엑소스트라이더와 소녀"
+    }
+  },
+  "89103926": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "隧者与少女",
+      "en": "Girl with Exostrider",
+      "ja": "エクソストライダーと少女と",
+      "ko": "엑소스트라이더와 소녀"
+    }
+  },
+  "89101005": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "深空与歌者",
+      "en": "Singer in Deepspace",
+      "ja": "深宇宙と歌う者",
+      "ko": "스페이스트렉 · 하늘과 가수"
+    }
+  },
+  "89101006": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "若以月为因果",
+      "en": "Lunar Causality",
+      "ja": "月を因果とするなら",
+      "ko": "인과의 닻이 맺은 달"
+    }
+  },
+  "89101007": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "眺望境界之线",
+      "en": "Horizon Lookout",
+      "ja": "境界線を眺めて",
+      "ko": "경계선을 바라보며"
+    }
+  },
+  "89101008": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "心心相鸣",
+      "en": "Wuther as One",
+      "ja": "鳴り合う潮の心",
+      "ko": "이심전심"
+    }
+  },
+  "89102005": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "深空与歌者",
+      "en": "Singer in Deepspace",
+      "ja": "深宇宙と歌う者",
+      "ko": "스페이스트렉 · 하늘과 가수"
+    }
+  },
+  "89102006": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "若以月为因果",
+      "en": "Lunar Causality",
+      "ja": "月を因果とするなら",
+      "ko": "인과의 닻이 맺은 달"
+    }
+  },
+  "89102007": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "眺望境界之线",
+      "en": "Horizon Lookout",
+      "ja": "境界線を眺めて",
+      "ko": "경계선을 바라보며"
+    }
+  },
+  "89103927": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "深空与歌者",
+      "en": "Singer in Deepspace",
+      "ja": "深宇宙と歌う者",
+      "ko": "스페이스트렉 · 하늘과 가수"
+    }
+  },
+  "89103928": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "若以月为因果",
+      "en": "Lunar Causality",
+      "ja": "月を因果とするなら",
+      "ko": "인과의 닻이 맺은 달"
+    }
+  },
+  "89103929": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "眺望境界之线",
+      "en": "Horizon Lookout",
+      "ja": "境界線を眺めて",
+      "ko": "경계선을 바라보며"
+    }
+  },
+  "89103026": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "炉芯掠影",
+      "en": "Reactor Shadow",
+      "ja": "ドライブの影",
+      "ko": "리액터 드라이브 스냅"
+    }
+  },
+  "89103027": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "测界之眼",
+      "en": "Observer's Eye",
+      "ja": "観測者の目",
+      "ko": "관측의 눈"
+    }
+  },
+  "89103029": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "极速冰点",
+      "en": "Flash Freeze",
+      "ja": "フラッシュフリーズ",
+      "ko": "초고속 빙점"
+    }
+  },
+  "89103030": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "巧思妙解",
+      "en": "Ingenuity",
+      "ja": "天才の発想",
+      "ko": "기발한 아이디어"
+    }
+  },
+  "89103031": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "踩雪大冒险",
+      "en": "On Thin Ice",
+      "ja": "雪踏み大冒険",
+      "ko": "눈 밟기 대모험"
+    }
+  },
+  "89103032": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "流变双翼",
+      "en": "Flux Wings",
+      "ja": "フラックスウィング",
+      "ko": "변화의 날개 한 쌍"
+    }
+  },
+  "89103033": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "循此日光",
+      "en": "Follow the Sunlight",
+      "ja": "陽の光を辿って",
+      "ko": "이 햇빛을 따라"
+    }
+  },
+  "89103034": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "莫莫狐",
+      "en": "MOOMOOSSI",
+      "ja": "ムムシ",
+      "ko": "무무씨"
+    }
+  },
+  "89101009": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "QUEEN",
+      "en": "QUEEN",
+      "ja": "クイーン",
+      "ko": "QUEEN"
+    }
+  },
+  "89101010": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "VIOLET",
+      "en": "VIOLET",
+      "ja": "ヴァイオレット",
+      "ko": "VIOLET"
+    }
+  },
+  "89101011": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "星海彼岸的呼唤",
+      "en": "Call from Beyond the Stars",
+      "ja": "星海を越える呼びかけ",
+      "ko": "별바다 건너의 부름"
+    }
+  },
+  "89102008": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "QUEEN",
+      "en": "QUEEN",
+      "ja": "クイーン",
+      "ko": "QUEEN"
+    }
+  },
+  "89102009": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "VIOLET",
+      "en": "VIOLET",
+      "ja": "ヴァイオレット",
+      "ko": "VIOLET"
+    }
+  },
+  "89102010": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "星海彼岸的呼唤",
+      "en": "Call from Beyond the Stars",
+      "ja": "星海を越える呼びかけ",
+      "ko": "별바다 건너의 부름"
+    }
+  },
+  "89103035": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "QUEEN",
+      "en": "QUEEN",
+      "ja": "クイーン",
+      "ko": "QUEEN"
+    }
+  },
+  "89103036": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "VIOLET",
+      "en": "VIOLET",
+      "ja": "ヴァイオレット",
+      "ko": "VIOLET"
+    }
+  },
+  "89103038": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "消融于钴蓝雪线",
+      "en": "Melting into the Cobalt Blue Snow",
+      "ja": "コバルトの雪に溶けて",
+      "ko": "시리도록 푸른 설선에 녹아들다"
+    }
+  },
+  "89103039": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "散场后的欢笑巡游",
+      "en": "After Party Smiles",
+      "ja": "終幕のラフパレード",
+      "ko": "축제의 끝, 만개한 미소"
+    }
+  },
+  "89103040": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "星星的记忆",
+      "en": "Memories of the Stars",
+      "ja": "星の記憶",
+      "ko": "별의 기억"
+    }
+  },
+  "89101012": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "「雪月花」",
+      "en": "Snow, Moon, and Flowers",
+      "ja": "「雪月花」",
+      "ko": "「설월화」"
+    }
+  },
+  "89101013": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "献给你的花束",
+      "en": "Flowers For You",
+      "ja": "あなたへ贈る花束",
+      "ko": "그대에게 바치는 꽃다발"
+    }
+  },
+  "89102011": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "「雪月花」",
+      "en": "Snow, Moon, and Flowers",
+      "ja": "「雪月花」",
+      "ko": "「설월화」"
+    }
+  },
+  "89102012": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "献给你的花束",
+      "en": "Flowers For You",
+      "ja": "あなたへ贈る花束",
+      "ko": "그대에게 바치는 꽃다발"
+    }
+  },
+  "89103041": {
+    "type": "MotorSticker",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "「雪月花」",
+      "en": "Snow, Moon, and Flowers",
+      "ja": "「雪月花」",
+      "ko": "「설월화」"
+    }
+  },
+  "89103042": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "献给你的花束",
+      "en": "Flowers For You",
+      "ja": "あなたへ贈る花束",
+      "ko": "그대에게 바치는 꽃다발"
+    }
+  },
+  "89103043": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "Resident Evil",
+      "en": "Resident Evil",
+      "ja": "バイオハザード",
+      "ko": "Biohazard"
+    }
+  },
+  "89103044": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "PRAGMATA",
+      "en": "PRAGMATA",
+      "ja": "PRAGMATA",
+      "ko": "PRAGMATA"
+    }
+  },
+  "89103045": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "日向翔阳",
+      "en": "Hinata Shoyo",
+      "ja": "日向翔陽",
+      "ko": "히나타 소요"
+    }
+  },
+  "89103046": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "影山飞雄",
+      "en": "Kageyama Tobio",
+      "ja": "影山飛雄",
+      "ko": "카게야마 토비오"
+    }
+  },
+  "89103047": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "保科宗四郎",
+      "en": "Soshiro Hoshina",
+      "ja": "保科宗四郎",
+      "ko": "호시나 소우시로"
+    }
+  },
+  "89103048": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "怪兽8号",
+      "en": "Kaiju No. 8",
+      "ja": "怪獣８号",
+      "ko": "괴수 8호"
+    }
+  },
+  "89103049": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "极限国度",
+      "en": "Riders Republic",
+      "ja": "ライダーズ リパブリック",
+      "ko": "라이더스 리퍼블릭"
+    }
+  },
+  "89103050": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "愤怒的小鸟",
+      "en": "Angry Birds",
+      "ja": "アングリーバード",
+      "ko": "앵그리 버드"
+    }
+  },
+  "89103051": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "极光远境",
+      "en": "Far Reaches of Aurora",
+      "ja": "オーロラ舞う最果て",
+      "ko": "먼 곳에 닿은 오로라"
+    }
+  },
+  "89103052": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "我心永恒",
+      "en": "Ever True",
+      "ja": "色褪せぬ永遠の意志",
+      "ko": "My Heart Will Go On"
+    }
+  },
+  "89103053": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "使命必达",
+      "en": "We Promise, We Deliver",
+      "ja": "届けるまでが配送",
+      "ko": "반드시 임무완수!"
+    }
+  },
+  "89103054": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "光驰向更深处",
+      "en": "Radiate into the Depths",
+      "ja": "光はさらに深みへ",
+      "ko": "더 깊은 곳으로 향하는 빛"
+    }
+  },
+  "89103055": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "这颗心脏的来处",
+      "en": "Where This Heart Comes From",
+      "ja": "この心臓の故郷",
+      "ko": "심장의 출처"
+    }
+  },
+  "89103056": {
+    "type": "MotorSticker",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "天衣无缝",
+      "en": "Seamless",
+      "ja": "完璧な嘘",
+      "ko": "완전무결"
+    }
+  },
+  "89300001": {
+    "type": "MotorDecoration",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "“小小救世主”",
+      "en": "\"Little Savior\"",
+      "ja": "「小さき救世主」",
+      "ko": "「작은 구세주」"
+    }
+  },
+  "89300002": {
+    "type": "MotorDecoration",
+    "qualityLevel": 5,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "绯雪团子",
+      "en": "Hiyuki Cube",
+      "ja": "緋雪団子",
+      "ko": "히유키 새알심"
+    }
+  },
+  "89200000": {
+    "type": "MotorSkin",
+    "qualityLevel": 4,
+    "isUp": false,
+    "names": {
+      "zh-Hans": "TERM-X",
+      "en": "TERM-X",
+      "ja": "TERM-X",
+      "ko": "TERM-X"
+    }
+  },
+  "1": {
+    "names": {
+      "zh-Hans": "致新世界",
+      "en": "To the New World",
+      "ja": "To the New World",
+      "ko": "새로운 세계에게"
+    } 
+  },
+  "2": {
+    "names": {
+      "zh-Hans": "五浔深处",
+      "en": "Into the Depths",
+      "ja": "Into the Depths",
+      "ko": "다섯 강의 깊은 곳"
+    }
+  },
+  "3": {
+    "names": {
+      "zh-Hans": "缄默欢歌",
+      "en": "Through the Silent Veil",
+      "ja": "Through the Silent Veil",
+      "ko": "침묵에 바치는 노랫소리"
+    }
+  },
+  "4": {
+    "names": {
+      "zh-Hans": "Waking of a World",
+      "en": "Waking of a World",
+      "ja": "Waking of a World",
+      "ko": "Waking of a World"
+    }
+  },
+  "6": {
+    "names": {
+      "zh-Hans": "真伪之塔",
+      "en": "Duplicitous Tower",
+      "ja": "Duplicitous Tower",
+      "ko": "진위의 탑"
+    }
+  },
+  "7": {
+    "names": {
+      "zh-Hans": "白日的入梦曲",
+      "en": "Daydream Lullaby",
+      "ja": "Daydream Lullaby",
+      "ko": "대낮의 자장가"
+    }
+  },
+  "8": {
+    "names": {
+      "zh-Hans": "弦汐未央",
+      "en": "The Waves Play On",
+      "ja": "The Waves Play On",
+      "ko": "The Waves Play On"
+    }
+  },
+  "9": {
+    "names": {
+      "zh-Hans": "呼嚎于山麓之巅",
+      "en": "Applause Greets the Hill",
+      "ja": "Applause Greets the Hill",
+      "ko": "Applause Greets the Hill"
+    }
+  },
+  "10": {
+    "names": {
+      "zh-Hans": "无悼荣辉",
+      "en": "Glory Unwept",
+      "ja": "Glory Unwept",
+      "ko": "Glory Unwept"
+    }
+  },
+  "11": {
+    "names": {
+      "zh-Hans": "千岛余音",
+      "en": "Thousand Island Aftertune",
+      "ja": "千の島の調べ",
+      "ko": "수많은 섬의 여음"
+    }
+  },
+  "12": {
+    "names": {
+      "zh-Hans": "夏日尽头",
+      "en": "Summer's End",
+      "ja": "Summer's End",
+      "ko": "이 여름의 끝을 넘어"
+    }
+  },
+  "999": {
+    "names": {
+      "zh-Hans": "今天的你，想为拉古那带来何种音乐？",
+      "en": "What kind of music will you bring to Ragunna today?",
+      "ja": "我が友よ、今日はラグーナにどんな音楽を響かせてくれるんだい？",
+      "ko": "오늘의 당신은 라군나에 어떤 음악을 들려주고 싶나요?"
+    }
+  },
+  "13": {
+    "names": {
+      "zh-Hans": "Pioneer's Roadtrip Mix",
+      "en": "Pioneer's Roadtrip Mix",
+      "ja": "Pioneer's Roadtrip Mix",
+      "ko": "Pioneer's Roadtrip Mix"
+    }
+  },
+  "14": {
+    "names": {
+      "zh-Hans": "引星为炬",
+      "en": "Our Torch, The Stars",
+      "ja": "Star as Torch",
+      "ko": "Star as Torch"
+    }
+  },
+  "15": {
+    "names": {
+      "zh-Hans": "女神异闻录５ 皇家版 联动专辑",
+      "en": "Persona 5 Royal: Collab Album",
+      "ja": "ペルソナ５ ザ・ロイヤル コラボアルバム",
+      "ko": "페르소나5 더 로열 콜라보 앨범"
+    }
+  },
+  "16": {
+    "names": {
+      "zh-Hans": "女神异闻录３ Reload联动专辑",
+      "en": "Persona 3 Reload: Collab Album",
+      "ja": "ペルソナ３ リロード コラボアルバム",
+      "ko": "페르소나3 리로드 콜라보 앨범"
+    }
+  },
+  "17": {
+    "names": {
+      "zh-Hans": "刺猬索尼克 联动专辑",
+      "en": "Sonic the Hedgehog: Collab Album",
+      "ja": "ソニック・ザ・ヘッジホッグ コラボアルバム",
+      "ko": "소닉 더 헤지혹 콜라보 앨범"
+    }
+  },
+  "18": {
+    "names": {
+      "zh-Hans": "For Ya",
+      "en": "For Ya",
+      "ja": "For Ya",
+      "ko": "For Ya"
+    }
+  },
+  "19": {
+    "names": {
+      "zh-Hans": "Neo-Tide | Remix Album",
+      "en": "Neo-Tide | Remix Album",
+      "ja": "Neo-Tide | Remix Album",
+      "ko": "Neo-Tide | Remix Album"
+    }
+  },
+  "20": {
+    "names": {
+      "zh-Hans": "行至漫漫雪色",
+      "en": "To the Snowland",
+      "ja": "To the Snowland",
+      "ko": "To the Snowland"
+    }
+  },
+  "21": {
+    "names": {
+      "zh-Hans": "若期待鎏金",
+      "en": "Gilded Expectations",
+      "ja": "Gilded Expectations",
+      "ko": "Gilded Expectations"
+    }
+  },
+  "22": {
+    "names": {
+      "zh-Hans": "旧夜群星闪耀时",
+      "en": "Beneath the Stars of the Old Night",
+      "ja": "Beneath the Stars of the Old Night",
+      "ko": "어젯밤 뭇별들의 순간"
+    }
+  }
+}

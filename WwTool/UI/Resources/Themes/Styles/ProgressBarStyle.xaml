@@ -1,0 +1,187 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:cv="clr-namespace:WwTool.Common.Converters" xmlns:utils="clr-namespace:WwTool.Common.Utils">
+    <cv:ProgressColorConverter x:Key="ProgressColorConverter" />
+    <Style x:Key="GachaBar" TargetType="ProgressBar">
+        <Setter Property="Minimum" Value="0" />
+        <Setter Property="Maximum" Value="80" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                    <Border
+                        x:Name="TemplateRoot"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="3"
+                        SnapsToDevicePixels="true">
+
+                        <Grid x:Name="PART_Track">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                x:Name="PART_Indicator"
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                ClipToBounds="True"
+                                CornerRadius="6">
+                                <Border.Background>
+                                    <Binding Converter="{StaticResource ProgressColorConverter}" Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
+                                </Border.Background>
+                                <Grid>
+                                    <Border x:Name="SlantedLinesLayer" ClipToBounds="True" Opacity="0.3">
+                                        <Border.Background>
+                                            <DrawingBrush
+                                                RenderOptions.CacheInvalidationThresholdMaximum="2.0"
+                                                RenderOptions.CacheInvalidationThresholdMinimum="0.5"
+                                                RenderOptions.CachingHint="Cache"
+                                                TileMode="Tile"
+                                                Viewport="0,0,20,20"
+                                                ViewportUnits="Absolute">
+                                                <DrawingBrush.Transform>
+                                                    <TranslateTransform x:Name="BrushTranslate" X="-5" Y="0" />
+                                                </DrawingBrush.Transform>
+                                                <DrawingBrush.Drawing>
+                                                    <GeometryDrawing Geometry="M 0,50 L 60,-40">
+                                                        <GeometryDrawing.Pen>
+                                                            <Pen Brush="White" Thickness="4" />
+                                                        </GeometryDrawing.Pen>
+                                                    </GeometryDrawing>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Border.Background>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <StackPanel Grid.Column="1" Margin="3,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+                                <TextBlock
+                                    FontSize="11"
+                                    FontWeight="Bold"
+                                    Foreground="{DynamicResource TextMainBrush}"
+                                    Text="{Binding Pity}" />
+                                <TextBlock
+                                    FontSize="11"
+                                    FontWeight="Bold"
+                                    Foreground="{DynamicResource TextMainBrush}"
+                                    Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard Timeline.DesiredFrameRate="30">
+                                    <DoubleAnimation
+                                        RepeatBehavior="Forever"
+                                        Storyboard.TargetName="BrushTranslate"
+                                        Storyboard.TargetProperty="X"
+                                        From="0"
+                                        To="20"
+                                        Duration="0:0:1.5" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+    <Style x:Key="ExpBarStyle" TargetType="ProgressBar">
+        <Setter Property="Minimum" Value="0" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="0,0,0,4">
+                            <TextBlock
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom"
+                                FontSize="11"
+                                Foreground="{DynamicResource TextSubBrush}"
+                                Text="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                FontSize="11"
+                                Foreground="{DynamicResource TextSubBrush}"
+                                Text="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Grid Width="{Binding ElementName=PART_Indicator, Path=ActualWidth}" HorizontalAlignment="Left">
+                                <TextBlock
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    FontSize="11"
+                                    FontWeight="Bold"
+                                    Foreground="{DynamicResource PrimaryBrush}"
+                                    RenderTransformOrigin="0.5,0.5"
+                                    Text="{Binding Value, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <TextBlock.RenderTransform>
+                                        <TranslateTransform X="8" />
+                                    </TextBlock.RenderTransform>
+                                </TextBlock>
+                            </Grid>
+                        </Grid>
+
+                        <Border
+                            x:Name="TemplateRoot"
+                            Grid.Row="1"
+                            Height="14"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            SnapsToDevicePixels="true">
+                            <Grid>
+                                <Grid x:Name="PART_Track">
+                                    <Border
+                                        x:Name="PART_Indicator"
+                                        HorizontalAlignment="Left"
+                                        Background="{DynamicResource CheckedBrush}"
+                                        ClipToBounds="True"
+                                        CornerRadius="6" />
+                                </Grid>
+
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Tag}" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style x:Key="AlbumBar" TargetType="ProgressBar">
+        <Setter Property="Minimum" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                    <Border
+                        x:Name="TemplateRoot"
+                        Height="14"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        SnapsToDevicePixels="true">
+                        <Grid>
+                            <Grid x:Name="PART_Track">
+                                <Border
+                                    x:Name="PART_Indicator"
+                                    HorizontalAlignment="Left"
+                                    Background="{DynamicResource CheckedBrush}"
+                                    ClipToBounds="True"
+                                    CornerRadius="6" />
+                            </Grid>
+
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

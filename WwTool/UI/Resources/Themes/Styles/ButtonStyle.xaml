@@ -1,0 +1,538 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:gif="https://github.com/XamlAnimatedGif/XamlAnimatedGif">
+
+    <Style TargetType="Button">
+        <Style.Resources>
+            <Style TargetType="{x:Type TextBlock}" />
+        </Style.Resources>
+
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource ButtonTextBrush}" />
+        <Setter Property="Padding" Value="5,0" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent">
+                        <Border Background="{DynamicResource ButtonBgBrush}" CornerRadius="4" Effect="{DynamicResource ShadowSm}" />
+
+                        <Grid x:Name="ScaleContainer" RenderTransformOrigin="0.5,0.5">
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Grid.RenderTransform>
+
+                            <Border x:Name="BaseBorder" Background="{DynamicResource ButtonBgBrush}" CornerRadius="4" />
+                            <Border
+                                x:Name="HoverBorder"
+                                Background="{DynamicResource HoverBgBrush}"
+                                CornerRadius="4"
+                                Opacity="0" />
+                            <Border
+                                x:Name="PressedBorder"
+                                Background="{DynamicResource ActiveBgBrush}"
+                                CornerRadius="4"
+                                Opacity="0" />
+
+                            <Grid Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Rectangle x:Name="IconRect" Grid.Column="0" Margin="0,1.5,5,1.5" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" Fill="{TemplateBinding Foreground}">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <ContentPresenter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="{x:Null}">
+                            <Setter TargetName="IconRect" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="HoverBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.15" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="HoverBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.25" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="HoverBorder" Property="Opacity" Value="0" />
+                            <Setter TargetName="PressedBorder" Property="Opacity" Value="1" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                            To="0.95"
+                                            Duration="0:0:0.1">
+                                            <DoubleAnimation.EasingFunction>
+                                                <PowerEase EasingMode="EaseInOut" Power="2" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                            To="0.95"
+                                            Duration="0:0:0.1">
+                                            <DoubleAnimation.EasingFunction>
+                                                <PowerEase EasingMode="EaseInOut" Power="2" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                            To="1.0"
+                                            Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                            To="1.0"
+                                            Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBgBrush}" />
+                            <Setter TargetName="HoverBorder" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PressedBorder" Property="Visibility" Value="Collapsed" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextPlaceholderBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SystemButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid Background="Transparent">
+                        <Border
+                            x:Name="border"
+                            Margin="2"
+                            Padding="1"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4"
+                            SnapsToDevicePixels="True" />
+                        <Border
+                            x:Name="hoverBorder"
+                            Margin="2"
+                            Padding="1"
+                            Background="{DynamicResource HoverBgBrush}"
+                            CornerRadius="4"
+                            Opacity="0"
+                            SnapsToDevicePixels="True" />
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="hoverBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="hoverBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CancelButtonStyle" TargetType="Button">
+        <Style.Resources>
+            <Style TargetType="{x:Type TextBlock}" />
+        </Style.Resources>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource CancelButtonHoverBrush}" />
+        <Setter Property="Padding" Value="5,0" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent">
+                        <Border Background="{DynamicResource CancelButtonBgBrush}" CornerRadius="4" Effect="{DynamicResource ShadowSm}" />
+
+                        <Grid x:Name="ScaleContainer" RenderTransformOrigin="0.5,0.5">
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Grid.RenderTransform>
+
+                            <Border
+                                x:Name="BaseBorder"
+                                Background="{DynamicResource CancelButtonBgBrush}"
+                                BorderBrush="{DynamicResource CancelButtonStrokeBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True" />
+                            <Border
+                                x:Name="HoverBorder"
+                                Background="{DynamicResource CancelButtonHoverBrush}"
+                                BorderBrush="{DynamicResource CancelButtonStrokeBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Opacity="0"
+                                SnapsToDevicePixels="True" />
+
+                            <Grid Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Rectangle x:Name="IconRect" Grid.Column="0" Margin="0,1.5,5,1.5" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" Fill="{TemplateBinding Foreground}">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <ContentPresenter x:Name="contentPresenter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="{x:Null}">
+                            <Setter TargetName="IconRect" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FFFFFF" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="HoverBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="HoverBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                            To="0.95"
+                                            Duration="0:0:0.1">
+                                            <DoubleAnimation.EasingFunction>
+                                                <PowerEase EasingMode="EaseInOut" Power="2" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                            To="0.95"
+                                            Duration="0:0:0.1">
+                                            <DoubleAnimation.EasingFunction>
+                                                <PowerEase EasingMode="EaseInOut" Power="2" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                            To="1.0"
+                                            Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                            To="1.0"
+                                            Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBgBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextPlaceholderBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="OkButtonStyle" TargetType="Button">
+        <Style.Resources>
+            <Style TargetType="{x:Type TextBlock}" />
+        </Style.Resources>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource OkButtonHoverBrush}" />
+        <Setter Property="Padding" Value="5,0" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent">
+                        <Border Background="{DynamicResource OkButtonBgBrush}" CornerRadius="4" Effect="{DynamicResource ShadowSm}" />
+
+                        <Grid x:Name="ScaleContainer" RenderTransformOrigin="0.5,0.5">
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Grid.RenderTransform>
+
+                            <Border
+                                x:Name="BaseBorder"
+                                Background="{DynamicResource OkButtonBgBrush}"
+                                BorderBrush="{DynamicResource OkButtonStrokeBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                SnapsToDevicePixels="True" />
+                            <Border
+                                x:Name="HoverBorder"
+                                Background="{DynamicResource OkButtonHoverBrush}"
+                                BorderBrush="{DynamicResource OkButtonStrokeBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Opacity="0"
+                                SnapsToDevicePixels="True" />
+
+                            <Grid Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Rectangle x:Name="IconRect" Grid.Column="0" Margin="0,1.5,5,1.5" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" Fill="{TemplateBinding Foreground}">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <ContentPresenter x:Name="contentPresenter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="{x:Null}">
+                            <Setter TargetName="IconRect" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FFFFFF" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="HoverBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="HoverBorder"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                            To="0.95"
+                                            Duration="0:0:0.1">
+                                            <DoubleAnimation.EasingFunction>
+                                                <PowerEase EasingMode="EaseInOut" Power="2" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                            To="0.95"
+                                            Duration="0:0:0.1">
+                                            <DoubleAnimation.EasingFunction>
+                                                <PowerEase EasingMode="EaseInOut" Power="2" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                            To="1.0"
+                                            Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ScaleContainer"
+                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                            To="1.0"
+                                            Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBgBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextPlaceholderBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style x:Key="ImageButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="BtnBorder"
+                        Background="Transparent"
+                        Opacity="0.8"
+                        RenderTransformOrigin="0.5,0.5">
+
+                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{TemplateBinding Foreground}">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+
+                        <Border.RenderTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                        </Border.RenderTransform>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BtnBorder" Property="Opacity" Value="1.0" />
+                            <Setter TargetName="BtnBorder" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="1.05" ScaleY="1.05" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="BtnBorder" Property="Opacity" Value="0.6" />
+                            <Setter TargetName="BtnBorder" Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.95" ScaleY="0.95" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="BtnBorder" Property="Opacity" Value="0.3" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

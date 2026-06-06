@@ -1,0 +1,172 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="{x:Type TabItem}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSubBrush}" />
+        <Setter Property="Margin" Value="3,0,3,1" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                    <Border
+                        x:Name="mainBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        SnapsToDevicePixels="True">
+                        <Grid>
+                            <ContentPresenter
+                                x:Name="contentPresenter"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                ContentSource="Header"
+                                RecognizesAccessKey="True" />
+
+                            <Border
+                                x:Name="underline"
+                                Height="2"
+                                Margin="0,0,0,-1"
+                                VerticalAlignment="Bottom"
+                                Background="{DynamicResource UnderLineBrush}"
+                                Opacity="0"
+                                RenderTransformOrigin="0.5,1">
+                                <Border.RenderTransform>
+                                    <ScaleTransform x:Name="scale" ScaleX="0" />
+                                </Border.RenderTransform>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
+                        </Trigger>
+
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="underline"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.2" />
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="scale"
+                                            Storyboard.TargetProperty="ScaleX"
+                                            To="1"
+                                            Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="underline"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.15" />
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="scale"
+                                            Storyboard.TargetProperty="ScaleX"
+                                            To="0"
+                                            Duration="0:0:0.15" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource TextPlaceholderBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type TabControl}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="0" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabControl}">
+                    <Grid KeyboardNavigation.TabNavigation="Local" SnapsToDevicePixels="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border
+                            Grid.Row="0"
+                            Margin="0,0,0,12"
+                            BorderBrush="{DynamicResource PageBgBrush}"
+                            BorderThickness="0,0,0,1">
+                            <TabPanel
+                                x:Name="headerPanel"
+                                Background="Transparent"
+                                IsItemsHost="True"
+                                KeyboardNavigation.TabNavigation="Once" />
+                        </Border>
+
+                        <Border Grid.Row="1" Padding="{TemplateBinding Padding}">
+
+                            <ContentControl
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{Binding SelectedContent, RelativeSource={RelativeSource TemplatedParent}, NotifyOnTargetUpdated=True}"
+                                ContentStringFormat="{Binding SelectedContentStringFormat, RelativeSource={RelativeSource TemplatedParent}}"
+                                ContentTemplate="{Binding SelectedContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                ContentTemplateSelector="{Binding SelectedContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                                Focusable="False">
+
+                                <ContentControl.RenderTransform>
+                                    <TranslateTransform X="0" />
+                                </ContentControl.RenderTransform>
+
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Style.Triggers>
+                                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                            From="30"
+                                                            To="0"
+                                                            Duration="0:0:0.35">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <CubicEase EasingMode="EaseOut" />
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="Opacity"
+                                                            From="0"
+                                                            To="1"
+                                                            Duration="0:0:0.25" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

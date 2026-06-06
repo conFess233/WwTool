@@ -1,0 +1,159 @@
+﻿<Window
+    x:Class="WwTool.UI.Views.MainView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behavior="clr-namespace:WwTool.Common.Behaviors"
+    xmlns:components="clr-namespace:WwTool.UI.Components"
+    xmlns:cv="clr-namespace:WwTool.Common.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ext="clr-namespace:WwTool.Extensions"
+    xmlns:gif="clr-namespace:XamlAnimatedGif;assembly=XamlAnimatedGif"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:WwTool.UI.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prism="http://prismlibrary.com/"
+    Title="WwTool"
+    Width="1280"
+    Height="720"
+    MinWidth="900"
+    MinHeight="500"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    AllowsTransparency="True"
+    Background="Transparent"
+    Closing="Window_Closing"
+    FontFamily="{StaticResource GlobalFontFamily}"
+    WindowStyle="None"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <cv:ResourceImageConverter x:Key="ResourceImageConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+
+
+
+    <Grid>
+        <!--  主内容层  -->
+        <Border
+            x:Name="MainContentBorder"
+            Background="{DynamicResource PageBgBrush}"
+            BorderBrush="{DynamicResource StrokeBrush}"
+            BorderThickness="1"
+            ClipToBounds="True"
+            CornerRadius="8">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsGlobalBlur}" Value="True">
+                            <Setter Property="Effect">
+                                <Setter.Value>
+                                    <BlurEffect Radius="12" RenderingBias="Performance" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="IsHitTestVisible" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <components:TitleBar Grid.Row="0" />
+
+                <Grid Grid.Row="1" Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <components:NavigationBar
+                        x:Name="leftNav"
+                        Grid.Column="0"
+                        ItemsSource="{Binding NavItems}"
+                        SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding NavigateCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </components:NavigationBar>
+
+                    <ContentControl Grid.Column="1" prism:RegionManager.RegionName="{x:Static ext:PrismManager.MainViewRegionName}" />
+                </Grid>
+
+                <ResizeGrip
+                    Grid.Row="1"
+                    Width="16"
+                    Height="16"
+                    Margin="0,0,3,3"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Background="Transparent"
+                    Cursor="SizeNWSE"
+                    MouseLeftButtonDown="ResizeGrip_MouseLeftButtonDown" />
+            </Grid>
+        </Border>
+
+        <!--  通知层  -->
+        <Border
+            Width="280"
+            Margin="20,0,20,20"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Bottom"
+            Panel.ZIndex="500"
+            Background="Transparent"
+            IsHitTestVisible="False">
+            <ItemsControl ItemsSource="{Binding UIStateService.Notifications}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel VerticalAlignment="Bottom" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <components:NotificationItem IsHitTestVisible="True" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <!--  加载遮罩层  -->
+        <Grid Panel.ZIndex="1000" Background="#4D000000" Visibility="{Binding UIStateService.IsLoading, Converter={StaticResource BoolToVis}}">
+            <Border
+                Width="240"
+                Padding="30,25"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="{DynamicResource CardBgBrush}"
+                CornerRadius="12">
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="25"
+                        Opacity="0.15"
+                        ShadowDepth="4"
+                        Color="{DynamicResource ShadowDarkColor}" />
+                </Border.Effect>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image
+                        Width="48"
+                        Height="48"
+                        Margin="0,0,0,15"
+                        HorizontalAlignment="Center"
+                        gif:AnimationBehavior.SourceUri="/UI/Resources/Images/Loading.gif" />
+
+                    <TextBlock
+                        x:Name="LoadingMessageTextBlock"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource TitleTextStyle}"
+                        Text="{Binding UIStateService.LoadingMessage}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
