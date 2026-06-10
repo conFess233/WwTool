@@ -144,7 +144,7 @@
 | 16  | Album | 女神异闻录３ Reload联动专辑        | Persona 3 Reload: Collab Album                      | ペルソナ３ リロード コラボアルバム                           | 페르소나3 리로드 콜라보 앨범                        |
 | 17  | Album | 刺猬索尼克 联动专辑                | Sonic the Hedgehog: Collab Album                    | ソニック・ザ・ヘッジホッグ コラボアルバム                    | 소닉 더 헤지혹 콜라보 앨범                          |
 | 18  | Album | For Ya                             | For Ya                                              | For Ya                                                       | For Ya                                              |
-| 19  | Album | Neo-Tide                           | Remix Album                                         | Neo-Tide                                                     | Remix Album                                         |
+| 19  | Album | Neo-Tide \| Remix Album            | Neo-Tide \| Remix Album                             | Neo-Tide \| Remix Album                                      | Neo-Tide \| Remix Album                             |
 | 20  | Album | 行至漫漫雪色                       | To the Snowland                                     | To the Snowland                                              | To the Snowland                                     |
 | 21  | Album | 若期待鎏金                         | Gilded Expectations                                 | Gilded Expectations                                          | Gilded Expectations                                 |
 | 22  | Album | 旧夜群星闪耀时                     | Beneath the Stars of the Old Night                  | Beneath the Stars of the Old Night                           | 어젯밤 뭇별들의 순간                                |
