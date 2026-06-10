@@ -12,11 +12,11 @@ namespace WwTool.Common.Models.ApiResponse
         /// </summary>
         public string CardPoolType { get; set; }
         /// <summary>
-        /// 资源 ID (对应角色或武器)
+        /// 资源 ID 
         /// </summary>
         public int ResourceId { get; set; }
         /// <summary>
-        /// 资源类型 (如 角色/武器)
+        /// 资源类型 
         /// </summary>
         public string ResourceType { get; set; }
         /// <summary>
@@ -32,7 +32,7 @@ namespace WwTool.Common.Models.ApiResponse
         /// </summary>
         public string Time { get; set; }
         /// <summary>
-        /// 品质 (3:蓝, 4:紫, 5:金)
+        /// 品质 
         /// </summary>
         public int QualityLevel { get; set; }
 

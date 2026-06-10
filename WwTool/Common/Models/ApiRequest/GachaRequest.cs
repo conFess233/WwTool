@@ -37,7 +37,7 @@ namespace WwTool.Common.Models.ApiRequest
         public string RecordId { get; set; } = string.Empty;
         
         /// <summary>
-        /// 卡池类型 (如 1:角色活动, 2:武器活动)
+        /// 卡池类型
         /// </summary>
         [JsonPropertyName("cardPoolType")]
         public int CardPoolType { get; set; } = 0;

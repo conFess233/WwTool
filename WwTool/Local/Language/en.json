@@ -175,7 +175,7 @@
   "Role_RadioWeekExp": "Podcast Weekly EXP",
   "Role_RadioLevel": "Level",
   "Role_RadioStatus": "Status: ",
-  "Role_RadioPremium": "Premium Podcast Unlocked",
+  "Role_RadioPremium": "Unlocked",
   "Role_RadioUnopened": "Locked",
   "Role_Activity": "Activity",
   "Role_ActivityToday": "Today's Activity",
@@ -263,4 +263,4 @@
   "Login_SuccessMsg": "Authorization code successfully obtained and securely saved!",
   "Dialog_Prompt": "Notice",
   "Common_Ok": "OK"
-}
+} 
