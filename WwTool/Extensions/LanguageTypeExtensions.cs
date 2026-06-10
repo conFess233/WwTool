@@ -20,14 +20,14 @@ namespace WwTool.Extensions
             return type switch
             {
                 LanguageType.ZhHans => "zh-Hans",
-                LanguageType.ZhHant => "zh-Hant",
+                //LanguageType.ZhHant => "zh-Hant",
                 LanguageType.En => "en",
                 LanguageType.Ja => "ja",
-                LanguageType.Ko => "ko",
-                LanguageType.De => "de",
-                LanguageType.Es => "es",
-                LanguageType.Fr => "fr",
-                LanguageType.Th => "th",
+                //LanguageType.Ko => "ko",
+                //LanguageType.De => "de",
+                //LanguageType.Es => "es",
+                //LanguageType.Fr => "fr",
+                //LanguageType.Th => "th",
                 _ => ""
             };
         }
