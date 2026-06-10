@@ -156,76 +156,90 @@ namespace WwTool.UI.ViewModels.Dialogs
                 return;
             }
 
-            ErrorMessage = string.Empty;
-            IsBusy = true;
-
-            await ExceptionHelper.ExecuteAsync(async () =>
+            try
             {
-                // 发起邮箱登录请求
-                var request = new EmailLoginRequest
+                ErrorMessage = string.Empty;
+                IsBusy = true;
+                _uiStateService.ShowLoading(LanguageManager.Instance["Logging_In"]);
+                await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    Email = Email,
-                    Password = Crypto.EncodePassword(Password)
-                };
-
-                var response = await _loginService.EmailLoginAsync(request);
-
-                if (response == null)
-                {
-                    throw new WwToolAuthException(LanguageManager.Instance["Login_NoData"]);
-                }
-
-                // 极验风控验证处理
-                if (response.Codes == 41000)
-                {
-                    _uiStateService.ShowToast(LanguageManager.Instance["Login_RiskTitle"], LanguageManager.Instance["Login_RiskMsg"], NotificationType.Warning);
-
-                    var geetestData = await GeetestServer.SolveGeetestAsync(_configService.App.GeetestPort);
-
-                    if (geetestData == null || geetestData.Count == 0)
+                    // 发起邮箱登录请求
+                    var request = new EmailLoginRequest
                     {
-                        throw new WwToolAuthException(LanguageManager.Instance["Login_GeetestFail"]);
-                    }
+                        Email = Email,
+                        Password = Crypto.EncodePassword(Password)
+                    };
 
-                    if (geetestData.TryGetValue("captcha_output", out var captchaOutput))
-                        request.GeetestCaptchaOutput = captchaOutput;
-                    if (geetestData.TryGetValue("gen_time", out var genTime))
-                        request.GeetestGenTime = genTime;
-                    if (geetestData.TryGetValue("lot_number", out var lotNumber))
-                        request.GeetestLotNumber = lotNumber;
-                    if (geetestData.TryGetValue("pass_token", out var passToken))
-                        request.GeetestPassToken = passToken;
-
-                    response = await _loginService.EmailLoginAsync(request);
+                    var response = await _loginService.EmailLoginAsync(request);
 
                     if (response == null)
                     {
-                        throw new WwToolAuthException(LanguageManager.Instance["Login_GeetestNoData"]);
+                        throw new WwToolAuthException(LanguageManager.Instance["Login_NoData"]);
                     }
-                }
 
-                if (response.Codes != 0)
-                {
-                    throw new WwToolAuthException(response.ErrorDescription ?? string.Format(LanguageManager.Instance["Login_AuthFail"], response.Codes));
-                }
+                    // 极验风控验证处理
+                    if (response.Codes == 41000)
+                    {
+                        _uiStateService.ShowToast(LanguageManager.Instance["Login_RiskTitle"],
+                            LanguageManager.Instance["Login_RiskMsg"], NotificationType.Warning);
 
-                // 生成授权码
-                var oauthResponse = await _loginService.GenerateAsync(new GenerateRequest());
-                if (oauthResponse == null || oauthResponse.Codes != 0 || string.IsNullOrEmpty(oauthResponse.OauthCode))
-                {
-                    throw new WwToolAuthException(oauthResponse?.ErrorDescription ?? LanguageManager.Instance["Login_GenerateFail"]);
-                }
+                        var geetestData = await GeetestServer.SolveGeetestAsync(_configService.App.GeetestPort);
 
-                // 同步玩家关联角色数据并更新到本地数据库
-                await _getDataService.SyncAllUserDataAsync(oauthCode: oauthResponse.OauthCode);
+                        if (geetestData == null || geetestData.Count == 0)
+                        {
+                            throw new WwToolAuthException(LanguageManager.Instance["Login_GeetestFail"]);
+                        }
 
-                _uiStateService.ShowToast(LanguageManager.Instance["Login_SuccessTitle"], LanguageManager.Instance["Login_SuccessMsg"], NotificationType.Success);
+                        if (geetestData.TryGetValue("captcha_output", out var captchaOutput))
+                            request.GeetestCaptchaOutput = captchaOutput;
+                        if (geetestData.TryGetValue("gen_time", out var genTime))
+                            request.GeetestGenTime = genTime;
+                        if (geetestData.TryGetValue("lot_number", out var lotNumber))
+                            request.GeetestLotNumber = lotNumber;
+                        if (geetestData.TryGetValue("pass_token", out var passToken))
+                            request.GeetestPassToken = passToken;
 
-                // 登录成功，关闭弹窗并返回 OK
-                RequestClose.Invoke(new DialogResult { Result = ButtonResult.OK });
-            }, "登录游戏账号");
+                        response = await _loginService.EmailLoginAsync(request);
 
-            IsBusy = false;
+                        if (response == null)
+                        {
+                            throw new WwToolAuthException(LanguageManager.Instance["Login_GeetestNoData"]);
+                        }
+                    }
+
+                    if (response.Codes != 0)
+                    {
+                        throw new WwToolAuthException(response.ErrorDescription ??
+                                                      string.Format(LanguageManager.Instance["Login_AuthFail"],
+                                                          response.Codes));
+                    }
+
+                    // 生成授权码
+                    var oauthResponse = await _loginService.GenerateAsync(new GenerateRequest());
+                    if (oauthResponse == null || oauthResponse.Codes != 0 ||
+                        string.IsNullOrEmpty(oauthResponse.OauthCode))
+                    {
+                        throw new WwToolAuthException(oauthResponse?.ErrorDescription ??
+                                                      LanguageManager.Instance["Login_GenerateFail"]);
+                    }
+
+                    // 同步玩家关联角色数据并更新到本地数据库
+                    await _getDataService.SyncAllUserDataAsync(oauthCode: oauthResponse.OauthCode);
+
+                    _uiStateService.ShowToast(LanguageManager.Instance["Login_SuccessTitle"],
+                        LanguageManager.Instance["Login_SuccessMsg"], NotificationType.Success);
+
+                    // 登录成功，关闭弹窗并返回 OK
+                    RequestClose.Invoke(new DialogResult { Result = ButtonResult.OK });
+                }, "登录游戏账号");
+            }
+            finally
+            {
+                _uiStateService.HideLoading();
+                IsBusy = false;
+            }
+
+
         }
 
         /// <summary>

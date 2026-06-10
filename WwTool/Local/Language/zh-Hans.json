@@ -264,5 +264,6 @@
   "Login_SuccessTitle": "登录成功",
   "Login_SuccessMsg": "授权码已成功获取并加密保存！",
   "Dialog_Prompt": "提示",
-  "Common_Ok": "确定"
+  "Common_Ok": "确定",
+  "Logging_In": "登录中..."
 }

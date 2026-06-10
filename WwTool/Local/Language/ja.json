@@ -264,5 +264,6 @@
   "Login_SuccessTitle": "ログイン成功",
   "Login_SuccessMsg": "認証コードを正常に取得し、暗号化して保存しました！",
   "Dialog_Prompt": "ヒント",
-  "Common_Ok": "OK"
+  "Common_Ok": "OK",
+  "Logging_In": "ログイン..."
 }

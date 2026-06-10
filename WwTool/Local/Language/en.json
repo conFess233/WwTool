@@ -264,5 +264,6 @@
   "Login_SuccessTitle": "Login Successful",
   "Login_SuccessMsg": "Authorization code successfully obtained and securely saved!",
   "Dialog_Prompt": "Notice",
-  "Common_Ok": "OK"
+  "Common_Ok": "OK",
+  "Logging_In": "Logging in..."
 } 

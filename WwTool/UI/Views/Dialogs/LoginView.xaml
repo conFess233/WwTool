@@ -300,6 +300,7 @@
                             Height="32"
                             MinWidth="120"
                             Margin="8,0,0,0"
+                            Command="{Binding LoginCommand}"
                             Content="{Binding Path=[Common_Login], Source={x:Static utils:LanguageManager.Instance}}"
                             IsEnabled="{Binding IsNotBusy}"
                             Style="{StaticResource OkButtonStyle}" />
