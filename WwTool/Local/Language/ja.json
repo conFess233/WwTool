@@ -7,6 +7,8 @@
   "Enum_CardPoolType_NoviceSelect": "初心者セレクト集音",
   "Enum_CardPoolType_RoleNewbie": "キャラクター新旅集音",
   "Enum_CardPoolType_WeaponNewbie": "武器新旅集音",
+  "Enum_CardPoolType_CharacterCollaboration": "キャラクターコラボ集音",
+  "Enum_CardPoolType_WeaponCollaboration": "武器コラボ集音",
   "Enum_LanguageType_ZhHans": "簡体字中国語",
   "Enum_LanguageType_ZhHant": "繁体字中国語",
   "Enum_LanguageType_En": "英語",

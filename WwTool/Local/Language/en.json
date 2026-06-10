@@ -7,6 +7,8 @@
   "Enum_CardPoolType_NoviceSelect": "Beginner's Choice Convene",
   "Enum_CardPoolType_RoleNewbie": "Character Beginner Convene",
   "Enum_CardPoolType_WeaponNewbie": "Weapon Beginner Convene",
+  "Enum_CardPoolType_CharacterCollaboration": "Character Collaboration Convene",
+  "Enum_CardPoolType_WeaponCollaboration": "Weapon Collaboration Convene",
   "Enum_LanguageType_ZhHans": "Simplified Chinese",
   "Enum_LanguageType_ZhHant": "Traditional Chinese",
   "Enum_LanguageType_En": "English",

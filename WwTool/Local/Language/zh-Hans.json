@@ -7,6 +7,8 @@
   "Enum_CardPoolType_NoviceSelect": "新手自选唤取",
   "Enum_CardPoolType_RoleNewbie": "角色新旅唤取",
   "Enum_CardPoolType_WeaponNewbie": "武器新旅唤取",
+  "Enum_CardPoolType_CharacterCollaboration": "角色联动唤取",
+  "Enum_CardPoolType_WeaponCollaboration": "武器联动唤取",
   "Enum_LanguageType_ZhHans": "简体中文",
   "Enum_LanguageType_ZhHant": "繁体中文",
   "Enum_LanguageType_En": "英语",
