@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -11,7 +11,7 @@
     <PlatformTarget>x64</PlatformTarget>  
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <InformationalVersion>v1.0.0</InformationalVersion>
+    <InformationalVersion>v1.0.1</InformationalVersion>
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
   </PropertyGroup>
 
@@ -33,6 +33,7 @@
     <None Remove="Local\Icons\1106.png" />
     <None Remove="Local\Icons\1107.png" />
     <None Remove="Local\Icons\1108.png" />
+    <None Remove="Local\Icons\1109.png" />
     <None Remove="Local\Icons\12.png" />
     <None Remove="Local\Icons\1202.png" />
     <None Remove="Local\Icons\1203.png" />
@@ -52,6 +53,7 @@
     <None Remove="Local\Icons\1305.png" />
     <None Remove="Local\Icons\1306.png" />
     <None Remove="Local\Icons\1307.png" />
+    <None Remove="Local\Icons\1308.png" />
     <None Remove="Local\Icons\14.png" />
     <None Remove="Local\Icons\1402.png" />
     <None Remove="Local\Icons\1403.png" />
@@ -75,6 +77,7 @@
     <None Remove="Local\Icons\1508.png" />
     <None Remove="Local\Icons\1509.png" />
     <None Remove="Local\Icons\1510.png" />
+    <None Remove="Local\Icons\1511.png" />
     <None Remove="Local\Icons\16.png" />
     <None Remove="Local\Icons\1601.png" />
     <None Remove="Local\Icons\1602.png" />
@@ -159,7 +162,9 @@
     <None Remove="Local\Icons\21030045.png" />
     <None Remove="Local\Icons\21030046.png" />
     <None Remove="Local\Icons\21030053.png" />
+    <None Remove="Local\Icons\21030056.png" />
     <None Remove="Local\Icons\21030064.png" />
+    <None Remove="Local\Icons\21030066.png" />
     <None Remove="Local\Icons\21030074.png" />
     <None Remove="Local\Icons\21030084.png" />
     <None Remove="Local\Icons\21030094.png" />
@@ -209,6 +214,7 @@
     <None Remove="Local\Icons\21050074.png" />
     <None Remove="Local\Icons\21050076.png" />
     <None Remove="Local\Icons\21050084.png" />
+    <None Remove="Local\Icons\21050086.png" />
     <None Remove="Local\Icons\21050094.png" />
     <None Remove="Local\Icons\21050104.png" />
     <None Remove="Local\Icons\22.png" />
@@ -467,6 +473,9 @@
     <Content Include="Local\Icons\1108.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Local\Icons\1109.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Local\Icons\12.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -522,6 +531,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\1307.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\1308.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\14.png">
@@ -591,6 +603,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\1510.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\1511.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\16.png">
@@ -845,7 +860,13 @@
     <Content Include="Local\Icons\21030053.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Local\Icons\21030056.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Local\Icons\21030064.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\21030066.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\21030074.png">
@@ -993,6 +1014,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\21050084.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\21050086.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\21050094.png">
