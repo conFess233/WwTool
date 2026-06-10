@@ -5,7 +5,7 @@ namespace WwTool.Common.Models.Config
     public class AppConfig
     {
 
-        public string GameLogPath { get; set; } = @"Wuthering Waves Game\Client\Saved\Logs\";
+        public string GameLogPath { get; set; } = @"Client\Saved\Logs\";
         public string GameLogFile { get; set; } = "Client.log";
         public string GameItemsResourcesPath { get; set; } = Path.Combine("Local/Data", "GameItemsResources.json");
 

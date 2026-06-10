@@ -7,15 +7,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using WwTool.Common.Enums;
+using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Common.Models.Config;
 using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
-using WwTool.Common.Enums;
-using WwTool.Common.Utils;
-using WwTool.Common.Utils;
 using ExceptionHelper = WwTool.Common.Utils.ExceptionHelper;
 
 namespace WwTool.UI.ViewModels
@@ -75,7 +75,7 @@ namespace WwTool.UI.ViewModels
             {
                 if (_configService.User.LastUserId != value?.Uid)
                 {
-                    if(value != null) _configService.User.LastUserId = value.Uid;
+                    if (value != null) _configService.User.LastUserId = value.Uid;
                 }
                 _selectedUser = value;
                 RaisePropertyChanged();
@@ -298,7 +298,7 @@ namespace WwTool.UI.ViewModels
                 {
                     string folder = dialog.FolderName;
 
-                    if (!File.Exists(Path.Combine(folder, _configService.App.GameLauncherFile)))
+                    if (!CheckPathExists.CheckPathExistsWithSubLevel(folder, _configService.App.GameLauncherFile))
                     {
                         throw new WwToolGamePathException(string.Format(LanguageManager.Instance["Toast_GameLauncherNotFound"], _configService.App.GameLauncherFile));
                     }

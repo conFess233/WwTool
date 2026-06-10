@@ -119,8 +119,6 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         public DelegateCommand ImportUrlCommand { get; set; }
 
-        public string? GamePath => _configService.User.GamePath;
-
         private string? _logUrl;
         public string? LogUrl
         {
@@ -331,19 +329,22 @@ namespace WwTool.UI.ViewModels
             _logger.Info("在 StatisticsViewModel 中调用了 AutoImportUrl 命令");
             ExceptionHelper.Execute(() =>
             {
-                if (string.IsNullOrEmpty(GamePath))
+                if (string.IsNullOrEmpty(_configService.User.GamePath))
                 {
                     throw new WwToolGamePathException(LanguageManager.Instance["Msg_NoGamePath"]);
                 }
+                var path = System.IO.Path.Combine(_configService.User.GamePath, "Wuthering Waves Game/" + _configService.App.GameLogPath, _configService.App.GameLogFile);
 
-                var path = System.IO.Path.Combine(GamePath, _configService.App.GameLogPath, _configService.App.GameLogFile);
+                if (_configService.User.GamePath.EndsWith("Wuthering Waves Game"))
+                    path = System.IO.Path.Combine(_configService.User.GamePath, _configService.App.GameLogPath, _configService.App.GameLogFile);
+
                 if (!File.Exists(path))
                 {
                     throw new FileNotFoundException(string.Format(LanguageManager.Instance["Msg_LogFileNotFound"], path));
                 }
 
                 var keyword = _configService.User.SearchGachaApiUrl;
-                var result = ReadLines.ReadLinesShared(path).LastOrDefault(x => x.Contains(keyword));
+                var result = ReadLines.ReadLinesDecrypt(path).LastOrDefault(x => x.Contains(keyword));
                 if (!string.IsNullOrEmpty(result))
                 {
                     Match match = Regex.Match(result, @"""url""\s*:\s*""(.*?)""");
