@@ -26,9 +26,15 @@ namespace WwTool.Common.Enums
         BeginnerChoice = 6,
 
         [Description("角色新旅唤取")]
-        CharacterNoviceJourney = 7,
+        CharacterNoviceJourney = 8,
 
         [Description("武器新旅唤取")]
-        WeaponNoviceJourney = 8
+        WeaponNoviceJourney = 9,
+
+        [Description("角色联动唤取")]
+        CharacterCollaboration = 10,
+
+        [Description("武器联动唤取")]
+        WeaponCollaboration = 11
     }
 }

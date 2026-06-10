@@ -1264,6 +1264,39 @@
       "ko": "서린 불꽃"
     }
   },
+  "21030056": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isLimited": true,
+    "names": {
+      "zh-Hans": "蜃影",
+      "en": "Spectral Trigger",
+      "ja": "スペクトラル・トリガー",
+      "ko": "스펙트럴 트리거"
+    }
+  },
+  "21030066": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isLimited": true,
+    "names": {
+      "zh-Hans": "碎骨",
+      "en": "Skull Thrasher",
+      "ja": "スカル・ポッパー",
+      "ko": "스컬 스래셔"
+    }
+  },
+  "21050086": {
+    "type": "Weapon",
+    "qualityLevel": 5,
+    "isLimited": true,
+    "names": {
+      "zh-Hans": "存帧",
+      "en": "Freeze Frame",
+      "ja": "フリーズフレーム",
+      "ko": "프리즈 프레임"
+    }
+  },
   "1102": {
     "type": "Character",
     "qualityLevel": 4,
@@ -1845,6 +1878,39 @@
       "en": "Sigrika",
       "ja": "シグリカ",
       "ko": "시그리카"
+    }
+  },
+  "1109": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isLimited": true,
+    "names": {
+      "zh-Hans": "洛瑟菈",
+      "en": "Lucilla",
+      "ja": "ルシラー",
+      "ko": "루실라"
+    }
+  },
+  "1308": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isLimited": true,
+    "names": {
+      "zh-Hans": "丽贝卡",
+      "en": "Rebecca",
+      "ja": "レベッカ",
+      "ko": "레베카"
+    }
+  },
+  "1511": {
+    "type": "Character",
+    "qualityLevel": 5,
+    "isLimited": true,
+    "names": {
+      "zh-Hans": "露西",
+      "en": "Lucy",
+      "ja": "ルーシー",
+      "ko": "루시"
     }
   },
   "89400001": {
@@ -2986,7 +3052,7 @@
       "en": "To the New World",
       "ja": "To the New World",
       "ko": "새로운 세계에게"
-    } 
+    }
   },
   "2": {
     "names": {
