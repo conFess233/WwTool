@@ -96,41 +96,44 @@ namespace WwTool.Common.Utils
             return new string(chars);
         }
 
-        private static readonly byte[] AesKey = Encoding.UTF8.GetBytes("WwToolSecureKey1"); // 16 bytes key
-        private static readonly byte[] AesIv = Encoding.UTF8.GetBytes("WwToolInitVector");  // 16 bytes IV
-
         /// <summary>
-        /// AES加密
+        /// 使用 Windows DPAPI 加密数据，保证本地存储安全
         /// </summary>
         /// <param name="plainText">要加密的字符串</param>
         /// <returns>Base64字符串</returns>
         public static string Encrypt(string plainText)
         {
             if (string.IsNullOrEmpty(plainText)) return string.Empty;
-            using Aes aes = Aes.Create();
-            aes.Key = AesKey;
-            aes.IV = AesIv;
-            ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-            byte[] inputBuffer = Encoding.UTF8.GetBytes(plainText);
-            byte[] outputBuffer = encryptor.TransformFinalBlock(inputBuffer, 0, inputBuffer.Length);
-            return Convert.ToBase64String(outputBuffer);
+            try
+            {
+                byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+                byte[] encryptedBytes = ProtectedData.Protect(plainBytes, null, DataProtectionScope.CurrentUser);
+                return Convert.ToBase64String(encryptedBytes);
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         /// <summary>
-        /// 解密
+        /// 使用 Windows DPAPI 解密数据
         /// </summary>
         /// <param name="cipherText">密文</param>
         /// <returns>明文</returns>
         public static string Decrypt(string cipherText)
         {
             if (string.IsNullOrEmpty(cipherText)) return string.Empty;
-            using Aes aes = Aes.Create();
-            aes.Key = AesKey;
-            aes.IV = AesIv;
-            ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-            byte[] inputBuffer = Convert.FromBase64String(cipherText);
-            byte[] outputBuffer = decryptor.TransformFinalBlock(inputBuffer, 0, inputBuffer.Length);
-            return Encoding.UTF8.GetString(outputBuffer);
+            try
+            {
+                byte[] cipherBytes = Convert.FromBase64String(cipherText);
+                byte[] decryptedBytes = ProtectedData.Unprotect(cipherBytes, null, DataProtectionScope.CurrentUser);
+                return Encoding.UTF8.GetString(decryptedBytes);
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }
