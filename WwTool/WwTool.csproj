@@ -1587,13 +1587,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9" />
     <PackageReference Include="Prism.DryIoc" Version="9.0.537" />
     <PackageReference Include="Prism.Wpf" Version="9.0.537" />
+    <PackageReference Include="SourceGear.sqlite3" Version="3.50.4.5" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
+    <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3" Version="3.0.3" />
     <PackageReference Include="XamlAnimatedGif" Version="2.3.2" />
   </ItemGroup>
 
