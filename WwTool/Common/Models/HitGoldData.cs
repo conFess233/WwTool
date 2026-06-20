@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using WwTool.Common.Models.ApiResponse;
@@ -9,5 +9,7 @@ namespace WwTool.Common.Models
     {
         public GachaData GachaData { get; set; }
         public int Pity { get; set; }
+        public System.Collections.ObjectModel.ObservableCollection<FourStarHistoryItem> FourStarHistories { get; set; } = new();
+        public bool? IsMiss { get; set; }
     }
 }

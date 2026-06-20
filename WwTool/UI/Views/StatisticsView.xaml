@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
     xmlns:local="clr-namespace:WwTool.UI.Views"
+    xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
     xmlns:viewmodels="clr-namespace:WwTool.UI.ViewModels"
@@ -164,316 +165,552 @@
         </Expander>
 
         <Grid Grid.Row="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <Expander
-                Grid.Row="0"
-                Margin="10"
-                Header="{Binding Path=[Stats_Overview], Source={x:Static utils:LanguageManager.Instance}}"
-                IsExpanded="True">
-                <Border
-                    Margin="0,10,0,0"
-                    Padding="12"
-                    BorderBrush="{DynamicResource StrokeBrush}"
-                    BorderThickness="1"
-                    CornerRadius="6">
+            <TabControl Padding="0" Background="Transparent" BorderThickness="0">
+                <TabItem Header="{Binding Path=[Stats_Overview], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='详细数据'}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
 
-                        <StackPanel
+                        <Expander
                             Grid.Row="0"
-                            Grid.Column="0"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_GameId], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                FontWeight="SemiBold"
-                                Text="{Binding UserId}" />
-                        </StackPanel>
+                            Margin="10"
+                            Header="{Binding Path=[Stats_Overview], Source={x:Static utils:LanguageManager.Instance}}"
+                            IsExpanded="True">
+                            <Border
+                                Margin="0,10,0,0"
+                                Padding="12"
+                                BorderBrush="{DynamicResource StrokeBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
 
-                        <StackPanel
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_TotalTides], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                FontWeight="SemiBold"
-                                Text="{Binding TotalTides}" />
-                        </StackPanel>
+                                    <StackPanel
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_GameId], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding UserId}" />
+                                    </StackPanel>
 
-                        <StackPanel
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_TotalAstrites], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                FontWeight="SemiBold"
-                                Text="{Binding TotalAstrites}" />
-                        </StackPanel>
+                                    <StackPanel
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_TotalTides], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding TotalTides}" />
+                                    </StackPanel>
 
-                        <StackPanel
-                            Grid.Row="0"
-                            Grid.Column="3"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_MissCount], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                FontWeight="SemiBold"
-                                Text="{Binding MissCount}" />
-                        </StackPanel>
+                                    <StackPanel
+                                        Grid.Row="0"
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_TotalAstrites], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding TotalAstrites}" />
+                                    </StackPanel>
 
-                        <StackPanel
-                            Grid.Row="0"
-                            Grid.Column="4"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_AvgLimitChara], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                <TextBlock
-                                    Margin="0,5"
-                                    HorizontalAlignment="Center"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding AvgLimitCharaTide, StringFormat={}{0:F2}}" />
-                                <TextBlock
-                                    Margin="0,5"
-                                    HorizontalAlignment="Center"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
-                            </StackPanel>
-                        </StackPanel>
+                                    <StackPanel
+                                        Grid.Row="0"
+                                        Grid.Column="3"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_MissCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding MissCount}" />
+                                    </StackPanel>
 
-                        <StackPanel
+                                    <StackPanel
+                                        Grid.Row="0"
+                                        Grid.Column="4"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_AvgLimitChara], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                            <TextBlock
+                                                Margin="0,5"
+                                                HorizontalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding AvgLimitCharaTide, StringFormat={}{0:F2}}" />
+                                            <TextBlock
+                                                Margin="0,5"
+                                                HorizontalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_SuccessCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding SuccessCount}" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_SuccessRate], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding SuccessRate, StringFormat={}{0:F2} %}" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_LimitGoldCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding LimitedGoldCount}" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Grid.Column="3"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_TotalGoldCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding TotalHitGold}" />
+                                    </StackPanel>
+
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Grid.Column="4"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Vertical">
+                                        <TextBlock
+                                            Margin="10,5"
+                                            HorizontalAlignment="Center"
+                                            Style="{StaticResource SubtitleTextStyle}"
+                                            Text="{Binding Path=[Stat_AvgChara], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                            <TextBlock
+                                                Margin="0,5"
+                                                HorizontalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding AvgCharaTide, StringFormat={}{0:F2}}" />
+                                            <TextBlock
+                                                Margin="0,5"
+                                                HorizontalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Expander>
+
+                        <TabControl
                             Grid.Row="1"
-                            Grid.Column="0"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_SuccessCount], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                FontWeight="SemiBold"
-                                Text="{Binding SuccessCount}" />
-                        </StackPanel>
+                            Margin="3"
+                            Padding="0"
+                            ItemsSource="{Binding PoolStatistics}">
+                            <TabControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource enumDescriptionConverter}">
+                                                <Binding Path="PoolType" />
+                                                <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </TabControl.ItemTemplate>
 
-                        <StackPanel
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_SuccessRate], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                FontWeight="SemiBold"
-                                Text="{Binding SuccessRate, StringFormat={}{0:F2} %}" />
-                        </StackPanel>
+                            <TabControl.ContentTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <ScrollViewer x:Name="PART_ScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                            <StackPanel Margin="0,10,0,10">
 
-                        <StackPanel
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_LimitGoldCount], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                FontWeight="SemiBold"
-                                Text="{Binding LimitedGoldCount}" />
-                        </StackPanel>
-
-                        <StackPanel
-                            Grid.Row="1"
-                            Grid.Column="3"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_TotalGoldCount], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                FontWeight="SemiBold"
-                                Text="{Binding TotalHitGold}" />
-                        </StackPanel>
-
-                        <StackPanel
-                            Grid.Row="1"
-                            Grid.Column="4"
-                            HorizontalAlignment="Center"
-                            Orientation="Vertical">
-                            <TextBlock
-                                Margin="10,5"
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Stat_AvgChara], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                <TextBlock
-                                    Margin="0,5"
-                                    HorizontalAlignment="Center"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding AvgCharaTide, StringFormat={}{0:F2}}" />
-                                <TextBlock
-                                    Margin="0,5"
-                                    HorizontalAlignment="Center"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </Expander>
-
-            <TabControl
-                Grid.Row="1"
-                Margin="3"
-                Padding="0"
-                ItemsSource="{Binding PoolStatistics}">
-                <TabControl.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock>
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource enumDescriptionConverter}">
-                                    <Binding Path="PoolType" />
-                                    <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                    </DataTemplate>
-                </TabControl.ItemTemplate>
-
-                <TabControl.ContentTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <ScrollViewer x:Name="PART_ScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                                <StackPanel Margin="0,10,0,10">
-
-                                    <Border
-                                        Margin="10,0,10,10"
-                                        Padding="12"
-                                        Background="{DynamicResource PageBgBrush}"
-                                        BorderBrush="{DynamicResource StrokeBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="8">
-                                        <UniformGrid Columns="4">
-                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_UsedTides], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                <TextBlock
-                                                    Margin="0,4,0,0"
-                                                    HorizontalAlignment="Center"
-                                                    FontSize="{StaticResource FontSizeXl}"
-                                                    Style="{StaticResource HeaderTextStyle}"
-                                                    Text="{Binding Calculate.Tides}" />
-                                            </StackPanel>
-                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_GoldCount], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                <TextBlock
-                                                    Margin="0,4,0,0"
-                                                    HorizontalAlignment="Center"
-                                                    FontSize="{StaticResource FontSizeXl}"
-                                                    Style="{StaticResource HeaderTextStyle}"
-                                                    Text="{Binding Calculate.HitGoldCount}" />
-                                            </StackPanel>
-                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_AstriteCost], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                <TextBlock
-                                                    Margin="0,4,0,0"
-                                                    HorizontalAlignment="Center"
-                                                    FontSize="{StaticResource FontSizeXl}"
-                                                    Style="{StaticResource HeaderTextStyle}"
-                                                    Text="{Binding Calculate.Astrites}" />
-                                            </StackPanel>
-                                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_AvgGold], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                                    <TextBlock
-                                                        Margin="0,4,0,0"
-                                                        HorizontalAlignment="Center"
-                                                        FontSize="{StaticResource FontSizeXl}"
-                                                        Style="{StaticResource HeaderTextStyle}"
-                                                        Text="{Binding Calculate.AvgGoldTide, StringFormat={}{0:F2}}" />
-                                                    <TextBlock
-                                                        Margin="0,4,0,0"
-                                                        HorizontalAlignment="Center"
-                                                        FontSize="{StaticResource FontSizeXl}"
-                                                        Style="{StaticResource HeaderTextStyle}"
-                                                        Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                </StackPanel>
-                                            </StackPanel>
-                                        </UniformGrid>
-                                    </Border>
-
-                                    <ItemsControl
-                                        ItemsSource="{Binding HitGoldDatas}"
-                                        ScrollViewer.CanContentScroll="True"
-                                        VirtualizingStackPanel.IsVirtualizing="True"
-                                        VirtualizingStackPanel.VirtualizationMode="Recycling">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
                                                 <Border
-                                                    Margin="5,3"
-                                                    Padding="4"
-                                                    HorizontalAlignment="Stretch"
+                                                    Margin="10,0,10,10"
+                                                    Padding="12"
                                                     Background="{DynamicResource PageBgBrush}"
                                                     BorderBrush="{DynamicResource StrokeBrush}"
                                                     BorderThickness="1"
                                                     CornerRadius="8">
+                                                    <UniformGrid Columns="4">
+                                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_UsedTides], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                            <TextBlock
+                                                                Margin="0,4,0,0"
+                                                                HorizontalAlignment="Center"
+                                                                FontSize="{StaticResource FontSizeXl}"
+                                                                Style="{StaticResource HeaderTextStyle}"
+                                                                Text="{Binding Calculate.Tides}" />
+                                                        </StackPanel>
+                                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_GoldCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                            <TextBlock
+                                                                Margin="0,4,0,0"
+                                                                HorizontalAlignment="Center"
+                                                                FontSize="{StaticResource FontSizeXl}"
+                                                                Style="{StaticResource HeaderTextStyle}"
+                                                                Text="{Binding Calculate.HitGoldCount}" />
+                                                        </StackPanel>
+                                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_AstriteCost], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                            <TextBlock
+                                                                Margin="0,4,0,0"
+                                                                HorizontalAlignment="Center"
+                                                                FontSize="{StaticResource FontSizeXl}"
+                                                                Style="{StaticResource HeaderTextStyle}"
+                                                                Text="{Binding Calculate.Astrites}" />
+                                                        </StackPanel>
+                                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_AvgGold], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                                                <TextBlock
+                                                                    Margin="0,4,0,0"
+                                                                    HorizontalAlignment="Center"
+                                                                    FontSize="{StaticResource FontSizeXl}"
+                                                                    Style="{StaticResource HeaderTextStyle}"
+                                                                    Text="{Binding Calculate.AvgGoldTide, StringFormat={}{0:F2}}" />
+                                                                <TextBlock
+                                                                    Margin="0,4,0,0"
+                                                                    HorizontalAlignment="Center"
+                                                                    FontSize="{StaticResource FontSizeXl}"
+                                                                    Style="{StaticResource HeaderTextStyle}"
+                                                                    Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </UniformGrid>
+                                                </Border>
+
+                                                <ItemsControl
+                                                    ItemsSource="{Binding HitGoldDatas}"
+                                                    ScrollViewer.CanContentScroll="True"
+                                                    VirtualizingStackPanel.IsVirtualizing="True"
+                                                    VirtualizingStackPanel.VirtualizationMode="Recycling">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border
+                                                                Margin="5,3"
+                                                                Padding="4"
+                                                                HorizontalAlignment="Stretch"
+                                                                Background="{DynamicResource PageBgBrush}"
+                                                                BorderBrush="{DynamicResource StrokeBrush}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="8">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                        <ColumnDefinition Width="12" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <StackPanel Grid.Column="0" Margin="10,0,0,0" HorizontalAlignment="Center">
+                                                                        <Image
+                                                                            Width="48"
+                                                                            Height="48"
+                                                                            HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center"
+                                                                            Source="{Binding GachaData.IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                                        <TextBlock
+                                                                            Width="49"
+                                                                            Margin="0,4,0,0"
+                                                                            HorizontalAlignment="Center"
+                                                                            FontSize="9"
+                                                                            Style="{StaticResource CaptionTextStyle}"
+                                                                            Text="{Binding GachaData.Time}"
+                                                                            TextAlignment="Center"
+                                                                            TextWrapping="WrapWithOverflow" />
+                                                                    </StackPanel>
+
+                                                                    <Grid Grid.Column="2">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                            <ColumnDefinition Width="*" />
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <StackPanel MinWidth="100" MaxWidth="200" Orientation="Horizontal">
+                                                                            <TextBlock
+                                                                                Grid.Column="0"
+                                                                                FontSize="15"
+                                                                                Foreground="{DynamicResource WarningTextBrush}"
+                                                                                Style="{StaticResource TitleTextStyle}"
+                                                                                TextTrimming="CharacterEllipsis">
+                                                                                <TextBlock.Text>
+                                                                                    <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
+                                                                                        <Binding Path="GachaData.ResourceId" />
+                                                                                        <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
+                                                                                        <Binding Path="GachaData.Name" />
+                                                                                    </MultiBinding>
+                                                                                </TextBlock.Text>
+                                                                            </TextBlock>
+                                                                        </StackPanel>
+
+
+                                                                        <StackPanel Grid.Column="1" Margin="10,0,5,0" VerticalAlignment="Center">
+                                                                            <ProgressBar
+                                                                                Height="20"
+                                                                                Background="Transparent"
+                                                                                BorderThickness="0"
+                                                                                Foreground="{DynamicResource SuccessTextBrush}"
+                                                                                Maximum="80"
+                                                                                Style="{StaticResource GachaBar}"
+                                                                                Value="{Binding Pity}" />
+                                                                            <ItemsControl Margin="0,5,0,0" ItemsSource="{Binding FourStarHistories}">
+                                                                                <ItemsControl.ItemsPanel>
+                                                                                    <ItemsPanelTemplate>
+                                                                                        <WrapPanel Orientation="Horizontal" />
+                                                                                    </ItemsPanelTemplate>
+                                                                                </ItemsControl.ItemsPanel>
+                                                                                <ItemsControl.ItemTemplate>
+                                                                                    <DataTemplate>
+                                                                                        <StackPanel Margin="0,0,8,0" Orientation="Horizontal">
+                                                                                            <Image Width="24" Height="24" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                                                            <TextBlock
+                                                                                                Margin="2,0,0,0"
+                                                                                                VerticalAlignment="Center"
+                                                                                                FontSize="10"
+                                                                                                Foreground="{DynamicResource TextBrush}"
+                                                                                                Text="{Binding Count, StringFormat='x{0}'}" />
+                                                                                        </StackPanel>
+                                                                                    </DataTemplate>
+                                                                                </ItemsControl.ItemTemplate>
+                                                                            </ItemsControl>
+                                                                        </StackPanel>
+                                                                    </Grid>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </ScrollViewer>
+
+                                        <Button
+                                            x:Name="BtnBackToTop"
+                                            Width="40"
+                                            Height="40"
+                                            Margin="0,0,20,20"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Bottom"
+                                            Background="{DynamicResource CardBgBrush}"
+                                            Opacity="0.8"
+                                            Style="{StaticResource SystemButtonStyle}"
+                                            Visibility="Collapsed">
+                                            <i:Interaction.Behaviors>
+                                                <b:ScrollToTopBehavior TargetScrollViewer="{Binding Source={x:Reference PART_ScrollViewer}}" />
+                                            </i:Interaction.Behaviors>
+                                            <Path
+                                                Width="16"
+                                                Height="16"
+                                                Data="M 10,20 L 10,6 M 4,12 L 10,6 L 16,12"
+                                                Stretch="Uniform"
+                                                Stroke="{DynamicResource TextMainBrush}"
+                                                StrokeEndLineCap="Round"
+                                                StrokeLineJoin="Round"
+                                                StrokeStartLineCap="Round"
+                                                StrokeThickness="2" />
+                                            <Button.Triggers>
+                                                <EventTrigger RoutedEvent="MouseEnter">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                                <EventTrigger RoutedEvent="MouseLeave">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0.8" Duration="0:0:0.2" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Button.Triggers>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="{Binding Path=[Stats_Charts], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='图表统计'}">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="10">
+                            <!-- 1. 筛选栏 -->
+                            <Border Margin="0,0,0,10" Padding="12" Background="{DynamicResource PageBgBrush}" BorderBrush="{DynamicResource StrokeBrush}" BorderThickness="1" CornerRadius="8">
+                                <StackPanel>
+                                    <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_Filter_DateRange], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='时间范围'}" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                        <ComboBox Width="150" SelectedIndex="{Binding SelectedDateRangeIndex}">
+                                            <ComboBoxItem Content="{Binding Path=[Stat_Filter_DateAll], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='全部记录'}" />
+                                            <ComboBoxItem Content="{Binding Path=[Stat_Filter_Date1Month], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='最近 1 个月'}" />
+                                            <ComboBoxItem Content="{Binding Path=[Stat_Filter_Date3Months], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='最近 3 个月'}" />
+                                        </ComboBox>
+                                        
+                                        <TextBlock Margin="20,0,10,0" VerticalAlignment="Center" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_Filter_Item], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='过滤特定五星 (明细时间轴)'}" />
+                                        <ComboBox Width="150" ItemsSource="{Binding AllGotGoldNames}" SelectedItem="{Binding SelectedGoldName}" />
+                                    </StackPanel>
+
+                                    <TextBlock Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_Filter_PoolType], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='筛选卡池'}" />
+                                    <ItemsControl ItemsSource="{Binding PoolFilters}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <CheckBox Margin="0,0,15,0" IsChecked="{Binding IsSelected}">
+                                                    <CheckBox.Content>
+                                                        <TextBlock Text="{Binding PoolType, Converter={StaticResource enumDescriptionConverter}}" Foreground="{DynamicResource TextMainBrush}" />
+                                                    </CheckBox.Content>
+                                                </CheckBox>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 2. 图表大屏 -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <Border Margin="0,0,10,10" Padding="12" Background="{DynamicResource PageBgBrush}" BorderBrush="{DynamicResource StrokeBrush}" BorderThickness="1" CornerRadius="8">
+                                        <StackPanel>
+                                            <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_MissRatePie], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='不歪概率环形图'}" />
+                                            <Grid Height="200">
+                                                <lvc:PieChart Background="Transparent" LegendPosition="Bottom" Series="{Binding SuccessRatePieSeries}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Margin="0,0,10,0" Padding="12" Background="{DynamicResource PageBgBrush}" BorderBrush="{DynamicResource StrokeBrush}" BorderThickness="1" CornerRadius="8">
+                                        <StackPanel>
+                                            <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_FourStarPieChart], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='四星获取比例'}" />
+                                            <Grid Height="200">
+                                                <lvc:PieChart Background="Transparent" LegendPosition="Bottom" Series="{Binding FourStarPieSeries}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <Border Grid.Column="1" Padding="12" Background="{DynamicResource PageBgBrush}" BorderBrush="{DynamicResource StrokeBrush}" BorderThickness="1" CornerRadius="8">
+                                    <StackPanel>
+                                        <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_PoolCompareChart], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='卡池综合对比分析'}" />
+                                        <Grid Height="450">
+                                            <lvc:CartesianChart Background="Transparent" Series="{Binding GlobalPoolCompareSeries}" TooltipPosition="Top" XAxes="{Binding GlobalPoolXAxes}" YAxes="{Binding GlobalPoolYAxes}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- 3. 微观明细流 -->
+                            <Border Margin="0,10,0,0" Padding="12" Background="{DynamicResource PageBgBrush}" BorderBrush="{DynamicResource StrokeBrush}" BorderThickness="1" CornerRadius="8">
+                                <StackPanel>
+                                    <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_PityBar], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='抽卡周期 (Pity)'}" />
+                                    <ItemsControl ItemsSource="{Binding FilteredHitGoldFlow}" ScrollViewer.CanContentScroll="True" VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Margin="5,3" Padding="4" HorizontalAlignment="Stretch" Background="{DynamicResource PageBgBrush}" CornerRadius="8">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="BorderBrush" Value="{DynamicResource StrokeBrush}" />
+                                                            <Setter Property="BorderThickness" Value="1" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsMiss}" Value="False">
+                                                                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                                                                    <Setter Property="BorderThickness" Value="2" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsMiss}" Value="True">
+                                                                    <Setter Property="BorderBrush" Value="{DynamicResource DangerTextBrush}" />
+                                                                    <Setter Property="BorderThickness" Value="2" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
                                                     <Grid>
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="Auto" />
@@ -482,21 +719,8 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <StackPanel Grid.Column="0" Margin="10,0,0,0" HorizontalAlignment="Center">
-                                                            <Image
-                                                                Width="48"
-                                                                Height="48"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalAlignment="Center"
-                                                                Source="{Binding GachaData.IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
-                                                            <TextBlock
-                                                                Width="49"
-                                                                Margin="0,4,0,0"
-                                                                HorizontalAlignment="Center"
-                                                                FontSize="9"
-                                                                Style="{StaticResource CaptionTextStyle}"
-                                                                Text="{Binding GachaData.Time}"
-                                                                TextAlignment="Center"
-                                                                TextWrapping="WrapWithOverflow" />
+                                                            <Image Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding GachaData.IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                            <TextBlock Width="49" Margin="0,4,0,0" HorizontalAlignment="Center" FontSize="9" Style="{StaticResource CaptionTextStyle}" Text="{Binding GachaData.Time}" TextAlignment="Center" TextWrapping="WrapWithOverflow" />
                                                         </StackPanel>
 
                                                         <Grid Grid.Column="2">
@@ -505,12 +729,7 @@
                                                                 <ColumnDefinition Width="*" />
                                                             </Grid.ColumnDefinitions>
                                                             <StackPanel MinWidth="100" MaxWidth="200" Orientation="Horizontal">
-                                                                <TextBlock
-                                                                    Grid.Column="0"
-                                                                    FontSize="15"
-                                                                    Foreground="Gold"
-                                                                    Style="{StaticResource TitleTextStyle}"
-                                                                    TextTrimming="CharacterEllipsis">
+                                                                <TextBlock Grid.Column="0" FontSize="15" Foreground="{DynamicResource WarningTextBrush}" Style="{StaticResource TitleTextStyle}" TextTrimming="CharacterEllipsis">
                                                                     <TextBlock.Text>
                                                                         <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
                                                                             <Binding Path="GachaData.ResourceId" />
@@ -520,18 +739,24 @@
                                                                     </TextBlock.Text>
                                                                 </TextBlock>
                                                             </StackPanel>
-
-
-                                                            <Grid Grid.Column="1" Margin="10,0,5,0" VerticalAlignment="Center">
-                                                                <ProgressBar
-                                                                    Height="20"
-                                                                    Background="Transparent"
-                                                                    BorderThickness="0"
-                                                                    Foreground="Green"
-                                                                    Maximum="80"
-                                                                    Style="{StaticResource GachaBar}"
-                                                                    Value="{Binding Pity}" />
-                                                            </Grid>
+                                                            <StackPanel Grid.Column="1" Margin="10,0,5,0" VerticalAlignment="Center">
+                                                                <ProgressBar Height="20" Background="Transparent" BorderThickness="0" Foreground="{DynamicResource SuccessTextBrush}" Maximum="80" Style="{StaticResource GachaBar}" Value="{Binding Pity}" />
+                                                                <ItemsControl ItemsSource="{Binding FourStarHistories}" Margin="0,5,0,0">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <WrapPanel Orientation="Horizontal" />
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <StackPanel Orientation="Horizontal" Margin="0,0,8,0">
+                                                                                <Image Width="16" Height="16" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                                                <TextBlock Text="{Binding Count, StringFormat='x{0}'}" FontSize="10" Foreground="{DynamicResource TextBrush}" Margin="2,0,0,0" VerticalAlignment="Center" />
+                                                                            </StackPanel>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
                                                         </Grid>
                                                     </Grid>
                                                 </Border>
@@ -539,52 +764,10 @@
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
                                 </StackPanel>
-                            </ScrollViewer>
-
-                            <Button
-                                x:Name="BtnBackToTop"
-                                Width="40"
-                                Height="40"
-                                Margin="0,0,20,20"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                Background="{DynamicResource CardBgBrush}"
-                                Opacity="0.8"
-                                Style="{StaticResource SystemButtonStyle}"
-                                Visibility="Collapsed">
-                                <i:Interaction.Behaviors>
-                                    <b:ScrollToTopBehavior TargetScrollViewer="{Binding Source={x:Reference PART_ScrollViewer}}" />
-                                </i:Interaction.Behaviors>
-                                <Path
-                                    Width="16"
-                                    Height="16"
-                                    Data="M 10,20 L 10,6 M 4,12 L 10,6 L 16,12"
-                                    Stretch="Uniform"
-                                    Stroke="{DynamicResource TextMainBrush}"
-                                    StrokeEndLineCap="Round"
-                                    StrokeLineJoin="Round"
-                                    StrokeStartLineCap="Round"
-                                    StrokeThickness="2" />
-                                <Button.Triggers>
-                                    <EventTrigger RoutedEvent="MouseEnter">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                    <EventTrigger RoutedEvent="MouseLeave">
-                                        <BeginStoryboard>
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0.8" Duration="0:0:0.2" />
-                                            </Storyboard>
-                                        </BeginStoryboard>
-                                    </EventTrigger>
-                                </Button.Triggers>
-                            </Button>
-                        </Grid>
-                    </DataTemplate>
-                </TabControl.ContentTemplate>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
             </TabControl>
         </Grid>
     </Grid>

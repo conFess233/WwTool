@@ -9,6 +9,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Typography.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Colors/GlassTheme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/ThemeBrushes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Images/Icons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/NavigationBar.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ButtonStyle.xaml" />
@@ -22,6 +23,7 @@
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ListBoxStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ToolTipStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/ComboBoxStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/SliderStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
