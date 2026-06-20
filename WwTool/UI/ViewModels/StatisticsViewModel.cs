@@ -147,8 +147,27 @@ namespace WwTool.UI.ViewModels
             get => _selectedUser;
             set
             {
-                _selectedUser = value;
-                RaisePropertyChanged();
+                if (SetProperty(ref _selectedUser, value))
+                {
+                    OnSelectedUserChanged(value);
+                }
+            }
+        }
+
+        private async void OnSelectedUserChanged(UserAccount? newUser)
+        {
+            if (newUser == null || string.IsNullOrEmpty(newUser.Uid)) return;
+
+            try
+            {
+                _configService.User.LastUserId = newUser.Uid;
+                await _configService.SaveAllAsync();
+
+                await LoadLocalGachaLog();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"切换账号并加载抽卡数据失败(UID: {newUser.Uid})", ex);
             }
         }
 
