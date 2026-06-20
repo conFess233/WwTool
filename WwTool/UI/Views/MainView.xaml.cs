@@ -59,15 +59,11 @@ namespace WwTool.UI.Views
             if (isEnabled)
             {
                 WindowBlurHelper.EnableBlur(this);
-
-                this.Background = (Brush)Application.Current.Resources["PageBgBrush"];
             }
             else
             {
                 // 移除底层 API 效果
                 WindowBlurHelper.DisableBlur(this);
-
-                this.Background = (Brush)Application.Current.Resources["SolidBgBrush"];
             }
         }
 

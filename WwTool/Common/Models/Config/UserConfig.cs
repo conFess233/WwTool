@@ -13,6 +13,7 @@ namespace WwTool.Common.Models.Config
         private string? _searchGachaApiUrl = "https://aki-gm-resources-oversea.aki-game.net/aki/gacha/index.html#/record?";
         private bool _autoLoadLocalData = true;
         private bool _isGlassEffectEnabled = true;
+        private int _glassOpacity = 40;
         private string _currentTheme = "DarkTheme"; // 默认加载深色主题
         private LanguageType _appLanguage = LanguageType.ZhHans;
 
@@ -27,6 +28,11 @@ namespace WwTool.Common.Models.Config
             {
                 SetProperty(ref _isGlassEffectEnabled, value);
             }
+        }
+        public int GlassOpacity
+        {
+            get => _glassOpacity;
+            set => SetProperty(ref _glassOpacity, value);
         }
         public string CurrentTheme
         {

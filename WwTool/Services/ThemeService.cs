@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -67,6 +67,18 @@ namespace WwTool.Services
             else
             {
                 mergedDicts.Insert(0, newThemeDict);
+            }
+
+            // 强制重新加载 ThemeBrushes.xaml 
+            var oldBrushesDict = mergedDicts.FirstOrDefault(d =>
+                d.Source != null && d.Source.OriginalString.Contains("ThemeBrushes.xaml"));
+
+            if (oldBrushesDict != null)
+            {
+                var brushesUri = oldBrushesDict.Source;
+                int brushesIndex = mergedDicts.IndexOf(oldBrushesDict);
+                mergedDicts.RemoveAt(brushesIndex);
+                mergedDicts.Insert(brushesIndex, new ResourceDictionary { Source = brushesUri });
             }
         }
     }

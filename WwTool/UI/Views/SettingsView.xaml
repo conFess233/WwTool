@@ -16,6 +16,7 @@
     </UserControl.RenderTransform>
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     </UserControl.Resources>
 
@@ -225,6 +226,19 @@
                             <Border Margin="10,0,0,0" HorizontalAlignment="Right">
                                 <ToggleButton IsChecked="{Binding User.IsGlassEffectEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SwitchToggleButtonStyle}" />
                             </Border>
+                        </StackPanel>
+
+                        <!-- 毛玻璃透明度调节 -->
+                        <StackPanel Margin="0,0,0,16" Visibility="{Binding User.IsGlassEffectEnabled, Converter={StaticResource BoolToVis}}">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <TextBlock FontSize="{StaticResource FontSizeBase}" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_GlassOpacity], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Style="{StaticResource CaptionTextStyle}" Text="{Binding User.GlassOpacity, StringFormat={}{0}%}" />
+                            </StackPanel>
+                            <Slider Style="{StaticResource ModernSliderStyle}" 
+                                    Minimum="0" Maximum="100" 
+                                    Value="{Binding User.GlassOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    IsSnapToTickEnabled="True" TickFrequency="1" />
+                            <TextBlock Margin="0,8,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_GlassOpacityHint], Source={x:Static utils:LanguageManager.Instance}}" />
                         </StackPanel>
                     </StackPanel>
                 </Border>

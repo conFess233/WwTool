@@ -94,6 +94,7 @@ namespace WwTool.UI.ViewModels
         /// 是否启用毛玻璃特效（从用户配置中读取）
         /// </summary>
         public bool IsGlassEffectEnabled => _configService.User.IsGlassEffectEnabled;
+        public double BackgroundOpacity => _configService.User.GlassOpacity / 100.0;
 
         public bool IsGlobalBlur
         {
@@ -124,6 +125,19 @@ namespace WwTool.UI.ViewModels
                 if (e.PropertyName == "Item[]")
                 {
                     UpdateNavTitles();
+                }
+            };
+
+            _configService.User.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(_configService.User.IsGlassEffectEnabled))
+                {
+                    RaisePropertyChanged(nameof(IsGlassEffectEnabled));
+                    RaisePropertyChanged(nameof(BackgroundOpacity));
+                }
+                else if (e.PropertyName == nameof(_configService.User.GlassOpacity))
+                {
+                    RaisePropertyChanged(nameof(BackgroundOpacity));
                 }
             };
         }

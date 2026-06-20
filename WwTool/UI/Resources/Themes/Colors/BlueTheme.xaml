@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Color x:Key="PageBgColor">#80EFF6FF</Color>
     <Color x:Key="CardBgColor">#B3FFFFFF</Color>
     <Color x:Key="SolidBgColor">#EFF6FF</Color>
@@ -41,77 +41,7 @@
     <Color x:Key="ShadowLightColor">#081E3A8A</Color>
     <Color x:Key="FocusShadowColor">#402563EB</Color>
 
-    <SolidColorBrush x:Key="PageBgBrush" Color="{DynamicResource PageBgColor}" />
-    <SolidColorBrush x:Key="CardBgBrush" Color="{DynamicResource CardBgColor}" />
-    <SolidColorBrush x:Key="SolidBgBrush" Color="{DynamicResource SolidBgColor}" />
-    <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}" />
-    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{DynamicResource PrimaryHoverColor}" />
-    <SolidColorBrush x:Key="TextMainBrush" Color="{DynamicResource TextMainColor}" />
-    <SolidColorBrush x:Key="TextSubBrush" Color="{DynamicResource TextSubColor}" />
-    <SolidColorBrush x:Key="TextPlaceholderBrush" Color="{DynamicResource TextPlaceholderColor}" />
-    <SolidColorBrush x:Key="ButtonTextBrush" Color="{DynamicResource ButtonTextColor}" />
-    <SolidColorBrush x:Key="HoverBgBrush" Color="{DynamicResource HoverBgColor}" />
-    <SolidColorBrush x:Key="ActiveBgBrush" Color="{DynamicResource ActiveBgColor}" />
-    <SolidColorBrush x:Key="ActiveTextBrush" Color="{DynamicResource ActiveTextColor}" />
-    <SolidColorBrush x:Key="DisabledBgBrush" Color="{DynamicResource DisabledBgColor}" />
-    <LinearGradientBrush x:Key="UnderLineBrush" StartPoint="0,0.5" EndPoint="1,0.5">
-        <GradientStop Offset="0" Color="{DynamicResource UnderLineTransparentColor}" />
-        <GradientStop Offset="0.5" Color="{DynamicResource UnderLineColor}" />
-        <GradientStop Offset="1" Color="{DynamicResource UnderLineTransparentColor}" />
-    </LinearGradientBrush>
-    <SolidColorBrush x:Key="StrokeBrush" Color="{DynamicResource StrokeColor}" />
-    <SolidColorBrush x:Key="TextBoxStrokeBrush" Color="{DynamicResource TextBoxStorkeColor}" />
-    <SolidColorBrush x:Key="ButtonBgBrush" Color="{DynamicResource ButtonBgColor}" />
-    <SolidColorBrush x:Key="ButtonStrokeBrush" Color="{DynamicResource ButtonStrokeColor}" />
-    <SolidColorBrush x:Key="CancelButtonBgBrush" Color="{DynamicResource CancelButtonBgColor}" />
-    <SolidColorBrush x:Key="CancelButtonHoverBrush" Color="{DynamicResource CancelButtonHoverColor}" />
-    <SolidColorBrush x:Key="CancelButtonStrokeBrush" Color="{DynamicResource CancelButtonStrokeColor}" />
-    <SolidColorBrush x:Key="OkButtonBgBrush" Color="{DynamicResource OkButtonBgColor}" />
-    <SolidColorBrush x:Key="OkButtonHoverBrush" Color="{DynamicResource OkButtonHoverColor}" />
-    <SolidColorBrush x:Key="OkButtonStrokeBrush" Color="{DynamicResource OkButtonStrokeColor}" />
-    <SolidColorBrush x:Key="CheckedBrush" Color="{DynamicResource CheckedColor}" />
-    <SolidColorBrush x:Key="SelectedBgBrush" Color="{DynamicResource SelectedBgColor}" />
-    <SolidColorBrush x:Key="UnselectedBgBrush" Color="{DynamicResource UnselectedBgColor}" />
-    <SolidColorBrush x:Key="ToggleOnBgBrush" Color="{DynamicResource ToggleOnBgColor}" />
-    <SolidColorBrush x:Key="ToggleOffBgBrush" Color="{DynamicResource ToggleOffBgColor}" />
-
-    <DropShadowEffect
-        x:Key="ShadowSm"
-        BlurRadius="5"
-        Direction="270"
-        Opacity="1"
-        RenderingBias="Performance"
-        ShadowDepth="2"
-        Color="{DynamicResource ShadowLightColor}" />
-    <DropShadowEffect
-        x:Key="NavBarShadow"
-        BlurRadius="5"
-        Direction="270"
-        Opacity="1"
-        RenderingBias="Performance"
-        ShadowDepth="2"
-        Color="{DynamicResource ShadowDarkColor}" />
-    <DropShadowEffect
-        x:Key="ShadowMd"
-        BlurRadius="12"
-        Direction="270"
-        Opacity="1"
-        RenderingBias="Performance"
-        ShadowDepth="4"
-        Color="{DynamicResource ShadowDarkColor}" />
-    <DropShadowEffect
-        x:Key="ShadowLg"
-        BlurRadius="40"
-        Direction="270"
-        Opacity="1"
-        RenderingBias="Performance"
-        ShadowDepth="12"
-        Color="{DynamicResource ShadowDarkColor}" />
-    <DropShadowEffect
-        x:Key="FocusShadow"
-        BlurRadius="12"
-        Opacity="0.1"
-        RenderingBias="Performance"
-        ShadowDepth="0"
-        Color="{DynamicResource FocusShadowColor}" />
+        <!-- Status Colors -->
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="SuccessColor">#10B981</Color>
 </ResourceDictionary>

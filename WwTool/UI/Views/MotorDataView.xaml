@@ -286,7 +286,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_EquippedSkin], Source={x:Static utils:LanguageManager.Instance}}" />
                             <StackPanel Grid.Column="1" Margin="8,0,0,0" Orientation="Horizontal">
-                                <TextBlock FontWeight="Bold" Foreground="Gold">
+                                <TextBlock FontWeight="Bold" Foreground="{DynamicResource WarningTextBrush}">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Text">
