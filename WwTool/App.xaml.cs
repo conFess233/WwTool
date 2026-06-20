@@ -9,6 +9,7 @@ using WwTool.Common;
 using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
+using WwTool.Services.Repositories;
 using WwTool.UI.ViewModels;
 using WwTool.UI.ViewModels.Dialogs;
 using WwTool.UI.Views;
@@ -180,6 +181,15 @@ namespace WwTool
             containerRegistry.RegisterInstance(provider.GetRequiredService<IHttpClientFactory>());
             containerRegistry.RegisterSingleton<LocalDataService>();
             containerRegistry.RegisterSingleton<GameDataService>();
+
+            // Repositories
+            containerRegistry.RegisterSingleton<IGachaRepository, GachaRepository>();
+            containerRegistry.RegisterSingleton<IUserRepository, UserRepository>();
+            containerRegistry.RegisterSingleton<IPlayerInfoRepository, PlayerInfoRepository>();
+
+            // Business Services
+            containerRegistry.RegisterSingleton<IGachaStatisticsService, GachaStatisticsService>();
+            containerRegistry.RegisterSingleton<IChartBuilderService, ChartBuilderService>();
 
             containerRegistry.RegisterSingleton<IConfigService, ConfigService>();
             containerRegistry.RegisterSingleton<ILoggerService, LoggerService>();

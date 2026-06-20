@@ -1,0 +1,219 @@
+<UserControl
+    x:Class="WwTool.UI.Views.UserControls.GlobalStatisticsControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    mc:Ignorable="d" 
+    d:DesignHeight="450" d:DesignWidth="800">
+    <Expander
+        Margin="10"
+        Header="{Binding Path=[Stats_Overview], Source={x:Static utils:LanguageManager.Instance}}"
+        IsExpanded="True">
+        <Border
+            Margin="0,10,0,0"
+            Padding="12"
+            BorderBrush="{DynamicResource StrokeBrush}"
+            BorderThickness="1"
+            CornerRadius="6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_GameId], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{Binding UserId}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_TotalTides], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{Binding TotalTides}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_TotalAstrites], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{Binding TotalAstrites}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="3"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_MissCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{Binding MissCount}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="4"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_AvgLimitChara], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,5"
+                            HorizontalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{Binding AvgLimitCharaTide, StringFormat={}{0:F2}}" />
+                        <TextBlock
+                            Margin="0,5"
+                            HorizontalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_SuccessCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{Binding SuccessCount}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_SuccessRate], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{Binding SuccessRate, StringFormat={}{0:F2} %}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_LimitGoldCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{Binding LimitedGoldCount}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="3"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_TotalGoldCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Text="{Binding TotalHitGold}" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="4"
+                    HorizontalAlignment="Center"
+                    Orientation="Vertical">
+                    <TextBlock
+                        Margin="10,5"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource SubtitleTextStyle}"
+                        Text="{Binding Path=[Stat_AvgChara], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,5"
+                            HorizontalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{Binding AvgCharaTide, StringFormat={}{0:F2}}" />
+                        <TextBlock
+                            Margin="0,5"
+                            HorizontalAlignment="Center"
+                            FontWeight="SemiBold"
+                            Text="{Binding Path=[Unit_Pull], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Expander>
+</UserControl>
