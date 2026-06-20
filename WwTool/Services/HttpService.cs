@@ -27,17 +27,21 @@ namespace WwTool.Services
         /// <summary>
         /// GET 请求
         /// </summary>
+        /// <summary>
+        /// GET 请求
+        /// </summary>
         public async Task<T?> GetAsync<T>(string url, Dictionary<string, string>? dynamicHeaders = null)
         {
-            using var client = CreateClient();
+            var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             ApplyHeaders(request, dynamicHeaders);
 
-            using var response = await client.SendAsync(request);
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var response = await client.SendAsync(request, cts.Token);
             response.EnsureSuccessStatusCode();
 
-            string json = await response.Content.ReadAsStringAsync();
+            string json = await response.Content.ReadAsStringAsync(cts.Token);
             return JsonSerializer.Deserialize<T>(json, _jsonOptions);
         }
 
@@ -46,7 +50,7 @@ namespace WwTool.Services
         /// </summary>
         public async Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data, Dictionary<string, string>? dynamicHeaders = null)
         {
-            using var client = CreateClient();
+            var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Post, url);
 
             ApplyHeaders(request, dynamicHeaders);
@@ -56,13 +60,15 @@ namespace WwTool.Services
 
             _logger.Debug($"HTTP POST 请求: {url}");
             var startTime = DateTime.Now;
-            using var response = await client.SendAsync(request);
+            
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var response = await client.SendAsync(request, cts.Token);
             var duration = (DateTime.Now - startTime).TotalMilliseconds;
             _logger.Debug($"HTTP POST 响应: {(int)response.StatusCode} (耗时: {duration}ms)");
 
             response.EnsureSuccessStatusCode();
 
-            string result = await response.Content.ReadAsStringAsync();
+            string result = await response.Content.ReadAsStringAsync(cts.Token);
             return JsonSerializer.Deserialize<TResponse>(result, _jsonOptions);
         }
 
@@ -71,7 +77,7 @@ namespace WwTool.Services
         /// </summary>
         public async Task<TResponse?> PostFormAsync<TResponse>(string url, Dictionary<string, string> formData, Dictionary<string, string>? dynamicHeaders = null)
         {
-            using var client = CreateClient();
+            var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Post, url);
 
             ApplyHeaders(request, dynamicHeaders);
@@ -80,13 +86,15 @@ namespace WwTool.Services
 
             _logger.Debug($"HTTP POST FORM 请求: {url}");
             var startTime = DateTime.Now;
-            using var response = await client.SendAsync(request);
+            
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var response = await client.SendAsync(request, cts.Token);
             var duration = (DateTime.Now - startTime).TotalMilliseconds;
             _logger.Debug($"HTTP POST FORM 响应: {(int)response.StatusCode} (耗时: {duration}ms)");
 
             response.EnsureSuccessStatusCode();
 
-            string result = await response.Content.ReadAsStringAsync();
+            string result = await response.Content.ReadAsStringAsync(cts.Token);
             return JsonSerializer.Deserialize<TResponse>(result, _jsonOptions);
         }
 
@@ -114,9 +122,7 @@ namespace WwTool.Services
 
         private HttpClient CreateClient()
         {
-            var client = _factory.CreateClient("WwToolClient");
-            client.Timeout = TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds);
-            return client;
+            return _factory.CreateClient("WwToolClient");
         }
     }
 }

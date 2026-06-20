@@ -13,6 +13,7 @@ namespace WwTool.Services.Interfaces
         Task SaveAllAsync();
 
         // 同步
+        void SaveAll();
 
         void LoadAll();
     }

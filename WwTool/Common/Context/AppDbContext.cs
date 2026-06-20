@@ -18,12 +18,17 @@ namespace WwTool.Common.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // 确保本地数据文件夹存在
-            Directory.CreateDirectory("Local/Data");
-            string dbPath = Path.Combine("Local/Data", "LocalData.db");
+            // 确保本地数据文件夹存在（使用 AppDomain.CurrentDomain.BaseDirectory 保证绝对路径）
+            string dbDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Local", "Data");
+            string dbPath = Path.Combine(dbDir, "LocalData.db");
 
-            // 配置使用 SQLite
-            optionsBuilder.UseSqlite($"Data Source={dbPath}");
+            if (!Directory.Exists(dbDir))
+            {
+                Directory.CreateDirectory(dbDir);
+            }
+
+            // 配置使用 SQLite 并开启 Busy Timeout 与 Foreign Keys 约束
+            optionsBuilder.UseSqlite($"Data Source={dbPath};Default Timeout=3;Foreign Keys=True");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -71,7 +71,7 @@ namespace WwTool.Common.Models.ApiResponse
         /// 角色 ID
         /// </summary>
         [JsonPropertyName("Id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 创建时间

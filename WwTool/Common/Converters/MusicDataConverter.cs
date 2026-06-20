@@ -73,7 +73,18 @@ namespace WwTool.Common.Converters
 
         public override void Write(Utf8JsonWriter writer, List<RoleMusicData> value, JsonSerializerOptions options)
         {
-            JsonSerializer.Serialize(writer, value, options);
+            if (value == null)
+            {
+                writer.WriteNullValue();
+                return;
+            }
+
+            writer.WriteStartArray();
+            foreach (var item in value)
+            {
+                JsonSerializer.Serialize(writer, item, options);
+            }
+            writer.WriteEndArray();
         }
     }
 }

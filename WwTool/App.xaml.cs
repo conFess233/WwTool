@@ -1,13 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
-using System.Data;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using WwTool.Common;
@@ -144,7 +139,14 @@ namespace WwTool
         protected override void OnExit(ExitEventArgs e)
         {
             var configService = Container.Resolve<IConfigService>();
-            configService.SaveAllAsync();
+            try
+            {
+                configService.SaveAll();
+            }
+            catch (Exception ex)
+            {
+                // 忽略或记录保存失败异常，防止退出崩溃
+            }
             base.OnExit(e);
         }
 

@@ -66,7 +66,29 @@ namespace WwTool.Services
         /// </summary>
         public void LoadResources()
         {
-            LoadResourcesAsync().GetAwaiter().GetResult();
+            if (!File.Exists(_gameItemsResourcesPath))
+            {
+                _logger.Warn($"未找到游戏物品资源文件: {_gameItemsResourcesPath}");
+                return;
+            }
+
+            try
+            {
+                _logger.Info($"正在同步加载游戏物品资源: {_gameItemsResourcesPath}");
+                string json = File.ReadAllText(_gameItemsResourcesPath);
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+                var data = JsonSerializer.Deserialize<Dictionary<int, GameItemInfo>>(json, options);
+                if (data != null)
+                {
+                    Items = data;
+                    _logger.Debug($"成功同步加载 {Items.Count} 个游戏物品。");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("同步读取或解析游戏物品资源失败", ex);
+            }
         }
 
         /// <summary>

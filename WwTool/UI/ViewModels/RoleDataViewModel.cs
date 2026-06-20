@@ -2,7 +2,6 @@ using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using WwTool.Common.Enums;
 using WwTool.Common.Models;
@@ -31,6 +30,10 @@ namespace WwTool.UI.ViewModels
         /// 本地数据库服务
         /// </summary>
         private readonly LocalDataService _localDb;
+        /// <summary>
+        /// 配置服务
+        /// </summary>
+        private readonly IConfigService _configService;
 
         /// <summary>
         /// 当前加载的角色详情数据
@@ -63,8 +66,27 @@ namespace WwTool.UI.ViewModels
             get => _selectedUser;
             set
             {
-                _selectedUser = value;
-                RaisePropertyChanged();
+                if (SetProperty(ref _selectedUser, value))
+                {
+                    OnSelectedUserChanged(value);
+                }
+            }
+        }
+
+        private async void OnSelectedUserChanged(UserAccount? newUser)
+        {
+            if (newUser == null || string.IsNullOrEmpty(newUser.Uid)) return;
+
+            try
+            {
+                _configService.User.LastUserId = newUser.Uid;
+                await _configService.SaveAllAsync();
+
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"切换账号并加载角色数据失败(UID: {newUser.Uid})", ex);
             }
         }
 
@@ -93,12 +115,13 @@ namespace WwTool.UI.ViewModels
         public DelegateCommand SyncDataCommand { get; }
 
         private readonly ILoggerService _logger;
-        public RoleDataViewModel(IGetDataService getDataService, IUIStateService uiStateService, LocalDataService localDb, ILoggerService logger)
+        public RoleDataViewModel(IGetDataService getDataService, IUIStateService uiStateService, LocalDataService localDb, ILoggerService logger, IConfigService configService)
         {
             _getDataService = getDataService;
             _uiStateService = uiStateService;
             _localDb = localDb;
             _logger = logger;
+            _configService = configService;
             Users = new();
             RefreshCommand = new DelegateCommand(async () => await LoadDataAsync());
             RefreshLocalAccountCommand = new DelegateCommand(async () => await RefreshLocalAccount());
@@ -188,7 +211,7 @@ namespace WwTool.UI.ViewModels
         }
 
         /// <summary>
-        /// 刷新本地用户账号列表并默认选中第一个用户
+        /// 刷新本地用户账号列表并优先选中上次选择的用户
         /// </summary>
         private async Task RefreshLocalAccount()
         {
@@ -202,7 +225,14 @@ namespace WwTool.UI.ViewModels
 
             if (Users != null && Users.Any())
             {
-                SelectedUser = Users.First(); // 默认选中第一个用户
+                if (!string.IsNullOrEmpty(_configService.User.LastUserId))
+                {
+                    SelectedUser = Users.FirstOrDefault(u => u.Uid == _configService.User.LastUserId) ?? Users.First();
+                }
+                else
+                {
+                    SelectedUser = Users.First();
+                }
             }
             _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Msg_ReadAccountsSuccess"], Users.Count), NotificationType.Success);
         }
@@ -215,8 +245,15 @@ namespace WwTool.UI.ViewModels
             if (!_isLoaded)
             {
                 _isLoaded = true;
-                await RefreshLocalAccount(); // 刷新本地用户信息
-                await LoadDataAsync();
+                try
+                {
+                    await RefreshLocalAccount(); // 刷新本地用户信息
+                    await LoadDataAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error("进入角色数据页面并进行初始化数据加载时捕获到异常", ex);
+                }
             }
 
         }

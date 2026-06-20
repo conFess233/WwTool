@@ -67,7 +67,13 @@ namespace WwTool.Services
                 if (string.IsNullOrEmpty(request.Area))
                     request.Area = apiConf.FixedParams.Area;
                 if (string.IsNullOrEmpty(request.Token))
+                {
+                    if (!string.IsNullOrEmpty(request.UserId))
+                    {
+                        _loginService.SwitchUserContext(request.UserId);
+                    }
                     request.Token = _loginService.LoginContext.AccessToken;
+                }
 
                 string queryParams = $"?loginType={request.LoginType}" +
                                      $"&userId={request.UserId}" +
@@ -226,6 +232,8 @@ namespace WwTool.Services
 
             var playerRegion = System.Text.Json.JsonSerializer.Deserialize<PlayerRegionInfo>(targetRegionDataJson);
             if (playerRegion == null) throw new WwToolApiException("解析玩家角色信息失败");
+
+            _loginService.SwitchUserContext(playerRegion.RoleId);
 
             await _localDb.SavePlayerRegionInfoAsync(playerRegion, targetRegion, oauthCode);
             return playerRegion;

@@ -84,6 +84,29 @@ namespace WwTool.Services
         }
 
         /// <summary>
+        /// 同步保存所有配置
+        /// </summary>
+        public void SaveAll()
+        {
+            SaveSync(App, _appConfigPath);
+            SaveSync(Api, _apiConfigPath);
+            SaveSync(User, _userConfigPath);
+        }
+
+        private void SaveSync<T>(T config, string path)
+        {
+            try
+            {
+                if (!Directory.Exists(_configFolder)) Directory.CreateDirectory(_configFolder);
+                File.WriteAllText(path, JsonSerializer.Serialize(config, _jsonOptions));
+            }
+            catch
+            {
+                // 忽略高频写入时的文件锁定异常
+            }
+        }
+
+        /// <summary>
         /// 用户配置变化时，触发自动保存
         /// </summary>
         /// <param name="sender"></param>
