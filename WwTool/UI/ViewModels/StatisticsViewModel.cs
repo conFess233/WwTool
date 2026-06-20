@@ -75,7 +75,8 @@ namespace WwTool.UI.ViewModels
 
             _configService.User.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(_configService.User.CurrentTheme))
+                if (e.PropertyName == nameof(_configService.User.CurrentTheme) ||
+                    e.PropertyName == nameof(_configService.User.AppLanguage))
                 {
                     Task.Delay(50).ContinueWith(_ =>
                     {
@@ -524,7 +525,7 @@ namespace WwTool.UI.ViewModels
                 {
                     foreach (var type in Enum.GetValues<CardPoolType>())
                     {
-                        _uiStateService.ShowLoading(string.Format(LanguageManager.Instance["Msg_SyncingPool"], EnumExtensions.GetDescription(type)));
+                        _uiStateService.ShowLoading(string.Format(LanguageManager.Instance["Msg_SyncingPool"], type.GetLocalizedDescription()));
                         var gachaData = await GetGachaLog((int)type);
                         await _gachaRepository.SyncGachaDataAsync(SelectedUser.Uid, (int)type, gachaData);
                     }
@@ -640,7 +641,8 @@ namespace WwTool.UI.ViewModels
 
                         if (hit.GachaData.ResourceId == 0) continue;
 
-                        if (!string.IsNullOrEmpty(SelectedGoldName) && SelectedGoldName != (LanguageManager.Instance["Stat_All"] ?? "全部") && hit.GachaData.Name != SelectedGoldName && hit.GachaData.ResourceId != 0) continue;
+                        string localizedGoldName = GetLocalizedItemName(hit.GachaData.ResourceId, hit.GachaData.Name);
+                        if (!string.IsNullOrEmpty(SelectedGoldName) && SelectedGoldName != (LanguageManager.Instance["Stat_All"] ?? "全部") && localizedGoldName != SelectedGoldName && hit.GachaData.ResourceId != 0) continue;
 
                         flowDatas.Add(hit);
                     }
@@ -652,16 +654,64 @@ namespace WwTool.UI.ViewModels
                     FilteredHitGoldFlow = new ObservableCollection<HitGoldData>(flowDatas.OrderByDescending(x => x.GachaData.Time));
                 });
 
-                // 提取所有的五星供下拉框选择
-                var allGolds = _allCachedGachaDatas.Where(x => x.QualityLevel == 5).Select(x => x.Name).Distinct().ToList();
+                // 提取所有的五星供下拉框选择并进行翻译
+                var goldItems = _allCachedGachaDatas
+                    .Where(x => x.QualityLevel == 5)
+                    .GroupBy(x => x.ResourceId)
+                    .Select(g => new { ResourceId = g.Key, OriginalName = g.First().Name })
+                    .ToList();
+
+                var allGolds = goldItems.Select(x => GetLocalizedItemName(x.ResourceId, x.OriginalName)).Distinct().ToList();
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     var curSelected = SelectedGoldName;
+                    bool wasAllSelected = string.IsNullOrEmpty(curSelected) || 
+                                          curSelected == "全部" || 
+                                          curSelected == "All" || 
+                                          curSelected == "全て" || 
+                                          curSelected == (LanguageManager.Instance["Stat_All"] ?? "全部");
+
                     AllGotGoldNames.Clear();
-                    AllGotGoldNames.Add(LanguageManager.Instance["Stat_All"] ?? "全部");
+                    string localizedAll = LanguageManager.Instance["Stat_All"] ?? "全部";
+                    AllGotGoldNames.Add(localizedAll);
                     foreach (var g in allGolds) AllGotGoldNames.Add(g);
-                    if (!string.IsNullOrEmpty(curSelected) && AllGotGoldNames.Contains(curSelected)) SelectedGoldName = curSelected;
-                    else SelectedGoldName = LanguageManager.Instance["Stat_All"] ?? "全部";
+
+                    if (wasAllSelected)
+                    {
+                        SelectedGoldName = localizedAll;
+                    }
+                    else
+                    {
+                        int selectedResourceId = 0;
+                        foreach (var g in goldItems)
+                        {
+                            if (GetLocalizedItemName(g.ResourceId, g.OriginalName, LanguageType.ZhHans) == curSelected ||
+                                GetLocalizedItemName(g.ResourceId, g.OriginalName, LanguageType.En) == curSelected ||
+                                GetLocalizedItemName(g.ResourceId, g.OriginalName, LanguageType.Ja) == curSelected)
+                            {
+                                selectedResourceId = g.ResourceId;
+                                break;
+                            }
+                        }
+
+                        if (selectedResourceId != 0)
+                        {
+                            string newSelectedName = GetLocalizedItemName(selectedResourceId, "");
+                            if (AllGotGoldNames.Contains(newSelectedName))
+                            {
+                                SelectedGoldName = newSelectedName;
+                            }
+                            else
+                            {
+                                SelectedGoldName = localizedAll;
+                            }
+                        }
+                        else
+                        {
+                            SelectedGoldName = localizedAll;
+                        }
+                    }
                 });
 
                 // 四星及歪率
@@ -706,7 +756,7 @@ namespace WwTool.UI.ViewModels
                     int tides = pData.Count;
                     int goldCount = pData.Count(x => x.QualityLevel == 5);
 
-                    compareXLabels.Add(EnumExtensions.GetDescription(type));
+                    compareXLabels.Add(type.GetLocalizedDescription());
                     tidesData.Add(tides);
                     astritesData.Add(tides * 160);
                     avgTideData.Add(goldCount > 0 ? (double)tides / goldCount : 0);
@@ -739,7 +789,9 @@ namespace WwTool.UI.ViewModels
                     else
                     {
                         ((PieSeries<int>)SuccessRatePieSeries[0]).Values = new[] { success };
+                        ((PieSeries<int>)SuccessRatePieSeries[0]).Name = LanguageManager.Instance["Stat_SuccessCount"] ?? "不歪";
                         ((PieSeries<int>)SuccessRatePieSeries[1]).Values = new[] { miss };
+                        ((PieSeries<int>)SuccessRatePieSeries[1]).Name = LanguageManager.Instance["Stat_MissCount"] ?? "歪卡";
                     }
 
                     if (FourStarPieSeries == null)
@@ -753,7 +805,9 @@ namespace WwTool.UI.ViewModels
                     else
                     {
                         ((PieSeries<int>)FourStarPieSeries[0]).Values = new[] { fourStarCharacterCount };
+                        ((PieSeries<int>)FourStarPieSeries[0]).Name = LanguageManager.Instance["Role"] ?? "角色";
                         ((PieSeries<int>)FourStarPieSeries[1]).Values = new[] { fourStarWeaponCount };
+                        ((PieSeries<int>)FourStarPieSeries[1]).Name = LanguageManager.Instance["Weapon"] ?? "武器";
                     }
 
                     if (GlobalPoolCompareSeries == null)
@@ -774,8 +828,15 @@ namespace WwTool.UI.ViewModels
                     else
                     {
                         ((ColumnSeries<int>)GlobalPoolCompareSeries[0]).Values = tidesData;
+                        ((ColumnSeries<int>)GlobalPoolCompareSeries[0]).Name = LanguageManager.Instance["Stat_TotalTides"] ?? "抽数";
                         ((LineSeries<double>)GlobalPoolCompareSeries[1]).Values = avgTideData;
+                        ((LineSeries<double>)GlobalPoolCompareSeries[1]).Name = LanguageManager.Instance["Stat_AvgGold"] ?? "平均水位";
                         GlobalPoolXAxes[0].Labels = compareXLabels;
+                        if (GlobalPoolYAxes != null && GlobalPoolYAxes.Length >= 2)
+                        {
+                            GlobalPoolYAxes[0].Name = LanguageManager.Instance["Stat_TotalTides"] ?? "Count";
+                            GlobalPoolYAxes[1].Name = LanguageManager.Instance["Stat_AvgGold"] ?? "Avg Tide";
+                        }
                     }
                 });
             }
@@ -783,6 +844,18 @@ namespace WwTool.UI.ViewModels
             {
                 _isUpdatingCharts = false;
             }
+        }
+
+        private string GetLocalizedItemName(int resourceId, string defaultName, LanguageType? lang = null)
+        {
+            if (resourceId == 0) return defaultName;
+            var itemInfo = _gameData.GetItemById(resourceId);
+            if (itemInfo != null)
+            {
+                string code = lang?.GetCode() ?? LanguageManager.Instance.CurrentLanguage.GetCode();
+                return itemInfo.GetName(code) ?? defaultName;
+            }
+            return defaultName;
         }
 
         private int ParsePoolType(string poolStr)
