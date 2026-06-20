@@ -1598,6 +1598,7 @@
     <PackageReference Include="SourceGear.sqlite3" Version="3.50.4.5" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
     <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3" Version="3.0.3" />
+    <PackageReference Include="System.Runtime.Caching" Version="10.0.9" />
     <PackageReference Include="XamlAnimatedGif" Version="2.3.2" />
   </ItemGroup>
 

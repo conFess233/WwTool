@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Runtime.Caching;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +18,7 @@ namespace WwTool.Common.Converters
     public class ImageConverter : IValueConverter
     {
         // 图片缓存
-        private static readonly ConcurrentDictionary<string, BitmapImage> cache = new();
+        private static readonly MemoryCache cache = MemoryCache.Default;
 
         private const string DefaultImg = "pack://application:,,,/UI/Resources/Images/Default.png";
 
@@ -71,7 +72,7 @@ namespace WwTool.Common.Converters
         // 缓存
         private BitmapImage LoadImage(string url)
         {
-            if (cache.TryGetValue(url, out var cachedBitmap))
+            if (cache.Get(url) is BitmapImage cachedBitmap)
             {
                 return cachedBitmap;
             }
@@ -92,8 +93,9 @@ namespace WwTool.Common.Converters
                 // 冻结对象
                 bitmap.Freeze();
 
-                // 加入缓存
-                cache.TryAdd(url, bitmap);
+                // 加入缓存 (滑动过期 5 分钟)
+                var policy = new CacheItemPolicy { SlidingExpiration = TimeSpan.FromMinutes(5) };
+                cache.Set(url, bitmap, policy);
                 return bitmap;
             }
             catch (Exception ex)

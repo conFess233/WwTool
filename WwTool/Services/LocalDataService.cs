@@ -157,8 +157,8 @@ namespace WwTool.Services
                 return records.Select(r => new GachaData
                 {
                     ResourceId = r.ResourceId,
-                    Name = r.Name ?? "",
-                    ResourceType = r.ResourceType ?? "",
+                    Name = r.Name != null ? string.Intern(r.Name) : "",
+                    ResourceType = r.ResourceType != null ? string.Intern(r.ResourceType) : "",
                     QualityLevel = r.QualityLevel,
                     Time = r.Time
                 }).ToList();
@@ -186,9 +186,9 @@ namespace WwTool.Services
                 return records.Select(r => new GachaData
                 {
                     ResourceId = r.ResourceId,
-                    CardPoolType = EnumExtensions.GetDescription((CardPoolType)poolType), // 将卡池类型转换为描述
-                    Name = r.Name ?? "",
-                    ResourceType = r.ResourceType ?? "",
+                    CardPoolType = string.Intern(EnumExtensions.GetDescription((CardPoolType)poolType)), // 将卡池类型转换为描述
+                    Name = r.Name != null ? string.Intern(r.Name) : "",
+                    ResourceType = r.ResourceType != null ? string.Intern(r.ResourceType) : "",
                     QualityLevel = r.QualityLevel,
                     Time = r.Time
                 }).ToList();
