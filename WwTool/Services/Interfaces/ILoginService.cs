@@ -14,6 +14,8 @@ namespace WwTool.Services.Interfaces
     {
         LoginContext LoginContext { get; }
 
+        void SwitchUserContext(string uid);
+
         Task<EmailLoginResponse?> EmailLoginAsync(EmailLoginRequest request);
         Task<GenerateResponse?> GenerateAsync(GenerateRequest request);
 

@@ -19,6 +19,8 @@ namespace WwTool.Services
         private readonly IConfigService _configService;
         private readonly ILoggerService _logger;
         private LoginContext _loginContext;
+        private readonly Dictionary<string, LoginContext> _userContexts = new();
+        private string _currentUid = string.Empty;
 
         /// <summary>
         /// 登录过程的上下文，包含登录状态和相关数据，以便后续验证
@@ -31,6 +33,29 @@ namespace WwTool.Services
             _configService = configService;
             _logger = logger;
             _loginContext = new LoginContext();
+        }
+
+        /// <summary>
+        /// 根据指定的 UID 切换内存中的登录上下文
+        /// </summary>
+        public void SwitchUserContext(string uid)
+        {
+            if (string.IsNullOrEmpty(uid)) return;
+
+            if (!_userContexts.TryGetValue(uid, out var context))
+            {
+                if (string.IsNullOrEmpty(_currentUid) && _loginContext != null && !string.IsNullOrEmpty(_loginContext.AccessToken))
+                {
+                    context = _loginContext;
+                }
+                else
+                {
+                    context = new LoginContext();
+                }
+                _userContexts[uid] = context;
+            }
+            _loginContext = context;
+            _currentUid = uid;
         }
 
         /// <summary>
