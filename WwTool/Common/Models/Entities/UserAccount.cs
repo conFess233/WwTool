@@ -4,12 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace WwTool.Common.Models
+namespace WwTool.Common.Models.Entities
 {
     /// <summary>
     /// 用户账号数据库模型
     /// </summary>
-    public class UserAccount : BaseModel
+    public class UserAccount
     {
         /// <summary>
         /// 用户 UID
@@ -32,7 +32,10 @@ namespace WwTool.Common.Models
 
         public int HeadPhoto { get; set; } = 0;
         public string IconPath => $"Local/Icons/{HeadPhoto}.png";
+        public DateTimeOffset? LastSyncedAtUtc { get; set; }
 
         public ICollection<GachaRecord> GachaRecords { get; set; } = new List<GachaRecord>();
+        public ICollection<GachaImportBatch> GachaImportBatches { get; set; } = [];
+        public ICollection<SyncState> SyncStates { get; set; } = [];
     }
 }

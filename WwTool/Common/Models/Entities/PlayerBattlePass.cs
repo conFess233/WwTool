@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WwTool.Common.Models
+namespace WwTool.Common.Models.Entities
 {
     public class PlayerBattlePass
     {
@@ -15,6 +15,7 @@ namespace WwTool.Common.Models
         public bool IsOpen { get; set; }
         public int Exp { get; set; }
         public int ExpLimit { get; set; }
+        public DateTimeOffset? LastSyncedAtUtc { get; set; }
 
         [ForeignKey("Uid")]
         public virtual UserAccount? UserAccount { get; set; }

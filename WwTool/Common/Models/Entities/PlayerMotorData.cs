@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WwTool.Common.Models
+namespace WwTool.Common.Models.Entities
 {
     public class PlayerMotorData
     {
@@ -19,6 +19,7 @@ namespace WwTool.Common.Models
 
         public int EquipSkinId { get; set; }
         public int EquipSkinQuality { get; set; }
+        public DateTimeOffset? LastSyncedAtUtc { get; set; }
 
         [ForeignKey("Uid")]
         public virtual UserAccount? UserAccount { get; set; }

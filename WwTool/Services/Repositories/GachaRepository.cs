@@ -1,220 +1,219 @@
+using System.Globalization;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WwTool.Common.Context;
 using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 using WwTool.Common.Models.ApiResponse;
 using WwTool.Extensions;
 using WwTool.Services.Interfaces;
 
-namespace WwTool.Services.Repositories
+namespace WwTool.Services.Repositories;
+
+public sealed class GachaRepository(
+    IDbContextFactory<AppDbContext> contextFactory,
+    IDatabaseWriteCoordinator writeCoordinator,
+    ILoggerService logger) : IGachaRepository
 {
-    public class GachaRepository : IGachaRepository
+    public async Task<IReadOnlyList<GachaData>> GetAllRecordsByUidAsync(
+        string uid,
+        CancellationToken cancellationToken = default)
     {
-        private readonly ILoggerService _logger;
-        private readonly System.Threading.SemaphoreSlim _writeLock = new System.Threading.SemaphoreSlim(1, 1);
-
-        public GachaRepository(ILoggerService logger)
+        try
         {
-            _logger = logger;
+            await using AppDbContext db = await contextFactory.CreateDbContextAsync(cancellationToken);
+            List<GachaRecord> records = await db.GachaRecords.AsNoTracking()
+                .Where(x => x.Uid == uid)
+                .OrderBy(x => x.SourceOrder)
+                .ToListAsync(cancellationToken);
+            return records.Select(x => ToApiModel(x)).ToList();
         }
-
-        public (string? LatestTime, int Count) GetLatestRecordInfo(string uid, int poolType)
+        catch (Exception ex)
         {
-            try
-            {
-                using var db = new AppDbContext();
-
-                var latestTime = db.GachaRecords
-                    .Where(x => x.Uid == uid && x.PoolType == poolType)
-                    .OrderByDescending(x => x.Time)
-                    .Select(x => x.Time)
-                    .FirstOrDefault();
-
-                if (string.IsNullOrEmpty(latestTime))
-                    return (null, 0);
-
-                int count = db.GachaRecords
-                    .Count(x => x.Uid == uid && x.PoolType == poolType && x.Time == latestTime);
-
-                return (latestTime, count);
-            }
-            catch (Exception ex)
-            {
-                throw new WwToolDatabaseException($"查询本地最新记录信息失败(Uid: {uid}, PoolType: {poolType})", ex);
-            }
+            throw new WwToolDatabaseException("读取本地抽卡记录失败。", ex);
         }
+    }
 
-        public void DeleteRecordsAtTime(string uid, int poolType, string time)
+    public async Task<IReadOnlyList<GachaData>> GetPoolRecordsByUidAsync(
+        string uid,
+        int poolType,
+        CancellationToken cancellationToken = default)
+    {
+        try
         {
-            try
-            {
-                using var db = new AppDbContext();
-
-                db.GachaRecords
-                    .Where(x => x.Uid == uid && x.PoolType == poolType && x.Time == time)
-                    .ExecuteDelete();
-            }
-            catch (Exception ex)
-            {
-                throw new WwToolDatabaseException($"删除本地特定时间点记录失败(Uid: {uid}, Time: {time})", ex);
-            }
+            await using AppDbContext db = await contextFactory.CreateDbContextAsync(cancellationToken);
+            List<GachaRecord> records = await db.GachaRecords.AsNoTracking()
+                .Where(x => x.Uid == uid && x.PoolType == poolType)
+                .OrderBy(x => x.SourceOrder)
+                .ToListAsync(cancellationToken);
+            return records.Select(x => ToApiModel(x, poolType)).ToList();
         }
-
-        public void InsertRecords(IEnumerable<GachaData> records, string uid, int poolType)
+        catch (Exception ex)
         {
-            if (records == null || !records.Any()) return;
+            throw new WwToolDatabaseException("读取指定卡池的本地记录失败。", ex);
+        }
+    }
 
-            try
+    public async Task<int> SyncGachaDataAsync(
+        string uid,
+        int poolType,
+        IEnumerable<GachaData> records,
+        string source = "remote",
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(uid);
+        ArgumentNullException.ThrowIfNull(records);
+
+        // 必须保持枚举顺序；这里有意不使用 OrderBy、Sort 或无序集合重建序列。
+        List<PreparedRecord> prepared = PrepareInSourceOrder(uid, poolType, records, cancellationToken);
+        DateTimeOffset startedAtUtc = DateTimeOffset.UtcNow;
+
+        try
+        {
+            int inserted = await writeCoordinator.ExecuteAsync(async (db, token) =>
             {
-                _logger.Debug($"正在插入 {records.Count()} 条记录 (UID: {uid}, 卡池类型: {poolType})");
-                using var db = new AppDbContext();
-
-                if (!db.UserAccounts.Any(a => a.Uid == uid))
+                if (!await db.UserAccounts.AnyAsync(x => x.Uid == uid, token))
                 {
                     db.UserAccounts.Add(new UserAccount { Uid = uid });
-                    db.SaveChanges();
                 }
 
-                var entities = records.Select(r => new GachaRecord
+                HashSet<string> existingFingerprints = await db.GachaRecords.AsNoTracking()
+                    .Where(x => x.Uid == uid && x.PoolType == poolType)
+                    .Select(x => x.StableFingerprint)
+                    .ToHashSetAsync(token);
+                long nextSourceOrder = (await db.GachaRecords
+                    .Where(x => x.Uid == uid && x.PoolType == poolType)
+                    .MaxAsync(x => (long?)x.SourceOrder, token) ?? -1) + 1;
+
+                var batch = new GachaImportBatch
                 {
                     Uid = uid,
                     PoolType = poolType,
-                    ResourceId = r.ResourceId,
-                    Name = r.Name,
-                    ResourceType = r.ResourceType,
-                    QualityLevel = r.QualityLevel,
-                    Time = r.Time
-                }).ToList();
+                    Source = source,
+                    StartedAtUtc = startedAtUtc,
+                    CompletedAtUtc = DateTimeOffset.UtcNow,
+                    RecordCount = prepared.Count
+                };
+                db.GachaImportBatches.Add(batch);
 
-                db.GachaRecords.AddRange(entities);
-                db.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                throw new WwToolDatabaseException($"批量保存抽卡记录失败(Uid: {uid}, PoolType: {poolType})", ex);
-            }
-        }
-
-        public async Task<List<GachaData>> GetAllRecordsByUid(string uid)
-        {
-            try
-            {
-                using var db = new AppDbContext();
-
-                var records = await db.GachaRecords
-                    .AsNoTracking()
-                    .Where(x => x.Uid == uid)
-                    .OrderBy(x => x.Time)
-                    .ToListAsync();
-
-                return records.Select(r => new GachaData
+                int accepted = 0;
+                foreach (PreparedRecord item in prepared)
                 {
-                    ResourceId = r.ResourceId,
-                    Name = r.Name != null ? string.Intern(r.Name) : "",
-                    ResourceType = r.ResourceType != null ? string.Intern(r.ResourceType) : "",
-                    QualityLevel = r.QualityLevel,
-                    Time = r.Time
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new WwToolDatabaseException($"获取账号本地所有记录失败(Uid: {uid})", ex);
-            }
-        }
-
-        public async Task<List<GachaData>> GetPoolRecordsByUid(string uid, int poolType)
-        {
-            try
-            {
-                using var db = new AppDbContext();
-
-                var records = await db.GachaRecords
-                    .AsNoTracking()
-                    .Where(x => x.Uid == uid && x.PoolType == poolType)
-                    .ToListAsync();
-
-                return records.Select(r => new GachaData
-                {
-                    ResourceId = r.ResourceId,
-                    CardPoolType = string.Intern(EnumExtensions.GetDescription((CardPoolType)poolType)),
-                    Name = r.Name != null ? string.Intern(r.Name) : "",
-                    ResourceType = r.ResourceType != null ? string.Intern(r.ResourceType) : "",
-                    QualityLevel = r.QualityLevel,
-                    Time = r.Time
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new WwToolDatabaseException($"获取账号指定卡池记录失败(Uid: {uid}, PoolType: {poolType})", ex);
-            }
-        }
-
-        public async Task<int> SyncGachaDataAsync(string uid, int poolType, IEnumerable<GachaData>? data)
-        {
-            await _writeLock.WaitAsync();
-            try
-            {
-                var (latestTimeStr, localCountAtLatestTime) = GetLatestRecordInfo(uid, poolType);
-
-                List<GachaData> newRecordsToSave = new List<GachaData>();
-                List<GachaData> sameTimeRecordsFromApi = new List<GachaData>();
-                if (data == null)
-                {
-                    throw new WwToolDatabaseException("传入的抽卡数据为空");
-                }
-
-                _logger.Info($"正在同步 {data.Count()} 条 API 记录到本地数据库 (UID: {uid}, 卡池类型: {poolType})");
-
-                foreach (var item in data)
-                {
-                    if (string.IsNullOrEmpty(latestTimeStr))
+                    token.ThrowIfCancellationRequested();
+                    if (!existingFingerprints.Add(item.Fingerprint))
                     {
-                        newRecordsToSave.Add(item);
+                        continue;
                     }
-                    else
+
+                    long sourceOrder = nextSourceOrder++;
+                    batch.FirstSourceOrder ??= sourceOrder;
+                    batch.LastSourceOrder = sourceOrder;
+                    db.GachaRecords.Add(new GachaRecord
                     {
-                        int cmp = string.Compare(item.Time, latestTimeStr);
-
-                        if (cmp > 0)
-                        {
-                            newRecordsToSave.Add(item);
-                        }
-                        else if (cmp == 0)
-                        {
-                            sameTimeRecordsFromApi.Add(item);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
+                        Uid = uid,
+                        ImportBatch = batch,
+                        PoolType = poolType,
+                        ResourceId = item.Record.ResourceId,
+                        NameSnapshot = item.Record.Name,
+                        ResourceType = item.Record.ResourceType,
+                        QualityLevel = item.Record.QualityLevel,
+                        Time = item.Record.Time,
+                        SourceOccurredAtUtc = item.OccurredAtUtc,
+                        ApiPageIndex = 0,
+                        ResponseItemIndex = item.ResponseItemIndex,
+                        SourceOrder = sourceOrder,
+                        DuplicateOccurrenceIndex = item.DuplicateOccurrenceIndex,
+                        StableFingerprint = item.Fingerprint,
+                        ImportedAtUtc = DateTimeOffset.UtcNow
+                    });
+                    accepted++;
                 }
 
-                if (sameTimeRecordsFromApi.Any())
-                {
-                    if (sameTimeRecordsFromApi.Count > localCountAtLatestTime)
-                    {
-                        DeleteRecordsAtTime(uid, poolType, latestTimeStr);
-                        newRecordsToSave.AddRange(sameTimeRecordsFromApi);
-                    }
-                }
+                await UpsertSyncStateAsync(db, uid, poolType, DateTimeOffset.UtcNow, token);
+                return accepted;
+            }, cancellationToken);
 
-                if (newRecordsToSave.Any())
-                {
-                    InsertRecords(newRecordsToSave, uid, poolType);
-                }
-
-                return newRecordsToSave.Count();
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+            logger.Info($"抽卡同步已完整提交，卡池 {poolType}，接收 {prepared.Count} 条，新增 {inserted} 条。");
+            return inserted;
+        }
+        catch (Exception ex)
+        {
+            throw new WwToolDatabaseException($"卡池 {poolType} 的抽卡记录未能完整提交，已保留原数据。", ex);
         }
     }
+
+    private static List<PreparedRecord> PrepareInSourceOrder(
+        string uid,
+        int poolType,
+        IEnumerable<GachaData> records,
+        CancellationToken cancellationToken)
+    {
+        var result = new List<PreparedRecord>();
+        var occurrences = new Dictionary<string, int>(StringComparer.Ordinal);
+        int responseItemIndex = 0;
+        foreach (GachaData record in records)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (record.ResourceId <= 0 || record.QualityLevel <= 0 || string.IsNullOrWhiteSpace(record.Time))
+            {
+                throw new InvalidDataException($"抽卡响应第 {responseItemIndex} 条记录缺少必填字段。");
+            }
+
+            string normalized = $"{uid}|{poolType}|{record.Time.Trim()}|{record.ResourceId}|{record.ResourceType.Trim()}|{record.QualityLevel}";
+            occurrences.TryGetValue(normalized, out int occurrenceIndex);
+            occurrences[normalized] = occurrenceIndex + 1;
+            string fingerprint = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"v1|{normalized}|{occurrenceIndex}")));
+            DateTimeOffset? occurredAtUtc = DateTimeOffset.TryParse(
+                record.Time,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeLocal,
+                out DateTimeOffset parsed) ? parsed.ToUniversalTime() : null;
+            result.Add(new PreparedRecord(record, responseItemIndex, occurrenceIndex, fingerprint, occurredAtUtc));
+            responseItemIndex++;
+        }
+
+        return result;
+    }
+
+    private static async Task UpsertSyncStateAsync(
+        AppDbContext db,
+        string uid,
+        int poolType,
+        DateTimeOffset completedAtUtc,
+        CancellationToken cancellationToken)
+    {
+        string scopeKey = poolType.ToString(CultureInfo.InvariantCulture);
+        SyncState? state = db.SyncStates.Local.FirstOrDefault(x => x.Uid == uid && x.DataKind == "Gacha" && x.ScopeKey == scopeKey);
+        state ??= await db.SyncStates.FirstOrDefaultAsync(
+            x => x.Uid == uid && x.DataKind == "Gacha" && x.ScopeKey == scopeKey,
+            cancellationToken);
+        if (state is null)
+        {
+            state = new SyncState { Uid = uid, DataKind = "Gacha", ScopeKey = scopeKey };
+            db.SyncStates.Add(state);
+        }
+
+        state.LastSuccessfulSyncAtUtc = completedAtUtc;
+    }
+
+    private static GachaData ToApiModel(GachaRecord record, int? poolType = null) => new()
+    {
+        CardPoolType = poolType is null ? string.Empty : ((CardPoolType)poolType.Value).GetDescription(),
+        ResourceId = record.ResourceId,
+        Name = record.NameSnapshot ?? string.Empty,
+        ResourceType = record.ResourceType ?? string.Empty,
+        QualityLevel = record.QualityLevel,
+        Time = record.Time
+    };
+
+    private sealed record PreparedRecord(
+        GachaData Record,
+        int ResponseItemIndex,
+        int DuplicateOccurrenceIndex,
+        string Fingerprint,
+        DateTimeOffset? OccurredAtUtc);
 }

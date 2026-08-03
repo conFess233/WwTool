@@ -1,11 +1,15 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using WwTool.Common;
+using WwTool.Common.Context;
 using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
@@ -31,6 +35,23 @@ namespace WwTool
 
         protected override Window CreateShell()
         {
+            DatabaseOptions databaseOptions = Container.Resolve<DatabaseOptions>();
+            try
+            {
+                LocalDataService.EnsureWritableDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Local"));
+                LocalDataService.EnsureWritableDirectory(Path.GetDirectoryName(databaseOptions.DatabasePath)!);
+                LocalDataService.EnsureWritableDirectory(databaseOptions.BackupDirectory);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"程序目录不可写，无法安全加载配置或数据库。\n\n{ex.Message}",
+                    "WwTool",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                throw;
+            }
+
             var configService = Container.Resolve<IConfigService>();
             configService.LoadAll();
 
@@ -71,12 +92,19 @@ namespace WwTool
             var gameData = Container.Resolve<GameDataService>();
             try
             {
-                await localDb.InitializeAsync();
                 await gameData.InitializeAsync();
+                await localDb.InitializeAsync();
             }
             catch (Exception ex)
             {
                 logger.Error("后台数据服务初始化时发生错误", ex);
+                MessageBox.Show(
+                    "本地数据初始化失败。原数据库和迁移备份已保留，请查看脱敏日志后重试。",
+                    "WwTool",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                Shutdown(-1);
+                return;
             }
 
             if (App.Current.MainWindow.DataContext is IConfigureService service)
@@ -103,7 +131,10 @@ namespace WwTool
                 logger.Fatal("主 UI 线程捕获到未处理的致命异常", e.Exception);
                 WwTool.Common.Utils.ExceptionHelper.HandleException(e.Exception, "主UI线程异常");
             }
-            catch { }
+            catch (Exception loggingException)
+            {
+                Trace.TraceError($"记录 UI 未处理异常失败: {loggingException}");
+            }
 
             // 标记异常已处理，防止程序崩溃退出
             e.Handled = true;
@@ -120,7 +151,10 @@ namespace WwTool
                     WwTool.Common.Utils.ExceptionHelper.HandleException(ex, "后台线程异常");
                 }
             }
-            catch { }
+            catch (Exception loggingException)
+            {
+                Trace.TraceError($"记录后台未处理异常失败: {loggingException}");
+            }
         }
 
         private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
@@ -131,7 +165,10 @@ namespace WwTool
                 logger.Error("未观察的 Task 异步任务抛出异常", e.Exception);
                 WwTool.Common.Utils.ExceptionHelper.HandleException(e.Exception, "异步任务异常");
             }
-            catch { }
+            catch (Exception loggingException)
+            {
+                Trace.TraceError($"记录未观察任务异常失败: {loggingException}");
+            }
 
             // 标记已被观察，阻止进程由于未捕获 Task 异常而终止
             e.SetObserved();
@@ -146,7 +183,7 @@ namespace WwTool
             }
             catch (Exception ex)
             {
-                // 忽略或记录保存失败异常，防止退出崩溃
+                Trace.TraceError($"退出时保存配置失败: {ex}");
             }
             base.OnExit(e);
         }
@@ -179,15 +216,22 @@ namespace WwTool
             var provider = services.BuildServiceProvider();
 
             containerRegistry.RegisterInstance(provider.GetRequiredService<IHttpClientFactory>());
+            DatabaseOptions databaseOptions = DatabaseOptions.CreateDefault();
+            var contextFactory = new AppDbContextFactory(databaseOptions);
+            containerRegistry.RegisterInstance(databaseOptions);
+            containerRegistry.RegisterInstance<IDbContextFactory<AppDbContext>>(contextFactory);
             containerRegistry.RegisterSingleton<LocalDataService>();
             containerRegistry.RegisterSingleton<GameDataService>();
 
-            // Repositories
+            // 注册数据仓储。
             containerRegistry.RegisterSingleton<IGachaRepository, GachaRepository>();
             containerRegistry.RegisterSingleton<IUserRepository, UserRepository>();
             containerRegistry.RegisterSingleton<IPlayerInfoRepository, PlayerInfoRepository>();
+            containerRegistry.RegisterSingleton<IDatabaseWriteCoordinator, DatabaseWriteCoordinator>();
+            containerRegistry.RegisterSingleton<IUserDataService, UserDataService>();
+            containerRegistry.RegisterSingleton<IGachaLogLocator, GachaLogLocator>();
 
-            // Business Services
+            // 注册业务服务。
             containerRegistry.RegisterSingleton<IGachaStatisticsService, GachaStatisticsService>();
             containerRegistry.RegisterSingleton<IChartBuilderService, ChartBuilderService>();
 

@@ -1,319 +1,262 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WwTool.Common.Context;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 using WwTool.Common.Models.ApiResponse;
+using WwTool.Common.Utils;
 using WwTool.Services.Interfaces;
 
-namespace WwTool.Services.Repositories
+namespace WwTool.Services.Repositories;
+
+public sealed class PlayerInfoRepository(
+    IDbContextFactory<AppDbContext> contextFactory,
+    IDatabaseWriteCoordinator writeCoordinator,
+    ILoggerService logger) : IPlayerInfoRepository
 {
-    public class PlayerInfoRepository : IPlayerInfoRepository
+    public async Task SavePlayerRegionInfoAsync(
+        PlayerRegionInfo playerRegionInfo,
+        string region,
+        string oauthCode,
+        CancellationToken cancellationToken = default)
     {
-        private readonly ILoggerService _logger;
-        private readonly System.Threading.SemaphoreSlim _writeLock = new System.Threading.SemaphoreSlim(1, 1);
-
-        public PlayerInfoRepository(ILoggerService logger)
+        ArgumentNullException.ThrowIfNull(playerRegionInfo);
+        try
         {
-            _logger = logger;
-        }
-
-        public async Task SavePlayerRegionInfoAsync(PlayerRegionInfo playerRegionInfo, string region, string oauthCode)
-        {
-            await _writeLock.WaitAsync();
-            try
+            await writeCoordinator.ExecuteAsync(async (db, token) =>
             {
-                using var db = new AppDbContext();
-
                 string uid = playerRegionInfo.RoleId;
-                var account = await db.UserAccounts.FirstOrDefaultAsync(x => x.Uid == uid);
+                UserAccount? account = await db.UserAccounts.FirstOrDefaultAsync(x => x.Uid == uid, token);
+                account ??= AddAccount(db, uid);
+                ApplyAccount(account, playerRegionInfo, region);
+                account.EncryptedOauthCode = Crypto.Encrypt(oauthCode);
 
-                if (account == null)
+                PlayerBaseInfo? baseInfo = await db.PlayerBaseInfos.FirstOrDefaultAsync(x => x.Uid == uid, token);
+                if (baseInfo is null)
                 {
-                    account = new UserAccount
-                    {
-                        Uid = uid,
-                        Name = playerRegionInfo.RoleName,
-                        Level = playerRegionInfo.Level,
-                        Sex = playerRegionInfo.Sex,
-                        HeadPhoto = playerRegionInfo.HeadPhoto,
-                        Region = region,
-                        EncryptedOauthCode = WwTool.Common.Utils.Crypto.Encrypt(oauthCode)
-                    };
-                    db.UserAccounts.Add(account);
-                }
-                else
-                {
-                    account.Name = playerRegionInfo.RoleName;
-                    account.Level = playerRegionInfo.Level;
-                    account.Sex = playerRegionInfo.Sex;
-                    account.HeadPhoto = playerRegionInfo.HeadPhoto;
-                    account.Region = region;
-                    account.EncryptedOauthCode = WwTool.Common.Utils.Crypto.Encrypt(oauthCode);
-                }
-
-                var baseInfo = await db.PlayerBaseInfos.FirstOrDefaultAsync(x => x.Uid == uid);
-                if (baseInfo == null)
-                {
-                    baseInfo = new PlayerBaseInfo
-                    {
-                        Uid = uid,
-                        RoleName = playerRegionInfo.RoleName,
-                        Level = playerRegionInfo.Level
-                    };
+                    baseInfo = new PlayerBaseInfo { Uid = uid };
                     db.PlayerBaseInfos.Add(baseInfo);
                 }
-                else
-                {
-                    baseInfo.RoleName = playerRegionInfo.RoleName;
-                    baseInfo.Level = playerRegionInfo.Level;
-                }
 
-                await db.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new WwToolDatabaseException($"本地保存玩家大区数据失败(Uid: {playerRegionInfo?.RoleId})", ex);
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
+                baseInfo.RoleName = playerRegionInfo.RoleName;
+                baseInfo.Level = playerRegionInfo.Level;
+                baseInfo.LastSyncedAtUtc = DateTimeOffset.UtcNow;
+                await UpsertSyncStateAsync(db, uid, "Account", string.Empty, token);
+            }, cancellationToken);
         }
-
-        public async Task SavePlayerRoleDataAsync(string uid, RoleDetailInfo roleDetail, string playerRegion, PlayerRegionInfo playerRegionInfo)
+        catch (Exception ex)
         {
-            await _writeLock.WaitAsync();
-            try
-            {
-                using var db = new AppDbContext();
-                using var transaction = await db.Database.BeginTransactionAsync();
-                try
-                {
-                    _logger.Debug($"正在保存玩家角色数据 (UID: {uid})");
-
-                    var account = await db.UserAccounts.FirstOrDefaultAsync(x => x.Uid == uid);
-
-                    if (account == null)
-                    {
-                        account = new UserAccount
-                        {
-                            Uid = playerRegionInfo.RoleId,
-                            Name = playerRegionInfo.RoleName,
-                            Level = playerRegionInfo.Level,
-                            Sex = playerRegionInfo.Sex,
-                            HeadPhoto = playerRegionInfo.HeadPhoto,
-                            Region = playerRegion
-                        };
-                        db.UserAccounts.Add(account);
-                    }
-                    else
-                    {
-                        account.Uid = playerRegionInfo.RoleId;
-                        account.Name = playerRegionInfo.RoleName;
-                        account.Level = playerRegionInfo.Level;
-                        account.Sex = playerRegionInfo.Sex;
-                        account.HeadPhoto = playerRegionInfo.HeadPhoto;
-                        account.Region = playerRegion;
-                    }
-
-                    // 角色基本数据
-                    var baseInfo = await db.PlayerBaseInfos.FirstOrDefaultAsync(x => x.Uid == uid);
-                    bool isNewBase = baseInfo == null;
-                    if (isNewBase) baseInfo = new PlayerBaseInfo { Uid = uid };
-
-                    baseInfo.RoleName = playerRegionInfo.RoleName;
-                    baseInfo.Level = roleDetail.Base?.Level ?? playerRegionInfo.Level;
-                    baseInfo.WorldLevel = roleDetail.Base?.WorldLevel ?? 0;
-                    baseInfo.ActiveDays = roleDetail.Base?.ActiveDays ?? 0;
-                    baseInfo.RoleNum = roleDetail.Base?.RoleNum ?? 0;
-                    baseInfo.SoundBox = roleDetail.Base?.SoundBox ?? 0;
-                    baseInfo.Energy = roleDetail.Base?.Energy ?? 0;
-                    baseInfo.MaxEnergy = roleDetail.Base?.MaxEnergy ?? 0;
-                    baseInfo.StoreEnergy = roleDetail.Base?.StoreEnergy ?? 0;
-                    baseInfo.MaxStoreEnergy = roleDetail.Base?.MaxStoreEnergy ?? 0;
-                    baseInfo.Liveness = roleDetail.Base?.Liveness ?? 0;
-                    baseInfo.LivenessMaxCount = roleDetail.Base?.LivenessMaxCount ?? 0;
-                    baseInfo.LivenessUnlock = roleDetail.Base?.LivenessUnlock ?? false;
-                    baseInfo.WeeklyInstCount = roleDetail.Base?.WeeklyInstCount ?? 0;
-                    baseInfo.CreatTime = roleDetail.Base?.CreatTime ?? 0;
-                    baseInfo.BirthMon = roleDetail.Base?.BirthMon ?? 0;
-                    baseInfo.BirthDay = roleDetail.Base?.BirthDay ?? 0;
-                    baseInfo.EnergyRecoverTime = roleDetail.Base?.EnergyRecoverTime ?? (long)0;
-                    baseInfo.StoreEnergyRecoverTime = roleDetail.Base?.StoreEnergyRecoverTime ?? (long)0;
-                    baseInfo.BoxesJson = System.Text.Json.JsonSerializer.Serialize(roleDetail.Base?.Boxes ?? new Dictionary<string, int>());
-                    baseInfo.BasicBoxesJson = System.Text.Json.JsonSerializer.Serialize(roleDetail.Base?.BasicBoxes ?? new Dictionary<string, int>());
-                    baseInfo.PhantomBoxesJson = System.Text.Json.JsonSerializer.Serialize(roleDetail.Base?.PhantomBoxes ?? new Dictionary<string, int>());
-
-                    if (isNewBase) db.PlayerBaseInfos.Add(baseInfo);
-
-                    // 摩托数据
-                    var motorData = await db.PlayerMotorData.FirstOrDefaultAsync(x => x.Uid == uid);
-                    bool isNewMotor = motorData == null;
-                    if (isNewMotor) motorData = new PlayerMotorData { Uid = uid };
-
-                    motorData.Level = roleDetail.MotorData?.Level ?? 0;
-                    motorData.Exp = roleDetail.MotorData?.Exp ?? 0;
-                    motorData.NextExp = roleDetail.MotorData?.NextExp ?? 0;
-                    motorData.SkinsJson = System.Text.Json.JsonSerializer.Serialize(roleDetail.MotorData?.Skins ?? new List<MotorSkin>());
-                    motorData.StickersJson = System.Text.Json.JsonSerializer.Serialize(roleDetail.MotorData?.Stickers ?? new List<MotorSticker>());
-                    motorData.DecorationsJson = System.Text.Json.JsonSerializer.Serialize(roleDetail.MotorData?.Decorations ?? new List<MotorDecoration>());
-                    motorData.FramesJson = System.Text.Json.JsonSerializer.Serialize(roleDetail.MotorData?.Frames ?? new List<MotorFrame>());
-                    motorData.EquipSkinId = roleDetail.MotorData?.EquipSkin?.SkinId ?? 0;
-                    motorData.EquipSkinQuality = roleDetail.MotorData?.EquipSkin?.Quality ?? 0;
-
-                    if (isNewMotor) db.PlayerMotorData.Add(motorData);
-
-                    // 电台数据
-                    var bpData = await db.PlayerBattlePasses.FirstOrDefaultAsync(x => x.Uid == uid);
-                    bool isNewBp = bpData == null;
-                    if (isNewBp) bpData = new PlayerBattlePass { Uid = uid };
-
-                    bpData.Level = roleDetail.BattlePass?.Level ?? 0;
-                    bpData.WeekExp = roleDetail.BattlePass?.WeekExp ?? 0;
-                    bpData.WeekMaxExp = roleDetail.BattlePass?.WeekMaxExp ?? 0;
-                    bpData.IsUnlock = roleDetail.BattlePass?.IsUnlock ?? false;
-                    bpData.IsOpen = roleDetail.BattlePass?.IsOpen ?? false;
-                    bpData.Exp = roleDetail.BattlePass?.Exp ?? 0;
-                    bpData.ExpLimit = roleDetail.BattlePass?.ExpLimit ?? 0;
-
-                    if (isNewBp) db.PlayerBattlePasses.Add(bpData);
-
-                    // 音乐数据
-                    var existingMusic = db.PlayerMusicData.Where(x => x.Uid == uid);
-                    db.PlayerMusicData.RemoveRange(existingMusic);
-
-                    if (roleDetail.MusicData != null)
-                    {
-                        foreach (var music in roleDetail.MusicData)
-                        {
-                            db.PlayerMusicData.Add(new PlayerMusicData
-                            {
-                                Uid = uid,
-                                AlbumId = music.Id,
-                                Count = music.Count,
-                                TotalCount = music.TotalCount
-                            });
-                        }
-                    }
-
-                    await db.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new WwToolDatabaseException($"本地保存玩家角色详情数据失败(Uid: {uid})", ex);
-            }
-            finally
-            {
-                _writeLock.Release();
-            }
-        }
-
-        public async Task<RoleDetailInfo?> LoadPlayerRoleDataAsync(string uid)
-        {
-            try
-            {
-                using var db = new AppDbContext();
-
-                var baseInfo = await db.PlayerBaseInfos.FirstOrDefaultAsync(x => x.Uid == uid);
-                if (baseInfo == null) return null;
-
-                var motorData = await db.PlayerMotorData.FirstOrDefaultAsync(x => x.Uid == uid);
-                var bpData = await db.PlayerBattlePasses.FirstOrDefaultAsync(x => x.Uid == uid);
-                var musicList = await db.PlayerMusicData.Where(x => x.Uid == uid).ToListAsync();
-
-                var roleDetail = new RoleDetailInfo
-                {
-                    Base = new RoleBaseInfo
-                    {
-                        Name = baseInfo.RoleName,
-                        Id = long.TryParse(baseInfo.Uid, out long parsedUid) ? parsedUid : 0,
-                        CreatTime = baseInfo.CreatTime,
-                        ActiveDays = baseInfo.ActiveDays,
-                        Level = baseInfo.Level,
-                        WorldLevel = baseInfo.WorldLevel,
-                        RoleNum = baseInfo.RoleNum,
-                        SoundBox = baseInfo.SoundBox,
-                        Energy = baseInfo.Energy,
-                        MaxEnergy = baseInfo.MaxEnergy,
-                        StoreEnergy = baseInfo.StoreEnergy,
-                        MaxStoreEnergy = baseInfo.MaxStoreEnergy,
-                        Liveness = baseInfo.Liveness,
-                        LivenessMaxCount = baseInfo.LivenessMaxCount,
-                        LivenessUnlock = baseInfo.LivenessUnlock,
-                        WeeklyInstCount = baseInfo.WeeklyInstCount,
-                        BirthMon = baseInfo.BirthMon,
-                        BirthDay = baseInfo.BirthDay,
-                        EnergyRecoverTime = baseInfo.EnergyRecoverTime,
-                        StoreEnergyRecoverTime = baseInfo.StoreEnergyRecoverTime,
-
-                        Boxes = string.IsNullOrEmpty(baseInfo.BoxesJson)
-                            ? new Dictionary<string, int>()
-                            : System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(baseInfo.BoxesJson) ?? new Dictionary<string, int>(),
-                        BasicBoxes = string.IsNullOrEmpty(baseInfo.BasicBoxesJson)
-                            ? new Dictionary<string, int>()
-                            : System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(baseInfo.BasicBoxesJson) ?? new Dictionary<string, int>(),
-                        PhantomBoxes = string.IsNullOrEmpty(baseInfo.PhantomBoxesJson)
-                            ? new Dictionary<string, int>()
-                            : System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, int>>(baseInfo.PhantomBoxesJson) ?? new Dictionary<string, int>()
-                    },
-                    BattlePass = bpData == null ? null : new RoleBattlePass
-                    {
-                        Level = bpData.Level,
-                        WeekExp = bpData.WeekExp,
-                        WeekMaxExp = bpData.WeekMaxExp,
-                        IsUnlock = bpData.IsUnlock,
-                        IsOpen = bpData.IsOpen,
-                        Exp = bpData.Exp,
-                        ExpLimit = bpData.ExpLimit
-                    },
-                    MotorData = motorData == null ? null : new RoleMotorData
-                    {
-                        Level = motorData.Level,
-                        Exp = motorData.Exp,
-                        NextExp = motorData.NextExp,
-                        Skins = string.IsNullOrEmpty(motorData.SkinsJson)
-                            ? new List<MotorSkin>()
-                            : System.Text.Json.JsonSerializer.Deserialize<List<MotorSkin>>(motorData.SkinsJson) ?? new List<MotorSkin>(),
-                        Stickers = string.IsNullOrEmpty(motorData.StickersJson)
-                            ? new List<MotorSticker>()
-                            : System.Text.Json.JsonSerializer.Deserialize<List<MotorSticker>>(motorData.StickersJson) ?? new List<MotorSticker>(),
-                        Decorations = string.IsNullOrEmpty(motorData.DecorationsJson)
-                            ? new List<MotorDecoration>()
-                            : System.Text.Json.JsonSerializer.Deserialize<List<MotorDecoration>>(motorData.DecorationsJson) ?? new List<MotorDecoration>(),
-                        Frames = string.IsNullOrEmpty(motorData.FramesJson)
-                            ? new List<MotorFrame>()
-                            : System.Text.Json.JsonSerializer.Deserialize<List<MotorFrame>>(motorData.FramesJson) ?? new List<MotorFrame>(),
-                        EquipSkin = motorData.EquipSkinId == 0 ? null : new MotorSkin
-                        {
-                            SkinId = motorData.EquipSkinId,
-                            Quality = motorData.EquipSkinQuality
-                        }
-                    },
-                    MusicData = musicList.Select(x => new RoleMusicData
-                    {
-                        Id = x.AlbumId,
-                        Count = x.Count,
-                        TotalCount = x.TotalCount
-                    }).ToList()
-                };
-
-                return roleDetail;
-            }
-            catch (Exception ex)
-            {
-                throw new WwToolDatabaseException($"加载本地玩家角色详情数据失败(Uid: {uid})", ex);
-            }
+            throw new WwToolDatabaseException("本地保存玩家大区数据失败。", ex);
         }
     }
+
+    public async Task SavePlayerRoleDataAsync(
+        string uid,
+        RoleDetailInfo roleDetail,
+        string playerRegion,
+        PlayerRegionInfo playerRegionInfo,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(roleDetail);
+        try
+        {
+            await writeCoordinator.ExecuteAsync(async (db, token) =>
+            {
+                DateTimeOffset syncedAtUtc = DateTimeOffset.UtcNow;
+                UserAccount? account = await db.UserAccounts.FirstOrDefaultAsync(x => x.Uid == uid, token);
+                account ??= AddAccount(db, uid);
+                ApplyAccount(account, playerRegionInfo, playerRegion);
+                account.LastSyncedAtUtc = syncedAtUtc;
+
+                PlayerBaseInfo? baseInfo = await db.PlayerBaseInfos.FirstOrDefaultAsync(x => x.Uid == uid, token);
+                if (baseInfo is null)
+                {
+                    baseInfo = new PlayerBaseInfo { Uid = uid };
+                    db.PlayerBaseInfos.Add(baseInfo);
+                }
+                MapBaseInfo(baseInfo, roleDetail, playerRegionInfo, syncedAtUtc);
+
+                PlayerMotorData? motor = await db.PlayerMotorData.FirstOrDefaultAsync(x => x.Uid == uid, token);
+                if (motor is null)
+                {
+                    motor = new PlayerMotorData { Uid = uid };
+                    db.PlayerMotorData.Add(motor);
+                }
+                MapMotor(motor, roleDetail, syncedAtUtc);
+
+                PlayerBattlePass? battlePass = await db.PlayerBattlePasses.FirstOrDefaultAsync(x => x.Uid == uid, token);
+                if (battlePass is null)
+                {
+                    battlePass = new PlayerBattlePass { Uid = uid };
+                    db.PlayerBattlePasses.Add(battlePass);
+                }
+                MapBattlePass(battlePass, roleDetail, syncedAtUtc);
+
+                List<PlayerMusicData> oldMusic = await db.PlayerMusicData.Where(x => x.Uid == uid).ToListAsync(token);
+                db.PlayerMusicData.RemoveRange(oldMusic);
+                foreach (RoleMusicData music in roleDetail.MusicData ?? [])
+                {
+                    db.PlayerMusicData.Add(new PlayerMusicData
+                    {
+                        Uid = uid,
+                        AlbumId = music.Id,
+                        Count = music.Count,
+                        TotalCount = music.TotalCount,
+                        LastSyncedAtUtc = syncedAtUtc
+                    });
+                }
+                await UpsertSyncStateAsync(db, uid, "Role", string.Empty, token);
+            }, cancellationToken);
+            logger.Info("玩家角色快照已完整提交。");
+        }
+        catch (Exception ex)
+        {
+            throw new WwToolDatabaseException("玩家角色快照未能完整提交，已保留原数据。", ex);
+        }
+    }
+
+    public async Task<RoleDetailInfo?> LoadPlayerRoleDataAsync(string uid, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await using AppDbContext db = await contextFactory.CreateDbContextAsync(cancellationToken);
+            PlayerBaseInfo? baseInfo = await db.PlayerBaseInfos.AsNoTracking().FirstOrDefaultAsync(x => x.Uid == uid, cancellationToken);
+            if (baseInfo is null) return null;
+            PlayerMotorData? motor = await db.PlayerMotorData.AsNoTracking().FirstOrDefaultAsync(x => x.Uid == uid, cancellationToken);
+            PlayerBattlePass? battlePass = await db.PlayerBattlePasses.AsNoTracking().FirstOrDefaultAsync(x => x.Uid == uid, cancellationToken);
+            List<PlayerMusicData> music = await db.PlayerMusicData.AsNoTracking().Where(x => x.Uid == uid).OrderBy(x => x.AlbumId).ToListAsync(cancellationToken);
+            return MapRoleDetail(baseInfo, motor, battlePass, music);
+        }
+        catch (Exception ex)
+        {
+            throw new WwToolDatabaseException("加载本地玩家角色快照失败。", ex);
+        }
+    }
+
+    private static UserAccount AddAccount(AppDbContext db, string uid)
+    {
+        var account = new UserAccount { Uid = uid };
+        db.UserAccounts.Add(account);
+        return account;
+    }
+
+    private static void ApplyAccount(UserAccount account, PlayerRegionInfo source, string region)
+    {
+        account.Name = source.RoleName;
+        account.Level = source.Level;
+        account.Sex = source.Sex;
+        account.HeadPhoto = source.HeadPhoto;
+        account.Region = region;
+        account.LastSyncedAtUtc = DateTimeOffset.UtcNow;
+    }
+
+    private static void MapBaseInfo(PlayerBaseInfo target, RoleDetailInfo source, PlayerRegionInfo region, DateTimeOffset syncedAtUtc)
+    {
+        RoleBaseInfo? value = source.Base;
+        target.RoleName = region.RoleName;
+        target.Level = value?.Level ?? region.Level;
+        target.WorldLevel = value?.WorldLevel ?? 0;
+        target.ActiveDays = value?.ActiveDays ?? 0;
+        target.RoleNum = value?.RoleNum ?? 0;
+        target.SoundBox = value?.SoundBox ?? 0;
+        target.Energy = value?.Energy ?? 0;
+        target.MaxEnergy = value?.MaxEnergy ?? 0;
+        target.StoreEnergy = value?.StoreEnergy ?? 0;
+        target.MaxStoreEnergy = value?.MaxStoreEnergy ?? 0;
+        target.Liveness = value?.Liveness ?? 0;
+        target.LivenessMaxCount = value?.LivenessMaxCount ?? 0;
+        target.LivenessUnlock = value?.LivenessUnlock ?? false;
+        target.WeeklyInstCount = value?.WeeklyInstCount ?? 0;
+        target.CreatTime = value?.CreatTime ?? 0;
+        target.BirthMon = value?.BirthMon ?? 0;
+        target.BirthDay = value?.BirthDay ?? 0;
+        target.EnergyRecoverTime = value?.EnergyRecoverTime ?? 0;
+        target.StoreEnergyRecoverTime = value?.StoreEnergyRecoverTime ?? 0;
+        target.BoxesJson = JsonSerializer.Serialize(value?.Boxes ?? new Dictionary<string, int>());
+        target.BasicBoxesJson = JsonSerializer.Serialize(value?.BasicBoxes ?? new Dictionary<string, int>());
+        target.PhantomBoxesJson = JsonSerializer.Serialize(value?.PhantomBoxes ?? new Dictionary<string, int>());
+        target.LastSyncedAtUtc = syncedAtUtc;
+    }
+
+    private static void MapMotor(PlayerMotorData target, RoleDetailInfo source, DateTimeOffset syncedAtUtc)
+    {
+        RoleMotorData? value = source.MotorData;
+        target.Level = value?.Level ?? 0;
+        target.Exp = value?.Exp ?? 0;
+        target.NextExp = value?.NextExp ?? 0;
+        target.SkinsJson = JsonSerializer.Serialize(value?.Skins ?? []);
+        target.StickersJson = JsonSerializer.Serialize(value?.Stickers ?? []);
+        target.DecorationsJson = JsonSerializer.Serialize(value?.Decorations ?? []);
+        target.FramesJson = JsonSerializer.Serialize(value?.Frames ?? []);
+        target.EquipSkinId = value?.EquipSkin?.SkinId ?? 0;
+        target.EquipSkinQuality = value?.EquipSkin?.Quality ?? 0;
+        target.LastSyncedAtUtc = syncedAtUtc;
+    }
+
+    private static void MapBattlePass(PlayerBattlePass target, RoleDetailInfo source, DateTimeOffset syncedAtUtc)
+    {
+        RoleBattlePass? value = source.BattlePass;
+        target.Level = value?.Level ?? 0;
+        target.WeekExp = value?.WeekExp ?? 0;
+        target.WeekMaxExp = value?.WeekMaxExp ?? 0;
+        target.IsUnlock = value?.IsUnlock ?? false;
+        target.IsOpen = value?.IsOpen ?? false;
+        target.Exp = value?.Exp ?? 0;
+        target.ExpLimit = value?.ExpLimit ?? 0;
+        target.LastSyncedAtUtc = syncedAtUtc;
+    }
+
+    private static async Task UpsertSyncStateAsync(
+        AppDbContext db,
+        string uid,
+        string dataKind,
+        string scopeKey,
+        CancellationToken cancellationToken)
+    {
+        SyncState? state = db.SyncStates.Local.FirstOrDefault(x => x.Uid == uid && x.DataKind == dataKind && x.ScopeKey == scopeKey);
+        state ??= await db.SyncStates.FirstOrDefaultAsync(
+            x => x.Uid == uid && x.DataKind == dataKind && x.ScopeKey == scopeKey,
+            cancellationToken);
+        if (state is null)
+        {
+            state = new SyncState { Uid = uid, DataKind = dataKind, ScopeKey = scopeKey };
+            db.SyncStates.Add(state);
+        }
+        state.LastSuccessfulSyncAtUtc = DateTimeOffset.UtcNow;
+    }
+
+    private static RoleDetailInfo MapRoleDetail(PlayerBaseInfo baseInfo, PlayerMotorData? motor, PlayerBattlePass? battlePass, IReadOnlyList<PlayerMusicData> music) => new()
+    {
+        Base = new RoleBaseInfo
+        {
+            Name = baseInfo.RoleName, Id = long.TryParse(baseInfo.Uid, out long id) ? id : 0,
+            CreatTime = baseInfo.CreatTime, ActiveDays = baseInfo.ActiveDays, Level = baseInfo.Level,
+            WorldLevel = baseInfo.WorldLevel, RoleNum = baseInfo.RoleNum, SoundBox = baseInfo.SoundBox,
+            Energy = baseInfo.Energy, MaxEnergy = baseInfo.MaxEnergy, StoreEnergy = baseInfo.StoreEnergy,
+            MaxStoreEnergy = baseInfo.MaxStoreEnergy, Liveness = baseInfo.Liveness,
+            LivenessMaxCount = baseInfo.LivenessMaxCount, LivenessUnlock = baseInfo.LivenessUnlock,
+            WeeklyInstCount = baseInfo.WeeklyInstCount, BirthMon = baseInfo.BirthMon, BirthDay = baseInfo.BirthDay,
+            EnergyRecoverTime = baseInfo.EnergyRecoverTime, StoreEnergyRecoverTime = baseInfo.StoreEnergyRecoverTime,
+            Boxes = Deserialize<Dictionary<string, int>>(baseInfo.BoxesJson),
+            BasicBoxes = Deserialize<Dictionary<string, int>>(baseInfo.BasicBoxesJson),
+            PhantomBoxes = Deserialize<Dictionary<string, int>>(baseInfo.PhantomBoxesJson)
+        },
+        BattlePass = battlePass is null ? null : new RoleBattlePass
+        {
+            Level = battlePass.Level, WeekExp = battlePass.WeekExp, WeekMaxExp = battlePass.WeekMaxExp,
+            IsUnlock = battlePass.IsUnlock, IsOpen = battlePass.IsOpen, Exp = battlePass.Exp, ExpLimit = battlePass.ExpLimit
+        },
+        MotorData = motor is null ? null : new RoleMotorData
+        {
+            Level = motor.Level, Exp = motor.Exp, NextExp = motor.NextExp,
+            Skins = Deserialize<List<MotorSkin>>(motor.SkinsJson), Stickers = Deserialize<List<MotorSticker>>(motor.StickersJson),
+            Decorations = Deserialize<List<MotorDecoration>>(motor.DecorationsJson), Frames = Deserialize<List<MotorFrame>>(motor.FramesJson),
+            EquipSkin = motor.EquipSkinId == 0 ? null : new MotorSkin { SkinId = motor.EquipSkinId, Quality = motor.EquipSkinQuality }
+        },
+        MusicData = music.Select(x => new RoleMusicData { Id = x.AlbumId, Count = x.Count, TotalCount = x.TotalCount }).ToList()
+    };
+
+    private static T Deserialize<T>(string json) where T : new() =>
+        string.IsNullOrWhiteSpace(json) ? new T() : JsonSerializer.Deserialize<T>(json) ?? new T();
 }

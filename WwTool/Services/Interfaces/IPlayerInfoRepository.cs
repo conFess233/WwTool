@@ -1,12 +1,10 @@
-using System.Threading.Tasks;
 using WwTool.Common.Models.ApiResponse;
 
-namespace WwTool.Services.Repositories
+namespace WwTool.Services.Repositories;
+
+public interface IPlayerInfoRepository
 {
-    public interface IPlayerInfoRepository
-    {
-        Task SavePlayerRegionInfoAsync(PlayerRegionInfo playerRegionInfo, string region, string oauthCode);
-        Task SavePlayerRoleDataAsync(string uid, RoleDetailInfo roleDetail, string playerRegion, PlayerRegionInfo playerRegionInfo);
-        Task<RoleDetailInfo?> LoadPlayerRoleDataAsync(string uid);
-    }
+    Task SavePlayerRegionInfoAsync(PlayerRegionInfo playerRegionInfo, string region, string oauthCode, CancellationToken cancellationToken = default);
+    Task SavePlayerRoleDataAsync(string uid, RoleDetailInfo roleDetail, string playerRegion, PlayerRegionInfo playerRegionInfo, CancellationToken cancellationToken = default);
+    Task<RoleDetailInfo?> LoadPlayerRoleDataAsync(string uid, CancellationToken cancellationToken = default);
 }

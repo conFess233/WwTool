@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -411,11 +411,15 @@
     <None Remove="UI\Resources\Images\DIY.png" />
     <None Remove="UI\Resources\Images\Energy.png" />
     <None Remove="UI\Resources\Images\Folder.png" />
+    <None Remove="UI\Resources\Images\Graph.png" />
+    <None Remove="UI\Resources\Images\LinkRolePull.png" />
+    <None Remove="UI\Resources\Images\LinkWeaponPull.png" />
     <None Remove="UI\Resources\Images\Liveness.png" />
     <None Remove="UI\Resources\Images\Motor.png" />
     <None Remove="UI\Resources\Images\MotorFrame.png" />
     <None Remove="UI\Resources\Images\MotorLevel.png" />
     <None Remove="UI\Resources\Images\Music.png" />
+    <None Remove="UI\Resources\Images\Overview.png" />
     <None Remove="UI\Resources\Images\Part0.png" />
     <None Remove="UI\Resources\Images\Part1.png" />
     <None Remove="UI\Resources\Images\Part2.png" />
@@ -423,6 +427,7 @@
     <None Remove="UI\Resources\Images\Part4.png" />
     <None Remove="UI\Resources\Images\Part5.png" />
     <None Remove="UI\Resources\Images\Part6.png" />
+    <None Remove="UI\Resources\Images\PermanentPull.png" />
     <None Remove="UI\Resources\Images\Phantom1.png" />
     <None Remove="UI\Resources\Images\Phantom2.png" />
     <None Remove="UI\Resources\Images\Phantom3.png" />
@@ -432,6 +437,8 @@
     <None Remove="UI\Resources\Images\Sticker.png" />
     <None Remove="UI\Resources\Images\StorgeEnergy.png" />
     <None Remove="UI\Resources\Images\Trash.png" />
+    <None Remove="UI\Resources\Images\UpRolePull.png" />
+    <None Remove="UI\Resources\Images\UpWeaponPull.png" />
     <None Remove="UI\Resources\Images\WeeklyInst.png" />
   </ItemGroup>
 
@@ -1551,9 +1558,13 @@
     <Resource Include="UI\Resources\Images\DIY.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="UI\Resources\Images\Graph.png" />
+    <Resource Include="UI\Resources\Images\LinkRolePull.png" />
+    <Resource Include="UI\Resources\Images\LinkWeaponPull.png" />
     <Resource Include="UI\Resources\Images\MotorFrame.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="UI\Resources\Images\Overview.png" />
     <Resource Include="UI\Resources\Images\Part0.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -1575,6 +1586,7 @@
     <Resource Include="UI\Resources\Images\Part6.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="UI\Resources\Images\PermanentPull.png" />
     <Resource Include="UI\Resources\Images\Phantom1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -1590,6 +1602,10 @@
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="10.0.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9" />
@@ -1694,6 +1710,8 @@
     <Resource Include="UI\Resources\Images\Trash.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="UI\Resources\Images\UpRolePull.png" />
+    <Resource Include="UI\Resources\Images\UpWeaponPull.png" />
     <Resource Include="UI\Resources\Images\WeeklyInst.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WwTool.Common.Models
+namespace WwTool.Common.Models.Entities
 {
     /// <summary>
     /// 玩家基础信息数据库模型
@@ -30,6 +30,7 @@ namespace WwTool.Common.Models
         public int BirthDay { get; set; }
         public long StoreEnergyRecoverTime { get; set; }
         public long EnergyRecoverTime { get; set; }
+        public DateTimeOffset? LastSyncedAtUtc { get; set; }
 
         public string BoxesJson { get; set; } = "{}";
         public string BasicBoxesJson { get; set; } = "{}";

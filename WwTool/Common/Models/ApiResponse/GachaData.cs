@@ -10,7 +10,7 @@ namespace WwTool.Common.Models.ApiResponse
         /// <summary>
         /// 卡池类型
         /// </summary>
-        public string CardPoolType { get; set; }
+        public string CardPoolType { get; set; } = string.Empty;
         /// <summary>
         /// 资源 ID 
         /// </summary>
@@ -18,11 +18,11 @@ namespace WwTool.Common.Models.ApiResponse
         /// <summary>
         /// 资源类型 
         /// </summary>
-        public string ResourceType { get; set; }
+        public string ResourceType { get; set; } = string.Empty;
         /// <summary>
         /// 资源名称
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         /// <summary>
         /// 数量
         /// </summary>
@@ -30,7 +30,7 @@ namespace WwTool.Common.Models.ApiResponse
         /// <summary>
         /// 获取时间
         /// </summary>
-        public string Time { get; set; }
+        public string Time { get; set; } = string.Empty;
         /// <summary>
         /// 品质 
         /// </summary>
