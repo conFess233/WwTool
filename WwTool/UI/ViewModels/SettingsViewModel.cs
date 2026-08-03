@@ -7,15 +7,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using WwTool.Common.Enums;
-using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
+using WwTool.Common.Models.Domain;
 using WwTool.Common.Models.Config;
-using WwTool.Common.Utils;
-using WwTool.Common.Utils;
 using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
+using WwTool.Services.Repositories;
 using ExceptionHelper = WwTool.Common.Utils.ExceptionHelper;
 
 namespace WwTool.UI.ViewModels
@@ -25,6 +25,7 @@ namespace WwTool.UI.ViewModels
     /// </summary>
     public class SettingsViewModel : BindableBase, INavigationAware
     {
+        private CancellationTokenSource _navigationCts = new();
         /// <summary>
         /// UI 状态服务（Toast / Loading）
         /// </summary>
@@ -40,7 +41,7 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 本地数据库服务
         /// </summary>
-        private readonly LocalDataService _localDb;
+        private readonly IUserDataService _userDataService;
         /// <summary>
         /// 日志服务
         /// </summary>
@@ -55,8 +56,8 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 本地用户账号列表
         /// </summary>
-        private ObservableCollection<UserAccount> _users;
-        public ObservableCollection<UserAccount> Users
+        private ObservableCollection<AccountSummary> _users = new();
+        public ObservableCollection<AccountSummary> Users
         {
             get => _users;
             set
@@ -66,9 +67,9 @@ namespace WwTool.UI.ViewModels
             }
         }
 
-        private UserAccount _selectedUser;
+        private AccountSummary _selectedUser = null!;
 
-        public UserAccount SelectedUser
+        public AccountSummary SelectedUser
         {
             get => _selectedUser;
             set
@@ -77,7 +78,7 @@ namespace WwTool.UI.ViewModels
                 {
                     if (value != null) _configService.User.LastUserId = value.Uid;
                 }
-                _selectedUser = value;
+                _selectedUser = value!;
                 RaisePropertyChanged();
             }
         }
@@ -104,12 +105,17 @@ namespace WwTool.UI.ViewModels
         public DelegateCommand DeleteLocalAccountCommand { get; }
 
 
-        public SettingsViewModel(IUIStateService uIStateService, IConfigService configService, IDialogService dialogService, LocalDataService localDb, ILoggerService logger)
+        public SettingsViewModel(
+            IUIStateService uIStateService,
+            IConfigService configService,
+            IDialogService dialogService,
+            IUserDataService userDataService,
+            ILoggerService logger)
         {
             _uiStateService = uIStateService;
             _dialogService = dialogService;
             _configService = configService;
-            _localDb = localDb;
+            _userDataService = userDataService;
             _logger = logger;
 
             SelectGamePathCommand = new DelegateCommand(SelectGamePath);
@@ -350,10 +356,9 @@ namespace WwTool.UI.ViewModels
         private async Task RefreshLocalAccountAsync()
         {
             _logger.Debug("在设置视图中刷新本地用户账号");
-            var localAccounts = await _localDb.GetAllUserAccountAsync();
-            if (localAccounts != null)
-                Users.Clear();
-            foreach (var user in localAccounts)
+            var localAccounts = await _userDataService.ListAccountsAsync(_navigationCts.Token);
+            Users.Clear();
+            foreach (var user in localAccounts ?? [])
             {
                 Users.Add(user);
             }
@@ -362,7 +367,8 @@ namespace WwTool.UI.ViewModels
             {
                 SelectedUser = Users.First(); // 默认选中第一个用户
             }
-            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Toast_UsersFetched"], Users.Count), NotificationType.Success);
+            var userCount = Users?.Count ?? 0;
+            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Toast_UsersFetched"], userCount), NotificationType.Success);
         }
 
         /// <summary>
@@ -387,7 +393,7 @@ namespace WwTool.UI.ViewModels
             {
                 if (result.Result == ButtonResult.OK)
                 {
-                    await _localDb.DeleteUserAccountAsync(SelectedUser.Uid);
+                    await _userDataService.DeleteAccountAsync(SelectedUser.Uid, _navigationCts.Token);
                     _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Toast_UserDeleted"], SelectedUser.Uid), NotificationType.Success);
                     await RefreshLocalAccountAsync();
                 }
@@ -400,6 +406,7 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
+            ResetNavigationCancellation();
             // 进入页面时刷新一次属性通知，确保前端显示最新值
             RaisePropertyChanged(nameof(User));
             RaisePropertyChanged(nameof(EnableFileLogging));
@@ -419,6 +426,13 @@ namespace WwTool.UI.ViewModels
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
-        public void OnNavigatedFrom(NavigationContext navigationContext) { }
+        public void OnNavigatedFrom(NavigationContext navigationContext) => _navigationCts.Cancel();
+
+        private void ResetNavigationCancellation()
+        {
+            if (!_navigationCts.IsCancellationRequested) return;
+            _navigationCts.Dispose();
+            _navigationCts = new CancellationTokenSource();
+        }
     }
 }

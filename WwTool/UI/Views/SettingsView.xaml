@@ -2,11 +2,15 @@
     x:Class="WwTool.UI.Views.SettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:WwTool.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:WwTool.UI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
-    xmlns:converters="clr-namespace:WwTool.Common.Converters"
+    HorizontalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    VerticalContentAlignment="Stretch"
     d:DesignHeight="1696.25"
     d:DesignWidth="747.5"
     mc:Ignorable="d">
@@ -28,13 +32,13 @@
                         Storyboard.TargetProperty="Opacity"
                         From="0"
                         To="1"
-                        Duration="0:0:0.35" />
+                        Duration="{StaticResource MotionPage}" />
                     <DoubleAnimation
                         Storyboard.TargetName="PageTransform"
                         Storyboard.TargetProperty="ScaleY"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -44,7 +48,7 @@
                         Storyboard.TargetProperty="ScaleX"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -61,27 +65,24 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
             <StackPanel>
                 <TextBlock Margin="20" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Settings_Title], Source={x:Static utils:LanguageManager.Instance}}" />
             </StackPanel>
         </Border>
 
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <StackPanel
-                MinWidth="720"
-                Margin="24,16,24,24"
-                HorizontalAlignment="Center">
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
+            <StackPanel MinWidth="0" MaxWidth="920" Margin="24,16,24,24" HorizontalAlignment="Stretch">
 
                 <Border
                     Margin="0,0,0,16"
-                    Background="{DynamicResource CardBgBrush}"
-                    BorderBrush="{DynamicResource StrokeBrush}"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="8">
+                    CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel Margin="16">
                         <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Settings_General], Source={x:Static utils:LanguageManager.Instance}}" />
-                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
                         <StackPanel Margin="0,0,0,16">
                             <TextBlock
@@ -145,7 +146,7 @@
                                     Margin="10,0,0,0"
                                     Command="{Binding DeleteLocalAccountCommand}"
                                     Content="{Binding Path=[Action_Delete], Source={x:Static utils:LanguageManager.Instance}}"
-                                    Foreground="{DynamicResource ButtonTextBrush}"
+                                    Foreground="{DynamicResource TextOnAccentBrush}"
                                     Style="{StaticResource CancelButtonStyle}"
                                     Tag="{StaticResource TrashImage}" />
                             </StackPanel>
@@ -166,13 +167,13 @@
 
                 <Border
                     Margin="0,0,0,16"
-                    Background="{DynamicResource CardBgBrush}"
-                    BorderBrush="{DynamicResource StrokeBrush}"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="8">
+                    CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel Margin="16">
                         <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Settings_UI], Source={x:Static utils:LanguageManager.Instance}}" />
-                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
                         <StackPanel Margin="0,0,0,16">
                             <TextBlock
@@ -180,7 +181,12 @@
                                 FontSize="{StaticResource FontSizeBase}"
                                 Style="{StaticResource SubtitleTextStyle}"
                                 Text="{Binding Path=[Settings_Language], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <ComboBox ItemsSource="{Binding LanguageTypes}" SelectedItem="{Binding AppLanguage}" MinWidth="200" HorizontalAlignment="Left" Height="34">
+                            <ComboBox
+                                Height="34"
+                                MinWidth="200"
+                                HorizontalAlignment="Left"
+                                ItemsSource="{Binding LanguageTypes}"
+                                SelectedItem="{Binding AppLanguage}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
@@ -190,32 +196,19 @@
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,16">
-                            <TextBlock
-                                Margin="0,0,0,12"
-                                FontSize="{StaticResource FontSizeBase}"
-                                Style="{StaticResource SubtitleTextStyle}"
-                                Text="{Binding Path=[Settings_Theme], Source={x:Static utils:LanguageManager.Instance}}" />
-
-                            <ListBox SelectedValue="{Binding User.CurrentTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Style="{StaticResource ThemePickerStyle}">
-                                <ListBoxItem Background="#0F172A" Content="{Binding Path=[Theme_Dark], Source={x:Static utils:LanguageManager.Instance}}" Tag="DarkTheme" />
-                                <ListBoxItem Background="#F3F4F6" Content="{Binding Path=[Theme_Light], Source={x:Static utils:LanguageManager.Instance}}" Tag="LightTheme" />
-                                <ListBoxItem Background="#E11D48" Content="{Binding Path=[Theme_Red], Source={x:Static utils:LanguageManager.Instance}}" Tag="RedTheme" />
-                                <ListBoxItem Background="#059669" Content="{Binding Path=[Theme_Green], Source={x:Static utils:LanguageManager.Instance}}" Tag="GreenTheme" />
-                                <ListBoxItem Background="#2563EB" Content="{Binding Path=[Theme_Blue], Source={x:Static utils:LanguageManager.Instance}}" Tag="BlueTheme" />
-                                <ListBoxItem Background="#EA580C" Content="{Binding Path=[Theme_Orange], Source={x:Static utils:LanguageManager.Instance}}" Tag="OrangeTheme" />
-                                <ListBoxItem Background="#D97706" Content="{Binding Path=[Theme_Yellow], Source={x:Static utils:LanguageManager.Instance}}" Tag="YellowTheme" />
-                                <ListBoxItem Background="#7C3AED" Content="{Binding Path=[Theme_Purple], Source={x:Static utils:LanguageManager.Instance}}" Tag="PurpleTheme" />
-                                <ListBoxItem Content="{Binding Path=[Theme_Glass], Source={x:Static utils:LanguageManager.Instance}}" Tag="GlassTheme">
-                                    <ListBoxItem.Background>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Offset="0.0" Color="#CCFFFFFF" />
-                                            <GradientStop Offset="1.0" Color="#33FFFFFF" />
-                                        </LinearGradientBrush>
-                                    </ListBoxItem.Background>
-                                </ListBoxItem>
+                            <TextBlock Margin="0,0,0,12" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_BaseTheme], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <ListBox SelectedValue="{Binding User.BaseTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Style="{StaticResource ThemeCardPickerStyle}">
+                                <ListBoxItem Background="{StaticResource PreviewWarmWhiteBackground}" BorderBrush="{StaticResource PreviewWarmWhiteSurface}" Content="{Binding Path=[Theme_WarmWhite], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewWarmWhiteAccent}" Tag="WarmWhite" />
+                                <ListBoxItem Background="{StaticResource PreviewDeepBlueBackground}" BorderBrush="{StaticResource PreviewDeepBlueSurface}" Content="{Binding Path=[Theme_DeepBlue], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewDeepBlueAccent}" Tag="DeepBlue" />
+                                <ListBoxItem Background="{StaticResource PreviewSoftGreenBackground}" BorderBrush="{StaticResource PreviewSoftGreenSurface}" Content="{Binding Path=[Theme_SoftGreen], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewSoftGreenAccent}" Tag="SoftGreen" />
+                                <ListBoxItem Background="{StaticResource PreviewSoftPinkBackground}" BorderBrush="{StaticResource PreviewSoftPinkSurface}" Content="{Binding Path=[Theme_SoftPink], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewSoftPinkAccent}" Tag="SoftPink" />
+                                <ListBoxItem Background="{StaticResource PreviewBlackGoldBackground}" BorderBrush="{StaticResource PreviewBlackGoldSurface}" Content="{Binding Path=[Theme_BlackGold], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewBlackGoldAccent}" Tag="BlackGold" />
                             </ListBox>
-
-                            <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_GlassHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBlock Margin="0,16,0,12" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_AccentTheme], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <ListBox SelectedValue="{Binding User.AccentTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Style="{StaticResource AccentPickerStyle}">
+                                <ListBoxItem Background="{DynamicResource AccentBrush}" Content="{Binding Path=[Theme_Follow], Source={x:Static utils:LanguageManager.Instance}}" Tag="FollowTheme" />
+                                <ListBoxItem Background="{StaticResource PreviewAccentBlue}" Content="{Binding Path=[Theme_Blue], Source={x:Static utils:LanguageManager.Instance}}" Tag="BlueAccent" /><ListBoxItem Background="{StaticResource PreviewAccentGreen}" Content="{Binding Path=[Theme_Green], Source={x:Static utils:LanguageManager.Instance}}" Tag="GreenAccent" /><ListBoxItem Background="{StaticResource PreviewAccentPurple}" Content="{Binding Path=[Theme_Purple], Source={x:Static utils:LanguageManager.Instance}}" Tag="PurpleAccent" /><ListBoxItem Background="{StaticResource PreviewAccentRed}" Content="{Binding Path=[Theme_Red], Source={x:Static utils:LanguageManager.Instance}}" Tag="RedAccent" /><ListBoxItem Background="{StaticResource PreviewAccentOrange}" Content="{Binding Path=[Theme_Orange], Source={x:Static utils:LanguageManager.Instance}}" Tag="OrangeAccent" /><ListBoxItem Background="{StaticResource PreviewAccentYellow}" Content="{Binding Path=[Theme_Yellow], Source={x:Static utils:LanguageManager.Instance}}" Tag="YellowAccent" />
+                            </ListBox>
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,16" VerticalAlignment="Center" Orientation="Horizontal">
@@ -228,30 +221,45 @@
                             </Border>
                         </StackPanel>
 
-                        <!-- 毛玻璃透明度调节 -->
+                        <!--  毛玻璃透明度调节  -->
                         <StackPanel Margin="0,0,0,16" Visibility="{Binding User.IsGlassEffectEnabled, Converter={StaticResource BoolToVis}}">
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
                                 <TextBlock FontSize="{StaticResource FontSizeBase}" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_GlassOpacity], Source={x:Static utils:LanguageManager.Instance}}" />
-                                <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Style="{StaticResource CaptionTextStyle}" Text="{Binding User.GlassOpacity, StringFormat={}{0}%}" />
+                                <TextBlock
+                                    Margin="10,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource CaptionTextStyle}"
+                                    Text="{Binding User.GlassOpacity, StringFormat={}{0}%}" />
                             </StackPanel>
-                            <Slider Style="{StaticResource ModernSliderStyle}" 
-                                    Minimum="0" Maximum="100" 
-                                    Value="{Binding User.GlassOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                    IsSnapToTickEnabled="True" TickFrequency="1" />
+                            <Slider
+                                IsSnapToTickEnabled="True"
+                                Maximum="95"
+                                Minimum="65"
+                                Style="{StaticResource ModernSliderStyle}"
+                                TickFrequency="1"
+                                Value="{Binding User.GlassOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Margin="0,8,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_GlassOpacityHint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16" Orientation="Horizontal">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_ReducedMotion], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_ReducedMotionHint], Source={x:Static utils:LanguageManager.Instance}}" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleButton Margin="10,0,0,0" HorizontalAlignment="Right" IsChecked="{Binding User.IsReducedMotionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SwitchToggleButtonStyle}" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
                 <Border
                     Margin="0,0,0,16"
-                    Background="{DynamicResource CardBgBrush}"
-                    BorderBrush="{DynamicResource StrokeBrush}"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="8">
+                    CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel Margin="16">
                         <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Settings_Network], Source={x:Static utils:LanguageManager.Instance}}" />
-                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
                         <StackPanel Margin="0,0,0,16">
                             <TextBlock
@@ -270,8 +278,8 @@
                                 Style="{StaticResource SubtitleTextStyle}"
                                 Text="{Binding Path=[Settings_GeetestPort], Source={x:Static utils:LanguageManager.Instance}}" />
                             <TextBox
-                                MinWidth="120"
                                 Height="34"
+                                MinWidth="120"
                                 Padding="8,4"
                                 HorizontalAlignment="Left"
                                 Text="{Binding GeetestPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -299,13 +307,13 @@
                 </Border>
 
                 <Border
-                    Background="{DynamicResource CardBgBrush}"
-                    BorderBrush="{DynamicResource StrokeBrush}"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="8">
+                    CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel Margin="16">
                         <TextBlock Margin="0,0,0,5" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Settings_Log], Source={x:Static utils:LanguageManager.Instance}}" />
-                        <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+                        <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
                         <StackPanel Margin="0,0,0,16" VerticalAlignment="Center" Orientation="Horizontal">
                             <StackPanel>
@@ -351,8 +359,8 @@
                                 Style="{StaticResource SubtitleTextStyle}"
                                 Text="{Binding Path=[Settings_LogDays], Source={x:Static utils:LanguageManager.Instance}}" />
                             <TextBox
-                                MinWidth="120"
                                 Height="34"
+                                MinWidth="120"
                                 Padding="8,4"
                                 HorizontalAlignment="Left"
                                 Text="{Binding LogRetentionDays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -366,8 +374,8 @@
                                 Style="{StaticResource SubtitleTextStyle}"
                                 Text="{Binding Path=[Settings_LogSize], Source={x:Static utils:LanguageManager.Instance}}" />
                             <TextBox
-                                MinWidth="120"
                                 Height="34"
+                                MinWidth="120"
                                 Padding="8,4"
                                 HorizontalAlignment="Left"
                                 Text="{Binding LogMaxSizeBytesMb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -381,8 +389,8 @@
                                 Style="{StaticResource SubtitleTextStyle}"
                                 Text="{Binding Path=[Settings_LogCount], Source={x:Static utils:LanguageManager.Instance}}" />
                             <TextBox
-                                MinWidth="120"
                                 Height="34"
+                                MinWidth="120"
                                 Padding="8,4"
                                 HorizontalAlignment="Left"
                                 Text="{Binding LogMaxFileCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -401,7 +409,7 @@
                 Command="{Binding SaveCommand}"
                 Content="{Binding Path=[Action_SaveSettings], Source={x:Static utils:LanguageManager.Instance}}"
                 FontSize="{StaticResource FontSizeLg}"
-                Foreground="{DynamicResource ButtonTextBrush}"
+                Foreground="{DynamicResource TextOnAccentBrush}"
                 Style="{StaticResource OkButtonStyle}"
                 Tag="{StaticResource SaveImage}" />
         </StackPanel>

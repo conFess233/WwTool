@@ -1,0 +1,5 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="AccentColor">#059669</Color><Color x:Key="AccentHoverColor">#047857</Color><Color x:Key="AccentPressedColor">#065F46</Color><Color x:Key="AccentContainerColor">#D1FAE5</Color><Color x:Key="AccentContainerHoverColor">#A7F3D0</Color><Color x:Key="FocusRingColor">#10B981</Color>
+    <Color x:Key="PrimaryColor">#059669</Color><Color x:Key="PrimaryHoverColor">#047857</Color><Color x:Key="ButtonBgColor">#059669</Color><Color x:Key="ButtonStrokeColor">#047857</Color><Color x:Key="CheckedColor">#059669</Color><Color x:Key="ToggleOnBgColor">#059669</Color>
+    <Color x:Key="ChartFourStarColor">#0D9488</Color>
+</ResourceDictionary>

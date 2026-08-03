@@ -27,14 +27,14 @@
         <cv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
 
         <Style x:Key="GlassPasswordBoxStyle" TargetType="{x:Type PasswordBox}">
-            <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource TextBoxStrokeBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource TextMainBrush}" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="8,6" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="MinWidth" Value="150" />
-            <Setter Property="CaretBrush" Value="{DynamicResource PrimaryBrush}" />
+            <Setter Property="CaretBrush" Value="{DynamicResource AccentBrush}" />
             <Setter Property="PasswordChar" Value="●" />
 
             <Setter Property="Template">
@@ -51,7 +51,7 @@
 
                             <Border
                                 x:Name="hoverBorder"
-                                BorderBrush="{DynamicResource PrimaryHoverBrush}"
+                                BorderBrush="{DynamicResource AccentHoverBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="6"
                                 IsHitTestVisible="False"
@@ -60,7 +60,7 @@
 
                             <Border
                                 x:Name="focusBorder"
-                                BorderBrush="{DynamicResource PrimaryBrush}"
+                                BorderBrush="{DynamicResource AccentBrush}"
                                 BorderThickness="1.5"
                                 CornerRadius="6"
                                 IsHitTestVisible="False"
@@ -85,7 +85,7 @@
                                                 Storyboard.TargetName="hoverBorder"
                                                 Storyboard.TargetProperty="Opacity"
                                                 To="1"
-                                                Duration="0:0:0.2" />
+                                                Duration="{StaticResource MotionNormal}" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.EnterActions>
@@ -96,7 +96,7 @@
                                                 Storyboard.TargetName="hoverBorder"
                                                 Storyboard.TargetProperty="Opacity"
                                                 To="0"
-                                                Duration="0:0:0.2" />
+                                                Duration="{StaticResource MotionNormal}" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.ExitActions>
@@ -110,7 +110,7 @@
                                                 Storyboard.TargetName="focusBorder"
                                                 Storyboard.TargetProperty="Opacity"
                                                 To="1"
-                                                Duration="0:0:0.3" />
+                                                Duration="{StaticResource MotionPage}" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.EnterActions>
@@ -121,14 +121,14 @@
                                                 Storyboard.TargetName="focusBorder"
                                                 Storyboard.TargetProperty="Opacity"
                                                 To="0"
-                                                Duration="0:0:0.3" />
+                                                Duration="{StaticResource MotionPage}" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.ExitActions>
                             </Trigger>
 
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledBgBrush}" />
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -140,10 +140,10 @@
     <Border
         Width="360"
         Padding="28,24,28,24"
-        Background="{DynamicResource CardBgBrush}"
-        BorderBrush="{DynamicResource StrokeBrush}"
+        Background="{DynamicResource SurfaceBrush}"
+        BorderBrush="{DynamicResource BorderBrush}"
         BorderThickness="1"
-        CornerRadius="12">
+        CornerRadius="{DynamicResource CornerRadiusCard}">
 
         <Border.Effect>
             <DropShadowEffect
@@ -169,7 +169,7 @@
                 Grid.Row="0"
                 Margin="0,0,0,20"
                 Padding="0,0,0,10"
-                BorderBrush="{DynamicResource UnderLineBrush}"
+                BorderBrush="{DynamicResource DividerBrush}"
                 BorderThickness="0,0,0,2">
                 <Grid>
                     <TextBlock
@@ -199,12 +199,12 @@
                                                     HorizontalAlignment="Center"
                                                     VerticalAlignment="Center"
                                                     Data="M2,2 L14,14 M2,14 L14,2"
-                                                    Stroke="{DynamicResource TextSubBrush}"
+                                                    Stroke="{DynamicResource TextSecondaryBrush}"
                                                     StrokeThickness="1.5" />
                                             </Border>
                                             <ControlTemplate.Triggers>
                                                 <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="ClosePath" Property="Stroke" Value="{DynamicResource CancelButtonBgBrush}" />
+                                                    <Setter TargetName="ClosePath" Property="Stroke" Value="{DynamicResource DangerContainerBrush}" />
                                                 </Trigger>
                                             </ControlTemplate.Triggers>
                                         </ControlTemplate>
@@ -220,7 +220,7 @@
                 <TextBlock
                     Margin="0,0,0,6"
                     FontSize="12"
-                    Foreground="{DynamicResource TextSubBrush}"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
                     Style="{StaticResource SubtitleTextStyle}"
                     Text="{Binding Path=[Login_Email], Source={x:Static utils:LanguageManager.Instance}}" />
                 <TextBox
@@ -235,7 +235,7 @@
                 <TextBlock
                     Margin="0,0,0,6"
                     FontSize="12"
-                    Foreground="{DynamicResource TextSubBrush}"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
                     Style="{StaticResource SubtitleTextStyle}"
                     Text="{Binding Path=[Login_Password], Source={x:Static utils:LanguageManager.Instance}}" />
                 <PasswordBox
@@ -254,7 +254,7 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
                     FontSize="12"
-                    Foreground="#FFEC7063"
+                    Foreground="{DynamicResource DangerBrush}"
                     Text="{Binding ErrorMessage}"
                     TextWrapping="Wrap">
                     <TextBlock.Style>

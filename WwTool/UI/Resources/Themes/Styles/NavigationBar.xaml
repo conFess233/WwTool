@@ -7,17 +7,17 @@
     <cv:ResourceImageConverter x:Key="ResourceImageConverter" />
 
     <Style x:Key="Bar" TargetType="{x:Type Border}">
-        <Setter Property="Background" Value="{DynamicResource CardBgBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
         <Setter Property="Margin" Value="0,3,3,3" />
-        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="CornerRadius" Value="8" />
         <Setter Property="Effect" Value="{DynamicResource NavBarShadow}" />
     </Style>
 
     <Style x:Key="Rectangle" TargetType="{x:Type Border}">
         <Setter Property="Width" Value="35" />
         <Setter Property="Height" Value="35" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Background" Value="{DynamicResource ActiveBgBrush}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="Margin" Value="6,18,0,0" />
         <Setter Property="Effect" Value="{DynamicResource ShadowSm}" />
@@ -37,7 +37,7 @@
                 <DataTrigger.EnterActions>
                     <BeginStoryboard>
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.2">
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="{StaticResource MotionNormal}">
                                 <DoubleAnimation.EasingFunction>
                                     <PowerEase EasingMode="EaseInOut" Power="2" />
                                 </DoubleAnimation.EasingFunction>
@@ -48,7 +48,7 @@
                 <DataTrigger.ExitActions>
                     <BeginStoryboard>
                         <Storyboard>
-                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.15">
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="{StaticResource MotionFast}">
                                 <DoubleAnimation.EasingFunction>
                                     <PowerEase EasingMode="EaseInOut" Power="2" />
                                 </DoubleAnimation.EasingFunction>
@@ -62,7 +62,8 @@
 
     <Style x:Key="NavBarItem" TargetType="ListBoxItem">
         <Setter Property="DockPanel.Dock" Value="Top" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
@@ -74,8 +75,8 @@
                             Width="{Binding RelativeSource={RelativeSource AncestorType=local:NavigationBar}, Path=HighlightWidth}"
                             Height="35"
                             Margin="-6,-3,0,0"
-                            Background="{DynamicResource HoverBgBrush}"
-                            CornerRadius="12"
+                            Background="{DynamicResource SurfaceHoverBrush}"
+                            CornerRadius="{DynamicResource CornerRadiusControl}"
                             Opacity="0" />
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -93,13 +94,13 @@
                                     <TranslateTransform X="0" />
                                 </Grid.RenderTransform>
 
-                                <Rectangle x:Name="iconBase" Fill="{DynamicResource TextMainBrush}">
+                                <Rectangle x:Name="iconBase" Fill="{DynamicResource TextSecondaryBrush}">
                                     <Rectangle.OpacityMask>
                                         <ImageBrush ImageSource="{Binding Icon, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
 
-                                <Rectangle x:Name="iconActive" Fill="{DynamicResource ActiveTextBrush}" Opacity="0">
+                                <Rectangle x:Name="iconActive" Fill="{DynamicResource AccentBrush}" Opacity="0">
                                     <Rectangle.OpacityMask>
                                         <ImageBrush ImageSource="{Binding Icon, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
                                     </Rectangle.OpacityMask>
@@ -112,10 +113,10 @@
                                 </Grid.RenderTransform>
 
                                 <Border>
-                                    <TextBlock x:Name="titleBase" Foreground="{DynamicResource TextMainBrush}" Style="{StaticResource Name}" />
+                                    <TextBlock x:Name="titleBase" Foreground="{DynamicResource TextSecondaryBrush}" Style="{StaticResource Name}" />
                                 </Border>
                                 <Border x:Name="titleActiveContainer" Opacity="0">
-                                    <TextBlock x:Name="titleActive" Foreground="{DynamicResource ActiveTextBrush}" Style="{StaticResource Name}" />
+                                    <TextBlock x:Name="titleActive" Foreground="{DynamicResource AccentBrush}" Style="{StaticResource Name}" />
                                 </Border>
                             </Grid>
                         </Grid>
@@ -130,7 +131,7 @@
                                             Storyboard.TargetName="hover"
                                             Storyboard.TargetProperty="Opacity"
                                             To="1"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -141,7 +142,7 @@
                                             Storyboard.TargetName="hover"
                                             Storyboard.TargetProperty="Opacity"
                                             To="0"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -155,12 +156,12 @@
                                             Storyboard.TargetName="iconActive"
                                             Storyboard.TargetProperty="Opacity"
                                             To="1"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                         <DoubleAnimation
                                             Storyboard.TargetName="titleActiveContainer"
                                             Storyboard.TargetProperty="Opacity"
                                             To="1"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -171,12 +172,12 @@
                                             Storyboard.TargetName="iconActive"
                                             Storyboard.TargetProperty="Opacity"
                                             To="0"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                         <DoubleAnimation
                                             Storyboard.TargetName="titleActiveContainer"
                                             Storyboard.TargetProperty="Opacity"
                                             To="0"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>

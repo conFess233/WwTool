@@ -6,8 +6,8 @@
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
     Height="32">
 
-    <Border ClipToBounds="True" CornerRadius="12">
-        <Grid Background="#01FFFFFF" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
+    <Border ClipToBounds="True" CornerRadius="{DynamicResource CornerRadiusCard}">
+        <Grid Background="{StaticResource TransparentHitTargetBrush}" MouseLeftButtonDown="Grid_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -37,7 +37,7 @@
                     <Path
                         Data="M 0,0 L 10,0"
                         SnapsToDevicePixels="True"
-                        Stroke="{DynamicResource TextSubBrush}"
+                        Stroke="{DynamicResource TextSecondaryBrush}"
                         StrokeThickness="1" />
                 </Button>
                 <Button Click="BtnMaximize_Click" Style="{StaticResource SystemButtonStyle}">
@@ -45,7 +45,7 @@
                         x:Name="PathMaximize"
                         Data="M 0,0 L 10,0 L 10,10 L 0,10 Z"
                         SnapsToDevicePixels="True"
-                        Stroke="{DynamicResource TextSubBrush}"
+                        Stroke="{DynamicResource TextSecondaryBrush}"
                         StrokeThickness="1" />
                 </Button>
                 <Button Click="BtnClose_Click">
@@ -71,7 +71,7 @@
                                                 x:Name="hoverBorder"
                                                 Margin="2"
                                                 Padding="1"
-                                                Background="{DynamicResource CancelButtonHoverBrush}"
+                                                Background="{DynamicResource DangerHoverBrush}"
                                                 CornerRadius="4"
                                                 Opacity="0"
                                                 SnapsToDevicePixels="True" />
@@ -86,7 +86,7 @@
                                                                 Storyboard.TargetName="hoverBorder"
                                                                 Storyboard.TargetProperty="Opacity"
                                                                 To="1"
-                                                                Duration="0:0:0.2" />
+                                                                Duration="{StaticResource MotionNormal}" />
                                                         </Storyboard>
                                                     </BeginStoryboard>
                                                 </Trigger.EnterActions>
@@ -97,7 +97,7 @@
                                                                 Storyboard.TargetName="hoverBorder"
                                                                 Storyboard.TargetProperty="Opacity"
                                                                 To="0"
-                                                                Duration="0:0:0.2" />
+                                                                Duration="{StaticResource MotionNormal}" />
                                                         </Storyboard>
                                                     </BeginStoryboard>
                                                 </Trigger.ExitActions>
@@ -111,7 +111,7 @@
                     <Path
                         Data="M 0,0 L 10,10 M 10,0 L 0,10"
                         SnapsToDevicePixels="True"
-                        Stroke="{DynamicResource TextSubBrush}"
+                        Stroke="{DynamicResource TextSecondaryBrush}"
                         StrokeThickness="1" />
                 </Button>
             </StackPanel>

@@ -81,7 +81,9 @@ namespace WwTool.Common.Behaviors
             {
                 From = TargetScrollViewer.VerticalOffset,
                 To = 0,
-                Duration = new Duration(TimeSpan.FromMilliseconds(350)),
+                Duration = Application.Current.TryFindResource("MotionPage") is Duration duration
+                    ? duration
+                    : new Duration(TimeSpan.FromMilliseconds(280)),
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
             };
 

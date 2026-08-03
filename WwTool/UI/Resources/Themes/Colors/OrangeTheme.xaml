@@ -1,47 +1,59 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Color x:Key="PageBgColor">#80FFF7ED</Color>
-    <Color x:Key="CardBgColor">#B3FFFFFF</Color>
-    <Color x:Key="SolidBgColor">#FFF7ED</Color>
-
-    <Color x:Key="PrimaryColor">#EA580C</Color>
-    <Color x:Key="PrimaryHoverColor">#C2410C</Color>
-
-    <Color x:Key="TextMainColor">#7C2D12</Color>
-    <Color x:Key="TextSubColor">#431407</Color>
-    <Color x:Key="TextPlaceholderColor">#EA580C</Color>
-
-    <Color x:Key="HoverBgColor">#0D000000</Color>
-    <Color x:Key="ActiveBgColor">#1A000000</Color>
-    <Color x:Key="ActiveTextColor">#7C2D12</Color>
-    <Color x:Key="DisabledBgColor">#FFEDD5</Color>
-
-    <Color x:Key="UnderLineColor">#FED7AA</Color>
-    <Color x:Key="UnderLineTransparentColor">#00FED7AA</Color>
-    <Color x:Key="StrokeColor">#FED7AA</Color>
-    <Color x:Key="TextBoxStorkeColor">#FDBA74</Color>
-
-    <Color x:Key="ButtonBgColor">#EA580C</Color>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="BackgroundColor">#F6F8FB</Color>
+    <Color x:Key="SurfaceColor">#EDFFFFFF</Color>
+    <Color x:Key="SurfaceElevatedColor">#FFFFFFFF</Color>
+    <Color x:Key="SurfaceMutedColor">#F1F5F9</Color>
+    <Color x:Key="BorderColor">#D8E0EA</Color>
+    <Color x:Key="BorderStrongColor">#B6C2D2</Color>
+    <Color x:Key="TextPrimaryColor">#0F172A</Color>
+    <Color x:Key="TextSecondaryColor">#334155</Color>
+    <Color x:Key="TextMutedColor">#64748B</Color>
+    <Color x:Key="TextOnAccentColor">#FFFFFF</Color>
+    <Color x:Key="AccentColor">#C2410C</Color>
+    <Color x:Key="AccentHoverColor">#9A3412</Color>
+    <Color x:Key="AccentPressedColor">#7C2D12</Color>
+    <Color x:Key="AccentContainerColor">#FFEDD5</Color>
+    <Color x:Key="AccentContainerHoverColor">#FED7AA</Color>
+    <Color x:Key="DangerColor">#DC2626</Color>
+    <Color x:Key="DangerHoverColor">#B91C1C</Color>
+    <Color x:Key="DangerContainerColor">#FEE2E2</Color>
+    <Color x:Key="SuccessColor">#047857</Color>
+    <Color x:Key="SuccessContainerColor">#D1FAE5</Color>
+    <Color x:Key="WarningColor">#92400E</Color>
+    <Color x:Key="WarningContainerColor">#FEF3C7</Color>
+    <Color x:Key="FocusRingColor">#EA580C</Color>
+    <Color x:Key="PageBgColor">#F6F8FB</Color>
+    <Color x:Key="CardBgColor">#EDFFFFFF</Color>
+    <Color x:Key="SolidBgColor">#F6F8FB</Color>
+    <Color x:Key="PrimaryColor">#C2410C</Color>
+    <Color x:Key="PrimaryHoverColor">#9A3412</Color>
+    <Color x:Key="TextMainColor">#0F172A</Color>
+    <Color x:Key="TextSubColor">#334155</Color>
+    <Color x:Key="TextPlaceholderColor">#64748B</Color>
+    <Color x:Key="HoverBgColor">#F1F5F9</Color>
+    <Color x:Key="ActiveBgColor">#FFEDD5</Color>
+    <Color x:Key="ActiveTextColor">#9A3412</Color>
+    <Color x:Key="DisabledBgColor">#E2E8F0</Color>
+    <Color x:Key="UnderLineColor">#D8E0EA</Color>
+    <Color x:Key="UnderLineTransparentColor">#00D8E0EA</Color>
+    <Color x:Key="StrokeColor">#D8E0EA</Color>
+    <Color x:Key="TextBoxStorkeColor">#B6C2D2</Color>
+    <Color x:Key="ButtonBgColor">#C2410C</Color>
     <Color x:Key="ButtonTextColor">#FFFFFF</Color>
-    <Color x:Key="ButtonStrokeColor">#C2410C</Color>
-
-    <Color x:Key="CancelButtonBgColor">#1AEC7063</Color>
-    <Color x:Key="CancelButtonHoverColor">#EC7063</Color>
-    <Color x:Key="CancelButtonStrokeColor">#4DEC7063</Color>
-    <Color x:Key="OkButtonBgColor">#1A58D58E</Color>
-    <Color x:Key="OkButtonHoverColor">#58D58E</Color>
-    <Color x:Key="OkButtonStrokeColor">#4D58D58E</Color>
-
-    <Color x:Key="CheckedColor">#EA580C</Color>
+    <Color x:Key="ButtonStrokeColor">#9A3412</Color>
+    <Color x:Key="CancelButtonBgColor">#FEE2E2</Color>
+    <Color x:Key="CancelButtonHoverColor">#DC2626</Color>
+    <Color x:Key="CancelButtonStrokeColor">#FCA5A5</Color>
+    <Color x:Key="OkButtonBgColor">#D1FAE5</Color>
+    <Color x:Key="OkButtonHoverColor">#047857</Color>
+    <Color x:Key="OkButtonStrokeColor">#6EE7B7</Color>
+    <Color x:Key="CheckedColor">#C2410C</Color>
     <Color x:Key="SelectedBgColor">#FFEDD5</Color>
     <Color x:Key="UnselectedBgColor">#00FFFFFF</Color>
-    <Color x:Key="ToggleOnBgColor">#EA580C</Color>
-    <Color x:Key="ToggleOffBgColor">#FDBA74</Color>
-
-    <Color x:Key="ShadowDarkColor">#1A7C2D12</Color>
-    <Color x:Key="ShadowLightColor">#087C2D12</Color>
+    <Color x:Key="ToggleOnBgColor">#C2410C</Color>
+    <Color x:Key="ToggleOffBgColor">#CBD5E1</Color>
+    <Color x:Key="ShadowDarkColor">#1F0F172A</Color>
+    <Color x:Key="ShadowLightColor">#0F0F172A</Color>
     <Color x:Key="FocusShadowColor">#40EA580C</Color>
-
-        <!-- Status Colors -->
-    <Color x:Key="WarningColor">#F59E0B</Color>
-    <Color x:Key="SuccessColor">#10B981</Color>
 </ResourceDictionary>

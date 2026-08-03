@@ -6,6 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    HorizontalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    VerticalContentAlignment="Stretch"
     d:DesignHeight="760.208"
     d:DesignWidth="1099.669"
     mc:Ignorable="d">
@@ -27,13 +31,13 @@
                         Storyboard.TargetProperty="Opacity"
                         From="0"
                         To="1"
-                        Duration="0:0:0.35" />
+                        Duration="{StaticResource MotionPage}" />
                     <DoubleAnimation
                         Storyboard.TargetName="PageTransform"
                         Storyboard.TargetProperty="ScaleY"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -43,7 +47,7 @@
                         Storyboard.TargetProperty="ScaleX"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -59,7 +63,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
             <Grid>
                 <TextBlock Margin="20,15" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Role_Title], Source={x:Static utils:LanguageManager.Instance}}" />
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
@@ -79,7 +83,7 @@
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshLocalAccountCommand}"
                         Content="{Binding Path=[Action_RefreshRoleList], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Tag="{StaticResource RefreshImage}" />
                     <Button
                         Height="32"
@@ -87,7 +91,7 @@
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshCommand}"
                         Content="{Binding Path=[Action_RefreshLocalData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource RefreshImage}" />
                     <Button
@@ -96,7 +100,7 @@
                         HorizontalAlignment="Right"
                         Command="{Binding SyncDataCommand}"
                         Content="{Binding Path=[Action_GetCloudData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource CloudImage}" />
                 </StackPanel>
@@ -104,9 +108,9 @@
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
 
-            <Grid MinWidth="720" Margin="24,16,24,24" HorizontalAlignment="Center">
+            <Grid MinWidth="0" MaxWidth="920" Margin="24,16,24,24" HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" MinWidth="250" />
                     <ColumnDefinition Width="16" />
@@ -116,10 +120,10 @@
                 <Border
                     Grid.Column="0"
                     VerticalAlignment="Top"
-                    Background="{DynamicResource CardBgBrush}"
-                    BorderBrush="{DynamicResource StrokeBrush}"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="8">
+                    CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel Margin="16">
                         <Image
                             Width="80"
@@ -141,7 +145,7 @@
                             Style="{StaticResource CaptionTextStyle}"
                             Text="{Binding SelectedUser.Uid, StringFormat={}UID: {0}}" />
 
-                        <Separator Margin="0,0,0,16" Background="{DynamicResource UnderLineBrush}" />
+                        <Separator Margin="0,0,0,16" Background="{DynamicResource DividerBrush}" />
 
                         <Grid Margin="0,0,0,8">
                             <TextBlock HorizontalAlignment="Left" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_Level], Source={x:Static utils:LanguageManager.Instance}}" />
@@ -186,13 +190,13 @@
                 <StackPanel Grid.Column="2">
                     <Border
                         Margin="0,0,0,16"
-                        Background="{DynamicResource CardBgBrush}"
-                        BorderBrush="{DynamicResource StrokeBrush}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="8">
+                        CornerRadius="{DynamicResource CornerRadiusCard}">
                         <StackPanel Margin="16">
                             <TextBlock Margin="0,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Role_Energy], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+                            <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
                             <StackPanel Margin="0,0,0,12">
                                 <Grid Margin="0,0,0,4">
@@ -207,7 +211,7 @@
                                     </StackPanel>
                                 </Grid>
                                 <ProgressBar
-                                    Background="{DynamicResource HoverBgBrush}"
+                                    Background="{DynamicResource SurfaceHoverBrush}"
                                     Maximum="{Binding RoleDetail.Base.MaxEnergy}"
                                     Style="{StaticResource ExpBarStyle}"
                                     Value="{Binding RoleDetail.Base.Energy}" />
@@ -225,7 +229,7 @@
                                     </StackPanel>
                                 </Grid>
                                 <ProgressBar
-                                    Background="{DynamicResource HoverBgBrush}"
+                                    Background="{DynamicResource SurfaceHoverBrush}"
                                     Maximum="{Binding RoleDetail.Base.MaxStoreEnergy}"
                                     Style="{StaticResource ExpBarStyle}"
                                     Value="{Binding RoleDetail.Base.StoreEnergy}" />
@@ -234,10 +238,10 @@
                     </Border>
                     <Border
                         Margin="0,0,0,16"
-                        Background="{DynamicResource CardBgBrush}"
-                        BorderBrush="{DynamicResource StrokeBrush}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="8">
+                        CornerRadius="{DynamicResource CornerRadiusCard}">
                         <StackPanel Margin="10">
                             <StackPanel Margin="0,0,0,5" VerticalAlignment="Center" Orientation="Horizontal">
                                 <Image Width="30" Height="30" Source="{StaticResource BattlePassImage}" />
@@ -247,7 +251,7 @@
                                     Style="{StaticResource TitleTextStyle}"
                                     Text="{Binding Path=[Role_Radio], Source={x:Static utils:LanguageManager.Instance}}" />
                             </StackPanel>
-                            <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+                            <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
 
                             <Grid Margin="0,0,0,12">
@@ -264,7 +268,7 @@
                                         </StackPanel>
                                     </Grid>
                                     <ProgressBar
-                                        Background="{DynamicResource HoverBgBrush}"
+                                        Background="{DynamicResource SurfaceHoverBrush}"
                                         Maximum="{Binding RoleDetail.BattlePass.WeekMaxExp}"
                                         Style="{StaticResource ExpBarStyle}"
                                         Value="{Binding RoleDetail.BattlePass.WeekExp}" />
@@ -276,8 +280,8 @@
                                     Width="54"
                                     Height="54"
                                     Margin="16,0,0,0"
-                                    Background="{DynamicResource StrokeBrush}"
-                                    BorderBrush="{DynamicResource UnderLineBrush}"
+                                    Background="{DynamicResource BorderBrush}"
+                                    BorderBrush="{DynamicResource DividerBrush}"
                                     BorderThickness="1"
                                     CornerRadius="27">
                                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -307,16 +311,16 @@
 
                     <Border
                         Margin="0,0,0,16"
-                        Background="{DynamicResource CardBgBrush}"
-                        BorderBrush="{DynamicResource StrokeBrush}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="8">
+                        CornerRadius="{DynamicResource CornerRadiusCard}">
                         <StackPanel Margin="12">
                             <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
                                 <Image Width="30" Height="30" Source="{StaticResource LivenessImage}" />
                                 <TextBlock Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Role_Activity], Source={x:Static utils:LanguageManager.Instance}}" />
                             </StackPanel>
-                            <Separator Margin="0,0,0,12" Background="{DynamicResource UnderLineBrush}" />
+                            <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
                             <Grid Margin="0,0,0,12">
                                 <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_ActivityToday], Source={x:Static utils:LanguageManager.Instance}}" />
@@ -327,7 +331,7 @@
                             </Grid>
                             <ProgressBar
                                 Margin="0,0,0,12"
-                                Background="{DynamicResource HoverBgBrush}"
+                                Background="{DynamicResource SurfaceHoverBrush}"
                                 Maximum="{Binding RoleDetail.Base.LivenessMaxCount}"
                                 Style="{StaticResource ExpBarStyle}"
                                 Value="{Binding RoleDetail.Base.Liveness}" />

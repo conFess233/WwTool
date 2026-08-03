@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 using WwTool.Common.Utils;
 
 namespace WwTool.UI.Components
@@ -14,9 +15,9 @@ namespace WwTool.UI.Components
     /// </summary>
     public class NavigationBar : ListBox
     {
-        private FrameworkElement _circle;
-        private DoubleAnimation _animation;
-        private TranslateTransform _transform;
+        private FrameworkElement? _circle;
+        private DoubleAnimation _animation = null!;
+        private TranslateTransform _transform = new();
         /// <summary>
         /// 展开宽度
         /// </summary>
@@ -88,7 +89,9 @@ namespace WwTool.UI.Components
         {
             _animation = new DoubleAnimation
             {
-                Duration = TimeSpan.FromMilliseconds(250),
+                Duration = Application.Current.TryFindResource("MotionNormal") is Duration duration
+                    ? duration
+                    : new Duration(TimeSpan.FromMilliseconds(220)),
                 EasingFunction = new QuinticEase
                 {
                     EasingMode = EasingMode.EaseInOut
@@ -167,7 +170,7 @@ namespace WwTool.UI.Components
                             System.Globalization.CultureInfo.CurrentCulture,
                             FlowDirection.LeftToRight,
                             typeface,
-                            12, // FontSize
+                            12, // 设置字体大小。
                             Brushes.Black,
                             dpi);
 
@@ -179,7 +182,7 @@ namespace WwTool.UI.Components
                 }
             }
 
-            // Width: left margin (8) + icon width (30) + margin (3) + text width + safety padding (24) = 65 + maxTextWidth
+            // 根据图标、文字和边距计算导航栏宽度。
             double targetExpanded = Math.Max(143, Math.Ceiling(65 + maxTextWidth));
             double targetHighlight = targetExpanded - 15;
 

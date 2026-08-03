@@ -30,6 +30,15 @@ namespace WwTool.UI.Views
             InitializeComponent();
             _configService = configService;
             _configService.User.PropertyChanged += UserConfig_PropertyChanged;
+            SystemParameters.StaticPropertyChanged += SystemParameters_StaticPropertyChanged;
+        }
+
+        private void SystemParameters_StaticPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SystemParameters.HighContrast))
+            {
+                Dispatcher.Invoke(() => ApplyGlassEffect(_configService.User.IsGlassEffectEnabled));
+            }
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -56,7 +65,7 @@ namespace WwTool.UI.Views
         /// </summary>
         private void ApplyGlassEffect(bool isEnabled)
         {
-            if (isEnabled)
+            if (isEnabled && !SystemParameters.HighContrast)
             {
                 WindowBlurHelper.EnableBlur(this);
             }
@@ -65,6 +74,13 @@ namespace WwTool.UI.Views
                 // 移除底层 API 效果
                 WindowBlurHelper.DisableBlur(this);
             }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _configService.User.PropertyChanged -= UserConfig_PropertyChanged;
+            SystemParameters.StaticPropertyChanged -= SystemParameters_StaticPropertyChanged;
+            base.OnClosed(e);
         }
 
         private void ResizeGrip_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

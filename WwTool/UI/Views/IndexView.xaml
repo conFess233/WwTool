@@ -31,13 +31,13 @@
                         Storyboard.TargetProperty="Opacity"
                         From="0"
                         To="1"
-                        Duration="0:0:0.35" />
+                        Duration="{StaticResource MotionPage}" />
                     <DoubleAnimation
                         Storyboard.TargetName="PageTransform"
                         Storyboard.TargetProperty="ScaleY"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -47,7 +47,7 @@
                         Storyboard.TargetProperty="ScaleX"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -63,7 +63,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -83,7 +83,7 @@
                         HorizontalAlignment="Right"
                         Command="{Binding ShowLoginDialogCommand}"
                         Content="{Binding Path=[Index_AddAccount], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource AddImage}" />
                     <Button
@@ -114,10 +114,10 @@
                     <Border
                         Grid.Row="0"
                         Padding="10"
-                        Background="{DynamicResource CardBgBrush}"
-                        BorderBrush="{DynamicResource StrokeBrush}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="8">
+                        CornerRadius="{DynamicResource CornerRadiusCard}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto" />
@@ -125,7 +125,7 @@
                                 <RowDefinition Height="auto" />
                             </Grid.RowDefinitions>
 
-                            <Border Grid.Row="0" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,1">
+                            <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" />
@@ -179,7 +179,7 @@
                                             HorizontalAlignment="Right"
                                             VerticalAlignment="Top"
                                             Command="{Binding RefreshInfoCommand}"
-                                            Foreground="{DynamicResource ButtonTextBrush}"
+                                            Foreground="{DynamicResource TextOnAccentBrush}"
                                             Style="{StaticResource ImageButtonStyle}"
                                             Tag="{DynamicResource RefreshImage}" />
 
@@ -188,7 +188,7 @@
                             </Border>
 
 
-                            <Border Grid.Row="1" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,1">
+                            <Border Grid.Row="1" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
                                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="auto" />
@@ -312,7 +312,7 @@
                                             <ProgressBar
                                                 Width="200"
                                                 extensions:ProgressBarExtensions.SmoothValue="{Binding Liveness}"
-                                                Background="{DynamicResource HoverBgBrush}"
+                                                Background="{DynamicResource SurfaceHoverBrush}"
                                                 Maximum="{Binding LivenessMaxCount}"
                                                 Minimum="0"
                                                 Style="{StaticResource ExpBarStyle}" />
@@ -358,7 +358,7 @@
                                             <ProgressBar
                                                 Width="200"
                                                 extensions:ProgressBarExtensions.SmoothValue="{Binding Liveness}"
-                                                Background="{DynamicResource HoverBgBrush}"
+                                                Background="{DynamicResource SurfaceHoverBrush}"
                                                 Maximum="{Binding BpExpLimit}"
                                                 Minimum="0"
                                                 Style="{StaticResource ExpBarStyle}"
@@ -418,7 +418,7 @@
                                         Margin="0,10,0,5"
                                         Orientation="Horizontal">
                                         <StackPanel Orientation="Vertical">
-                                            <Rectangle Width="40" Height="40" Fill="{DynamicResource TextMainBrush}">
+                                            <Rectangle Width="40" Height="40" Fill="{DynamicResource TextPrimaryBrush}">
                                                 <Rectangle.OpacityMask>
                                                     <ImageBrush ImageSource="{StaticResource RoleImage}" Stretch="Uniform" />
                                                 </Rectangle.OpacityMask>
@@ -489,10 +489,10 @@
                         Grid.Row="1"
                         Margin="0,10,0,0"
                         Padding="10"
-                        Background="{DynamicResource CardBgBrush}"
-                        BorderBrush="{DynamicResource StrokeBrush}"
+                        Background="{DynamicResource SurfaceBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="1"
-                        CornerRadius="8">
+                        CornerRadius="{DynamicResource CornerRadiusCard}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />

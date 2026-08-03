@@ -5,6 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    HorizontalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    VerticalContentAlignment="Stretch"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -20,13 +24,13 @@
                         Storyboard.TargetProperty="Opacity"
                         From="0"
                         To="1"
-                        Duration="0:0:0.35" />
+                        Duration="{StaticResource MotionPage}" />
                     <DoubleAnimation
                         Storyboard.TargetName="PageTransform"
                         Storyboard.TargetProperty="ScaleY"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -36,7 +40,7 @@
                         Storyboard.TargetProperty="ScaleX"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -49,22 +53,22 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="1">
-            <Border BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+            <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
                 <TextBlock Margin="10" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Nav_About], Source={x:Static utils:LanguageManager.Instance}}" />
             </Border>
         </StackPanel>
 
-        <ScrollViewer Grid.Row="1" Margin="20" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" Margin="20" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <Border
                     Margin="0,0,0,20"
                     Padding="20"
-                    Background="{DynamicResource CardBgBrush}"
-                    CornerRadius="10">
+                    Background="{DynamicResource SurfaceBrush}"
+                    CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel>
                         <TextBlock
                             Margin="0,0,0,10"
@@ -90,7 +94,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Padding="20" Background="{DynamicResource CardBgBrush}" CornerRadius="10">
+                <Border Padding="20" Background="{DynamicResource SurfaceBrush}" CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel>
                         <TextBlock
                             Margin="0,0,0,10"

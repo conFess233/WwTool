@@ -7,8 +7,10 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/DesignTokens.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/ThemePreviews.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Typography.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Colors/GlassTheme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Presets/DeepBlue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/ThemeBrushes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Images/Icons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/UI/Resources/Themes/Styles/NavigationBar.xaml" />

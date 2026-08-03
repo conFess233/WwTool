@@ -9,7 +9,7 @@ namespace WwTool.UI.Components
 {
     public partial class TitleBar : UserControl
     {
-        private Window _parentWindow;
+        private Window? _parentWindow;
 
         public TitleBar()
         {
@@ -79,7 +79,7 @@ namespace WwTool.UI.Components
                 : WindowState.Maximized;
         }
 
-        private void ParentWindow_StateChanged(object sender, EventArgs e)
+        private void ParentWindow_StateChanged(object? sender, EventArgs e)
         {
             if (_parentWindow == null) return;
             // 切换最大化与常规状态的几何 icon
@@ -96,7 +96,7 @@ namespace WwTool.UI.Components
         #region 任务栏边缘
         private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == 0x0024) // WM_GETMINMAXINFO
+            if (msg == 0x0024) // 处理窗口尺寸消息。
             {
                 WmGetMinMaxInfo(hwnd, lParam);
                 handled = true;
@@ -112,8 +112,9 @@ namespace WwTool.UI.Components
 
         private void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
         {
-            MINMAXINFO mmi = (MINMAXINFO)Marshal.PtrToStructure(lParam, typeof(MINMAXINFO));
-            IntPtr monitor = MonitorFromWindow(hwnd, 2); // MONITOR_DEFAULTTONEAREST
+            MINMAXINFO? mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+            if (mmi == null) return;
+            IntPtr monitor = MonitorFromWindow(hwnd, 2); // 获取最近的显示器。
 
             if (monitor != IntPtr.Zero)
             {
@@ -130,8 +131,8 @@ namespace WwTool.UI.Components
 
             if (_parentWindow != null && _parentWindow.MinWidth > 0 && _parentWindow.MinHeight > 0)
             {
-                PresentationSource source = PresentationSource.FromVisual(_parentWindow);
-                if (source != null)
+                PresentationSource? source = PresentationSource.FromVisual(_parentWindow);
+                if (source?.CompositionTarget != null)
                 {
                     // 计算屏幕 DPI 缩放
                     Matrix transformToDevice = source.CompositionTarget.TransformToDevice;

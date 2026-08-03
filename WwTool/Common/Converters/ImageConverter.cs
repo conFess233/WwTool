@@ -8,6 +8,7 @@ using System.IO;
 using System.Security.Policy;
 using System.Text;
 using System.Windows.Data;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace WwTool.Common.Converters
@@ -70,7 +71,7 @@ namespace WwTool.Common.Converters
         }
 
         // 缓存
-        private BitmapImage LoadImage(string url)
+        private object LoadImage(string url)
         {
             if (cache.Get(url) is BitmapImage cachedBitmap)
             {
@@ -105,7 +106,7 @@ namespace WwTool.Common.Converters
             }
         }
 
-        private BitmapImage CreateDefaultImage()
+        private object CreateDefaultImage()
         {
             try
             {
@@ -121,7 +122,7 @@ namespace WwTool.Common.Converters
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("默认图片加载失败 - " + ex.Message);
-                return null;
+                return DependencyProperty.UnsetValue;
             }
         }
     }

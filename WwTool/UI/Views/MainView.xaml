@@ -33,30 +33,19 @@
 
 
     <Grid>
-        <!-- 用于提供颜色和透明度的底层背景，不包含子元素 -->
-        <Border CornerRadius="8">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="Background" Value="{DynamicResource SolidBgBrush}" />
-                    <Setter Property="Opacity" Value="1.0" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsGlassEffectEnabled}" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource PageBgBrush}" />
-                            <Setter Property="Opacity" Value="{Binding BackgroundOpacity}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-        </Border>
+        <!-- Material opacity belongs to background brushes; content remains fully opaque. -->
+        <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="{DynamicResource CornerRadiusControl}" />
+        <Border Background="{DynamicResource BackgroundAtmosphereBrush}" CornerRadius="{DynamicResource CornerRadiusControl}" IsHitTestVisible="False" />
+        <Border Background="{DynamicResource BackgroundTextureBrush}" CornerRadius="{DynamicResource CornerRadiusControl}" IsHitTestVisible="False" />
 
         <!--  主内容层  -->
         <Border
             x:Name="MainContentBorder"
-            Background="#01000000"
-            BorderBrush="{DynamicResource StrokeBrush}"
+            Background="{StaticResource TransparentHitTargetBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
             BorderThickness="1"
             ClipToBounds="True"
-            CornerRadius="8">
+            CornerRadius="{DynamicResource CornerRadiusControl}">
             <Border.Style>
                 <Style TargetType="Border">
                     <Style.Triggers>
@@ -98,7 +87,11 @@
                         </i:Interaction.Triggers>
                     </components:NavigationBar>
 
-                    <ContentControl Grid.Column="1" prism:RegionManager.RegionName="{x:Static ext:PrismManager.MainViewRegionName}" />
+                    <ContentControl
+                        Grid.Column="1"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch"
+                        prism:RegionManager.RegionName="{x:Static ext:PrismManager.MainViewRegionName}" />
                 </Grid>
 
                 <ResizeGrip
@@ -140,19 +133,19 @@
         <!--  应用内弹窗层  -->
         <Grid Panel.ZIndex="800" Visibility="{Binding UIStateService.IsDialogVisible, Converter={StaticResource BoolToVis}}">
             <!--  半透明背景遮罩，拦截所有点击  -->
-            <Border Background="#4D000000" />
+            <Border Background="{StaticResource OverlayBrush}" />
             <ContentControl HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding UIStateService.CurrentDialogView}" />
         </Grid>
 
         <!--  加载遮罩层  -->
-        <Grid Panel.ZIndex="1000" Background="#4D000000" Visibility="{Binding UIStateService.IsLoading, Converter={StaticResource BoolToVis}}">
+        <Grid Panel.ZIndex="1000" Background="{StaticResource OverlayBrush}" Visibility="{Binding UIStateService.IsLoading, Converter={StaticResource BoolToVis}}">
             <Border
                 Width="240"
                 Padding="30,25"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Background="{DynamicResource CardBgBrush}"
-                CornerRadius="12">
+                Background="{DynamicResource SurfaceBrush}"
+                CornerRadius="{DynamicResource CornerRadiusCard}">
                 <Border.Effect>
                     <DropShadowEffect
                         BlurRadius="25"

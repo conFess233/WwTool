@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Windows;
 using System.Windows.Data;
 
 namespace WwTool.Common.Converters
@@ -16,7 +17,7 @@ namespace WwTool.Common.Converters
                 return App.Current.Resources[key];
             }
 
-            return null;
+            return DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType,

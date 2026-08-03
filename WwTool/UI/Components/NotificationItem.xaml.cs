@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WwTool.Common.Enums;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 
 namespace WwTool.UI.Components
 {

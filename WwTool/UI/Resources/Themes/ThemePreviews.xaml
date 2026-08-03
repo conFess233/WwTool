@@ -1,0 +1,8 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="PreviewWarmWhiteBackground" Color="#F8F1E6" /><SolidColorBrush x:Key="PreviewWarmWhiteSurface" Color="#FFFCF6" /><SolidColorBrush x:Key="PreviewWarmWhiteAccent" Color="#B8842F" />
+    <SolidColorBrush x:Key="PreviewDeepBlueBackground" Color="#151B22" /><SolidColorBrush x:Key="PreviewDeepBlueSurface" Color="#303E4C" /><SolidColorBrush x:Key="PreviewDeepBlueAccent" Color="#9BBFD3" />
+    <SolidColorBrush x:Key="PreviewSoftGreenBackground" Color="#F1F0E8" /><SolidColorBrush x:Key="PreviewSoftGreenSurface" Color="#F9F9F1" /><SolidColorBrush x:Key="PreviewSoftGreenAccent" Color="#536B52" />
+    <SolidColorBrush x:Key="PreviewSoftPinkBackground" Color="#F7F0EC" /><SolidColorBrush x:Key="PreviewSoftPinkSurface" Color="#FFFAF8" /><SolidColorBrush x:Key="PreviewSoftPinkAccent" Color="#AD796C" />
+    <SolidColorBrush x:Key="PreviewBlackGoldBackground" Color="#171512" /><SolidColorBrush x:Key="PreviewBlackGoldSurface" Color="#2E2922" /><SolidColorBrush x:Key="PreviewBlackGoldAccent" Color="#B99555" />
+    <SolidColorBrush x:Key="PreviewAccentBlue" Color="#4F86B9" /><SolidColorBrush x:Key="PreviewAccentGreen" Color="#5F8267" /><SolidColorBrush x:Key="PreviewAccentPurple" Color="#80689B" /><SolidColorBrush x:Key="PreviewAccentRed" Color="#A25454" /><SolidColorBrush x:Key="PreviewAccentOrange" Color="#B16F3F" /><SolidColorBrush x:Key="PreviewAccentYellow" Color="#B58A3C" />
+</ResourceDictionary>

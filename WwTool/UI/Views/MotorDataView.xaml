@@ -6,6 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    HorizontalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    VerticalContentAlignment="Stretch"
     d:DesignHeight="600"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -29,13 +33,13 @@
                         Storyboard.TargetProperty="Opacity"
                         From="0"
                         To="1"
-                        Duration="0:0:0.35" />
+                        Duration="{StaticResource MotionPage}" />
                     <DoubleAnimation
                         Storyboard.TargetName="PageTransform"
                         Storyboard.TargetProperty="ScaleY"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -45,7 +49,7 @@
                         Storyboard.TargetProperty="ScaleX"
                         From="0.8"
                         To="1"
-                        Duration="0:0:0.4">
+                        Duration="{StaticResource MotionPage}">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseInOut" />
                         </DoubleAnimation.EasingFunction>
@@ -61,7 +65,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="{DynamicResource UnderLineBrush}" BorderThickness="0,0,0,2">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
             <Grid>
                 <TextBlock Margin="20,15" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Motor_Title], Source={x:Static utils:LanguageManager.Instance}}" />
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
@@ -81,7 +85,7 @@
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshLocalAccountCommand}"
                         Content="{Binding Path=[Action_RefreshRoleList], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Tag="{StaticResource RefreshImage}" />
                     <Button
                         Height="32"
@@ -89,7 +93,7 @@
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshCommand}"
                         Content="{Binding Path=[Action_RefreshLocalData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource RefreshImage}" />
                     <Button
@@ -98,7 +102,7 @@
                         HorizontalAlignment="Right"
                         Command="{Binding SyncDataCommand}"
                         Content="{Binding Path=[Action_GetCloudData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource ButtonTextBrush}"
+                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource CloudImage}" />
                 </StackPanel>
@@ -106,26 +110,26 @@
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-
-            <Grid
-                Width="720"
-                MaxWidth="720"
-                Margin="24,16,24,24"
-                HorizontalAlignment="Center">
+        <Grid
+            Grid.Row="1"
+            MinWidth="320"
+            MaxWidth="720"
+            Margin="24,16,24,24"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
                 <Border
                     Grid.Row="0"
                     Margin="0,0,0,16"
-                    Background="{DynamicResource CardBgBrush}"
-                    BorderBrush="{DynamicResource StrokeBrush}"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="8">
+                    CornerRadius="{DynamicResource CornerRadiusCard}">
                     <Grid Margin="20">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -134,7 +138,7 @@
 
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
-                                <Rectangle Width="30" Height="30" Fill="{DynamicResource TextMainBrush}">
+                                <Rectangle Width="30" Height="30" Fill="{DynamicResource TextPrimaryBrush}">
                                     <Rectangle.OpacityMask>
                                         <ImageBrush ImageSource="{StaticResource MotorLevelImage}" Stretch="Uniform" />
                                     </Rectangle.OpacityMask>
@@ -142,7 +146,7 @@
                                 <TextBlock Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Motor_Level], Source={x:Static utils:LanguageManager.Instance}}" />
 
                             </StackPanel>
-                            <Separator Margin="0,0,0,10" Background="{DynamicResource UnderLineBrush}" />
+                            <Separator Margin="0,0,0,10" Background="{DynamicResource DividerBrush}" />
 
                             <Grid Margin="0,12,0,4">
                                 <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_Exp], Source={x:Static utils:LanguageManager.Instance}}" />
@@ -152,7 +156,7 @@
                                 </StackPanel>
                             </Grid>
                             <ProgressBar
-                                Background="{DynamicResource HoverBgBrush}"
+                                Background="{DynamicResource SurfaceHoverBrush}"
                                 Maximum="{Binding RoleDetail.MotorData.NextExp}"
                                 Style="{StaticResource ExpBarStyle}"
                                 Value="{Binding RoleDetail.MotorData.Exp}" />
@@ -164,8 +168,8 @@
                             Height="70"
                             Margin="24,0,0,0"
                             VerticalAlignment="Center"
-                            Background="{DynamicResource StrokeBrush}"
-                            BorderBrush="{DynamicResource UnderLineBrush}"
+                            Background="{DynamicResource BorderBrush}"
+                            BorderBrush="{DynamicResource DividerBrush}"
                             BorderThickness="2"
                             CornerRadius="35">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -187,13 +191,13 @@
                 <Border
                     Grid.Row="1"
                     Margin="0,0,0,16"
-                    Background="{DynamicResource CardBgBrush}"
-                    BorderBrush="{DynamicResource StrokeBrush}"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="8">
+                    CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel Margin="20">
                         <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
-                            <Rectangle Width="40" Height="40" Fill="{DynamicResource TextMainBrush}">
+                            <Rectangle Width="40" Height="40" Fill="{DynamicResource TextPrimaryBrush}">
                                 <Rectangle.OpacityMask>
                                     <ImageBrush ImageSource="{StaticResource DIYImage}" Stretch="Uniform" />
                                 </Rectangle.OpacityMask>
@@ -201,12 +205,12 @@
                             <TextBlock Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Motor_UnlockStats], Source={x:Static utils:LanguageManager.Instance}}" />
                         </StackPanel>
 
-                        <Separator Margin="0,0,0,10" Background="{DynamicResource UnderLineBrush}" />
+                        <Separator Margin="0,0,0,10" Background="{DynamicResource DividerBrush}" />
 
                         <UniformGrid Columns="4">
                             <StackPanel HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextMainBrush}">
+                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
                                         <Rectangle.OpacityMask>
                                             <ImageBrush ImageSource="{StaticResource MotorImage}" Stretch="Uniform" />
                                         </Rectangle.OpacityMask>
@@ -224,7 +228,7 @@
 
                             <StackPanel HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextMainBrush}">
+                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
                                         <Rectangle.OpacityMask>
                                             <ImageBrush ImageSource="{StaticResource StickerImage}" Stretch="Uniform" />
                                         </Rectangle.OpacityMask>
@@ -242,7 +246,7 @@
 
                             <StackPanel HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextMainBrush}">
+                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
                                         <Rectangle.OpacityMask>
                                             <ImageBrush ImageSource="{StaticResource DecorationsImage}" Stretch="Uniform" />
                                         </Rectangle.OpacityMask>
@@ -260,7 +264,7 @@
 
                             <StackPanel HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextMainBrush}">
+                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
                                         <Rectangle.OpacityMask>
                                             <ImageBrush ImageSource="{StaticResource MotorFrameImage}" Stretch="Uniform" />
                                         </Rectangle.OpacityMask>
@@ -277,7 +281,7 @@
                             </StackPanel>
                         </UniformGrid>
 
-                        <Separator Margin="0,16,0,16" Background="{DynamicResource UnderLineBrush}" />
+                        <Separator Margin="0,16,0,16" Background="{DynamicResource DividerBrush}" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -286,7 +290,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_EquippedSkin], Source={x:Static utils:LanguageManager.Instance}}" />
                             <StackPanel Grid.Column="1" Margin="8,0,0,0" Orientation="Horizontal">
-                                <TextBlock FontWeight="Bold" Foreground="{DynamicResource WarningTextBrush}">
+                                <TextBlock FontWeight="Bold" Foreground="{DynamicResource WarningBrush}">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Text">
@@ -325,9 +329,10 @@
 
                 <TabControl
                     Grid.Row="2"
-                    Height="240"
-                    BorderBrush="{DynamicResource StrokeBrush}"
-                    BorderThickness="1">
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    HorizontalContentAlignment="Stretch"
+                    VerticalContentAlignment="Stretch">
 
                     <TabItem>
                         <TabItem.Header>
@@ -340,8 +345,8 @@
                                         <Border
                                             Margin="0,0,0,6"
                                             Padding="10,6"
-                                            Background="{DynamicResource PageBgBrush}"
-                                            BorderBrush="{DynamicResource StrokeBrush}"
+                                            Background="{DynamicResource BackgroundBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="4">
                                             <Grid>
@@ -380,8 +385,8 @@
                                         <Border
                                             Margin="0,0,0,6"
                                             Padding="10,6"
-                                            Background="{DynamicResource PageBgBrush}"
-                                            BorderBrush="{DynamicResource StrokeBrush}"
+                                            Background="{DynamicResource BackgroundBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="4">
                                             <Grid>
@@ -401,7 +406,7 @@
                                                         Width="30"
                                                         Height="30"
                                                         Margin="4,0,0,0"
-                                                        Fill="{DynamicResource TextMainBrush}"
+                                                        Fill="{DynamicResource TextPrimaryBrush}"
                                                         ToolTip="{Binding PartId}">
                                                         <Rectangle.OpacityMask>
                                                             <ImageBrush ImageSource="{Binding PartIconPath, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
@@ -431,8 +436,8 @@
                                         <Border
                                             Margin="0,0,0,6"
                                             Padding="10,6"
-                                            Background="{DynamicResource PageBgBrush}"
-                                            BorderBrush="{DynamicResource StrokeBrush}"
+                                            Background="{DynamicResource BackgroundBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="4">
                                             <Grid>
@@ -452,7 +457,7 @@
                                                         Width="30"
                                                         Height="30"
                                                         Margin="4,0,0,0"
-                                                        Fill="{DynamicResource TextMainBrush}"
+                                                        Fill="{DynamicResource TextPrimaryBrush}"
                                                         ToolTip="{Binding PartId}">
                                                         <Rectangle.OpacityMask>
                                                             <ImageBrush ImageSource="{Binding PartIconPath, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
@@ -482,8 +487,8 @@
                                         <Border
                                             Margin="0,0,0,6"
                                             Padding="10,6"
-                                            Background="{DynamicResource PageBgBrush}"
-                                            BorderBrush="{DynamicResource StrokeBrush}"
+                                            Background="{DynamicResource BackgroundBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="4">
                                             <Grid>
@@ -522,8 +527,8 @@
                                         <Border
                                             Margin="0,0,0,6"
                                             Padding="10,6"
-                                            Background="{DynamicResource PageBgBrush}"
-                                            BorderBrush="{DynamicResource StrokeBrush}"
+                                            Background="{DynamicResource BackgroundBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="4">
                                             <Grid Margin="0,0,0,10">
@@ -551,8 +556,8 @@
                                                 </Grid>
                                                 <ProgressBar
                                                     Grid.Row="1"
-                                                    Background="{DynamicResource HoverBgBrush}"
-                                                    Foreground="{DynamicResource ActiveBgBrush}"
+                                                    Background="{DynamicResource BorderBrush}"
+                                                    Foreground="{DynamicResource AccentBrush}"
                                                     Maximum="{Binding TotalCount}"
                                                     Style="{StaticResource AlbumBar}"
                                                     Value="{Binding Count}" />
@@ -564,8 +569,7 @@
                         </ScrollViewer>
                     </TabItem>
                 </TabControl>
-            </Grid>
-        </ScrollViewer>
+        </Grid>
 
     </Grid>
 </UserControl>

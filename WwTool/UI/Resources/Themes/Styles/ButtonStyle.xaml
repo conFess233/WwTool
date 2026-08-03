@@ -5,32 +5,34 @@
             <Style TargetType="{x:Type TextBlock}" />
         </Style.Resources>
 
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource ButtonTextBrush}" />
-        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Cursor" Value="Hand" />
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid Background="Transparent">
-                        <Border Background="{DynamicResource ButtonBgBrush}" CornerRadius="4" Effect="{DynamicResource ShadowSm}" />
+                        <Border Background="{DynamicResource AccentBrush}" CornerRadius="{DynamicResource CornerRadiusSmall}" Effect="{DynamicResource ShadowSm}" />
 
                         <Grid x:Name="ScaleContainer" RenderTransformOrigin="0.5,0.5">
                             <Grid.RenderTransform>
                                 <ScaleTransform ScaleX="1" ScaleY="1" />
                             </Grid.RenderTransform>
 
-                            <Border x:Name="BaseBorder" Background="{DynamicResource ButtonBgBrush}" CornerRadius="4" />
+                            <Border x:Name="BaseBorder" Background="{DynamicResource AccentBrush}" CornerRadius="{DynamicResource CornerRadiusSmall}" />
                             <Border
                                 x:Name="HoverBorder"
-                                Background="{DynamicResource HoverBgBrush}"
-                                CornerRadius="4"
+                                Background="{DynamicResource AccentHoverBrush}"
+                                CornerRadius="{DynamicResource CornerRadiusSmall}"
                                 Opacity="0" />
                             <Border
                                 x:Name="PressedBorder"
-                                Background="{DynamicResource ActiveBgBrush}"
-                                CornerRadius="4"
+                                Background="{DynamicResource AccentPressedBrush}"
+                                CornerRadius="{DynamicResource CornerRadiusSmall}"
                                 Opacity="0" />
 
                             <Grid Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Stretch">
@@ -60,7 +62,7 @@
                                             Storyboard.TargetName="HoverBorder"
                                             Storyboard.TargetProperty="Opacity"
                                             To="1"
-                                            Duration="0:0:0.15" />
+                                            Duration="{StaticResource MotionFast}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -71,7 +73,7 @@
                                             Storyboard.TargetName="HoverBorder"
                                             Storyboard.TargetProperty="Opacity"
                                             To="0"
-                                            Duration="0:0:0.25" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -87,7 +89,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="0.95"
-                                            Duration="0:0:0.1">
+                                            Duration="{StaticResource MotionFast}">
                                             <DoubleAnimation.EasingFunction>
                                                 <PowerEase EasingMode="EaseInOut" Power="2" />
                                             </DoubleAnimation.EasingFunction>
@@ -96,7 +98,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                             To="0.95"
-                                            Duration="0:0:0.1">
+                                            Duration="{StaticResource MotionFast}">
                                             <DoubleAnimation.EasingFunction>
                                                 <PowerEase EasingMode="EaseInOut" Power="2" />
                                             </DoubleAnimation.EasingFunction>
@@ -111,7 +113,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="1.0"
-                                            Duration="0:0:0.25">
+                                            Duration="{StaticResource MotionNormal}">
                                             <DoubleAnimation.EasingFunction>
                                                 <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -120,7 +122,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                             To="1.0"
-                                            Duration="0:0:0.25">
+                                            Duration="{StaticResource MotionNormal}">
                                             <DoubleAnimation.EasingFunction>
                                                 <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -131,10 +133,10 @@
                         </Trigger>
 
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBgBrush}" />
+                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBrush}" />
                             <Setter TargetName="HoverBorder" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="PressedBorder" Property="Visibility" Value="Collapsed" />
-                            <Setter Property="Foreground" Value="{DynamicResource TextPlaceholderBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -147,7 +149,8 @@
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="28" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -157,14 +160,14 @@
                             Margin="2"
                             Padding="1"
                             Background="{TemplateBinding Background}"
-                            CornerRadius="4"
+                            CornerRadius="{DynamicResource CornerRadiusSmall}"
                             SnapsToDevicePixels="True" />
                         <Border
                             x:Name="hoverBorder"
                             Margin="2"
                             Padding="1"
-                            Background="{DynamicResource HoverBgBrush}"
-                            CornerRadius="4"
+                            Background="{DynamicResource SurfaceHoverBrush}"
+                            CornerRadius="{DynamicResource CornerRadiusSmall}"
                             Opacity="0"
                             SnapsToDevicePixels="True" />
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -179,7 +182,7 @@
                                             Storyboard.TargetName="hoverBorder"
                                             Storyboard.TargetProperty="Opacity"
                                             To="1"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -190,7 +193,7 @@
                                             Storyboard.TargetName="hoverBorder"
                                             Storyboard.TargetProperty="Opacity"
                                             To="0"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -205,16 +208,18 @@
         <Style.Resources>
             <Style TargetType="{x:Type TextBlock}" />
         </Style.Resources>
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource CancelButtonHoverBrush}" />
-        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="Foreground" Value="{DynamicResource DangerHoverBrush}" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Cursor" Value="Hand" />
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid Background="Transparent">
-                        <Border Background="{DynamicResource CancelButtonBgBrush}" CornerRadius="4" Effect="{DynamicResource ShadowSm}" />
+                        <Border Background="{DynamicResource DangerContainerBrush}" CornerRadius="{DynamicResource CornerRadiusSmall}" Effect="{DynamicResource ShadowSm}" />
 
                         <Grid x:Name="ScaleContainer" RenderTransformOrigin="0.5,0.5">
                             <Grid.RenderTransform>
@@ -223,17 +228,17 @@
 
                             <Border
                                 x:Name="BaseBorder"
-                                Background="{DynamicResource CancelButtonBgBrush}"
-                                BorderBrush="{DynamicResource CancelButtonStrokeBrush}"
+                                Background="{DynamicResource DangerContainerBrush}"
+                                BorderBrush="{DynamicResource DangerBrush}"
                                 BorderThickness="1"
-                                CornerRadius="4"
+                                CornerRadius="{DynamicResource CornerRadiusSmall}"
                                 SnapsToDevicePixels="True" />
                             <Border
                                 x:Name="HoverBorder"
-                                Background="{DynamicResource CancelButtonHoverBrush}"
-                                BorderBrush="{DynamicResource CancelButtonStrokeBrush}"
+                                Background="{DynamicResource DangerHoverBrush}"
+                                BorderBrush="{DynamicResource DangerBrush}"
                                 BorderThickness="1"
-                                CornerRadius="4"
+                                CornerRadius="{DynamicResource CornerRadiusSmall}"
                                 Opacity="0"
                                 SnapsToDevicePixels="True" />
 
@@ -257,7 +262,7 @@
                             <Setter TargetName="IconRect" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#FFFFFF" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
@@ -265,7 +270,7 @@
                                             Storyboard.TargetName="HoverBorder"
                                             Storyboard.TargetProperty="Opacity"
                                             To="1"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -276,7 +281,7 @@
                                             Storyboard.TargetName="HoverBorder"
                                             Storyboard.TargetProperty="Opacity"
                                             To="0"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -289,7 +294,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="0.95"
-                                            Duration="0:0:0.1">
+                                            Duration="{StaticResource MotionFast}">
                                             <DoubleAnimation.EasingFunction>
                                                 <PowerEase EasingMode="EaseInOut" Power="2" />
                                             </DoubleAnimation.EasingFunction>
@@ -298,7 +303,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                             To="0.95"
-                                            Duration="0:0:0.1">
+                                            Duration="{StaticResource MotionFast}">
                                             <DoubleAnimation.EasingFunction>
                                                 <PowerEase EasingMode="EaseInOut" Power="2" />
                                             </DoubleAnimation.EasingFunction>
@@ -313,7 +318,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="1.0"
-                                            Duration="0:0:0.25">
+                                            Duration="{StaticResource MotionNormal}">
                                             <DoubleAnimation.EasingFunction>
                                                 <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -322,7 +327,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                             To="1.0"
-                                            Duration="0:0:0.25">
+                                            Duration="{StaticResource MotionNormal}">
                                             <DoubleAnimation.EasingFunction>
                                                 <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -332,8 +337,8 @@
                             </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBgBrush}" />
-                            <Setter Property="Foreground" Value="{DynamicResource TextPlaceholderBrush}" />
+                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -345,16 +350,18 @@
         <Style.Resources>
             <Style TargetType="{x:Type TextBlock}" />
         </Style.Resources>
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource OkButtonHoverBrush}" />
-        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Cursor" Value="Hand" />
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Grid Background="Transparent">
-                        <Border Background="{DynamicResource OkButtonBgBrush}" CornerRadius="4" Effect="{DynamicResource ShadowSm}" />
+                        <Border Background="{DynamicResource SuccessContainerBrush}" CornerRadius="{DynamicResource CornerRadiusSmall}" Effect="{DynamicResource ShadowSm}" />
 
                         <Grid x:Name="ScaleContainer" RenderTransformOrigin="0.5,0.5">
                             <Grid.RenderTransform>
@@ -363,17 +370,17 @@
 
                             <Border
                                 x:Name="BaseBorder"
-                                Background="{DynamicResource OkButtonBgBrush}"
-                                BorderBrush="{DynamicResource OkButtonStrokeBrush}"
+                                Background="{DynamicResource SuccessContainerBrush}"
+                                BorderBrush="{DynamicResource SuccessBrush}"
                                 BorderThickness="1"
-                                CornerRadius="4"
+                                CornerRadius="{DynamicResource CornerRadiusSmall}"
                                 SnapsToDevicePixels="True" />
                             <Border
                                 x:Name="HoverBorder"
-                                Background="{DynamicResource OkButtonHoverBrush}"
-                                BorderBrush="{DynamicResource OkButtonStrokeBrush}"
+                                Background="{DynamicResource SuccessBrush}"
+                                BorderBrush="{DynamicResource SuccessBrush}"
                                 BorderThickness="1"
-                                CornerRadius="4"
+                                CornerRadius="{DynamicResource CornerRadiusSmall}"
                                 Opacity="0"
                                 SnapsToDevicePixels="True" />
 
@@ -396,7 +403,7 @@
                             <Setter TargetName="IconRect" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#FFFFFF" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
@@ -404,7 +411,7 @@
                                             Storyboard.TargetName="HoverBorder"
                                             Storyboard.TargetProperty="Opacity"
                                             To="1"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -415,7 +422,7 @@
                                             Storyboard.TargetName="HoverBorder"
                                             Storyboard.TargetProperty="Opacity"
                                             To="0"
-                                            Duration="0:0:0.2" />
+                                            Duration="{StaticResource MotionNormal}" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -428,7 +435,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="0.95"
-                                            Duration="0:0:0.1">
+                                            Duration="{StaticResource MotionFast}">
                                             <DoubleAnimation.EasingFunction>
                                                 <PowerEase EasingMode="EaseInOut" Power="2" />
                                             </DoubleAnimation.EasingFunction>
@@ -437,7 +444,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                             To="0.95"
-                                            Duration="0:0:0.1">
+                                            Duration="{StaticResource MotionFast}">
                                             <DoubleAnimation.EasingFunction>
                                                 <PowerEase EasingMode="EaseInOut" Power="2" />
                                             </DoubleAnimation.EasingFunction>
@@ -452,7 +459,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
                                             To="1.0"
-                                            Duration="0:0:0.25">
+                                            Duration="{StaticResource MotionNormal}">
                                             <DoubleAnimation.EasingFunction>
                                                 <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -461,7 +468,7 @@
                                             Storyboard.TargetName="ScaleContainer"
                                             Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
                                             To="1.0"
-                                            Duration="0:0:0.25">
+                                            Duration="{StaticResource MotionNormal}">
                                             <DoubleAnimation.EasingFunction>
                                                 <BackEase Amplitude="0.5" EasingMode="EaseInOut" />
                                             </DoubleAnimation.EasingFunction>
@@ -471,8 +478,8 @@
                             </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBgBrush}" />
-                            <Setter Property="Foreground" Value="{DynamicResource TextPlaceholderBrush}" />
+                            <Setter TargetName="BaseBorder" Property="Background" Value="{DynamicResource DisabledBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -487,6 +494,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
 
         <Setter Property="Template">
             <Setter.Value>

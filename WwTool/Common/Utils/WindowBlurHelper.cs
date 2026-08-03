@@ -68,7 +68,7 @@ namespace WwTool.Common.Utils
             var accent = new AccentPolicy
             {
                 AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND,
-                // 这里可以控制亚克力的叠加颜色。0x01000000 代表完全交由 WPF 的 Background 画刷控制
+            // 使用 WPF 背景画刷控制亚克力颜色。
                 GradientColor = 0x01000000
             };
 
