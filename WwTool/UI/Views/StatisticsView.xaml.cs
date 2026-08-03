@@ -26,5 +26,15 @@ namespace WwTool.UI.Views
         {
             InitializeComponent();
         }
+
+        private void OnChartSectionClick(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button { Tag: string targetName } &&
+                FindName(targetName) is FrameworkElement target)
+            {
+                target.BringIntoView(new Rect(0, 0, Math.Max(1, target.ActualWidth), 1));
+                target.Focus();
+            }
+        }
     }
 }

@@ -8,8 +8,6 @@ namespace WwTool.Common.Models
     {
         // 总抽数
         private int _Tides;
-        // 总星声花费
-        private int _Astrites;
         // 总出金数
         private int _hitGoldCount;
         // 平均每金

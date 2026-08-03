@@ -7,7 +7,7 @@ namespace WwTool.Common.Models
 {
     public class HitGoldData
     {
-        public GachaData GachaData { get; set; }
+        public GachaData GachaData { get; set; } = new();
         public int Pity { get; set; }
         public System.Collections.ObjectModel.ObservableCollection<FourStarHistoryItem> FourStarHistories { get; set; } = new();
         public bool? IsMiss { get; set; }

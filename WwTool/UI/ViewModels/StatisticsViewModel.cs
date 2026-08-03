@@ -1,4 +1,5 @@
 using LiveChartsCore;
+using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using Microsoft.Win32;
@@ -12,6 +13,8 @@ using System.Windows.Media;
 using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
+using WwTool.Common.Models.Domain;
 using WwTool.Common.Models.ApiResponse;
 using WwTool.Common.Utils;
 using WwTool.Extensions;
@@ -27,23 +30,24 @@ namespace WwTool.UI.ViewModels
     /// </summary>
     public class StatisticsViewModel : BindableBase, INavigationAware
     {
+        private CancellationTokenSource _navigationCts = new();
         private readonly IGetDataService _getDataService;
         private readonly IDialogService _dialogService;
         private readonly IEventAggregator _eventAggregator;
         private readonly IUIStateService _uiStateService;
         private readonly IConfigService _configService;
         private readonly GameDataService _gameData;
-        private readonly IGachaRepository _gachaRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserDataService _userDataService;
         private readonly IGachaStatisticsService _gachaStatisticsService;
         private readonly IChartBuilderService _chartBuilderService;
         private readonly ILoggerService _logger;
+        private readonly IGachaLogLocator _gachaLogLocator;
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-        public void OnNavigatedFrom(NavigationContext navigationContext) { }
+        public void OnNavigatedFrom(NavigationContext navigationContext) => _navigationCts.Cancel();
 
-        public StatisticsViewModel(IEventAggregator eventAggregator, IUIStateService uIStateService, IGetDataService getDataService, IDialogService dialogService, IConfigService configService, GameDataService gameData, IGachaRepository gachaRepository, IUserRepository userRepository, IGachaStatisticsService gachaStatisticsService, IChartBuilderService chartBuilderService, ILoggerService logger)
+        public StatisticsViewModel(IEventAggregator eventAggregator, IUIStateService uIStateService, IGetDataService getDataService, IDialogService dialogService, IConfigService configService, GameDataService gameData, IUserDataService userDataService, IGachaStatisticsService gachaStatisticsService, IChartBuilderService chartBuilderService, ILoggerService logger, IGachaLogLocator gachaLogLocator)
         {
             _uiStateService = uIStateService;
             _eventAggregator = eventAggregator;
@@ -51,15 +55,16 @@ namespace WwTool.UI.ViewModels
             _dialogService = dialogService;
             _configService = configService;
             _gameData = gameData;
-            _gachaRepository = gachaRepository;
-            _userRepository = userRepository;
+            _userDataService = userDataService;
             _gachaStatisticsService = gachaStatisticsService;
             _chartBuilderService = chartBuilderService;
             _logger = logger;
+            _gachaLogLocator = gachaLogLocator;
+            _selectedGachaServerRegion = _configService.User.GachaServerRegion;
 
             PoolStatistics = new ObservableCollection<CardPoolStatistics>(Enum.GetValues<CardPoolType>().Select(x => new CardPoolStatistics { PoolType = x }));
             Users = new();
-            AutoImportUrlCommand = new DelegateCommand(AutoImportUrl);
+            AutoImportUrlCommand = new DelegateCommand(async () => await AutoImportUrlAsync());
             ClearDataCommand = new DelegateCommand(ClearData);
             GetGachaLogCommand = new DelegateCommand(async () => await StatisticsDatas());
             LoadLocalDataCommand = new DelegateCommand(LoadLocalData);
@@ -75,7 +80,8 @@ namespace WwTool.UI.ViewModels
 
             _configService.User.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(_configService.User.CurrentTheme) ||
+                if (e.PropertyName == nameof(_configService.User.BaseTheme) ||
+                    e.PropertyName == nameof(_configService.User.AccentTheme) ||
                     e.PropertyName == nameof(_configService.User.AppLanguage))
                 {
                     Task.Delay(50).ContinueWith(_ =>
@@ -93,12 +99,16 @@ namespace WwTool.UI.ViewModels
         /// 页面是否已初始化的标记
         /// </summary>
         private bool _isInitialized = false;
+        private bool _isSelectingInitialAccount;
 
         /// <summary>
         /// 页面导航进入时触发，执行初始化流程
         /// </summary>
         async void IRegionAware.OnNavigatedTo(NavigationContext navigationContext)
         {
+            ResetNavigationCancellation();
+            SelectedStatisticsTabIndex = 0;
+            SelectedPoolStatisticsIndex = 0;
             await setUp();
         }
 
@@ -127,15 +137,120 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         public DelegateCommand ImportUrlCommand { get; set; }
 
+        private bool _importFullLine = false;
+        public bool ImportFullLine
+        {
+            get => _importFullLine;
+            set
+            {
+                if (SetProperty(ref _importFullLine, value))
+                {
+                    if (!value && !string.IsNullOrEmpty(LogUrl))
+                    {
+                        LogUrl = LogUrl;
+                    }
+                }
+            }
+        }
+
         private string? _logUrl;
         public string? LogUrl
         {
             get => _logUrl;
             set
             {
-                _logUrl = value;
+                var processedValue = value;
+                if (!ImportFullLine && !string.IsNullOrEmpty(processedValue))
+                {
+                    var match = Regex.Match(processedValue, @"https?://[^\s""'\n\r]+");
+                    if (match.Success)
+                    {
+                        processedValue = match.Value;
+                    }
+                }
+                _logUrl = processedValue;
                 RaisePropertyChanged();
+                UpdateGachaServerSelection(processedValue);
             }
+        }
+
+        private GachaServerRegion _selectedGachaServerRegion;
+        private bool _isGachaServerLockedByUrl;
+        private bool _isGachaImportInProgress;
+
+        public bool IsChinaGachaServer
+        {
+            get => _selectedGachaServerRegion == GachaServerRegion.China;
+            set
+            {
+                if (value && IsGachaServerSelectionEnabled)
+                {
+                    SetManualGachaServer(GachaServerRegion.China);
+                }
+            }
+        }
+
+        public bool IsInternationalGachaServer
+        {
+            get => _selectedGachaServerRegion == GachaServerRegion.International;
+            set
+            {
+                if (value && IsGachaServerSelectionEnabled)
+                {
+                    SetManualGachaServer(GachaServerRegion.International);
+                }
+            }
+        }
+
+        public bool IsGachaServerSelectionEnabled => !_isGachaServerLockedByUrl && !_isGachaImportInProgress;
+
+        private void SetManualGachaServer(GachaServerRegion region)
+        {
+            _configService.User.GachaServerRegion = region;
+            SetEffectiveGachaServer(region);
+        }
+
+        private void SetEffectiveGachaServer(GachaServerRegion region)
+        {
+            if (_selectedGachaServerRegion == region)
+            {
+                return;
+            }
+
+            _selectedGachaServerRegion = region;
+            RaisePropertyChanged(nameof(IsChinaGachaServer));
+            RaisePropertyChanged(nameof(IsInternationalGachaServer));
+        }
+
+        private void UpdateGachaServerSelection(string? input)
+        {
+            bool wasEnabled = IsGachaServerSelectionEnabled;
+            if (GachaServerDetector.TryDetect(input, out GachaServerRegion detectedRegion))
+            {
+                _isGachaServerLockedByUrl = true;
+                SetEffectiveGachaServer(detectedRegion);
+            }
+            else
+            {
+                _isGachaServerLockedByUrl = false;
+                SetEffectiveGachaServer(_configService.User.GachaServerRegion);
+            }
+
+            if (wasEnabled != IsGachaServerSelectionEnabled)
+            {
+                RaisePropertyChanged(nameof(IsGachaServerSelectionEnabled));
+            }
+        }
+
+        private void SetGachaImportInProgress(bool value)
+        {
+            if (_isGachaImportInProgress == value)
+            {
+                return;
+            }
+
+            _isGachaImportInProgress = value;
+            RaisePropertyChanged(nameof(IsGachaServerSelectionEnabled));
         }
 
         private string? _userId;
@@ -149,8 +264,8 @@ namespace WwTool.UI.ViewModels
             }
         }
 
-        private UserAccount _selectedUser;
-        public UserAccount SelectedUser
+        private AccountSummary _selectedUser = null!;
+        public AccountSummary SelectedUser
         {
             get => _selectedUser;
             set
@@ -162,9 +277,10 @@ namespace WwTool.UI.ViewModels
             }
         }
 
-        private async void OnSelectedUserChanged(UserAccount? newUser)
+        private async void OnSelectedUserChanged(AccountSummary? newUser)
         {
             if (newUser == null || string.IsNullOrEmpty(newUser.Uid)) return;
+            if (_isSelectingInitialAccount) return;
 
             try
             {
@@ -179,8 +295,8 @@ namespace WwTool.UI.ViewModels
             }
         }
 
-        private ObservableCollection<UserAccount> _users;
-        public ObservableCollection<UserAccount> Users
+        private ObservableCollection<AccountSummary> _users = new();
+        public ObservableCollection<AccountSummary> Users
         {
             get => _users; set
             {
@@ -190,7 +306,7 @@ namespace WwTool.UI.ViewModels
         }
 
         // 卡池数据统计
-        private ObservableCollection<CardPoolStatistics> _poolStatistics;
+        private ObservableCollection<CardPoolStatistics> _poolStatistics = new();
         public ObservableCollection<CardPoolStatistics> PoolStatistics
         {
             get => _poolStatistics; set
@@ -223,16 +339,16 @@ namespace WwTool.UI.ViewModels
         #endregion
 
         #region 图表数据绑定
-        private ISeries[] _globalPoolCompareSeries;
+        private ISeries[] _globalPoolCompareSeries = [];
         public ISeries[] GlobalPoolCompareSeries { get => _globalPoolCompareSeries; set { _globalPoolCompareSeries = value; RaisePropertyChanged(); } }
 
-        private Axis[] _globalPoolXAxes;
+        private Axis[] _globalPoolXAxes = [];
         public Axis[] GlobalPoolXAxes { get => _globalPoolXAxes; set { _globalPoolXAxes = value; RaisePropertyChanged(); } }
 
-        private Axis[] _globalPoolYAxes;
+        private Axis[] _globalPoolYAxes = [];
         public Axis[] GlobalPoolYAxes { get => _globalPoolYAxes; set { _globalPoolYAxes = value; RaisePropertyChanged(); } }
 
-        private ISeries[] _successRatePieSeries;
+        private ISeries[] _successRatePieSeries = [];
         public ISeries[] SuccessRatePieSeries { get => _successRatePieSeries; set { _successRatePieSeries = value; RaisePropertyChanged(); } }
 
         private ObservableCollection<HitGoldData> _filteredHitGoldFlow = new();
@@ -247,25 +363,173 @@ namespace WwTool.UI.ViewModels
             set { _poolCharts = value; RaisePropertyChanged(); }
         }
 
-        private ISeries[] _fourStarPieSeries;
+        private ISeries[] _fourStarPieSeries = [];
         public ISeries[] FourStarPieSeries
         {
             get => _fourStarPieSeries;
             set { _fourStarPieSeries = value; RaisePropertyChanged(); }
         }
 
-        private ISeries[] _dailyPullLineSeries;
+        private ISeries[] _dailyPullLineSeries = [];
         public ISeries[] DailyPullLineSeries
         {
             get => _dailyPullLineSeries;
             set { _dailyPullLineSeries = value; RaisePropertyChanged(); }
         }
 
-        private Axis[] _dailyXAxes;
+        private int _selectedStatisticsTabIndex;
+        public int SelectedStatisticsTabIndex
+        {
+            get => _selectedStatisticsTabIndex;
+            set => SetProperty(ref _selectedStatisticsTabIndex, value);
+        }
+
+        private int _selectedPoolStatisticsIndex;
+        public int SelectedPoolStatisticsIndex
+        {
+            get => _selectedPoolStatisticsIndex;
+            set => SetProperty(ref _selectedPoolStatisticsIndex, value);
+        }
+
+        private bool _includeIncompleteFeaturedSegment;
+        public bool IncludeIncompleteFeaturedSegment
+        {
+            get => _includeIncompleteFeaturedSegment;
+            set { if (SetProperty(ref _includeIncompleteFeaturedSegment, value)) _ = UpdateChartsAsync(); }
+        }
+
+        private ISeries[] _pityDistributionSeries = [];
+        public ISeries[] PityDistributionSeries { get => _pityDistributionSeries; set => SetProperty(ref _pityDistributionSeries, value); }
+        public Axis[] PityDistributionXAxes { get; set; } = [];
+        public Axis[] PityDistributionYAxes { get; set; } = [];
+        private ISeries[] _fiveStarTimelineSeries = [];
+        public ISeries[] FiveStarTimelineSeries { get => _fiveStarTimelineSeries; set => SetProperty(ref _fiveStarTimelineSeries, value); }
+        public Axis[] FiveStarTimelineXAxes { get; set; } = [];
+        public Axis[] FiveStarTimelineYAxes { get; set; } = [];
+        private ISeries[] _rarityStackedSeries = [];
+        public ISeries[] RarityStackedSeries { get => _rarityStackedSeries; set => SetProperty(ref _rarityStackedSeries, value); }
+        public Axis[] RarityStackedXAxes { get; set; } = [];
+        public Axis[] RarityStackedYAxes { get; set; } = [];
+        private ISeries[] _activityHeatSeries = [];
+        public ISeries[] ActivityHeatSeries { get => _activityHeatSeries; set => SetProperty(ref _activityHeatSeries, value); }
+        public Axis[] ActivityHeatXAxes { get; set; } = [];
+        public Axis[] ActivityHeatYAxes { get; set; } = [];
+        private ISeries[] _cumulativeTrendSeries = [];
+        public ISeries[] CumulativeTrendSeries { get => _cumulativeTrendSeries; set => SetProperty(ref _cumulativeTrendSeries, value); }
+        public Axis[] CumulativeTrendXAxes { get; set; } = [];
+        public Axis[] CumulativeTrendYAxes { get; set; } = [];
+        private ISeries[] _currentPityGaugeSeries = [];
+        public ISeries[] CurrentPityGaugeSeries { get => _currentPityGaugeSeries; set => SetProperty(ref _currentPityGaugeSeries, value); }
+        private int _currentCharacterPity;
+        public int CurrentCharacterPity { get => _currentCharacterPity; set => SetProperty(ref _currentCharacterPity, value); }
+        private ISeries[] _featuredExpectationSeries = [];
+        public ISeries[] FeaturedExpectationSeries { get => _featuredExpectationSeries; set => SetProperty(ref _featuredExpectationSeries, value); }
+        public Axis[] FeaturedExpectationXAxes { get; set; } = [];
+        public Axis[] FeaturedExpectationYAxes { get; set; } = [];
+
+        private SolidColorPaint _chartLegendTextPaint = new(SKColors.Black);
+        public SolidColorPaint ChartLegendTextPaint
+        {
+            get => _chartLegendTextPaint;
+            set => SetProperty(ref _chartLegendTextPaint, value);
+        }
+
+        private SolidColorPaint _chartLegendBackgroundPaint = new(SKColors.Transparent);
+        public SolidColorPaint ChartLegendBackgroundPaint
+        {
+            get => _chartLegendBackgroundPaint;
+            set => SetProperty(ref _chartLegendBackgroundPaint, value);
+        }
+
+        private SolidColorPaint _chartTooltipTextPaint = new(SKColors.Black);
+        public SolidColorPaint ChartTooltipTextPaint
+        {
+            get => _chartTooltipTextPaint;
+            set => SetProperty(ref _chartTooltipTextPaint, value);
+        }
+
+        private SolidColorPaint _chartTooltipBackgroundPaint = new(SKColors.White);
+        public SolidColorPaint ChartTooltipBackgroundPaint
+        {
+            get => _chartTooltipBackgroundPaint;
+            set => SetProperty(ref _chartTooltipBackgroundPaint, value);
+        }
+
+        private Axis[] _dailyXAxes = [];
         public Axis[] DailyXAxes
         {
             get => _dailyXAxes;
             set { _dailyXAxes = value; RaisePropertyChanged(); }
+        }
+
+        private Axis[] _dailyYAxes = [];
+        public Axis[] DailyYAxes
+        {
+            get => _dailyYAxes;
+            set { _dailyYAxes = value; RaisePropertyChanged(); }
+        }
+
+        private const int TrendViewportSize = 30;
+        private double _trendViewportStart;
+        public double TrendViewportStart
+        {
+            get => _trendViewportStart;
+            set
+            {
+                if (SetProperty(ref _trendViewportStart, value))
+                {
+                    ApplyTrendViewport();
+                }
+            }
+        }
+
+        private double _trendViewportMaximum;
+        public double TrendViewportMaximum
+        {
+            get => _trendViewportMaximum;
+            set => SetProperty(ref _trendViewportMaximum, value);
+        }
+
+        private bool _isTrendViewportEnabled;
+        public bool IsTrendViewportEnabled
+        {
+            get => _isTrendViewportEnabled;
+            set => SetProperty(ref _isTrendViewportEnabled, value);
+        }
+
+        private int _filteredPullCount;
+        public int FilteredPullCount
+        {
+            get => _filteredPullCount;
+            set => SetProperty(ref _filteredPullCount, value);
+        }
+
+        private int _filteredGoldCount;
+        public int FilteredGoldCount
+        {
+            get => _filteredGoldCount;
+            set => SetProperty(ref _filteredGoldCount, value);
+        }
+
+        private double _filteredAveragePity;
+        public double FilteredAveragePity
+        {
+            get => _filteredAveragePity;
+            set => SetProperty(ref _filteredAveragePity, value);
+        }
+
+        private int _filteredActiveDays;
+        public int FilteredActiveDays
+        {
+            get => _filteredActiveDays;
+            set => SetProperty(ref _filteredActiveDays, value);
+        }
+
+        private string _peakDaySummary = "-";
+        public string PeakDaySummary
+        {
+            get => _peakDaySummary;
+            set => SetProperty(ref _peakDaySummary, value);
         }
         #endregion
 
@@ -275,6 +539,7 @@ namespace WwTool.UI.ViewModels
         private int _totalHitGold;          // 总出金数
         private int _missCount;             // 角色限定池歪卡次数
         private int _successCount;          // 角色限定池不歪次数
+        private int _featuredCharacterCount; // 角色限定池 UP 五星总数（含大保底）
         private int _limitedGoldCount;      // 角色限定池出金数
         private double _successRate;        // 不歪率
         private double _avgLimitCharaTide;  // 角色限定池每限定金平均抽数
@@ -390,7 +655,7 @@ namespace WwTool.UI.ViewModels
                 }
                 else
                 {
-                    var newUser = new UserAccount { Uid = info.PlayerId };
+                    var newUser = new AccountSummary { Uid = info.PlayerId };
                     Users.Add(newUser);
                     SelectedUser = newUser;
                 }
@@ -406,58 +671,51 @@ namespace WwTool.UI.ViewModels
             {
                 await Task.Delay(50);
 
-                await LoadLocalAccount();
+                _isSelectingInitialAccount = true;
+                try
+                {
+                    await LoadLocalAccount();
+                }
+                finally
+                {
+                    _isSelectingInitialAccount = false;
+                }
 
-                if (_configService.User.AutoLoadLocalData && SelectedUser != null)
+                if (SelectedUser != null && !_allCachedGachaDatas.Any())
                 {
                     await LoadLocalGachaLog();
                 }
                 _isInitialized = true;
+                return;
             }
 
+            if (_allCachedGachaDatas.Any())
+            {
+                await Statistics();
+            }
         }
 
         /// <summary>
         /// 从游戏日志中自动提取抽卡查询 URL
         /// </summary>
-        private void AutoImportUrl()
+        private async Task AutoImportUrlAsync()
         {
             _logger.Info("在 StatisticsViewModel 中调用了 AutoImportUrl 命令");
-            ExceptionHelper.Execute(() =>
+            await ExceptionHelper.ExecuteAsync(async () =>
             {
                 if (string.IsNullOrEmpty(_configService.User.GamePath))
                 {
                     throw new WwToolGamePathException(LanguageManager.Instance["Msg_NoGamePath"]);
                 }
-                var path = System.IO.Path.Combine(_configService.User.GamePath, "Wuthering Waves Game/" + _configService.App.GameLogPath, _configService.App.GameLogFile);
-
-                if (_configService.User.GamePath.EndsWith("Wuthering Waves Game"))
-                    path = System.IO.Path.Combine(_configService.User.GamePath, _configService.App.GameLogPath, _configService.App.GameLogFile);
-
-                if (!File.Exists(path))
-                {
-                    throw new FileNotFoundException(string.Format(LanguageManager.Instance["Msg_LogFileNotFound"], path));
-                }
-
-                var keyword = _configService.User.SearchGachaApiUrl;
-                var result = ReadLines.ReadLinesDecrypt(path).LastOrDefault(x => x.Contains(keyword));
-                if (!string.IsNullOrEmpty(result))
-                {
-                    Match match = Regex.Match(result, @"""url""\s*:\s*""(.*?)""");
-                    if (match.Success)
-                    {
-                        var url = match.Groups[1].Value;
-                        LogUrl = url;
-                        RefreshQueryData();
-                        _uiStateService.ShowToast(LanguageManager.Instance["Msg_AutoImportSuccessTitle"], LanguageManager.Instance["Msg_AutoImportSuccess"], NotificationType.Success);
-                        return;
-                    }
-                    LogUrl = result;
-                }
-                else
-                {
-                    throw new WwToolException(LanguageManager.Instance["Msg_ApiUrlNotFound"]);
-                }
+                var keyword = _configService.User.SearchGachaApiUrl ?? string.Empty;
+                LogUrl = await _gachaLogLocator.FindLatestQueryUrlAsync(
+                    _configService.User.GamePath,
+                    _configService.App.GameLogPath,
+                    _configService.App.GameLogFile,
+                    keyword,
+                    _navigationCts.Token);
+                RefreshQueryData();
+                _uiStateService.ShowToast(LanguageManager.Instance["Msg_AutoImportSuccessTitle"], LanguageManager.Instance["Msg_AutoImportSuccess"], NotificationType.Success);
             }, "自动导入 API 地址");
         }
 
@@ -495,15 +753,15 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         /// <param name="poolType">卡池类型枚举值</param>
         /// <returns>抽卡记录集合</returns>
-        private async Task<IEnumerable<GachaData>> GetGachaLog(int poolType)
+        private async Task<IEnumerable<GachaData>> GetGachaLog(int poolType, GachaServerRegion serverRegion)
         {
             if (string.IsNullOrEmpty(_logUrl))
-                return null;
+                return [];
             var param = GachaUrlParser.Parse(_logUrl);
             param.LanguageCode = LanguageTypeExtensions.GetCode(_configService.User.AppLanguage);
             param.CardPoolType = poolType;
 
-            var data = await _getDataService.GetGachaLogAsync(param);
+            var data = await _getDataService.GetGachaLogAsync(param, serverRegion, _navigationCts.Token);
 
             return data;
 
@@ -514,6 +772,8 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         private async Task StatisticsDatas()
         {
+            GachaServerRegion serverRegion = _selectedGachaServerRegion;
+            SetGachaImportInProgress(true);
             _logger.Info("在 StatisticsViewModel 中调用了 StatisticsDatas 命令");
             try
             {
@@ -526,8 +786,8 @@ namespace WwTool.UI.ViewModels
                     foreach (var type in Enum.GetValues<CardPoolType>())
                     {
                         _uiStateService.ShowLoading(string.Format(LanguageManager.Instance["Msg_SyncingPool"], type.GetLocalizedDescription()));
-                        var gachaData = await GetGachaLog((int)type);
-                        await _gachaRepository.SyncGachaDataAsync(SelectedUser.Uid, (int)type, gachaData);
+                        var gachaData = await GetGachaLog((int)type, serverRegion);
+                        await _userDataService.ImportGachaAsync(SelectedUser.Uid, (int)type, gachaData, "remote", _navigationCts.Token);
                     }
 
                     _uiStateService.ShowLoading(LanguageManager.Instance["Msg_SyncFinishedProcessing"]);
@@ -536,7 +796,7 @@ namespace WwTool.UI.ViewModels
                     {
                         foreach (var type in Enum.GetValues<CardPoolType>())
                         {
-                            var data = await _gachaRepository.GetPoolRecordsByUid(SelectedUser.Uid, (int)type);
+                            var data = await _userDataService.ReadGachaInSourceOrderAsync(SelectedUser.Uid, (int)type, _navigationCts.Token);
                             if (data != null)
                             {
                                 allGachaDatas.AddRange(data);
@@ -556,6 +816,7 @@ namespace WwTool.UI.ViewModels
                                         {
                                             SuccessCount = res.SuccessCount;
                                             MissCount = res.MissCount;
+                                            _featuredCharacterCount = res.FeaturedCount;
                                         }
 
                                         var chartData = PoolCharts.FirstOrDefault(x => x.PoolType == pool.PoolType);
@@ -583,15 +844,20 @@ namespace WwTool.UI.ViewModels
             finally
             {
                 _uiStateService.HideLoading();
+                SetGachaImportInProgress(false);
+                UpdateGachaServerSelection(_logUrl);
             }
         }
 
         /// <summary>
         /// 汇总计算所有卡池的统计数据（总抽数、总花费、不歪率等）
         /// </summary>
-        private async Task Statistics(List<GachaData> allGachaDatas = null)
+        private async Task Statistics(List<GachaData>? allGachaDatas = null)
         {
-            var globalStats = _gachaStatisticsService.CalculateGlobalStatistics(PoolStatistics, SuccessCount);
+            var globalStats = _gachaStatisticsService.CalculateGlobalStatistics(
+                PoolStatistics,
+                SuccessCount,
+                _featuredCharacterCount);
 
             TotalTides = globalStats.TotalTides;
             TotalAstrites = globalStats.TotalAstrites;
@@ -601,7 +867,7 @@ namespace WwTool.UI.ViewModels
             AvgCharaTide = globalStats.AvgCharaTide;
             AvgLimitCharaTide = globalStats.AvgLimitCharaTide;
 
-            if (allGachaDatas != null && allGachaDatas.Any())
+            if (allGachaDatas != null)
             {
                 _allCachedGachaDatas = allGachaDatas;
             }
@@ -610,6 +876,13 @@ namespace WwTool.UI.ViewModels
         }
 
         private bool _isUpdatingCharts = false;
+        private bool _isLoadingLocalGachaLog;
+        private bool _isStatisticsLoading;
+        public bool IsStatisticsLoading { get => _isStatisticsLoading; set => SetProperty(ref _isStatisticsLoading, value); }
+        private bool _hasStatisticsData;
+        public bool HasStatisticsData { get => _hasStatisticsData; set => SetProperty(ref _hasStatisticsData, value); }
+        private string? _statisticsErrorMessage;
+        public string? StatisticsErrorMessage { get => _statisticsErrorMessage; set => SetProperty(ref _statisticsErrorMessage, value); }
         private async Task UpdateChartsAsync()
         {
             if (_isUpdatingCharts) return;
@@ -617,16 +890,77 @@ namespace WwTool.UI.ViewModels
 
             try
             {
-                if (_allCachedGachaDatas == null || !_allCachedGachaDatas.Any()) return;
+                if (_allCachedGachaDatas == null || !_allCachedGachaDatas.Any())
+                {
+                    FilteredPullCount = 0;
+                    FilteredGoldCount = 0;
+                    FilteredAveragePity = 0;
+                    FilteredActiveDays = 0;
+                    PeakDaySummary = "-";
+                    FilteredHitGoldFlow = new();
+                    DailyPullLineSeries = [];
+                    DailyXAxes = [];
+                    DailyYAxes = [];
+                    TrendViewportMaximum = 0;
+                    TrendViewportStart = 0;
+                    IsTrendViewportEnabled = false;
+                    SuccessRatePieSeries = [];
+                    FourStarPieSeries = [];
+                    GlobalPoolCompareSeries = [];
+                    GlobalPoolXAxes = [];
+                    GlobalPoolYAxes = [];
+                    ClearInsightCharts();
+                    return;
+                }
 
                 var filteredDatas = _allCachedGachaDatas.Where(x =>
-            {
-                if (SelectedDateRangeIndex == 1 && DateTime.TryParse(x.Time, out var dt1) && dt1 < DateTime.Now.AddMonths(-1)) return false;
-                if (SelectedDateRangeIndex == 2 && DateTime.TryParse(x.Time, out var dt2) && dt2 < DateTime.Now.AddMonths(-3)) return false;
+                {
+                    if (SelectedDateRangeIndex == 1 && DateTime.TryParse(x.Time, out var dt1) && dt1 < DateTime.Now.AddMonths(-1)) return false;
+                    if (SelectedDateRangeIndex == 2 && DateTime.TryParse(x.Time, out var dt2) && dt2 < DateTime.Now.AddMonths(-3)) return false;
 
-                if (!PoolFilters.Any(f => f.IsSelected && (int)f.PoolType == ParsePoolType(x.CardPoolType))) return false;
-                return true;
-            }).ToList();
+                    if (!PoolFilters.Any(f => f.IsSelected && (int)f.PoolType == ParsePoolType(x.CardPoolType))) return false;
+                    return true;
+                }).ToList();
+
+                GachaInsights insights = _gachaStatisticsService.CalculateInsights(
+                    filteredDatas,
+                    IncludeIncompleteFeaturedSegment);
+
+                var dailyBuckets = new SortedDictionary<DateTime, (int Pulls, int Golds)>();
+                foreach (var item in filteredDatas)
+                {
+                    if (!DateTime.TryParse(item.Time, out var pullTime)) continue;
+
+                    var day = pullTime.Date;
+                    dailyBuckets.TryGetValue(day, out var bucket);
+                    dailyBuckets[day] = (
+                        bucket.Pulls + 1,
+                        bucket.Golds + (item.QualityLevel == 5 ? 1 : 0));
+                }
+
+                int labelStep = Math.Max(1, (int)Math.Ceiling(dailyBuckets.Count / 12d));
+                var dailyLabels = dailyBuckets.Keys
+                    .Select((date, index) => index % labelStep == 0 || index == dailyBuckets.Count - 1
+                        ? date.ToString("MM-dd")
+                        : string.Empty)
+                    .ToList();
+                var dailyPulls = dailyBuckets.Values.Select(x => x.Pulls).ToList();
+                var dailyGolds = dailyBuckets.Values.Select(x => x.Golds).ToList();
+                var peakDay = dailyBuckets.OrderByDescending(x => x.Value.Pulls).FirstOrDefault();
+
+                IsTrendViewportEnabled = dailyBuckets.Count > TrendViewportSize;
+                TrendViewportMaximum = Math.Max(0, dailyBuckets.Count - TrendViewportSize);
+                TrendViewportStart = TrendViewportMaximum;
+
+                FilteredPullCount = filteredDatas.Count;
+                FilteredGoldCount = filteredDatas.Count(x => x.QualityLevel == 5);
+                FilteredAveragePity = FilteredGoldCount == 0
+                    ? 0
+                    : (double)FilteredPullCount / FilteredGoldCount;
+                FilteredActiveDays = dailyBuckets.Count;
+                PeakDaySummary = dailyBuckets.Count == 0
+                    ? "-"
+                    : $"{peakDay.Key:MM-dd} · {peakDay.Value.Pulls}";
 
                 // 如果选择了特定角色，再次过滤
                 var flowDatas = new List<HitGoldData>();
@@ -666,10 +1000,10 @@ namespace WwTool.UI.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     var curSelected = SelectedGoldName;
-                    bool wasAllSelected = string.IsNullOrEmpty(curSelected) || 
-                                          curSelected == "全部" || 
-                                          curSelected == "All" || 
-                                          curSelected == "全て" || 
+                    bool wasAllSelected = string.IsNullOrEmpty(curSelected) ||
+                                          curSelected == "全部" ||
+                                          curSelected == "All" ||
+                                          curSelected == "全て" ||
                                           curSelected == (LanguageManager.Instance["Stat_All"] ?? "全部");
 
                     AllGotGoldNames.Clear();
@@ -717,7 +1051,7 @@ namespace WwTool.UI.ViewModels
                 // 四星及歪率
                 int fourStarCharacterCount = 0;
                 int fourStarWeaponCount = 0;
-                int success = 0, miss = 0;
+                int success = 0;
 
                 foreach (var item in filteredDatas)
                 {
@@ -729,16 +1063,16 @@ namespace WwTool.UI.ViewModels
                         else fourStarWeaponCount++;
                     }
 
-                    if (item.QualityLevel == 5 && ParsePoolType(item.CardPoolType) == (int)CardPoolType.CharacterEvent)
-                    {
-                        var itemInfo = _gameData.GetItemById(item.ResourceId);
-                        if (itemInfo != null)
-                        {
-                            if (itemInfo.IsUp) success++;
-                            else miss++;
-                        }
-                    }
                 }
+
+                var filteredCharacterEventStats = _gachaStatisticsService.OrganizeData(
+                    filteredDatas.Where(x => ParsePoolType(x.CardPoolType) == (int)CardPoolType.CharacterEvent),
+                    CardPoolType.CharacterEvent,
+                    LanguageTypeExtensions.GetCode(_configService.User.AppLanguage));
+                success = filteredCharacterEventStats.SuccessCount;
+                int otherFiveStars = Math.Max(
+                    0,
+                    filteredCharacterEventStats.PoolStatistics.Calculate.HitGoldCount - success);
 
                 // 比较图表
                 var compareXLabels = new List<string>();
@@ -764,80 +1098,111 @@ namespace WwTool.UI.ViewModels
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    var textColorObj = (System.Windows.Media.Color)Application.Current.Resources["TextMainColor"];
-                    var textColor = new SKColor(textColorObj.R, textColorObj.G, textColorObj.B, textColorObj.A);
-                    var textPaint = new SolidColorPaint(textColor);
+                    ChartThemePalette palette = GetChartThemePalette();
+                    var axisTextPaint = new SolidColorPaint(palette.TextSecondary);
+                    var separatorPaint = new SolidColorPaint(palette.Stroke.WithAlpha((byte)Math.Min((int)palette.Stroke.Alpha, 120))) { StrokeThickness = 1 };
 
-                    var strokeColorObj = (System.Windows.Media.Color)Application.Current.Resources["StrokeColor"];
-                    var strokeColor = new SKColor(strokeColorObj.R, strokeColorObj.G, strokeColorObj.B, strokeColorObj.A);
-                    var separatorPaint = new SolidColorPaint(strokeColor) { StrokeThickness = 1 };
+                    ChartLegendTextPaint = new SolidColorPaint(palette.TextSecondary);
+                    ChartLegendBackgroundPaint = new SolidColorPaint(SKColors.Transparent);
+                    ChartTooltipTextPaint = new SolidColorPaint(palette.TextPrimary);
+                    ChartTooltipBackgroundPaint = new SolidColorPaint(
+                        palette.SurfaceElevated.WithAlpha((byte)Math.Min((int)palette.SurfaceElevated.Alpha, 236)));
 
-                    var primaryColorObj = (System.Windows.Media.Color)Application.Current.Resources["PrimaryColor"];
-                    var primaryColor = new SKColor(primaryColorObj.R, primaryColorObj.G, primaryColorObj.B, primaryColorObj.A);
-
-                    var warningColorObj = (System.Windows.Media.Color)Application.Current.Resources["WarningColor"];
-                    var warningColor = new SKColor(warningColorObj.R, warningColorObj.G, warningColorObj.B, warningColorObj.A);
-
-                    if (SuccessRatePieSeries == null)
+                    foreach (CardPoolChartData poolChart in PoolCharts)
                     {
-                        SuccessRatePieSeries = new ISeries[]
+                        foreach (ISeries series in poolChart.GoldHistorySeries)
                         {
-                            new PieSeries<int> { Values = new[] { success }, Name = LanguageManager.Instance["Stat_SuccessCount"] ?? "不歪", InnerRadius = 40, Fill = new SolidColorPaint(primaryColor) },
-                            new PieSeries<int> { Values = new[] { miss }, Name = LanguageManager.Instance["Stat_MissCount"] ?? "歪卡", InnerRadius = 40, Fill = new SolidColorPaint(warningColor) }
-                        };
-                    }
-                    else
-                    {
-                        ((PieSeries<int>)SuccessRatePieSeries[0]).Values = new[] { success };
-                        ((PieSeries<int>)SuccessRatePieSeries[0]).Name = LanguageManager.Instance["Stat_SuccessCount"] ?? "不歪";
-                        ((PieSeries<int>)SuccessRatePieSeries[1]).Values = new[] { miss };
-                        ((PieSeries<int>)SuccessRatePieSeries[1]).Name = LanguageManager.Instance["Stat_MissCount"] ?? "歪卡";
-                    }
+                            if (series is ColumnSeries<int> columns)
+                            {
+                                columns.Fill = new SolidColorPaint(palette.Primary);
+                                columns.DataLabelsPaint = new SolidColorPaint(palette.TextPrimary);
+                            }
+                        }
 
-                    if (FourStarPieSeries == null)
-                    {
-                        FourStarPieSeries = new ISeries[]
+                        foreach (Axis axis in poolChart.XAxes)
                         {
-                            new PieSeries<int> { Values = new[] { fourStarCharacterCount }, Name = LanguageManager.Instance["Role"] ?? "角色", InnerRadius = 25, Fill = new SolidColorPaint(primaryColor) },
-                            new PieSeries<int> { Values = new[] { fourStarWeaponCount }, Name = LanguageManager.Instance["Weapon"] ?? "武器", InnerRadius = 25, Fill = new SolidColorPaint(warningColor) }
-                        };
-                    }
-                    else
-                    {
-                        ((PieSeries<int>)FourStarPieSeries[0]).Values = new[] { fourStarCharacterCount };
-                        ((PieSeries<int>)FourStarPieSeries[0]).Name = LanguageManager.Instance["Role"] ?? "角色";
-                        ((PieSeries<int>)FourStarPieSeries[1]).Values = new[] { fourStarWeaponCount };
-                        ((PieSeries<int>)FourStarPieSeries[1]).Name = LanguageManager.Instance["Weapon"] ?? "武器";
-                    }
-
-                    if (GlobalPoolCompareSeries == null)
-                    {
-                        GlobalPoolCompareSeries = new ISeries[]
-                        {
-                            new ColumnSeries<int> { Values = tidesData, Name = LanguageManager.Instance["Stat_TotalTides"] ?? "抽数", ScalesYAt = 0, Fill = new SolidColorPaint(primaryColor) },
-                            new LineSeries<double> { Values = avgTideData, Name = LanguageManager.Instance["Stat_AvgGold"] ?? "平均水位", ScalesYAt = 1, GeometrySize = 10, Stroke = new SolidColorPaint(warningColor) { StrokeThickness = 3 }, GeometryFill = new SolidColorPaint(warningColor), GeometryStroke = new SolidColorPaint(warningColor) }
-                        };
-                        
-                        GlobalPoolXAxes = new[] { new Axis { Labels = compareXLabels, LabelsRotation = 15, LabelsPaint = textPaint, SeparatorsPaint = separatorPaint } };
-                        GlobalPoolYAxes = new[]
-                        {
-                            new Axis { Position = LiveChartsCore.Measure.AxisPosition.Start, Name = LanguageManager.Instance["Stat_TotalTides"] ?? "Count", LabelsPaint = textPaint, NamePaint = textPaint, SeparatorsPaint = separatorPaint },
-                            new Axis { Position = LiveChartsCore.Measure.AxisPosition.End, Name = LanguageManager.Instance["Stat_AvgGold"] ?? "Avg Tide", ShowSeparatorLines = false, LabelsPaint = textPaint, NamePaint = textPaint }
-                        };
-                    }
-                    else
-                    {
-                        ((ColumnSeries<int>)GlobalPoolCompareSeries[0]).Values = tidesData;
-                        ((ColumnSeries<int>)GlobalPoolCompareSeries[0]).Name = LanguageManager.Instance["Stat_TotalTides"] ?? "抽数";
-                        ((LineSeries<double>)GlobalPoolCompareSeries[1]).Values = avgTideData;
-                        ((LineSeries<double>)GlobalPoolCompareSeries[1]).Name = LanguageManager.Instance["Stat_AvgGold"] ?? "平均水位";
-                        GlobalPoolXAxes[0].Labels = compareXLabels;
-                        if (GlobalPoolYAxes != null && GlobalPoolYAxes.Length >= 2)
-                        {
-                            GlobalPoolYAxes[0].Name = LanguageManager.Instance["Stat_TotalTides"] ?? "Count";
-                            GlobalPoolYAxes[1].Name = LanguageManager.Instance["Stat_AvgGold"] ?? "Avg Tide";
+                            axis.LabelsPaint = new SolidColorPaint(palette.TextSecondary);
+                            axis.SeparatorsPaint = new SolidColorPaint(palette.Stroke) { StrokeThickness = 1 };
                         }
                     }
+
+                    BuildInsightCharts(insights, axisTextPaint, separatorPaint, palette);
+
+                    DailyPullLineSeries = new ISeries[]
+                    {
+                        new ColumnSeries<int>
+                        {
+                            Values = dailyPulls,
+                            Name = LanguageManager.Instance["Stat_DailyPulls"] ?? "当日抽数",
+                            MaxBarWidth = 24,
+                            Fill = new SolidColorPaint(palette.Primary),
+                            DataLabelsPaint = new SolidColorPaint(palette.TextPrimary)
+                        },
+                        new LineSeries<int>
+                        {
+                            Values = dailyGolds,
+                            Name = LanguageManager.Instance["Stat_DailyGolds"] ?? "当日五星",
+                            ScalesYAt = 1,
+                            GeometrySize = 8,
+                            Stroke = new SolidColorPaint(palette.Warning) { StrokeThickness = 3 },
+                            GeometryFill = new SolidColorPaint(palette.Warning),
+                            GeometryStroke = new SolidColorPaint(palette.Warning)
+                        }
+                    };
+                    DailyXAxes = new[]
+                    {
+                        new Axis
+                        {
+                            Labels = dailyLabels,
+                            LabelsRotation = dailyLabels.Count > 14 ? 45 : 0,
+                            LabelsPaint = axisTextPaint,
+                            SeparatorsPaint = separatorPaint,
+                            MinLimit = IsTrendViewportEnabled ? TrendViewportStart - 0.5 : null,
+                            MaxLimit = IsTrendViewportEnabled ? TrendViewportStart + TrendViewportSize - 0.5 : null
+                        }
+                    };
+                    DailyYAxes = new[]
+                    {
+                        new Axis
+                        {
+                            Position = LiveChartsCore.Measure.AxisPosition.Start,
+                            MinLimit = 0,
+                            LabelsPaint = axisTextPaint,
+                            SeparatorsPaint = separatorPaint
+                        },
+                        new Axis
+                        {
+                            Position = LiveChartsCore.Measure.AxisPosition.End,
+                            MinLimit = 0,
+                            ShowSeparatorLines = false,
+                            LabelsPaint = axisTextPaint
+                        }
+                    };
+
+                    SuccessRatePieSeries =
+                    [
+                        new PieSeries<int> { Values = [success], Name = LanguageManager.Instance["Stat_SuccessCount"] ?? "不歪", InnerRadius = 40, Fill = new SolidColorPaint(palette.Success) },
+                        new PieSeries<int> { Values = [otherFiveStars], Name = LanguageManager.Instance["Stat_OtherGoldCount"] ?? "其他五星", InnerRadius = 40, Fill = new SolidColorPaint(palette.Warning) }
+                    ];
+
+                    FourStarPieSeries =
+                    [
+                        new PieSeries<int> { Values = [fourStarCharacterCount], Name = LanguageManager.Instance["Role"] ?? "角色", InnerRadius = 25, Fill = new SolidColorPaint(palette.Primary) },
+                        new PieSeries<int> { Values = [fourStarWeaponCount], Name = LanguageManager.Instance["Weapon"] ?? "武器", InnerRadius = 25, Fill = new SolidColorPaint(palette.FourStar) }
+                    ];
+
+                    GlobalPoolCompareSeries =
+                    [
+                        new ColumnSeries<int> { Values = tidesData, Name = LanguageManager.Instance["Stat_TotalTides"] ?? "抽数", ScalesYAt = 0, Fill = new SolidColorPaint(palette.Primary) },
+                        new LineSeries<double> { Values = avgTideData, Name = LanguageManager.Instance["Stat_AvgGold"] ?? "平均水位", ScalesYAt = 1, GeometrySize = 10, Stroke = new SolidColorPaint(palette.Warning) { StrokeThickness = 3 }, GeometryFill = new SolidColorPaint(palette.Warning), GeometryStroke = new SolidColorPaint(palette.Warning) }
+                    ];
+
+                    GlobalPoolXAxes = [new Axis { Labels = compareXLabels, LabelsRotation = 15, LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint }];
+                    GlobalPoolYAxes =
+                    [
+                        new Axis { Position = LiveChartsCore.Measure.AxisPosition.Start, Name = LanguageManager.Instance["Stat_TotalTides"] ?? "Count", LabelsPaint = axisTextPaint, NamePaint = axisTextPaint, SeparatorsPaint = separatorPaint },
+                        new Axis { Position = LiveChartsCore.Measure.AxisPosition.End, Name = LanguageManager.Instance["Stat_AvgGold"] ?? "Avg Tide", ShowSeparatorLines = false, LabelsPaint = axisTextPaint, NamePaint = axisTextPaint }
+                    ];
                 });
             }
             finally
@@ -845,6 +1210,214 @@ namespace WwTool.UI.ViewModels
                 _isUpdatingCharts = false;
             }
         }
+
+        private void ClearInsightCharts()
+        {
+            PityDistributionSeries = [];
+            FiveStarTimelineSeries = [];
+            RarityStackedSeries = [];
+            ActivityHeatSeries = [];
+            CumulativeTrendSeries = [];
+            CurrentPityGaugeSeries = [];
+            FeaturedExpectationSeries = [];
+            CurrentCharacterPity = 0;
+        }
+
+        private void BuildInsightCharts(
+            GachaInsights insights,
+            SolidColorPaint axisTextPaint,
+            SolidColorPaint separatorPaint,
+            ChartThemePalette palette)
+        {
+            PityDistributionSeries =
+            [
+                new ColumnSeries<int>
+                {
+                    Values = insights.PityDistribution,
+                    Name = LanguageManager.Instance["Stat_PityDistribution"] ?? "Pity distribution",
+                    Fill = new SolidColorPaint(palette.Primary),
+                    MaxBarWidth = 36
+                }
+            ];
+            PityDistributionXAxes =
+            [
+                new Axis { Labels = insights.PityLabels.ToArray(), LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint }
+            ];
+            PityDistributionYAxes = [new Axis { MinLimit = 0, LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint }];
+            RaisePropertyChanged(nameof(PityDistributionXAxes));
+            RaisePropertyChanged(nameof(PityDistributionYAxes));
+
+            FiveStarTimelineSeries =
+            [
+                new LineSeries<int>
+                {
+                    Values = insights.FiveStars.Select(x => x.Pity).ToArray(),
+                    Name = LanguageManager.Instance["Stat_Pity"] ?? "Pity",
+                    GeometrySize = 10,
+                    Stroke = new SolidColorPaint(palette.Warning) { StrokeThickness = 3 },
+                    GeometryFill = new SolidColorPaint(palette.Warning),
+                    GeometryStroke = new SolidColorPaint(palette.Warning)
+                }
+            ];
+            FiveStarTimelineXAxes =
+            [
+                new Axis
+                {
+                    Labels = insights.FiveStars.Select(x => $"{x.OccurredAt:MM-dd} {x.Name}").ToArray(),
+                    LabelsRotation = insights.FiveStars.Count > 10 ? 35 : 0,
+                    LabelsPaint = axisTextPaint,
+                    SeparatorsPaint = separatorPaint
+                }
+            ];
+            FiveStarTimelineYAxes = [new Axis { MinLimit = 0, LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint }];
+            RaisePropertyChanged(nameof(FiveStarTimelineXAxes));
+            RaisePropertyChanged(nameof(FiveStarTimelineYAxes));
+
+            RarityStackedSeries =
+            [
+                new StackedColumnSeries<int> { Values = insights.PoolRarities.Select(x => x.ThreeStar).ToArray(), Name = "3★", Fill = new SolidColorPaint(palette.TextMuted) },
+                new StackedColumnSeries<int> { Values = insights.PoolRarities.Select(x => x.FourStar).ToArray(), Name = "4★", Fill = new SolidColorPaint(palette.FourStar) },
+                new StackedColumnSeries<int> { Values = insights.PoolRarities.Select(x => x.FiveStar).ToArray(), Name = "5★", Fill = new SolidColorPaint(palette.Warning) }
+            ];
+            RarityStackedXAxes =
+            [
+                new Axis
+                {
+                    Labels = insights.PoolRarities.Select(x => x.PoolType.GetLocalizedDescription()).ToArray(),
+                    LabelsRotation = 15,
+                    LabelsPaint = axisTextPaint,
+                    SeparatorsPaint = separatorPaint
+                }
+            ];
+            RarityStackedYAxes = [new Axis { MinLimit = 0, LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint }];
+            RaisePropertyChanged(nameof(RarityStackedXAxes));
+            RaisePropertyChanged(nameof(RarityStackedYAxes));
+
+            DateTime heatStart = insights.DailyPulls.Count == 0
+                ? DateTime.Today
+                : insights.DailyPulls.Min(x => x.Date).Date;
+            var heatPoints = insights.DailyPulls.Select(x =>
+            {
+                int week = (int)((x.Date.Date - heatStart).TotalDays / 7);
+                int day = ((int)x.Date.DayOfWeek + 6) % 7;
+                return new WeightedPoint(week, day, x.Pulls);
+            }).ToArray();
+            ActivityHeatSeries =
+            [
+                new HeatSeries<WeightedPoint>
+                {
+                    Values = heatPoints,
+                    Name = LanguageManager.Instance["Stat_DailyPulls"] ?? "Daily pulls",
+                    HeatMap =
+                    [
+                        ToLvcColor(palette.Primary.WithAlpha(20)),
+                        ToLvcColor(palette.Primary.WithAlpha(80)),
+                        ToLvcColor(palette.Primary.WithAlpha(160)),
+                        ToLvcColor(palette.Primary)
+                    ],
+                    PointPadding = new LiveChartsCore.Drawing.Padding(2)
+                }
+            ];
+            int heatWeeks = heatPoints.Length == 0 ? 0 : (int)heatPoints.Max(x => x.X ?? 0) + 1;
+            ActivityHeatXAxes = [new Axis { Labels = Enumerable.Range(0, heatWeeks).Select(x => heatStart.AddDays(x * 7).ToString("MM-dd")).ToArray(), LabelsPaint = axisTextPaint, SeparatorsPaint = null }];
+            ActivityHeatYAxes = [new Axis { Labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], LabelsPaint = axisTextPaint, SeparatorsPaint = null }];
+            RaisePropertyChanged(nameof(ActivityHeatXAxes));
+            RaisePropertyChanged(nameof(ActivityHeatYAxes));
+
+            CumulativeTrendSeries =
+            [
+                new LineSeries<int> { Values = insights.CumulativePulls.Select(x => x.Pulls).ToArray(), Name = LanguageManager.Instance["Stat_CumulativePulls"] ?? "Cumulative pulls", Fill = null, GeometrySize = 5, Stroke = new SolidColorPaint(palette.Primary) { StrokeThickness = 3 }, GeometryFill = new SolidColorPaint(palette.Primary), GeometryStroke = new SolidColorPaint(palette.Primary) },
+                new LineSeries<int> { Values = insights.CumulativePulls.Select(x => x.FiveStars).ToArray(), Name = LanguageManager.Instance["Stat_CumulativeGolds"] ?? "Cumulative 5-star", ScalesYAt = 1, Fill = null, GeometrySize = 5, Stroke = new SolidColorPaint(palette.Warning) { StrokeThickness = 3 }, GeometryFill = new SolidColorPaint(palette.Warning), GeometryStroke = new SolidColorPaint(palette.Warning) }
+            ];
+            CumulativeTrendXAxes = [new Axis { Labels = insights.CumulativePulls.Select(x => x.Date.ToString("MM-dd")).ToArray(), LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint }];
+            CumulativeTrendYAxes =
+            [
+                new Axis { Position = LiveChartsCore.Measure.AxisPosition.Start, MinLimit = 0, LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint },
+                new Axis { Position = LiveChartsCore.Measure.AxisPosition.End, MinLimit = 0, LabelsPaint = axisTextPaint, ShowSeparatorLines = false }
+            ];
+            RaisePropertyChanged(nameof(CumulativeTrendXAxes));
+            RaisePropertyChanged(nameof(CumulativeTrendYAxes));
+
+            CurrentCharacterPity = insights.CurrentCharacterPity;
+            CurrentPityGaugeSeries =
+            [
+                new PieSeries<double> { Values = [Math.Min(80, insights.CurrentCharacterPity)], Name = LanguageManager.Instance["Stat_CurrentPity"] ?? "Current pity", InnerRadius = 62, Fill = new SolidColorPaint(palette.Primary) },
+                new PieSeries<double> { Values = [Math.Max(0, 80 - insights.CurrentCharacterPity)], Name = LanguageManager.Instance["Stat_RemainingPity"] ?? "Remaining", InnerRadius = 62, Fill = new SolidColorPaint(palette.Stroke.WithAlpha(90)) }
+            ];
+
+            FeaturedExpectationSeries =
+            [
+                new LineSeries<int> { Values = insights.FeaturedPulls.Select(x => x.CumulativePulls).ToArray(), Name = LanguageManager.Instance["Stat_ActualCumulative"] ?? "Actual cumulative", Fill = null, GeometrySize = 8, Stroke = new SolidColorPaint(palette.Primary) { StrokeThickness = 3 }, GeometryFill = new SolidColorPaint(palette.Primary), GeometryStroke = new SolidColorPaint(palette.Primary) },
+                new LineSeries<double> { Values = insights.FeaturedPulls.Select(x => x.ExpectedCumulativePulls).ToArray(), Name = LanguageManager.Instance["Stat_ExpectedCumulative"] ?? "Expected cumulative", Fill = null, GeometrySize = 0, Stroke = new SolidColorPaint(palette.Success) { StrokeThickness = 2 } },
+                new LineSeries<double> { Values = insights.FeaturedPulls.Select(x => x.RunningAverage).ToArray(), Name = LanguageManager.Instance["Stat_RunningFeaturedAverage"] ?? "Average per UP", ScalesYAt = 1, Fill = null, GeometrySize = 8, Stroke = new SolidColorPaint(palette.Warning) { StrokeThickness = 3 }, GeometryFill = new SolidColorPaint(palette.Warning), GeometryStroke = new SolidColorPaint(palette.Warning) }
+            ];
+            FeaturedExpectationXAxes = [new Axis { Labels = insights.FeaturedPulls.Select(x => $"{x.Index}. {x.Name}").ToArray(), LabelsRotation = 20, LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint }];
+            FeaturedExpectationYAxes =
+            [
+                new Axis { Position = LiveChartsCore.Measure.AxisPosition.Start, MinLimit = 0, LabelsPaint = axisTextPaint, SeparatorsPaint = separatorPaint },
+                new Axis { Position = LiveChartsCore.Measure.AxisPosition.End, MinLimit = 0, LabelsPaint = axisTextPaint, ShowSeparatorLines = false }
+            ];
+            RaisePropertyChanged(nameof(FeaturedExpectationXAxes));
+            RaisePropertyChanged(nameof(FeaturedExpectationYAxes));
+        }
+
+        private static ChartThemePalette GetChartThemePalette()
+        {
+            SKColor primary = GetChartColor("ChartPrimaryColor");
+            return new ChartThemePalette(
+                GetChartColor("TextPrimaryColor"),
+                GetChartColor("TextSecondaryColor"),
+                GetChartColor("TextMutedColor"),
+                GetChartColor("ChartGridColor"),
+                primary,
+                GetChartColor("ChartSecondaryColor"),
+                GetChartColor("ChartTertiaryColor"),
+                GetChartColor("SurfaceElevatedColor"),
+                TryGetChartColor("ChartFourStarColor", out SKColor fourStar)
+                    ? fourStar
+                    : DeriveFourStarColor(primary));
+        }
+
+        private static SKColor GetChartColor(string resourceKey)
+        {
+            return TryGetChartColor(resourceKey, out SKColor color)
+                ? color
+                : throw new InvalidOperationException($"Missing chart theme color resource: {resourceKey}");
+        }
+
+        private static bool TryGetChartColor(string resourceKey, out SKColor color)
+        {
+            if (Application.Current.Resources[resourceKey] is System.Windows.Media.Color resourceColor)
+            {
+                color = new SKColor(resourceColor.R, resourceColor.G, resourceColor.B, resourceColor.A);
+                return true;
+            }
+
+            color = default;
+            return false;
+        }
+
+        private static SKColor DeriveFourStarColor(SKColor primary)
+        {
+            byte red = (byte)Math.Clamp((primary.Red + primary.Blue) / 2 + 32, 0, 255);
+            byte green = (byte)Math.Clamp(primary.Green * 0.65, 0, 255);
+            byte blue = (byte)Math.Clamp(Math.Max(primary.Blue, primary.Red * 0.9), 0, 255);
+            return new SKColor(red, green, blue, primary.Alpha);
+        }
+
+        private static LiveChartsCore.Drawing.LvcColor ToLvcColor(SKColor color)
+            => new(color.Red, color.Green, color.Blue, color.Alpha);
+
+        private readonly record struct ChartThemePalette(
+            SKColor TextPrimary,
+            SKColor TextSecondary,
+            SKColor TextMuted,
+            SKColor Stroke,
+            SKColor Primary,
+            SKColor Warning,
+            SKColor Success,
+            SKColor SurfaceElevated,
+            SKColor FourStar);
 
         private string GetLocalizedItemName(int resourceId, string defaultName, LanguageType? lang = null)
         {
@@ -884,6 +1457,15 @@ namespace WwTool.UI.ViewModels
                 return;
             }
 
+            if (_isLoadingLocalGachaLog)
+            {
+                return;
+            }
+
+            _isLoadingLocalGachaLog = true;
+            IsStatisticsLoading = true;
+            StatisticsErrorMessage = null;
+
             _logger.Info("在 StatisticsViewModel 中调用了 LoadLocalGachaLog 命令");
 
             try
@@ -898,7 +1480,7 @@ namespace WwTool.UI.ViewModels
                     {
                         foreach (var type in Enum.GetValues<CardPoolType>())
                         {
-                            var localData = await _gachaRepository.GetPoolRecordsByUid(SelectedUser.Uid, (int)type);
+                            var localData = await _userDataService.ReadGachaInSourceOrderAsync(SelectedUser.Uid, (int)type, _navigationCts.Token);
 
                             if (localData != null)
                             {
@@ -919,6 +1501,7 @@ namespace WwTool.UI.ViewModels
                                         {
                                             SuccessCount = res.SuccessCount;
                                             MissCount = res.MissCount;
+                                            _featuredCharacterCount = res.FeaturedCount;
                                         }
 
                                         var chartData = PoolCharts.FirstOrDefault(x => x.PoolType == pool.PoolType);
@@ -936,15 +1519,35 @@ namespace WwTool.UI.ViewModels
                         }
                     });
                     await Statistics(allGachaDatas);
+                    HasStatisticsData = allGachaDatas.Count > 0;
 
                     _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_LoadedLocalGacha"], NotificationType.Success);
                     UserId = SelectedUser.Uid;
-                }, "加载本地数据");
+                }, "加载本地数据", ex =>
+                {
+                    HasStatisticsData = false;
+                    StatisticsErrorMessage = ex.Message;
+                });
             }
             finally
             {
                 _uiStateService.HideLoading();
+                _isLoadingLocalGachaLog = false;
+                IsStatisticsLoading = false;
             }
+        }
+
+        private void ApplyTrendViewport()
+        {
+            if (DailyXAxes.Length == 0) return;
+
+            DailyXAxes[0].MinLimit = IsTrendViewportEnabled
+                ? TrendViewportStart - 0.5
+                : null;
+            DailyXAxes[0].MaxLimit = IsTrendViewportEnabled
+                ? TrendViewportStart + TrendViewportSize - 0.5
+                : null;
+            RaisePropertyChanged(nameof(DailyXAxes));
         }
 
 
@@ -968,7 +1571,7 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var users = await Task.Run(async () => await _userRepository.GetAllUserAccountAsync());
+                    var users = await _userDataService.ListAccountsAsync(_navigationCts.Token);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -982,7 +1585,7 @@ namespace WwTool.UI.ViewModels
                         {
                             if (!string.IsNullOrEmpty(_configService.User.LastUserId))
                             {
-                                SelectedUser = Users.FirstOrDefault(u => u.Uid == _configService.User.LastUserId);
+                                SelectedUser = Users.FirstOrDefault(u => u.Uid == _configService.User.LastUserId) ?? Users.First();
                             }
                             else
                             {
@@ -1006,6 +1609,13 @@ namespace WwTool.UI.ViewModels
         private async void RefreshLocalData()
         {
             await LoadLocalAccount();
+        }
+
+        private void ResetNavigationCancellation()
+        {
+            if (!_navigationCts.IsCancellationRequested) return;
+            _navigationCts.Dispose();
+            _navigationCts = new CancellationTokenSource();
         }
     }
 }

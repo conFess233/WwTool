@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using WwTool.Common.Enums;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 using WwTool.Common.Models.ApiResponse;
+using WwTool.Common.Models.Domain;
 
 namespace WwTool.Services.Interfaces
 {
@@ -10,6 +12,7 @@ namespace WwTool.Services.Interfaces
         public CardPoolStatistics PoolStatistics { get; set; } = new();
         public int SuccessCount { get; set; }
         public int MissCount { get; set; }
+        public int FeaturedCount { get; set; }
         public List<int> GoldValues { get; set; } = new();
         public List<string> GoldLabels { get; set; } = new();
     }
@@ -17,7 +20,8 @@ namespace WwTool.Services.Interfaces
     public interface IGachaStatisticsService
     {
         GachaStatisticsResult OrganizeData(IEnumerable<GachaData> data, CardPoolType poolType, string languageCode);
-        GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount);
+        GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount, int featuredCount);
+        GachaInsights CalculateInsights(IEnumerable<GachaData> data, bool includeIncompleteFeaturedSegment = false);
     }
 
     public class GlobalStatisticsResult

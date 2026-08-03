@@ -5,18 +5,19 @@ using SkiaSharp;
 using System.Collections.Generic;
 using WwTool.Common;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 
 namespace WwTool.Services
 {
     public interface IChartBuilderService
     {
-        ISeries[] BuildGoldHistorySeries(List<int> goldValues, string name, ISeries[] existingSeries = null);
-        Axis[] BuildGoldHistoryXAxes(List<string> goldLabels, Axis[] existingAxes = null);
+        ISeries[] BuildGoldHistorySeries(List<int> goldValues, string name, ISeries[]? existingSeries = null);
+        Axis[] BuildGoldHistoryXAxes(List<string> goldLabels, Axis[]? existingAxes = null);
     }
 
     public class ChartBuilderService : IChartBuilderService
     {
-        public ISeries[] BuildGoldHistorySeries(List<int> goldValues, string name, ISeries[] existingSeries = null)
+        public ISeries[] BuildGoldHistorySeries(List<int> goldValues, string name, ISeries[]? existingSeries = null)
         {
             if (existingSeries != null && existingSeries.Length > 0 && existingSeries[0] is ColumnSeries<int> col)
             {
@@ -36,7 +37,7 @@ namespace WwTool.Services
             };
         }
 
-        public Axis[] BuildGoldHistoryXAxes(List<string> goldLabels, Axis[] existingAxes = null)
+        public Axis[] BuildGoldHistoryXAxes(List<string> goldLabels, Axis[]? existingAxes = null)
         {
             if (existingAxes != null && existingAxes.Length > 0)
             {
