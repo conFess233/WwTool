@@ -5,6 +5,8 @@ namespace WwTool.Services.Interfaces
 {
     public interface IConfigService
     {
+        event EventHandler? UserAutoSaveFailed;
+
         AppConfig App { get; }
         ApiConfig Api { get; }
         UserConfig User { get; }

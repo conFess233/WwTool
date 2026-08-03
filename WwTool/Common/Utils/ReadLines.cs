@@ -12,7 +12,6 @@ namespace WwTool.Common.Utils
     {
         /// <summary>
         /// 以共享读写的方式逐行读取文本文件
-        /// 适用于读取正在被其他进程（如游戏客户端）写入的日志文件
         /// </summary>
         /// <param name="path">文件绝对路径</param>
         /// <returns>日志行</returns>
@@ -29,7 +28,7 @@ namespace WwTool.Common.Utils
 
             while (!reader.EndOfStream)
             {
-                yield return reader.ReadLine();
+                yield return reader.ReadLine()!;
             }
         }
 
@@ -68,7 +67,7 @@ namespace WwTool.Common.Utils
             using var reader = new StreamReader(decryptedMs, Encoding.UTF8);
             while (!reader.EndOfStream)
             {
-                yield return reader.ReadLine();
+                yield return reader.ReadLine()!;
             }
         }
     }

@@ -16,7 +16,6 @@ namespace WwTool.Common.Models.ApiRequest
         [JsonPropertyName("playerId")]
         public string PlayerId { get; set; } = string.Empty;
         
-        //public string CardPoolId { get; set; }
         
         /// <summary>
         /// 服务器ID

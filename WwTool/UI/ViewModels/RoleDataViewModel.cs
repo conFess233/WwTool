@@ -5,9 +5,12 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using WwTool.Common.Enums;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
+using WwTool.Common.Models.Domain;
 using WwTool.Common.Models.ApiResponse;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
+using WwTool.Services.Repositories;
 using WwTool.Common.Utils;
 using ExceptionHelper = WwTool.Common.Utils.ExceptionHelper;
 
@@ -18,6 +21,7 @@ namespace WwTool.UI.ViewModels
     /// </summary>
     public class RoleDataViewModel : BindableBase, INavigationAware
     {
+        private CancellationTokenSource _navigationCts = new();
         /// <summary>
         /// 数据获取服务
         /// </summary>
@@ -29,7 +33,7 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 本地数据库服务
         /// </summary>
-        private readonly LocalDataService _localDb;
+        private readonly IUserDataService _userDataService;
         /// <summary>
         /// 配置服务
         /// </summary>
@@ -43,13 +47,13 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 本地用户账号列表
         /// </summary>
-        private ObservableCollection<UserAccount> _users;
+        private ObservableCollection<AccountSummary> _users = new();
         /// <summary>
         /// 页面是否已初次加载的标记
         /// </summary>
         private bool _isLoaded = false;
 
-        public ObservableCollection<UserAccount> Users
+        public ObservableCollection<AccountSummary> Users
         {
             get => _users;
             set
@@ -59,9 +63,9 @@ namespace WwTool.UI.ViewModels
             }
         }
 
-        private UserAccount _selectedUser;
+        private AccountSummary _selectedUser = null!;
 
-        public UserAccount SelectedUser
+        public AccountSummary SelectedUser
         {
             get => _selectedUser;
             set
@@ -73,7 +77,7 @@ namespace WwTool.UI.ViewModels
             }
         }
 
-        private async void OnSelectedUserChanged(UserAccount? newUser)
+        private async void OnSelectedUserChanged(AccountSummary? newUser)
         {
             if (newUser == null || string.IsNullOrEmpty(newUser.Uid)) return;
 
@@ -115,11 +119,16 @@ namespace WwTool.UI.ViewModels
         public DelegateCommand SyncDataCommand { get; }
 
         private readonly ILoggerService _logger;
-        public RoleDataViewModel(IGetDataService getDataService, IUIStateService uiStateService, LocalDataService localDb, ILoggerService logger, IConfigService configService)
+        public RoleDataViewModel(
+            IGetDataService getDataService,
+            IUIStateService uiStateService,
+            IUserDataService userDataService,
+            ILoggerService logger,
+            IConfigService configService)
         {
             _getDataService = getDataService;
             _uiStateService = uiStateService;
-            _localDb = localDb;
+            _userDataService = userDataService;
             _logger = logger;
             _configService = configService;
             Users = new();
@@ -147,7 +156,7 @@ namespace WwTool.UI.ViewModels
                 _uiStateService.ShowLoading(LanguageManager.Instance["Msg_LoadingRoleData"]);
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var roleDetail = await _localDb.LoadPlayerRoleDataAsync(SelectedUser.Uid);
+                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(SelectedUser.Uid, _navigationCts.Token);
                     if (roleDetail != null)
                     {
                         RoleDetail = roleDetail;
@@ -192,9 +201,9 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var oauthCode = await _localDb.GetOauthCodeAsync(SelectedUser.Uid);
-                    await _getDataService.SyncAllUserDataAsync(SelectedUser.Uid, oauthCode);
-                    var roleDetail = await _localDb.LoadPlayerRoleDataAsync(SelectedUser.Uid);
+                    var oauthCode = await _userDataService.GetCredentialAsync(SelectedUser.Uid, _navigationCts.Token);
+                    await _getDataService.SyncAllUserDataAsync(SelectedUser.Uid, oauthCode, _navigationCts.Token);
+                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(SelectedUser.Uid, _navigationCts.Token);
                     if (roleDetail != null)
                     {
                         RoleDetail = roleDetail;
@@ -215,10 +224,9 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         private async Task RefreshLocalAccount()
         {
-            var localAccounts = await _localDb.GetAllUserAccountAsync();
-            if (localAccounts != null)
-                Users.Clear();
-            foreach (var user in localAccounts)
+            var localAccounts = await _userDataService.ListAccountsAsync(_navigationCts.Token);
+            Users.Clear();
+            foreach (var user in localAccounts ?? [])
             {
                 Users.Add(user);
             }
@@ -234,7 +242,8 @@ namespace WwTool.UI.ViewModels
                     SelectedUser = Users.First();
                 }
             }
-            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Msg_ReadAccountsSuccess"], Users.Count), NotificationType.Success);
+            var userCount = Users?.Count ?? 0;
+            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Msg_ReadAccountsSuccess"], userCount), NotificationType.Success);
         }
 
         /// <summary>
@@ -242,6 +251,7 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
+            ResetNavigationCancellation();
             if (!_isLoaded)
             {
                 _isLoaded = true;
@@ -260,6 +270,13 @@ namespace WwTool.UI.ViewModels
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-        public void OnNavigatedFrom(NavigationContext navigationContext) { }
+        public void OnNavigatedFrom(NavigationContext navigationContext) => _navigationCts.Cancel();
+
+        private void ResetNavigationCancellation()
+        {
+            if (!_navigationCts.IsCancellationRequested) return;
+            _navigationCts.Dispose();
+            _navigationCts = new CancellationTokenSource();
+        }
     }
 }

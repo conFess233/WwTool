@@ -56,7 +56,7 @@ namespace WwTool.Services
                         throw new InvalidOperationException($"弹窗 '{name}' 的 ViewModel 必须实现 IDialogAware 接口。");
                     }
 
-                    // 使用 Prism 的 DialogUtilities 初始化 ViewModel 的 RequestClose 监听
+            // 初始化弹窗关闭监听。
                     DialogUtilities.InitializeListener(viewModel, (result) =>
                     {
                         // 确保在 UI 线程执行关闭逻辑

@@ -17,7 +17,7 @@ namespace WwTool.Common.Models
             set { SetProperty(ref _icon, value); }
         }
 
-        private string _title;
+        private string _title = string.Empty;
 
         /// <summary>
         /// 菜单名称
@@ -28,7 +28,7 @@ namespace WwTool.Common.Models
             set { SetProperty(ref _title, value); }
         }
 
-        private string _nameSpace;
+        private string _nameSpace = string.Empty;
 
         /// <summary>
         /// 菜单命名空间

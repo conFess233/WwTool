@@ -1,9 +1,8 @@
-namespace WwTool.Services.Interfaces
+namespace WwTool.Services.Interfaces;
+
+public interface IHttpService
 {
-    public interface IHttpService
-    {
-        Task<T?> GetAsync<T>(string url, Dictionary<string, string>? dynamicHeaders = null);
-        Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data, Dictionary<string, string>? dynamicHeaders = null);
-        Task<TResponse?> PostFormAsync<TResponse>(string url, Dictionary<string, string> formData, Dictionary<string, string>? dynamicHeaders = null);
-    }
+    Task<T?> GetAsync<T>(string url, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default);
+    Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default);
+    Task<TResponse?> PostFormAsync<TResponse>(string url, Dictionary<string, string> formData, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default);
 }

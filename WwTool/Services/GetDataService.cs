@@ -1,9 +1,12 @@
 using System.Security.Cryptography;
+using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 using WwTool.Common.Models.ApiRequest;
 using WwTool.Common.Models.ApiResponse;
 using WwTool.Services.Interfaces;
+using WwTool.Services.Repositories;
 using static WwTool.Services.LoginService;
 
 namespace WwTool.Services
@@ -16,15 +19,23 @@ namespace WwTool.Services
         private readonly IHttpService _apiService;
         private readonly IConfigService _configService;
         private readonly ILoginService _loginService;
-        private readonly LocalDataService _localDb;
+        private readonly IUserRepository _userRepository;
+        private readonly IPlayerInfoRepository _playerInfoRepository;
         private readonly ILoggerService _logger;
 
-        public GetDataService(IHttpService apiService, IConfigService configService, ILoginService loginService, LocalDataService localDb, ILoggerService logger)
+        public GetDataService(
+            IHttpService apiService,
+            IConfigService configService,
+            ILoginService loginService,
+            IUserRepository userRepository,
+            IPlayerInfoRepository playerInfoRepository,
+            ILoggerService logger)
         {
             _apiService = apiService;
             _configService = configService;
             _loginService = loginService;
-            _localDb = localDb;
+            _userRepository = userRepository;
+            _playerInfoRepository = playerInfoRepository;
             _logger = logger;
         }
 
@@ -34,12 +45,15 @@ namespace WwTool.Services
         /// <param name="req">请求体</param>
         /// <returns>抽卡数据列表</returns>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<IEnumerable<GachaData>> GetGachaLogAsync(GachaRequest req)
+        public async Task<IEnumerable<GachaData>> GetGachaLogAsync(GachaRequest req, GachaServerRegion serverRegion, CancellationToken cancellationToken = default)
         {
             _logger.Info($"开始获取抽卡记录 (卡池类型: {req.CardPoolType})");
+            string endpoint = serverRegion == GachaServerRegion.International
+                ? _configService.Api.Urls.GachaUrlNET
+                : _configService.Api.Urls.GachaUrlCN;
             var response = await _apiService.PostAsync<GachaRequest, GachaResponse<List<GachaData>>>(
-                _configService.Api.Urls.GachaUrl,
-                req);
+                endpoint,
+                req, cancellationToken: cancellationToken);
 
             if (response != null && response.Code == 0)
             {
@@ -55,7 +69,7 @@ namespace WwTool.Services
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<GetUserInfoResponse?> GetUserInfoAsync(GetUserInfoRequest request)
+        public async Task<GetUserInfoResponse?> GetUserInfoAsync(GetUserInfoRequest request, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -83,7 +97,7 @@ namespace WwTool.Services
 
                 string url = apiConf.Urls.GetUserInfoUrl + queryParams;
 
-                var response = await _apiService.GetAsync<GetUserInfoResponse>(url);
+                var response = await _apiService.GetAsync<GetUserInfoResponse>(url, cancellationToken: cancellationToken);
                 if (response == null)
                     throw new WwToolApiException("查询账号大区信息请求未返回数据");
                 return response;
@@ -100,7 +114,7 @@ namespace WwTool.Services
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<QueryPlayerInfoResponse?> QueryPlayerInfoAsync(QueryPlayerInfoRequest request)
+        public async Task<QueryPlayerInfoResponse?> QueryPlayerInfoAsync(QueryPlayerInfoRequest request, CancellationToken cancellationToken = default)
         {
             _logger.Debug("带重试地查询玩家基本信息...");
             for (int i = 0; i < _configService.Api.MaxRetries; i++)
@@ -108,13 +122,13 @@ namespace WwTool.Services
                 try
                 {
                     var apiConf = _configService.Api;
-                    var response = await _apiService.PostAsync<QueryPlayerInfoRequest, QueryPlayerInfoResponse>(apiConf.Urls.QueryPlayerInfoUrl, request);
+                    var response = await _apiService.PostAsync<QueryPlayerInfoRequest, QueryPlayerInfoResponse>(apiConf.Urls.QueryPlayerInfoUrl, request, cancellationToken: cancellationToken);
                     if (response == null)
                         throw new WwToolApiException("查询玩家信息请求未返回数据");
 
                     if (response.Message != null && response.Message.Contains("retrying", StringComparison.OrdinalIgnoreCase) && i < _configService.Api.MaxRetries - 1)
                     {
-                        await Task.Delay(_configService.Api.DelayMs);
+                        await Task.Delay(_configService.Api.DelayMs, cancellationToken);
                         continue;
                     }
                     return response;
@@ -123,7 +137,7 @@ namespace WwTool.Services
                 {
                     if (i < _configService.Api.MaxRetries - 1)
                     {
-                        await Task.Delay(_configService.Api.DelayMs);
+                        await Task.Delay(_configService.Api.DelayMs, cancellationToken);
                         continue;
                     }
                     throw new WwToolApiException("查询玩家信息发生异常", ex);
@@ -138,20 +152,20 @@ namespace WwTool.Services
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<QueryRoleResponse?> QueryRoleAsync(QueryRoleRequest request)
+        public async Task<QueryRoleResponse?> QueryRoleAsync(QueryRoleRequest request, CancellationToken cancellationToken = default)
         {
             for (int i = 0; i < _configService.Api.MaxRetries; i++)
             {
                 try
                 {
                     var apiConf = _configService.Api;
-                    var response = await _apiService.PostAsync<QueryRoleRequest, QueryRoleResponse>(apiConf.Urls.QueryRoleUrl, request);
+                    var response = await _apiService.PostAsync<QueryRoleRequest, QueryRoleResponse>(apiConf.Urls.QueryRoleUrl, request, cancellationToken: cancellationToken);
                     if (response == null)
                         throw new WwToolApiException("查询玩家角色详情请求未返回数据");
 
                     if (response.Message != null && response.Message.Contains("retrying", StringComparison.OrdinalIgnoreCase) && i < _configService.Api.MaxRetries - 1)
                     {
-                        await Task.Delay(_configService.Api.DelayMs);
+                        await Task.Delay(_configService.Api.DelayMs, cancellationToken);
                         continue;
                     }
 
@@ -162,7 +176,7 @@ namespace WwTool.Services
                 {
                     if (i < _configService.Api.MaxRetries - 1)
                     {
-                        await Task.Delay(_configService.Api.DelayMs);
+                        await Task.Delay(_configService.Api.DelayMs, cancellationToken);
                         continue;
                     }
                     throw new WwToolApiException("查询玩家角色详情发生异常", ex);
@@ -172,24 +186,24 @@ namespace WwTool.Services
         }
 
         /// <summary>
-        /// 从本地数据库拉取角色信息，forceRefresh 为 true 时则从服务器拉取一遍再从数据库拉取
+        /// 读取角色信息，并按需先从服务器同步。
         /// </summary>
         /// <param name="uid">UID</param>
         /// <param name="forceRefresh">是否从服务器同步数据</param>
         /// <returns></returns>
         /// <exception cref="WwToolDatabaseException"></exception>
-        public async Task<RoleDetailInfo?> GetRoleDetailAsync(string uid, bool forceRefresh = false)
+        public async Task<RoleDetailInfo?> GetRoleDetailAsync(string uid, bool forceRefresh = false, CancellationToken cancellationToken = default)
         {
             if (forceRefresh)
             {
-                var account = await _localDb.GetUserAccountAsync(uid);
+                var account = await _userRepository.GetUserAccountAsync(uid, cancellationToken);
                 if (account != null && !string.IsNullOrEmpty(account.Region))
                 {
-                    await FetchAndSaveRoleDetailAsync(uid, account.Region);
+                    await FetchAndSaveRoleDetailAsync(uid, account.Region, cancellationToken: cancellationToken);
                 }
             }
 
-            var roleDetali = await _localDb.LoadPlayerRoleDataAsync(uid);
+            var roleDetali = await _playerInfoRepository.LoadPlayerRoleDataAsync(uid, cancellationToken);
             if (roleDetali == null)
             {
                 throw new WwToolDatabaseException($"未找到对应 UID:{uid} 的角色数据");
@@ -205,16 +219,16 @@ namespace WwTool.Services
         /// <returns></returns>
         /// <exception cref="WwToolAuthException"></exception>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<PlayerRegionInfo?> FetchAndSavePlayerRegionInfoAsync(string? uid = null, string? oauthCode = null)
+        public async Task<PlayerRegionInfo?> FetchAndSavePlayerRegionInfoAsync(string? uid = null, string? oauthCode = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(oauthCode))
             {
                 if (string.IsNullOrEmpty(uid)) throw new WwToolAuthException("缺少必要的授权信息，请重新登录");
-                oauthCode = await _localDb.GetOauthCodeAsync(uid);
+                oauthCode = await _userRepository.GetOauthCodeAsync(uid, cancellationToken);
                 if (string.IsNullOrEmpty(oauthCode)) throw new WwToolAuthException("授权码已过期或不存在，请重新登录");
             }
 
-            var playerInfoResponse = await QueryPlayerInfoAsync(new QueryPlayerInfoRequest { OauthCode = oauthCode });
+            var playerInfoResponse = await QueryPlayerInfoAsync(new QueryPlayerInfoRequest { OauthCode = oauthCode }, cancellationToken);
             if (playerInfoResponse == null || playerInfoResponse.Code != 0 || playerInfoResponse.Data == null || playerInfoResponse.Data.Count == 0)
             {
                 throw new WwToolApiException(playerInfoResponse?.Message ?? "获取关联游戏角色信息失败");
@@ -235,7 +249,7 @@ namespace WwTool.Services
 
             _loginService.SwitchUserContext(playerRegion.RoleId);
 
-            await _localDb.SavePlayerRegionInfoAsync(playerRegion, targetRegion, oauthCode);
+            await _playerInfoRepository.SavePlayerRegionInfoAsync(playerRegion, targetRegion, oauthCode, cancellationToken);
             return playerRegion;
         }
 
@@ -248,12 +262,12 @@ namespace WwTool.Services
         /// <returns></returns>
         /// <exception cref="WwToolAuthException"></exception>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<RoleDetailInfo?> FetchAndSaveRoleDetailAsync(string uid, string region, string? oauthCode = null)
+        public async Task<RoleDetailInfo?> FetchAndSaveRoleDetailAsync(string uid, string region, string? oauthCode = null, CancellationToken cancellationToken = default)
         {
             _logger.Info($"获取并保存角色详情 (UID: {uid}, 大区: {region})");
             if (string.IsNullOrEmpty(oauthCode))
             {
-                oauthCode = await _localDb.GetOauthCodeAsync(uid);
+                oauthCode = await _userRepository.GetOauthCodeAsync(uid, cancellationToken);
                 if (string.IsNullOrEmpty(oauthCode)) throw new WwToolAuthException("本地授权已过期或不存在，请重新登录");
             }
 
@@ -264,13 +278,13 @@ namespace WwTool.Services
                 Region = region
             };
 
-            var roleResponse = await QueryRoleAsync(request);
+            var roleResponse = await QueryRoleAsync(request, cancellationToken);
             if (roleResponse == null || roleResponse.Code != 0 || roleResponse.Data == null || roleResponse.Data.Count == 0)
             {
                 throw new WwToolApiException(roleResponse?.Message ?? "获取游戏角色详细信息失败");
             }
 
-            string roleDetailJson = string.Empty;
+            string? roleDetailJson = null;
             if (!roleResponse.Data.TryGetValue(region, out roleDetailJson))
             {
                 foreach (var kv in roleResponse.Data)
@@ -280,10 +294,13 @@ namespace WwTool.Services
                 }
             }
 
+            if (string.IsNullOrWhiteSpace(roleDetailJson))
+                throw new WwToolApiException("未找到玩家角色详情数据");
+
             var roleDetail = System.Text.Json.JsonSerializer.Deserialize<RoleDetailInfo>(roleDetailJson);
             if (roleDetail == null) throw new WwToolApiException("解析玩家角色详细信息失败");
 
-            var account = await _localDb.GetUserAccountAsync(uid);
+            var account = await _userRepository.GetUserAccountAsync(uid, cancellationToken);
             var playerRegion = new PlayerRegionInfo
             {
                 RoleId = uid,
@@ -293,7 +310,7 @@ namespace WwTool.Services
                 HeadPhoto = account?.HeadPhoto ?? 0
             };
 
-            await _localDb.SavePlayerRoleDataAsync(uid, roleDetail, region, playerRegion);
+            await _playerInfoRepository.SavePlayerRoleDataAsync(uid, roleDetail, region, playerRegion, cancellationToken);
             return roleDetail;
         }
 
@@ -303,19 +320,19 @@ namespace WwTool.Services
         /// <param name="uid"></param>
         /// <param name="oauthCode"></param>
         /// <returns></returns>
-        public async Task SyncAllUserDataAsync(string? uid = null, string? oauthCode = null)
+        public async Task SyncAllUserDataAsync(string? uid = null, string? oauthCode = null, CancellationToken cancellationToken = default)
         {
-            var regionInfo = await FetchAndSavePlayerRegionInfoAsync(uid, oauthCode);
+            var regionInfo = await FetchAndSavePlayerRegionInfoAsync(uid, oauthCode, cancellationToken);
             if (regionInfo != null)
             {
                 string region = "Default";
-                var account = await _localDb.GetUserAccountAsync(regionInfo.RoleId);
+                var account = await _userRepository.GetUserAccountAsync(regionInfo.RoleId, cancellationToken);
                 if (account != null && !string.IsNullOrEmpty(account.Region))
                 {
                     region = account.Region;
                 }
 
-                await FetchAndSaveRoleDetailAsync(regionInfo.RoleId, region, oauthCode);
+                await FetchAndSaveRoleDetailAsync(regionInfo.RoleId, region, oauthCode, cancellationToken);
 
                 _configService.User.LastUserId = regionInfo.RoleId;
                 await _configService.SaveAllAsync();

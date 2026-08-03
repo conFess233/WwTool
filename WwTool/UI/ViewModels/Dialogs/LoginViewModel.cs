@@ -10,6 +10,7 @@ using WwTool.Common.Enums;
 using WwTool.Common.Events;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 using WwTool.Common.Models.ApiRequest;
 using WwTool.Common.Models.ApiResponse;
 using WwTool.Common.Utils;
@@ -44,7 +45,6 @@ namespace WwTool.UI.ViewModels.Dialogs
         /// <summary>
         /// 本地数据库服务
         /// </summary>
-        private readonly LocalDataService _localDb;
         /// <summary>
         /// 事件聚合器，控制背景模糊
         /// </summary>
@@ -125,14 +125,12 @@ namespace WwTool.UI.ViewModels.Dialogs
             ILoginService loginService,
             IUIStateService uiStateService,
             IGetDataService getDataService,
-            LocalDataService localDb,
             IEventAggregator eventAggregator)
         {
             _configService = configService;
             _loginService = loginService;
             _uiStateService = uiStateService;
             _getDataService = getDataService;
-            _localDb = localDb;
             _eventAggregator = eventAggregator;
 
             LoginCommand = new DelegateCommand(LoginAsync, () => !IsBusy)

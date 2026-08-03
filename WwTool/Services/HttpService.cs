@@ -30,14 +30,15 @@ namespace WwTool.Services
         /// <summary>
         /// GET 请求
         /// </summary>
-        public async Task<T?> GetAsync<T>(string url, Dictionary<string, string>? dynamicHeaders = null)
+        public async Task<T?> GetAsync<T>(string url, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default)
         {
             var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             ApplyHeaders(request, dynamicHeaders);
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
             using var response = await client.SendAsync(request, cts.Token);
             response.EnsureSuccessStatusCode();
 
@@ -48,7 +49,7 @@ namespace WwTool.Services
         /// <summary>
         /// POST JSON 请求 (application/json)
         /// </summary>
-        public async Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data, Dictionary<string, string>? dynamicHeaders = null)
+        public async Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default)
         {
             var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Post, url);
@@ -58,10 +59,11 @@ namespace WwTool.Services
             string json = JsonSerializer.Serialize(data, _camelCaseOptions);
             request.Content = new StringContent(json, Encoding.UTF8, _configService.Api.CommonHeaders.DefaultContentType);
 
-            _logger.Debug($"HTTP POST 请求: {url}");
+            _logger.Debug($"HTTP POST 请求: {GetEndpointCategory(url)}");
             var startTime = DateTime.Now;
             
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
             using var response = await client.SendAsync(request, cts.Token);
             var duration = (DateTime.Now - startTime).TotalMilliseconds;
             _logger.Debug($"HTTP POST 响应: {(int)response.StatusCode} (耗时: {duration}ms)");
@@ -75,7 +77,7 @@ namespace WwTool.Services
         /// <summary>
         /// POST 表单请求 (application/x-www-form-urlencoded)
         /// </summary>
-        public async Task<TResponse?> PostFormAsync<TResponse>(string url, Dictionary<string, string> formData, Dictionary<string, string>? dynamicHeaders = null)
+        public async Task<TResponse?> PostFormAsync<TResponse>(string url, Dictionary<string, string> formData, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default)
         {
             var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Post, url);
@@ -84,10 +86,11 @@ namespace WwTool.Services
 
             request.Content = new FormUrlEncodedContent(formData);
 
-            _logger.Debug($"HTTP POST FORM 请求: {url}");
+            _logger.Debug($"HTTP POST FORM 请求: {GetEndpointCategory(url)}");
             var startTime = DateTime.Now;
             
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
             using var response = await client.SendAsync(request, cts.Token);
             var duration = (DateTime.Now - startTime).TotalMilliseconds;
             _logger.Debug($"HTTP POST FORM 响应: {(int)response.StatusCode} (耗时: {duration}ms)");
@@ -124,5 +127,8 @@ namespace WwTool.Services
         {
             return _factory.CreateClient("WwToolClient");
         }
+
+        private static string GetEndpointCategory(string url) =>
+            Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) ? $"{uri.Host}{uri.AbsolutePath}" : "invalid-endpoint";
     }
 }

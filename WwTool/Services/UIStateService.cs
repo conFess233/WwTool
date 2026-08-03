@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using WwTool.Common.Enums;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services
@@ -24,7 +25,7 @@ namespace WwTool.Services
             private set => SetProperty(ref _isLoading, value);
         }
 
-        private string _loadingMessage;
+        private string _loadingMessage = string.Empty;
         /// <summary>
         /// 加载中消息
         /// </summary>

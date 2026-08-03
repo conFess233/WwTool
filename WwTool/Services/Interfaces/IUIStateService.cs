@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using WwTool.Common.Enums;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 
 namespace WwTool.Services.Interfaces
 {

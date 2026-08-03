@@ -44,7 +44,7 @@ namespace WwTool.Common.Utils
                 try
                 {
                     // 1. 浏览器访问主页，返回包含极验 SDK 的 HTML
-                    if (request.Url.AbsolutePath == "/" && request.HttpMethod == "GET")
+                    if (request.Url?.AbsolutePath == "/" && request.HttpMethod == "GET")
                     {
                         string html = GetGeetestHtml();
                         byte[] buffer = Encoding.UTF8.GetBytes(html);
@@ -54,7 +54,7 @@ namespace WwTool.Common.Utils
                         await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
                     }
                     // 2. 浏览器验证成功后，将参数 POST 回本地服务器
-                    else if (request.Url.AbsolutePath == "/submit" && request.HttpMethod == "POST")
+                    else if (request.Url?.AbsolutePath == "/submit" && request.HttpMethod == "POST")
                     {
                         using var reader = new StreamReader(request.InputStream, request.ContentEncoding);
                         string body = await reader.ReadToEndAsync();

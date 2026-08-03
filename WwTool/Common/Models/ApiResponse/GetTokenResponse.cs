@@ -17,7 +17,7 @@ namespace WwTool.Common.Models.ApiResponse
         /// 访问令牌
         /// </summary>
         [JsonPropertyName("access_token")]
-        public string AccessToken { get; set; }
+        public string AccessToken { get; set; } = string.Empty;
 
         /// <summary>
         /// 过期时间

@@ -1,44 +1,96 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Collections.Specialized;
 using System.Web;
 using WwTool.Common.Models.ApiRequest;
 
 namespace WwTool.Common.Utils
 {
     /// <summary>
-    /// 抽卡 URL 解析工具类
-    /// 用于将游戏客户端中的抽卡记录 URL 解析为用于查询的请求对象
+    /// 解析并校验抽卡记录链接。
     /// </summary>
     public static class GachaUrlParser
     {
-        /// <summary>
-        /// 解析 URL 并生成 GachaRequest 对象
-        /// </summary>
-        /// <param name="url">包含抽卡查询参数的完整 URL 字符串</param>
-        /// <returns>封装了查询参数的 GachaRequest 实例</returns>
         public static GachaRequest Parse(string url)
         {
-            string query =
-                url.Substring(url.IndexOf('?'));
-
-            var parameters = HttpUtility.ParseQueryString(query);
-
-            return new GachaRequest
+            if (TryParse(url, out GachaRequest? request, out string? error))
             {
-                ServerId = parameters["svr_id"],
+                return request!;
+            }
 
-                PlayerId = parameters["player_id"],
+            throw new FormatException(error);
+        }
 
-                LanguageCode = parameters["lang"],
+        public static bool TryParse(
+            string? url,
+            out GachaRequest? request,
+            out string? error)
+        {
+            request = null;
+            error = null;
 
-                CardPoolType = int.Parse(parameters["gacha_type"]),
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                error = "The gacha URL is empty.";
+                return false;
+            }
 
-                RecordId = parameters["record_id"],
+            if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out Uri? uri)
+                || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            {
+                error = "The gacha URL must be an absolute HTTP or HTTPS URL.";
+                return false;
+            }
 
-                //CardPoolId =
-                //    parameters["resources_id"]
+            string query = uri.Query;
+            if (string.IsNullOrEmpty(query) && uri.Fragment.Contains("?"))
+            {
+                int index = uri.Fragment.IndexOf('?');
+                if (index >= 0)
+                {
+                    query = uri.Fragment.Substring(index);
+                }
+            }
+            NameValueCollection parameters = HttpUtility.ParseQueryString(query);
+            if (!TryGetRequired(parameters, "svr_id", out string serverId, out error)
+                || !TryGetRequired(parameters, "player_id", out string playerId, out error)
+                || !TryGetRequired(parameters, "lang", out string languageCode, out error)
+                || !TryGetRequired(parameters, "record_id", out string recordId, out error)
+                || !TryGetRequired(parameters, "gacha_type", out string cardPoolValue, out error))
+            {
+                return false;
+            }
+
+            if (!int.TryParse(cardPoolValue, out int cardPoolType) || cardPoolType < 0)
+            {
+                error = "Query parameter 'gacha_type' must be a non-negative integer.";
+                return false;
+            }
+
+            request = new GachaRequest
+            {
+                ServerId = serverId,
+                PlayerId = playerId,
+                LanguageCode = languageCode,
+                CardPoolType = cardPoolType,
+                RecordId = recordId
             };
+            return true;
+        }
+
+        private static bool TryGetRequired(
+            NameValueCollection parameters,
+            string key,
+            out string value,
+            out string? error)
+        {
+            value = parameters[key]?.Trim() ?? string.Empty;
+            if (value.Length > 0)
+            {
+                error = null;
+                return true;
+            }
+
+            error = $"Missing required query parameter '{key}'.";
+            return false;
         }
     }
 }

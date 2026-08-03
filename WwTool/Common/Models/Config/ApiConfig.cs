@@ -67,7 +67,10 @@ namespace WwTool.Common.Models.Config
     }
     public class Urls
     {
-        public string GachaUrl { get; set; } = "https://gmserver-api.aki-game2.net/gacha/record/query";
+        // 国际服抽卡记录链接
+        public string GachaUrlNET { get; set; } = "https://gmserver-api.aki-game2.net/gacha/record/query";
+        // 国服抽卡记录链接
+        public string GachaUrlCN { get; set; } = "https://gmserver-api.aki-game2.com/gacha/record/query";
         public string EmailLoginUrl { get; set; } = "https://sdkapi.kurogame-service.com/sdkcom/v2/login/emailPwd.lg";
         public string GenerateUrl { get; set; } = "https://sdkapi.kurogame-service.com/sdkcom/v2/user/oauth/code/generate.lg";
         public string GetTokenUrl { get; set; } = "https://sdkapi.kurogame-service.com/sdkcom/v2/auth/getToken.lg";

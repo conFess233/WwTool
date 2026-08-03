@@ -11,7 +11,7 @@ namespace WwTool.Common.Utils
 {
     /// <summary>
     /// 全局多语言管理器，提供动态语言切换与基于键的字符串获取能力
-    /// 实现了 INotifyPropertyChanged 接口，支持 WPF 的动态 UI 绑定
+    /// 管理界面语言并通知绑定更新。
     /// </summary>
     public class LanguageManager : INotifyPropertyChanged
     {

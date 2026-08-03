@@ -9,11 +9,13 @@ using System.Windows;
 using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
+using WwTool.Common.Models.Domain;
 using WwTool.Common.Models.ApiRequest;
 using WwTool.Common.Models.ApiResponse;
-using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
+using WwTool.Services.Repositories;
 using WwTool.Common.Utils;
 using ExceptionHelper = WwTool.Common.Utils.ExceptionHelper;
 
@@ -24,12 +26,13 @@ namespace WwTool.UI.ViewModels
     /// </summary>
     public class IndexViewModel : BindableBase, INavigationAware
     {
+        private CancellationTokenSource _navigationCts = new();
         private readonly IConfigService _configService;
         private readonly ILoginService _loginService;
         private readonly IDialogService _dialogService;
         private readonly IUIStateService _uiStateService;
         private readonly IGetDataService _getDataService;
-        private readonly LocalDataService _localDb;
+        private readonly IUserDataService _userDataService;
         private readonly ILoggerService _logger;
 
         /// <summary>
@@ -49,14 +52,21 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         public DelegateCommand LoadLocalAccountInfoCommand { get; }
 
-        public IndexViewModel(IConfigService configService, ILoginService loginService, IDialogService dialogService, IUIStateService uiStateService, IGetDataService getDataService, LocalDataService localDb, ILoggerService logger)
+        public IndexViewModel(
+            IConfigService configService,
+            ILoginService loginService,
+            IDialogService dialogService,
+            IUIStateService uiStateService,
+            IGetDataService getDataService,
+            IUserDataService userDataService,
+            ILoggerService logger)
         {
             _configService = configService;
             _loginService = loginService;
             _dialogService = dialogService;
             _uiStateService = uiStateService;
             _getDataService = getDataService;
-            _localDb = localDb;
+            _userDataService = userDataService;
             _logger = logger;
 
             ShowLoginDialogCommand = new DelegateCommand(ShowLoginDialog);
@@ -126,7 +136,7 @@ namespace WwTool.UI.ViewModels
         private int _birthDay;
         private int _bpLevel;
         private int _bpWeekUp;
-        private string _region;
+        private string _region = string.Empty;
 
 
 
@@ -136,8 +146,8 @@ namespace WwTool.UI.ViewModels
         private int _bpExp;
         private int _bpExpLimit;
 
-        private ObservableCollection<UserAccount> _users;
-        private UserAccount _selectedUser;
+        private ObservableCollection<AccountSummary> _users = new();
+        private AccountSummary _selectedUser = null!;
         #endregion
 
         #region 属性
@@ -145,7 +155,7 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 本地账号列表
         /// </summary>
-        public ObservableCollection<UserAccount> Users
+        public ObservableCollection<AccountSummary> Users
         {
             get => _users; set
             {
@@ -157,7 +167,7 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 当前选中的用户账号
         /// </summary>
-        public UserAccount SelectedUser
+        public AccountSummary SelectedUser
         {
             get => _selectedUser;
             set
@@ -360,10 +370,10 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var oauthCode = await _localDb.GetOauthCodeAsync(SelectedUser.Uid);
-                    await _getDataService.SyncAllUserDataAsync(SelectedUser.Uid, oauthCode);
-                    var roleDetail = await _localDb.LoadPlayerRoleDataAsync(SelectedUser.Uid);
-                    if (roleDetail != null)
+                    var oauthCode = await _userDataService.GetCredentialAsync(SelectedUser.Uid, _navigationCts.Token);
+                    await _getDataService.SyncAllUserDataAsync(SelectedUser.Uid, oauthCode, _navigationCts.Token);
+                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(SelectedUser.Uid, _navigationCts.Token);
+                    if (roleDetail?.Base != null && roleDetail.BattlePass != null)
                     {
                         RoleName = SelectedUser.Name;
                         Uid = SelectedUser.Uid;
@@ -391,7 +401,7 @@ namespace WwTool.UI.ViewModels
                         BpLevel = roleDetail.BattlePass.Level;
                         BpWeekUp = roleDetail.BattlePass.WeekExp;
                         BpWeekMaxUp = roleDetail.BattlePass.WeekMaxExp;
-                        Region = SelectedUser.Region;
+                        Region = SelectedUser.Region ?? string.Empty;
 
                         if (showMessage)
                             _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_FetchRoleSuccess"], NotificationType.Success);
@@ -433,8 +443,8 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var roleDetail = await _localDb.LoadPlayerRoleDataAsync(uid);
-                    if (roleDetail != null)
+                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(uid, _navigationCts.Token);
+                    if (roleDetail?.Base != null && roleDetail.BattlePass != null)
                     {
                         RoleName = SelectedUser.Name;
                         Uid = SelectedUser.Uid;
@@ -462,7 +472,7 @@ namespace WwTool.UI.ViewModels
                         BpLevel = roleDetail.BattlePass.Level;
                         BpWeekUp = roleDetail.BattlePass.WeekExp;
                         BpWeekMaxUp = roleDetail.BattlePass.WeekMaxExp;
-                        Region = SelectedUser.Region;
+                        Region = SelectedUser.Region ?? string.Empty;
 
                         if (showMessage)
                             _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_FetchRoleSuccess"], NotificationType.Success);
@@ -494,7 +504,7 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var users = await Task.Run(async () => await _localDb.GetAllUserAccountAsync());
+                    var users = await _userDataService.ListAccountsAsync(_navigationCts.Token);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -508,7 +518,7 @@ namespace WwTool.UI.ViewModels
                         {
                             if (!string.IsNullOrEmpty(_configService.User.LastUserId))
                             {
-                                SelectedUser = Users.FirstOrDefault(u => u.Uid == _configService.User.LastUserId);
+                                SelectedUser = Users.FirstOrDefault(u => u.Uid == _configService.User.LastUserId) ?? Users.First();
                             }
                             else
                             {
@@ -533,6 +543,7 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
+            ResetNavigationCancellation();
             if (!_isLoaded)
             {
                 _isLoaded = true;
@@ -543,6 +554,13 @@ namespace WwTool.UI.ViewModels
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
-        public void OnNavigatedFrom(NavigationContext navigationContext) { }
+        public void OnNavigatedFrom(NavigationContext navigationContext) => _navigationCts.Cancel();
+
+        private void ResetNavigationCancellation()
+        {
+            if (!_navigationCts.IsCancellationRequested) return;
+            _navigationCts.Dispose();
+            _navigationCts = new CancellationTokenSource();
+        }
     }
 }

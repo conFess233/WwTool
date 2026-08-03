@@ -8,6 +8,7 @@ using System.Windows.Controls.Primitives;
 using WwTool.Common;
 using WwTool.Common.Events;
 using WwTool.Common.Models;
+using WwTool.Common.Models.Entities;
 using WwTool.Common.Models.Config;
 using WwTool.Common.Utils;
 using WwTool.Extensions;
@@ -41,7 +42,6 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 配置服务，提供应用、API 和用户配置的读写
         /// </summary>
-        private readonly IConfigService _configService;
 
         /// <summary>
         /// 暴露给视图层的 UI 状态服务实例
@@ -55,7 +55,7 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 侧边栏导航项集合
         /// </summary>
-        private ObservableCollection<NavItem> navItems;
+        private ObservableCollection<NavItem> navItems = new();
 
         /// <summary>
         /// 全局消息提示文本
@@ -90,12 +90,6 @@ namespace WwTool.UI.ViewModels
             }
         }
 
-        /// <summary>
-        /// 是否启用毛玻璃特效（从用户配置中读取）
-        /// </summary>
-        public bool IsGlassEffectEnabled => _configService.User.IsGlassEffectEnabled;
-        public double BackgroundOpacity => _configService.User.GlassOpacity / 100.0;
-
         public bool IsGlobalBlur
         {
             get => _isGlobalBlur;
@@ -105,13 +99,12 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 构造函数，初始化服务依赖、导航命令和事件订阅
         /// </summary>
-        public MainViewModel(IRegionManager regionManager, IDialogService dialogService, IUIStateService uIStateService, IEventAggregator eventAggregator, IConfigService configService)
+        public MainViewModel(IRegionManager regionManager, IDialogService dialogService, IUIStateService uIStateService, IEventAggregator eventAggregator)
         {
             this._dialogService = dialogService;
             this._eventAggregator = eventAggregator;
             this._uiStateService = uIStateService;
             this._regionManager = regionManager;
-            _configService = configService;
             NavItems = new ObservableCollection<NavItem>();
             NavigateCommand = new DelegateCommand<NavItem>(Navigate);
 
@@ -128,18 +121,6 @@ namespace WwTool.UI.ViewModels
                 }
             };
 
-            _configService.User.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(_configService.User.IsGlassEffectEnabled))
-                {
-                    RaisePropertyChanged(nameof(IsGlassEffectEnabled));
-                    RaisePropertyChanged(nameof(BackgroundOpacity));
-                }
-                else if (e.PropertyName == nameof(_configService.User.GlassOpacity))
-                {
-                    RaisePropertyChanged(nameof(BackgroundOpacity));
-                }
-            };
         }
 
         /// <summary>

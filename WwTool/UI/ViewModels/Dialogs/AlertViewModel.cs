@@ -32,7 +32,7 @@ namespace WwTool.UI.ViewModels.Dialogs
         /// <summary>
         /// 弹窗消息正文
         /// </summary>
-        private string _message;
+        private string _message = string.Empty;
         public string Message
         {
             get => _message;
@@ -52,8 +52,8 @@ namespace WwTool.UI.ViewModels.Dialogs
         /// <summary>
         /// 自定义数据，可用于弹窗与调用方之间传递额外信息
         /// </summary>
-        private object _customData;
-        public object CustomData
+        private object? _customData;
+        public object? CustomData
         {
             get => _customData;
             set => SetProperty(ref _customData, value);
@@ -83,7 +83,8 @@ namespace WwTool.UI.ViewModels.Dialogs
             {
                 // 返回数据
                 var parameters = new DialogParameters();
-                parameters.Add("CustomData", CustomData);
+                if (CustomData != null)
+                    parameters.Add("CustomData", CustomData);
 
                 // 关闭弹窗并返回 OK 结果，携带参数
                 RequestClose.Invoke(new DialogResult { Parameters = parameters, Result = ButtonResult.OK });

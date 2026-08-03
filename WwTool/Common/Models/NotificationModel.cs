@@ -8,11 +8,11 @@ namespace WwTool.Common.Models
 {
     public class NotificationModel
     {
-        public string Title { get; set; }
-        public string Message { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
         public NotificationType Type { get; set; }
 
-        public DelegateCommand CloseCommand { get; set; }
+        public DelegateCommand CloseCommand { get; set; } = null!;
 
         public SolidColorBrush ThemeBrush
         {

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -101,9 +102,9 @@ namespace WwTool.Services
                         {
                             await WriteEntryToFileAsync(entry);
                         }
-                        catch
+                        catch (Exception writeException)
                         {
-                            // 忽略日志系统内部错误，防止其导致主程序崩溃
+                            Trace.TraceError($"写入日志失败: {writeException}");
                         }
                     }
                 }
@@ -117,7 +118,10 @@ namespace WwTool.Services
                     {
                         await WriteEntryToFileAsync(entry);
                     }
-                    catch { }
+                    catch (Exception writeException)
+                    {
+                        Trace.TraceError($"关闭时刷新日志失败: {writeException}");
+                    }
                 }
             }
         }
@@ -165,12 +169,16 @@ namespace WwTool.Services
                     {
                         File.Move(activeLogPath, rotatedPath);
                     }
-                    catch
+                    catch (Exception rotationException)
                     {
                         // 移动失败时，附加 GUID 防止重名
                         rotatedFileName = $"wwtool_{dateStr}_{timeStr}_{Guid.NewGuid().ToString().Substring(0, 4)}.log";
                         rotatedPath = Path.Combine(LogsFolder, rotatedFileName);
-                        try { File.Move(activeLogPath, rotatedPath); } catch { }
+                        try { File.Move(activeLogPath, rotatedPath); }
+                        catch (Exception fallbackException)
+                        {
+                            Trace.TraceError($"日志轮转失败: {rotationException}; fallback: {fallbackException}");
+                        }
                     }
 
                     // 触发定期清理
@@ -207,7 +215,8 @@ namespace WwTool.Services
                 {
                     if (file.LastWriteTime < retentionDate)
                     {
-                        try { file.Delete(); } catch { }
+                        try { file.Delete(); }
+                        catch (Exception deleteException) { Trace.TraceError($"删除过期日志失败: {deleteException}"); }
                     }
                 }
 
@@ -224,13 +233,14 @@ namespace WwTool.Services
                     int filesToDeleteCount = logFiles.Count - maxFileCount;
                     for (int i = 0; i < filesToDeleteCount; i++)
                     {
-                        try { logFiles[i].Delete(); } catch { }
+                        try { logFiles[i].Delete(); }
+                        catch (Exception deleteException) { Trace.TraceError($"清理超量日志失败: {deleteException}"); }
                     }
                 }
             }
-            catch
+            catch (Exception cleanupException)
             {
-                // 忽略清理时的异常
+                Trace.TraceError($"清理日志失败: {cleanupException}");
             }
         }
 
@@ -245,7 +255,10 @@ namespace WwTool.Services
                 _cts.Cancel();
                 _writeTask.Wait(1000);
             }
-            catch { }
+            catch (Exception disposeException)
+            {
+                Trace.TraceError($"停止日志写入队列失败: {disposeException}");
+            }
             finally
             {
                 _cts.Dispose();

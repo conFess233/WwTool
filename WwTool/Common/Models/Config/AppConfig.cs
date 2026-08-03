@@ -17,7 +17,7 @@ namespace WwTool.Common.Models.Config
         public string LogFolderPath { get; set; } = Path.Combine("Local", "Logs");
         public int LogRetentionDays { get; set; } = 7;
         public bool EnableFileLogging { get; set; } = true;
-        public long LogMaxSizeBytes { get; set; } = 10 * 1024 * 1024; // 10MB
+        public long LogMaxSizeBytes { get; set; } = 10 * 1024 * 1024; // 默认限制为 10 MB。
         public int LogMaxFileCount { get; set; } = 5;
 
         // 极验本地验证服务配置
