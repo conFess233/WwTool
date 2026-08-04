@@ -34,6 +34,7 @@
     <None Remove="Local\Icons\1107.png" />
     <None Remove="Local\Icons\1108.png" />
     <None Remove="Local\Icons\1109.png" />
+    <None Remove="Local\Icons\1110.png" />
     <None Remove="Local\Icons\12.png" />
     <None Remove="Local\Icons\1202.png" />
     <None Remove="Local\Icons\1203.png" />
@@ -54,6 +55,8 @@
     <None Remove="Local\Icons\1306.png" />
     <None Remove="Local\Icons\1307.png" />
     <None Remove="Local\Icons\1308.png" />
+    <None Remove="Local\Icons\1309.png" />
+    <None Remove="Local\Icons\1310.png" />
     <None Remove="Local\Icons\14.png" />
     <None Remove="Local\Icons\1402.png" />
     <None Remove="Local\Icons\1403.png" />
@@ -87,6 +90,7 @@
     <None Remove="Local\Icons\1606.png" />
     <None Remove="Local\Icons\1607.png" />
     <None Remove="Local\Icons\1608.png" />
+    <None Remove="Local\Icons\1610.png" />
     <None Remove="Local\Icons\17.png" />
     <None Remove="Local\Icons\18.png" />
     <None Remove="Local\Icons\19.png" />
@@ -146,6 +150,7 @@
     <None Remove="Local\Icons\21020084.png" />
     <None Remove="Local\Icons\21020086.png" />
     <None Remove="Local\Icons\21020094.png" />
+    <None Remove="Local\Icons\21020096.png" />
     <None Remove="Local\Icons\21020104.png" />
     <None Remove="Local\Icons\21030011.png" />
     <None Remove="Local\Icons\21030012.png" />
@@ -216,8 +221,13 @@
     <None Remove="Local\Icons\21050084.png" />
     <None Remove="Local\Icons\21050086.png" />
     <None Remove="Local\Icons\21050094.png" />
+    <None Remove="Local\Icons\21050096.png" />
     <None Remove="Local\Icons\21050104.png" />
     <None Remove="Local\Icons\22.png" />
+    <None Remove="Local\Icons\23.png" />
+    <None Remove="Local\Icons\24.png" />
+    <None Remove="Local\Icons\25.png" />
+    <None Remove="Local\Icons\26.png" />
     <None Remove="Local\Icons\3.png" />
     <None Remove="Local\Icons\4.png" />
     <None Remove="Local\Icons\5022.png" />
@@ -272,6 +282,11 @@
     <None Remove="Local\Icons\82000010.png" />
     <None Remove="Local\Icons\82000011.png" />
     <None Remove="Local\Icons\82000012.png" />
+    <None Remove="Local\Icons\82000013.png" />
+    <None Remove="Local\Icons\82000014.png" />
+    <None Remove="Local\Icons\82000015.png" />
+    <None Remove="Local\Icons\82000016.png" />
+    <None Remove="Local\Icons\82000017.png" />
     <None Remove="Local\Icons\82011102.png" />
     <None Remove="Local\Icons\82011107.png" />
     <None Remove="Local\Icons\82011205.png" />
@@ -345,6 +360,7 @@
     <None Remove="Local\Icons\89103025.png" />
     <None Remove="Local\Icons\89103026.png" />
     <None Remove="Local\Icons\89103027.png" />
+    <None Remove="Local\Icons\89103028.png" />
     <None Remove="Local\Icons\89103029.png" />
     <None Remove="Local\Icons\89103030.png" />
     <None Remove="Local\Icons\89103031.png" />
@@ -372,6 +388,13 @@
     <None Remove="Local\Icons\89103054.png" />
     <None Remove="Local\Icons\89103055.png" />
     <None Remove="Local\Icons\89103056.png" />
+    <None Remove="Local\Icons\89103058.png" />
+    <None Remove="Local\Icons\89103059.png" />
+    <None Remove="Local\Icons\89103060.png" />
+    <None Remove="Local\Icons\89103061.png" />
+    <None Remove="Local\Icons\89103062.png" />
+    <None Remove="Local\Icons\89103063.png" />
+    <None Remove="Local\Icons\89103064.png" />
     <None Remove="Local\Icons\89103926.png" />
     <None Remove="Local\Icons\89103927.png" />
     <None Remove="Local\Icons\89103928.png" />
@@ -384,9 +407,12 @@
     <None Remove="Local\Icons\89200000.png" />
     <None Remove="Local\Icons\89300001.png" />
     <None Remove="Local\Icons\89300002.png" />
+    <None Remove="Local\Icons\89300003.png" />
     <None Remove="Local\Icons\89400001.png" />
     <None Remove="Local\Icons\89400002.png" />
     <None Remove="Local\Icons\89400003.png" />
+    <None Remove="Local\Icons\89400004.png" />
+    <None Remove="Local\Icons\89400005.png" />
     <None Remove="Local\Icons\9.png" />
     <None Remove="Local\Icons\999.png" />
     <None Remove="Local\Icons\T_ShopMotoIcon01.png" />
@@ -483,6 +509,9 @@
     <Content Include="Local\Icons\1109.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Local\Icons\1110.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Local\Icons\12.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -541,6 +570,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\1308.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\1309.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\1310.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\14.png">
@@ -640,6 +675,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\1608.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\1610.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\17.png">
@@ -817,6 +855,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\21020094.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\21020096.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\21020104.png">
@@ -1029,10 +1070,25 @@
     <Content Include="Local\Icons\21050094.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Local\Icons\21050096.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Local\Icons\21050104.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\22.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\23.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\24.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\25.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\26.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\3.png">
@@ -1195,6 +1251,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\82000012.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\82000013.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\82000014.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\82000015.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\82000016.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\82000017.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\82011102.png">
@@ -1416,6 +1487,9 @@
     <Content Include="Local\Icons\89103027.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Local\Icons\89103028.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Local\Icons\89103029.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1497,6 +1571,27 @@
     <Content Include="Local\Icons\89103056.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Local\Icons\89103058.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\89103059.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\89103060.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\89103061.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\89103062.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\89103063.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\89103064.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Local\Icons\89103926.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1533,6 +1628,9 @@
     <Content Include="Local\Icons\89300002.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Local\Icons\89300003.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Local\Icons\89400001.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1540,6 +1638,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\89400003.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\89400004.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Local\Icons\89400005.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Local\Icons\9.png">
