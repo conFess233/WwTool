@@ -84,7 +84,7 @@ namespace WwTool
             // 初始化全局异常包装类
             var logger = Container.Resolve<ILoggerService>();
             var uiState = Container.Resolve<IUIStateService>();
-            WwTool.Common.Utils.ExceptionHelper.Initialize(logger, uiState);
+            WwTool.Common.Utils.ExceptionHelper.Initialize(logger, uiState, Container.Resolve<IConfigService>());
 
             logger.Info("WwTool 客户端应用程序初始化中...");
 

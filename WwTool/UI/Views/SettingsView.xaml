@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:WwTool.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:enums="clr-namespace:WwTool.Common.Enums"
     xmlns:local="clr-namespace:WwTool.UI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
@@ -248,6 +249,20 @@
                             </StackPanel>
                             <ToggleButton Margin="10,0,0,0" HorizontalAlignment="Right" IsChecked="{Binding User.IsReducedMotionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SwitchToggleButtonStyle}" />
                         </StackPanel>
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_NotificationMode], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBlock Margin="0,4,0,8" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_NotificationModeHint], Source={x:Static utils:LanguageManager.Instance}}" TextWrapping="Wrap" />
+                            <ComboBox
+                                MinWidth="180"
+                                HorizontalAlignment="Left"
+                                SelectedValue="{Binding User.NotificationDisplayMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedValuePath="Tag">
+                                <ComboBoxItem Content="{Binding Path=[NotificationMode_Concise], Source={x:Static utils:LanguageManager.Instance}}" Tag="{x:Static enums:NotificationDisplayMode.Concise}" />
+                                <ComboBoxItem Content="{Binding Path=[NotificationMode_Full], Source={x:Static utils:LanguageManager.Instance}}" Tag="{x:Static enums:NotificationDisplayMode.Full}" />
+                                <ComboBoxItem Content="{Binding Path=[NotificationMode_ExceptionsOnly], Source={x:Static utils:LanguageManager.Instance}}" Tag="{x:Static enums:NotificationDisplayMode.ExceptionsOnly}" />
+                            </ComboBox>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 
@@ -403,6 +418,12 @@
         </ScrollViewer>
 
         <StackPanel Grid.Row="2" HorizontalAlignment="Right" Orientation="Horizontal">
+            <TextBlock
+                Margin="10"
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource SuccessBrush}"
+                Style="{StaticResource CaptionTextStyle}"
+                Text="{Binding SettingsStatusMessage}" />
             <Button
                 Margin="10"
                 Padding="10,5"

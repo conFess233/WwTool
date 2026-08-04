@@ -132,19 +132,21 @@ namespace WwTool.UI.ViewModels
             _logger = logger;
             _configService = configService;
             Users = new();
-            RefreshCommand = new DelegateCommand(async () => await LoadDataAsync());
-            RefreshLocalAccountCommand = new DelegateCommand(async () => await RefreshLocalAccount());
+            RefreshCommand = new DelegateCommand(async () => await LoadDataAsync(showMessage: true));
+            RefreshLocalAccountCommand = new DelegateCommand(async () => await RefreshLocalAccount(showMessage: true));
             SyncDataCommand = new DelegateCommand(async () => await SyncDataAsync());
         }
 
         /// <summary>
         /// 从本地数据库加载指定账号的角色数据
         /// </summary>
-        private async Task LoadDataAsync()
+        /// <param name="showMessage">是否显示用户主动加载的结果提示</param>
+        private async Task LoadDataAsync(bool showMessage = false)
         {
             if (SelectedUser == null)
             {
-                _uiStateService.ShowToast(LanguageManager.Instance["Toast_Error"], LanguageManager.Instance["Msg_NoAccountSelected"], NotificationType.Error);
+                if (showMessage)
+                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Error"], LanguageManager.Instance["Msg_NoAccountSelected"], NotificationType.Error);
 
                 return;
             }
@@ -160,13 +162,23 @@ namespace WwTool.UI.ViewModels
                     if (roleDetail != null)
                     {
                         RoleDetail = roleDetail;
-                        _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_LoadRoleSuccess"], NotificationType.Success);
+                        if (showMessage)
+                        {
+                            ToastHelper.ShowActionResult(
+                                _uiStateService,
+                                LanguageManager.Instance["Toast_Success"],
+                                LanguageManager.Instance["Msg_LoadRoleSuccess"],
+                                NotificationType.Success,
+                                nameof(RoleDataViewModel),
+                                "role:load-local-data");
+                        }
                     }
                     else
                     {
-                        _uiStateService.ShowToast(LanguageManager.Instance["Toast_Warning"], LanguageManager.Instance["Msg_ReturnRoleEmpty"], NotificationType.Warning);
+                        if (showMessage)
+                            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Warning"], LanguageManager.Instance["Msg_ReturnRoleEmpty"], NotificationType.Warning);
                     }
-                }, "加载角色数据");
+                }, "加载角色数据", notifyUser: showMessage);
 
 
             }
@@ -207,7 +219,13 @@ namespace WwTool.UI.ViewModels
                     if (roleDetail != null)
                     {
                         RoleDetail = roleDetail;
-                        _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_FetchRoleSuccess"], NotificationType.Success);
+                        ToastHelper.ShowActionResult(
+                            _uiStateService,
+                            LanguageManager.Instance["Toast_Success"],
+                            LanguageManager.Instance["Msg_FetchRoleSuccess"],
+                            NotificationType.Success,
+                            nameof(RoleDataViewModel),
+                            "role:sync-data");
                     }
                     else
                         _uiStateService.ShowToast(LanguageManager.Instance["Toast_Error"], LanguageManager.Instance["Msg_FetchRoleEmpty"], NotificationType.Warning);
@@ -222,7 +240,8 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 刷新本地用户账号列表并优先选中上次选择的用户
         /// </summary>
-        private async Task RefreshLocalAccount()
+        /// <param name="showMessage">是否显示用户主动刷新账号的结果提示</param>
+        private async Task RefreshLocalAccount(bool showMessage = false)
         {
             var localAccounts = await _userDataService.ListAccountsAsync(_navigationCts.Token);
             Users.Clear();
@@ -242,8 +261,20 @@ namespace WwTool.UI.ViewModels
                     SelectedUser = Users.First();
                 }
             }
-            var userCount = Users?.Count ?? 0;
-            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Msg_ReadAccountsSuccess"], userCount), NotificationType.Success);
+            if (showMessage)
+            {
+                int userCount = Users?.Count ?? 0;
+                NotificationType resultType = userCount == 0 ? NotificationType.Info : NotificationType.Success;
+                ToastHelper.ShowActionResult(
+                    _uiStateService,
+                    LanguageManager.Instance[resultType == NotificationType.Info ? "Toast_Info" : "Toast_Success"],
+                    userCount == 0
+                        ? LanguageManager.Instance["Msg_ActionNoNewData"]
+                        : string.Format(LanguageManager.Instance["Msg_ReadAccountsSuccess"], userCount),
+                    resultType,
+                    nameof(RoleDataViewModel),
+                    "role:refresh-accounts");
+            }
         }
 
         /// <summary>

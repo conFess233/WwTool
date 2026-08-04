@@ -20,12 +20,14 @@ namespace WwTool.Common.Models.Config
         private LanguageType _appLanguage = LanguageType.ZhHans;
         private bool _isReducedMotionEnabled;
         private GachaServerRegion _gachaServerRegion = GachaServerRegion.China;
+        private NotificationDisplayMode _notificationDisplayMode = NotificationDisplayMode.Concise;
 
         public string? GamePath { get => _gamePath; set => SetProperty(ref _gamePath, value); }
         public string? LastUserId { get => _lastUserId; set => SetProperty(ref _lastUserId, value); }
         public string? SearchGachaApiUrl { get => _searchGachaApiUrl; set => SetProperty(ref _searchGachaApiUrl, value); }
         public bool AutoLoadLocalData { get => _autoLoadLocalData; set => SetProperty(ref _autoLoadLocalData, value); }
         public GachaServerRegion GachaServerRegion { get => _gachaServerRegion; set => SetProperty(ref _gachaServerRegion, value); }
+        public NotificationDisplayMode NotificationDisplayMode { get => _notificationDisplayMode; set => SetProperty(ref _notificationDisplayMode, value); }
         public bool IsGlassEffectEnabled
         {
             get => _isGlassEffectEnabled;

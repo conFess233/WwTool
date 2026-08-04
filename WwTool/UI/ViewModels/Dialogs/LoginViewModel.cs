@@ -224,9 +224,6 @@ namespace WwTool.UI.ViewModels.Dialogs
                     // 同步玩家关联角色数据并更新到本地数据库
                     await _getDataService.SyncAllUserDataAsync(oauthCode: oauthResponse.OauthCode);
 
-                    _uiStateService.ShowToast(LanguageManager.Instance["Login_SuccessTitle"],
-                        LanguageManager.Instance["Login_SuccessMsg"], NotificationType.Success);
-
                     // 登录成功，关闭弹窗并返回 OK
                     RequestClose.Invoke(new DialogResult { Result = ButtonResult.OK });
                 }, "登录游戏账号");

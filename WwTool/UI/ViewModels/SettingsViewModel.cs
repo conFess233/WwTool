@@ -52,6 +52,13 @@ namespace WwTool.UI.ViewModels
         public UserConfig User { get; private set; }
 
         private bool _isLoaded = false;
+        private string _settingsStatusMessage = string.Empty;
+
+        public string SettingsStatusMessage
+        {
+            get => _settingsStatusMessage;
+            private set => SetProperty(ref _settingsStatusMessage, value);
+        }
 
         /// <summary>
         /// 本地用户账号列表
@@ -121,7 +128,7 @@ namespace WwTool.UI.ViewModels
             SelectGamePathCommand = new DelegateCommand(SelectGamePath);
             SelectLogPathCommand = new DelegateCommand(SelectLogPath);
             SaveCommand = new DelegateCommand(async () => await SaveAsync());
-            RefreshLocalAccountCommand = new DelegateCommand(async () => await RefreshLocalAccountAsync());
+            RefreshLocalAccountCommand = new DelegateCommand(async () => await RefreshLocalAccountAsync(showMessage: true));
             DeleteLocalAccountCommand = new DelegateCommand(DeleteLocalAccount);
             User = _configService.User;
             Users = new();
@@ -310,7 +317,7 @@ namespace WwTool.UI.ViewModels
                     }
 
                     _configService.User.GamePath = folder;
-                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Toast_GamePathUpdated"], NotificationType.Success);
+                    ShowSettingsStatus(LanguageManager.Instance["Toast_GamePathUpdated"]);
                 }
             }, "选择游戏安装路径");
         }
@@ -331,7 +338,7 @@ namespace WwTool.UI.ViewModels
                 if (dialog.ShowDialog() == true)
                 {
                     _configService.App.LogFolderPath = dialog.FolderName;
-                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Toast_LogDirUpdated"], NotificationType.Success);
+                    ShowSettingsStatus(LanguageManager.Instance["Toast_LogDirUpdated"]);
                 }
             }, "选择日志保存路径");
         }
@@ -346,14 +353,15 @@ namespace WwTool.UI.ViewModels
             {
                 await _configService.SaveAllAsync();
                 _logger.Debug("设置已成功保存到磁盘。");
-                _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Toast_SettingsSaved"], NotificationType.Success);
+                ShowSettingsStatus(LanguageManager.Instance["Toast_SettingsSaved"]);
             }, "保存设置");
         }
 
         /// <summary>
         /// 刷新本地用户账号列表
         /// </summary>
-        private async Task RefreshLocalAccountAsync()
+        /// <param name="showMessage">是否显示用户主动刷新账号的结果提示</param>
+        private async Task RefreshLocalAccountAsync(bool showMessage = false)
         {
             _logger.Debug("在设置视图中刷新本地用户账号");
             var localAccounts = await _userDataService.ListAccountsAsync(_navigationCts.Token);
@@ -367,8 +375,20 @@ namespace WwTool.UI.ViewModels
             {
                 SelectedUser = Users.First(); // 默认选中第一个用户
             }
-            var userCount = Users?.Count ?? 0;
-            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Toast_UsersFetched"], userCount), NotificationType.Success);
+            if (showMessage)
+            {
+                int userCount = Users?.Count ?? 0;
+                NotificationType resultType = userCount == 0 ? NotificationType.Info : NotificationType.Success;
+                ToastHelper.ShowActionResult(
+                    _uiStateService,
+                    LanguageManager.Instance[resultType == NotificationType.Info ? "Toast_Info" : "Toast_Success"],
+                    userCount == 0
+                        ? LanguageManager.Instance["Msg_ActionNoNewData"]
+                        : string.Format(LanguageManager.Instance["Toast_UsersFetched"], userCount),
+                    resultType,
+                    nameof(SettingsViewModel),
+                    "settings:refresh-accounts");
+            }
         }
 
         /// <summary>
@@ -394,11 +414,26 @@ namespace WwTool.UI.ViewModels
                 if (result.Result == ButtonResult.OK)
                 {
                     await _userDataService.DeleteAccountAsync(SelectedUser.Uid, _navigationCts.Token);
-                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Toast_UserDeleted"], SelectedUser.Uid), NotificationType.Success);
+                    _uiStateService.ShowToast(new NotificationRequest
+                    {
+                        Title = LanguageManager.Instance["Toast_Success"],
+                        Message = string.Format(LanguageManager.Instance["Toast_UserDeleted"], SelectedUser.Uid),
+                        Type = NotificationType.Success,
+                        Priority = NotificationPriority.Important,
+                        Source = nameof(SettingsViewModel),
+                        DedupeKey = "settings:account-deleted"
+                    });
                     await RefreshLocalAccountAsync();
                 }
             });
 
+        }
+
+        private async void ShowSettingsStatus(string message)
+        {
+            SettingsStatusMessage = message;
+            await Task.Delay(TimeSpan.FromSeconds(3));
+            if (SettingsStatusMessage == message) SettingsStatusMessage = string.Empty;
         }
 
         /// <summary>

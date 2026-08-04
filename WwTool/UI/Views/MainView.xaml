@@ -109,13 +109,12 @@
 
         <!--  通知层  -->
         <Border
-            Width="280"
+            Width="320"
             Margin="20,0,20,20"
-            HorizontalAlignment="Left"
+            HorizontalAlignment="Right"
             VerticalAlignment="Bottom"
             Panel.ZIndex="500"
-            Background="Transparent"
-            IsHitTestVisible="False">
+            Background="{x:Null}">
             <ItemsControl ItemsSource="{Binding UIStateService.Notifications}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -124,7 +123,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <components:NotificationItem IsHitTestVisible="True" />
+                        <components:NotificationItem />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

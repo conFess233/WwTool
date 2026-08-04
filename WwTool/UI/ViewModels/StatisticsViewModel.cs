@@ -69,7 +69,7 @@ namespace WwTool.UI.ViewModels
             GetGachaLogCommand = new DelegateCommand(async () => await StatisticsDatas());
             LoadLocalDataCommand = new DelegateCommand(LoadLocalData);
             RefreshUsersCommand = new DelegateCommand(RefreshLocalData);
-            ImportUrlCommand = new DelegateCommand(RefreshQueryData);
+            ImportUrlCommand = new DelegateCommand(() => RefreshQueryData(showMessage: true));
 
             foreach (var type in Enum.GetValues<CardPoolType>())
             {
@@ -639,7 +639,8 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 刷新查询数据，从 URL 解析参数并尝试匹配本地账号
         /// </summary>
-        void RefreshQueryData()
+        /// <param name="showMessage">是否显示用户主动导入的结果提示</param>
+        void RefreshQueryData(bool showMessage = false)
         {
             if (!string.IsNullOrEmpty(_logUrl))
             {
@@ -658,6 +659,16 @@ namespace WwTool.UI.ViewModels
                     var newUser = new AccountSummary { Uid = info.PlayerId };
                     Users.Add(newUser);
                     SelectedUser = newUser;
+                }
+                if (showMessage)
+                {
+                    ToastHelper.ShowActionResult(
+                        _uiStateService,
+                        LanguageManager.Instance["Toast_Success"],
+                        LanguageManager.Instance["Msg_AutoImportSuccess"],
+                        NotificationType.Success,
+                        nameof(StatisticsViewModel),
+                        "gacha:manual-import-url");
                 }
             }
         }
@@ -715,7 +726,15 @@ namespace WwTool.UI.ViewModels
                     keyword,
                     _navigationCts.Token);
                 RefreshQueryData();
-                _uiStateService.ShowToast(LanguageManager.Instance["Msg_AutoImportSuccessTitle"], LanguageManager.Instance["Msg_AutoImportSuccess"], NotificationType.Success);
+                _uiStateService.ShowToast(new NotificationRequest
+                {
+                    Title = LanguageManager.Instance["Msg_AutoImportSuccessTitle"],
+                    Message = LanguageManager.Instance["Msg_AutoImportSuccess"],
+                    Type = NotificationType.Success,
+                    Priority = NotificationPriority.Important,
+                    Source = nameof(StatisticsViewModel),
+                    DedupeKey = "gacha:auto-import"
+                });
             }, "自动导入 API 地址");
         }
 
@@ -742,7 +761,15 @@ namespace WwTool.UI.ViewModels
                         pool.Calculate.Clear();
                     }
 
-                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_ClearedData"], NotificationType.Success);
+                    _uiStateService.ShowToast(new NotificationRequest
+                    {
+                        Title = LanguageManager.Instance["Toast_Success"],
+                        Message = LanguageManager.Instance["Msg_ClearedData"],
+                        Type = NotificationType.Success,
+                        Priority = NotificationPriority.Important,
+                        Source = nameof(StatisticsViewModel),
+                        DedupeKey = "gacha:data-cleared"
+                    });
                 }
             });
 
@@ -780,6 +807,7 @@ namespace WwTool.UI.ViewModels
                 _uiStateService.ShowLoading(LanguageManager.Instance["Msg_SyncingGacha"]);
                 await Task.Delay(50);
                 RefreshQueryData();
+                int previousRecordCount = _allCachedGachaDatas.Count;
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
@@ -837,7 +865,18 @@ namespace WwTool.UI.ViewModels
                     _uiStateService.ShowLoading(LanguageManager.Instance["Msg_CalculatingData"]);
                     await Statistics(allGachaDatas);
 
-                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_SyncSuccess"], NotificationType.Success);
+                    int addedRecordCount = Math.Max(0, allGachaDatas.Count - previousRecordCount);
+                    NotificationType resultType = addedRecordCount == 0 ? NotificationType.Info : NotificationType.Success;
+                    ToastHelper.ShowActionResult(
+                        _uiStateService,
+                        LanguageManager.Instance[resultType == NotificationType.Info ? "Toast_Info" : "Toast_Success"],
+                        addedRecordCount == 0
+                            ? LanguageManager.Instance["Msg_ActionNoNewData"]
+                            : string.Format(LanguageManager.Instance["Msg_GachaSyncAdded"], addedRecordCount),
+                        resultType,
+                        nameof(StatisticsViewModel),
+                        "gacha:cloud-sync");
+
                     UserId = SelectedUser.Uid;
                 }, "同步抽卡记录");
             }
@@ -1449,7 +1488,8 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 从本地数据库加载当前账号的抽卡记录并重新统计
         /// </summary>
-        public async Task LoadLocalGachaLog()
+        /// <param name="showMessage">是否显示用户主动加载的结果提示</param>
+        public async Task LoadLocalGachaLog(bool showMessage = false)
         {
             if (string.IsNullOrEmpty(SelectedUser?.Uid))
             {
@@ -1521,13 +1561,26 @@ namespace WwTool.UI.ViewModels
                     await Statistics(allGachaDatas);
                     HasStatisticsData = allGachaDatas.Count > 0;
 
-                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_LoadedLocalGacha"], NotificationType.Success);
+                    if (showMessage)
+                    {
+                        NotificationType resultType = allGachaDatas.Count == 0 ? NotificationType.Info : NotificationType.Success;
+                        ToastHelper.ShowActionResult(
+                            _uiStateService,
+                            LanguageManager.Instance[resultType == NotificationType.Info ? "Toast_Info" : "Toast_Success"],
+                            allGachaDatas.Count == 0
+                                ? LanguageManager.Instance["Msg_ActionNoNewData"]
+                                : LanguageManager.Instance["Msg_LoadedLocalGacha"],
+                            resultType,
+                            nameof(StatisticsViewModel),
+                            "gacha:load-local-data");
+                    }
+
                     UserId = SelectedUser.Uid;
                 }, "加载本地数据", ex =>
                 {
                     HasStatisticsData = false;
                     StatisticsErrorMessage = ex.Message;
-                });
+                }, notifyUser: showMessage);
             }
             finally
             {
@@ -1556,14 +1609,15 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         private async void LoadLocalData()
         {
-            await LoadLocalGachaLog();
+            await LoadLocalGachaLog(showMessage: true);
         }
 
 
         /// <summary>
         /// 从本地数据库加载所有用户账号并自动选中上次使用的账号
         /// </summary>
-        private async Task LoadLocalAccount()
+        /// <param name="showMessage">是否显示用户主动刷新账号的结果提示</param>
+        private async Task LoadLocalAccount(bool showMessage = false)
         {
             try
             {
@@ -1594,8 +1648,21 @@ namespace WwTool.UI.ViewModels
                         }
                     });
 
-                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Msg_LoadedLocalAccount"], users.Count), NotificationType.Success);
-                }, "获取本地账号");
+                    if (showMessage)
+                    {
+                        NotificationType resultType = users.Count == 0 ? NotificationType.Info : NotificationType.Success;
+                        ToastHelper.ShowActionResult(
+                            _uiStateService,
+                            LanguageManager.Instance[resultType == NotificationType.Info ? "Toast_Info" : "Toast_Success"],
+                            users.Count == 0
+                                ? LanguageManager.Instance["Msg_ActionNoNewData"]
+                                : string.Format(LanguageManager.Instance["Msg_LoadedLocalAccount"], users.Count),
+                            resultType,
+                            nameof(StatisticsViewModel),
+                            "gacha:refresh-accounts");
+                    }
+
+                }, "获取本地账号", notifyUser: showMessage);
             }
             finally
             {
@@ -1608,7 +1675,7 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         private async void RefreshLocalData()
         {
-            await LoadLocalAccount();
+            await LoadLocalAccount(showMessage: true);
         }
 
         private void ResetNavigationCancellation()

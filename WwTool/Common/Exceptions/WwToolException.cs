@@ -45,4 +45,15 @@ namespace WwTool.Common.Exceptions
         public WwToolAuthException(string message) : base(message) { }
         public WwToolAuthException(string message, Exception innerException) : base(message, innerException) { }
     }
+
+    public sealed class GuideAuthenticationRequiredException : WwToolAuthException
+    {
+        public GuideAuthenticationRequiredException(string message) : base(message) { }
+    }
+
+    public sealed class GuideApiException : WwToolApiException
+    {
+        public GuideApiException(string message) : base(message) { }
+        public GuideApiException(string message, Exception innerException) : base(message, innerException) { }
+    }
 }

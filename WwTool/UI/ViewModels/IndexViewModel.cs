@@ -82,7 +82,7 @@ namespace WwTool.UI.ViewModels
         private async Task RefreshLocalAccount()
         {
             _logger.Debug("在 IndexViewModel 中调用了 RefreshLocalAccount 命令");
-            await LoadLocalAccountAsync();
+            await LoadLocalAccountAsync(showMessage: true);
         }
 
         /// <summary>
@@ -91,20 +91,22 @@ namespace WwTool.UI.ViewModels
         private async Task RefreshInfo()
         {
             _logger.Info("在 IndexViewModel 中调用了 RefreshInfo 命令");
-            await FeachUserInfoAsync();
+            await FeachUserInfoAsync(showMessage: true);
         }
 
         /// <summary>
         /// 加载当前选中账号的本地角色信息
         /// </summary>
-        private async Task LoadSelectedAccountInfoAsync()
+        /// <param name="showMessage">是否显示用户主动操作的结果提示</param>
+        private async Task LoadSelectedAccountInfoAsync(bool showMessage = true)
         {
             if (SelectedUser == null)
             {
-                _uiStateService.ShowToast(LanguageManager.Instance["Toast_Error"], LanguageManager.Instance["Msg_NoAccountSelected"], NotificationType.Error);
+                if (showMessage)
+                    _uiStateService.ShowToast(LanguageManager.Instance["Toast_Error"], LanguageManager.Instance["Msg_NoAccountSelected"], NotificationType.Error);
                 return;
             }
-            await LoadLocalAccountInfoAsync(SelectedUser.Uid);
+            await LoadLocalAccountInfoAsync(SelectedUser.Uid, showMessage: showMessage);
         }
 
         /// <summary>
@@ -404,14 +406,23 @@ namespace WwTool.UI.ViewModels
                         Region = SelectedUser.Region ?? string.Empty;
 
                         if (showMessage)
-                            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_FetchRoleSuccess"], NotificationType.Success);
+                        {
+                            ToastHelper.ShowActionResult(
+                                _uiStateService,
+                                LanguageManager.Instance["Toast_Success"],
+                                LanguageManager.Instance["Msg_FetchRoleSuccess"],
+                                NotificationType.Success,
+                                nameof(IndexViewModel),
+                                "index:refresh-player");
+                        }
+
                     }
                     else
                     {
                         if (showMessage)
                             _uiStateService.ShowToast(LanguageManager.Instance["Toast_Error"], LanguageManager.Instance["Msg_FetchRoleEmpty"], NotificationType.Warning);
                     }
-                }, "获取角色数据");
+                }, "获取角色数据", notifyUser: showMessage);
             }
             catch
             {
@@ -475,14 +486,23 @@ namespace WwTool.UI.ViewModels
                         Region = SelectedUser.Region ?? string.Empty;
 
                         if (showMessage)
-                            _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Msg_FetchRoleSuccess"], NotificationType.Success);
+                        {
+                            ToastHelper.ShowActionResult(
+                                _uiStateService,
+                                LanguageManager.Instance["Toast_Success"],
+                                LanguageManager.Instance["Msg_LoadRoleSuccess"],
+                                NotificationType.Success,
+                                nameof(IndexViewModel),
+                                "index:load-local-player");
+                        }
+
                     }
                     else
                     {
                         if (showMessage)
                             _uiStateService.ShowToast(LanguageManager.Instance["Toast_Error"], LanguageManager.Instance["Msg_LocalRoleEmpty"], NotificationType.Warning);
                     }
-                }, "获取本地角色数据");
+                }, "获取本地角色数据", notifyUser: showMessage);
             }
             catch
             {
@@ -496,7 +516,8 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 从本地数据库读取所有用户账号，并根据配置自动选中上次使用的账号
         /// </summary>
-        private async Task LoadLocalAccountAsync()
+        /// <param name="showMessage">是否显示用户主动刷新账号的结果提示</param>
+        private async Task LoadLocalAccountAsync(bool showMessage = false)
         {
             try
             {
@@ -527,9 +548,21 @@ namespace WwTool.UI.ViewModels
                         }
                     });
 
-                    if (_uiStateService != null)
-                        _uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], string.Format(LanguageManager.Instance["Msg_ReadAccountsSuccess"], users.Count), NotificationType.Success);
-                }, "获取本地账号");
+                    if (showMessage)
+                    {
+                        NotificationType resultType = users.Count == 0 ? NotificationType.Info : NotificationType.Success;
+                        ToastHelper.ShowActionResult(
+                            _uiStateService,
+                            LanguageManager.Instance[resultType == NotificationType.Info ? "Toast_Info" : "Toast_Success"],
+                            users.Count == 0
+                                ? LanguageManager.Instance["Msg_ActionNoNewData"]
+                                : string.Format(LanguageManager.Instance["Msg_ReadAccountsSuccess"], users.Count),
+                            resultType,
+                            nameof(IndexViewModel),
+                            "index:refresh-accounts");
+                    }
+
+                }, "获取本地账号", notifyUser: showMessage);
             }
             finally
             {
@@ -548,7 +581,7 @@ namespace WwTool.UI.ViewModels
             {
                 _isLoaded = true;
                 await LoadLocalAccountAsync();
-                await LoadSelectedAccountInfoAsync();
+                await LoadSelectedAccountInfoAsync(showMessage: false);
             }
 
         }

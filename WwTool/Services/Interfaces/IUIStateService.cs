@@ -15,6 +15,7 @@ namespace WwTool.Services.Interfaces
         void ShowLoading(string message = "正在处理中...");
         void HideLoading();
         void ShowToast(string title, string message, NotificationType type = NotificationType.Info);
+        void ShowToast(NotificationRequest request);
         void RemoveToast(NotificationModel notification);
         void ShowDialog(object view);
         void CloseDialog();
