@@ -32,6 +32,18 @@
     <SolidColorBrush x:Key="ChartTertiaryBrush" Color="{DynamicResource ChartTertiaryColor}" />
     <SolidColorBrush x:Key="ChartFourStarBrush" Color="{DynamicResource ChartFourStarColor}" />
     <SolidColorBrush x:Key="ChartGridBrush" Color="{DynamicResource ChartGridColor}" />
+    <SolidColorBrush x:Key="RarityFiveStarBrush" Color="{DynamicResource WarningColor}" />
+    <SolidColorBrush x:Key="RarityFourStarBrush" Color="{DynamicResource ChartFourStarColor}" />
+    <SolidColorBrush x:Key="RarityThreeStarBrush" Color="{DynamicResource InfoColor}" />
+    <SolidColorBrush x:Key="RarityFiveStarBadgeBrush" Color="{DynamicResource WarningColor}" Opacity="0.78" />
+    <SolidColorBrush x:Key="RarityFourStarBadgeBrush" Color="{DynamicResource ChartFourStarColor}" Opacity="0.78" />
+    <SolidColorBrush x:Key="ResonanceZeroBrush" Color="#747982" Opacity="0.78" />
+    <SolidColorBrush x:Key="ResonanceOneBrush" Color="#3979D1" Opacity="0.78" />
+    <SolidColorBrush x:Key="ResonanceTwoBrush" Color="#25A7B8" Opacity="0.78" />
+    <SolidColorBrush x:Key="ResonanceThreeBrush" Color="#3B9863" Opacity="0.78" />
+    <SolidColorBrush x:Key="ResonanceFourBrush" Color="#8E5BB7" Opacity="0.78" />
+    <SolidColorBrush x:Key="ResonanceFiveBrush" Color="#C59A32" Opacity="0.78" />
+    <SolidColorBrush x:Key="ResonanceSixBrush" Color="#C94B4B" Opacity="0.82" />
 
     <RadialGradientBrush x:Key="BackgroundAtmosphereBrush" Center="0.82,0.08" GradientOrigin="0.82,0.08" RadiusX="0.75" RadiusY="0.75" Opacity="{DynamicResource AtmosphereOpacity}">
         <GradientStop Offset="0" Color="{DynamicResource AtmosphereColor}" /><GradientStop Offset="1" Color="#00000000" />

@@ -6,351 +6,284 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
-    HorizontalAlignment="Stretch"
-    HorizontalContentAlignment="Stretch"
-    VerticalAlignment="Stretch"
-    VerticalContentAlignment="Stretch"
-    d:DesignHeight="760.208"
-    d:DesignWidth="1099.669"
+    d:DesignHeight="760"
+    d:DesignWidth="1100"
     mc:Ignorable="d">
-
     <UserControl.Resources>
         <cv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
         <cv:ImageConverter x:Key="ImageConverter" />
+
+        <Style x:Key="GuideCardBorderStyle" TargetType="Border">
+            <Setter Property="Width" Value="120" />
+            <Setter Property="Height" Value="156" />
+            <Setter Property="Margin" Value="0,0,10,10" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
+            <Setter Property="ClipToBounds" Value="True" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Star}" Value="5">
+                    <Setter Property="BorderBrush" Value="{DynamicResource RarityFiveStarBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Star}" Value="4">
+                    <Setter Property="BorderBrush" Value="{DynamicResource RarityFourStarBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Star}" Value="3">
+                    <Setter Property="BorderBrush" Value="{DynamicResource RarityThreeStarBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="GuideStarBadgeStyle" TargetType="Border">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Padding" Value="5,2" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Star}" Value="5">
+                    <Setter Property="Background" Value="{DynamicResource RarityFiveStarBadgeBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Star}" Value="4">
+                    <Setter Property="Background" Value="{DynamicResource RarityFourStarBadgeBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="GuideResonanceBadgeStyle" TargetType="Border">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Padding" Value="7,3" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Background" Value="{DynamicResource ResonanceZeroBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Sequence}" Value="1"><Setter Property="Background" Value="{DynamicResource ResonanceOneBrush}" /></DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="2"><Setter Property="Background" Value="{DynamicResource ResonanceTwoBrush}" /></DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="3"><Setter Property="Background" Value="{DynamicResource ResonanceThreeBrush}" /></DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="4"><Setter Property="Background" Value="{DynamicResource ResonanceFourBrush}" /></DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="5"><Setter Property="Background" Value="{DynamicResource ResonanceFiveBrush}" /></DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="6"><Setter Property="Background" Value="{DynamicResource ResonanceSixBrush}" /></DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="GuideSortComboBoxItemStyle" BasedOn="{StaticResource {x:Type ComboBoxItem}}" TargetType="ComboBoxItem">
+            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+            <Setter Property="ToolTip" Value="{Binding DisabledHint}" />
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+        </Style>
+
+        <DataTemplate x:Key="RoleCardTemplate">
+            <Border Style="{StaticResource GuideCardBorderStyle}" ToolTip="{Binding ToolTipText}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="34" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" ClipToBounds="True">
+                        <Image Source="{Binding IconPath, Converter={StaticResource ImageConverter}, ConverterParameter=120, IsAsync=True}" Stretch="UniformToFill" />
+                        <Border Style="{StaticResource GuideStarBadgeStyle}">
+                            <TextBlock FontSize="11" FontWeight="Bold" Foreground="White" Text="{Binding Star, StringFormat={}{0}★}" />
+                        </Border>
+                        <Border Style="{StaticResource GuideResonanceBadgeStyle}">
+                            <TextBlock FontWeight="SemiBold" Foreground="White" Text="{Binding SequenceLabel}" />
+                        </Border>
+                    </Grid>
+                    <Border Grid.Row="1" Background="#E6151517" CornerRadius="0,0,6,6">
+                        <Grid>
+                            <TextBlock
+                                Margin="6,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="White"
+                                Text="{Binding DisplayName}"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="WeaponCardTemplate">
+            <Border Style="{StaticResource GuideCardBorderStyle}" ToolTip="{Binding ToolTipText}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="48" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" ClipToBounds="True">
+                        <Image Source="{Binding IconPath, Converter={StaticResource ImageConverter}, ConverterParameter=120, IsAsync=True}" Stretch="Uniform" />
+                        <Border Style="{StaticResource GuideStarBadgeStyle}">
+                            <TextBlock FontSize="11" FontWeight="Bold" Foreground="White" Text="{Binding Star, StringFormat={}{0}★}" />
+                        </Border>
+                    </Grid>
+                    <Border Grid.Row="1" Background="#E6151517" CornerRadius="0,0,6,6">
+                        <StackPanel Margin="6,3">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Foreground="White"
+                                Text="{Binding DisplayName}"
+                                TextTrimming="CharacterEllipsis" />
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                <TextBlock FontSize="11" Foreground="#CFCFCF" Text="{Binding Path=[Guide_Owner], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <TextBlock
+                                    FontSize="11"
+                                    Foreground="#CFCFCF"
+                                    Text="{Binding OwnerName}"
+                                    TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </UserControl.Resources>
 
-    <UserControl.RenderTransform>
-        <ScaleTransform x:Name="PageTransform" ScaleX="0.8" ScaleY="0.8" />
-    </UserControl.RenderTransform>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <Grid Margin="28,24,28,36">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-    <UserControl.Triggers>
-        <EventTrigger RoutedEvent="UserControl.Loaded">
-            <BeginStoryboard>
-                <Storyboard>
-                    <DoubleAnimation
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="1"
-                        Duration="{StaticResource MotionPage}" />
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleY"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleX"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                </Storyboard>
-            </BeginStoryboard>
-        </EventTrigger>
-    </UserControl.Triggers>
-
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
-            <Grid>
-                <TextBlock Margin="20,15" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Role_Title], Source={x:Static utils:LanguageManager.Instance}}" />
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <ComboBox Height="30" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Nav_RoleData], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBlock Margin="0,6,0,0" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Path=[Guide_PageDescription], Source={x:Static utils:LanguageManager.Instance}}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
+                    <ComboBox
+                        Width="220"
+                        Margin="0,0,10,0"
+                        ItemsSource="{Binding Users}"
+                        SelectedItem="{Binding SelectedUser}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="{Binding Uid}" />
-                                    <TextBlock Margin="5,0,0,0" Style="{StaticResource BaseTextBlockStyle}" Text="{Binding Name}" />
+                                <StackPanel>
+                                    <TextBlock FontWeight="SemiBold" Text="{Binding Name}" />
+                                    <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}" Text="{Binding Uid}" />
                                 </StackPanel>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <Button
-                        Height="32"
-                        Margin="20,0,0,0"
-                        HorizontalAlignment="Right"
-                        Command="{Binding RefreshLocalAccountCommand}"
-                        Content="{Binding Path=[Action_RefreshRoleList], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
-                        Tag="{StaticResource RefreshImage}" />
-                    <Button
-                        Height="32"
-                        Margin="10,0,0,0"
-                        HorizontalAlignment="Right"
-                        Command="{Binding RefreshCommand}"
-                        Content="{Binding Path=[Action_RefreshLocalData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
-                        Style="{StaticResource OkButtonStyle}"
-                        Tag="{StaticResource RefreshImage}" />
-                    <Button
-                        Height="32"
-                        Margin="10,0,20,0"
-                        HorizontalAlignment="Right"
-                        Command="{Binding SyncDataCommand}"
-                        Content="{Binding Path=[Action_GetCloudData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
-                        Style="{StaticResource OkButtonStyle}"
-                        Tag="{StaticResource CloudImage}" />
+                    <Button Command="{Binding SyncCommand}" Content="{Binding Path=[Guide_Sync], Source={x:Static utils:LanguageManager.Instance}}" />
                 </StackPanel>
-
             </Grid>
-        </Border>
 
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
-
-            <Grid MinWidth="0" MaxWidth="920" Margin="24,16,24,24" HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" MinWidth="250" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Border
-                    Grid.Column="0"
-                    VerticalAlignment="Top"
-                    Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="{DynamicResource CornerRadiusCard}">
-                    <StackPanel Margin="16">
-                        <Image
-                            Width="80"
-                            Height="80"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Source="{Binding SelectedUser.IconPath, Converter={StaticResource ImageConverter}}" />
-
+            <Border
+                Grid.Row="1"
+                Margin="0,0,0,20"
+                Padding="24"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource CornerRadiusCard}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Path=[Guide_RoleCount], Source={x:Static utils:LanguageManager.Instance}}" />
                         <TextBlock
-                            HorizontalAlignment="Center"
-                            FontSize="{StaticResource FontSizeLg}"
+                            Margin="0,5,0,0"
+                            FontSize="28"
                             FontWeight="Bold"
-                            Style="{StaticResource TitleTextStyle}"
-                            Text="{Binding SelectedUser.Name}" />
-
-                        <TextBlock
-                            Margin="0,4,0,16"
-                            HorizontalAlignment="Center"
-                            Style="{StaticResource CaptionTextStyle}"
-                            Text="{Binding SelectedUser.Uid, StringFormat={}UID: {0}}" />
-
-                        <Separator Margin="0,0,0,16" Background="{DynamicResource DividerBrush}" />
-
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock HorizontalAlignment="Left" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_Level], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                <TextBlock FontWeight="SemiBold" Text="{Binding RoleDetail.Base.Level}" />
-                                <TextBlock FontWeight="SemiBold" Text="{Binding Path=[Unit_Level], Source={x:Static utils:LanguageManager.Instance}}" />
-                            </StackPanel>
-                        </Grid>
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock HorizontalAlignment="Left" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_SolaLevel], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                <TextBlock FontWeight="SemiBold" Text="{Binding RoleDetail.Base.WorldLevel}" />
-                                <TextBlock FontWeight="SemiBold" Text="{Binding Path=[Unit_Level], Source={x:Static utils:LanguageManager.Instance}}" />
-                            </StackPanel>
-                        </Grid>
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock HorizontalAlignment="Left" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_ActiveDays], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                <TextBlock FontWeight="SemiBold" Text="{Binding RoleDetail.Base.ActiveDays}" />
-                                <TextBlock FontWeight="SemiBold" Text="{Binding Path=[Unit_Day], Source={x:Static utils:LanguageManager.Instance}}" />
-                            </StackPanel>
-                        </Grid>
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock HorizontalAlignment="Left" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_RoleCount], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                <TextBlock FontWeight="SemiBold" Text="{Binding RoleDetail.Base.RoleNum}" />
-                                <TextBlock FontWeight="SemiBold" Text="{Binding Path=[Unit_Role], Source={x:Static utils:LanguageManager.Instance}}" />
-                            </StackPanel>
-                        </Grid>
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock HorizontalAlignment="Left" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_Birthday], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                <TextBlock FontWeight="SemiBold" Text="{Binding RoleDetail.Base.BirthMon}" />
-                                <TextBlock FontWeight="SemiBold" Text="{Binding Path=[Unit_Month], Source={x:Static utils:LanguageManager.Instance}}" />
-                                <TextBlock Margin="5,0,0,0" FontWeight="SemiBold" Text="{Binding RoleDetail.Base.BirthDay}" />
-                                <TextBlock FontWeight="SemiBold" Text="{Binding Path=[Unit_Day2], Source={x:Static utils:LanguageManager.Instance}}" />
-                            </StackPanel>
-                        </Grid>
+                            Text="{Binding RoleCount}" />
                     </StackPanel>
-                </Border>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Path=[Guide_WeaponCount], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            FontSize="28"
+                            FontWeight="Bold"
+                            Text="{Binding WeaponCount}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Path=[Guide_LastSynced], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <TextBlock
+                            Margin="0,8,0,0"
+                            FontSize="15"
+                            FontWeight="SemiBold"
+                            Text="{Binding LastSyncedText}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
 
-                <StackPanel Grid.Column="2">
-                    <Border
-                        Margin="0,0,0,16"
-                        Background="{DynamicResource SurfaceBrush}"
-                        BorderBrush="{DynamicResource BorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="{DynamicResource CornerRadiusCard}">
-                        <StackPanel Margin="16">
-                            <TextBlock Margin="0,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Role_Energy], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
-
-                            <StackPanel Margin="0,0,0,12">
-                                <Grid Margin="0,0,0,4">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Image Width="30" Height="30" Source="{StaticResource EnergyImage}" />
-                                        <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_CrystalSheet], Source={x:Static utils:LanguageManager.Instance}}" />
-                                    </StackPanel>
-
-                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                        <TextBlock FontWeight="Bold" Text="{Binding RoleDetail.Base.Energy}" />
-                                        <TextBlock Text="{Binding RoleDetail.Base.MaxEnergy, StringFormat={} / {0}}" />
-                                    </StackPanel>
-                                </Grid>
-                                <ProgressBar
-                                    Background="{DynamicResource SurfaceHoverBrush}"
-                                    Maximum="{Binding RoleDetail.Base.MaxEnergy}"
-                                    Style="{StaticResource ExpBarStyle}"
-                                    Value="{Binding RoleDetail.Base.Energy}" />
+            <Border
+                Grid.Row="2"
+                Padding="18"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource CornerRadiusCard}">
+                <TabControl>
+                    <TabItem Header="{Binding Path=[Guide_RolesTab], Source={x:Static utils:LanguageManager.Instance}}">
+                        <StackPanel Margin="0,16,0,0">
+                            <StackPanel Margin="0,0,0,12" HorizontalAlignment="Right" Orientation="Horizontal">
+                                <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="{Binding Path=[Guide_Sort], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <ComboBox
+                                    Width="150"
+                                    ItemContainerStyle="{StaticResource GuideSortComboBoxItemStyle}"
+                                    DisplayMemberPath="DisplayName"
+                                    ItemsSource="{Binding RoleSortOptions}"
+                                    SelectedItem="{Binding SelectedRoleSort}" />
                             </StackPanel>
-
-                            <StackPanel>
-                                <Grid Margin="0,0,0,4">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Image Width="30" Height="30" Source="{StaticResource StorgeEnergyImage}" />
-                                        <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_CrystalElement], Source={x:Static utils:LanguageManager.Instance}}" />
-                                    </StackPanel>
-                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                        <TextBlock FontWeight="Bold" Text="{Binding RoleDetail.Base.StoreEnergy}" />
-                                        <TextBlock Text="{Binding RoleDetail.Base.MaxStoreEnergy, StringFormat={} / {0}}" />
-                                    </StackPanel>
-                                </Grid>
-                                <ProgressBar
-                                    Background="{DynamicResource SurfaceHoverBrush}"
-                                    Maximum="{Binding RoleDetail.Base.MaxStoreEnergy}"
-                                    Style="{StaticResource ExpBarStyle}"
-                                    Value="{Binding RoleDetail.Base.StoreEnergy}" />
-                            </StackPanel>
+                            <TextBlock
+                                Margin="8,34"
+                                HorizontalAlignment="Center"
+                                Foreground="{DynamicResource TextMutedBrush}"
+                                Text="{Binding Path=[Guide_NoRoles], Source={x:Static utils:LanguageManager.Instance}}"
+                                Visibility="{Binding HasRoles, Converter={StaticResource BoolToVisibility}, ConverterParameter=inverse}" />
+                            <ItemsControl ItemTemplate="{StaticResource RoleCardTemplate}" ItemsSource="{Binding Roles}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </StackPanel>
-                    </Border>
-                    <Border
-                        Margin="0,0,0,16"
-                        Background="{DynamicResource SurfaceBrush}"
-                        BorderBrush="{DynamicResource BorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="{DynamicResource CornerRadiusCard}">
-                        <StackPanel Margin="10">
-                            <StackPanel Margin="0,0,0,5" VerticalAlignment="Center" Orientation="Horizontal">
-                                <Image Width="30" Height="30" Source="{StaticResource BattlePassImage}" />
-                                <TextBlock
-                                    Margin="10,0,0,0"
-                                    HorizontalAlignment="Center"
-                                    Style="{StaticResource TitleTextStyle}"
-                                    Text="{Binding Path=[Role_Radio], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </TabItem>
+                    <TabItem Header="{Binding Path=[Guide_WeaponsTab], Source={x:Static utils:LanguageManager.Instance}}">
+                        <StackPanel Margin="0,16,0,0">
+                            <StackPanel Margin="0,0,0,12" HorizontalAlignment="Right" Orientation="Horizontal">
+                                <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="{Binding Path=[Guide_Sort], Source={x:Static utils:LanguageManager.Instance}}" />
+                                <ComboBox
+                                    Width="150"
+                                    ItemContainerStyle="{StaticResource GuideSortComboBoxItemStyle}"
+                                    DisplayMemberPath="DisplayName"
+                                    ItemsSource="{Binding WeaponSortOptions}"
+                                    SelectedItem="{Binding SelectedWeaponSort}" />
                             </StackPanel>
-                            <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
-
-
-                            <Grid Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
-                                    <Grid Margin="0,0,0,4">
-                                        <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_RadioWeekExp], Source={x:Static utils:LanguageManager.Instance}}" />
-                                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                            <TextBlock FontWeight="Bold" Text="{Binding RoleDetail.BattlePass.WeekExp}" />
-                                            <TextBlock Text="{Binding RoleDetail.BattlePass.WeekMaxExp, StringFormat={} / {0}}" />
-                                        </StackPanel>
-                                    </Grid>
-                                    <ProgressBar
-                                        Background="{DynamicResource SurfaceHoverBrush}"
-                                        Maximum="{Binding RoleDetail.BattlePass.WeekMaxExp}"
-                                        Style="{StaticResource ExpBarStyle}"
-                                        Value="{Binding RoleDetail.BattlePass.WeekExp}" />
-                                </StackPanel>
-
-                                <!--  等级徽章  -->
-                                <Border
-                                    Grid.Column="1"
-                                    Width="54"
-                                    Height="54"
-                                    Margin="16,0,0,0"
-                                    Background="{DynamicResource BorderBrush}"
-                                    BorderBrush="{DynamicResource DividerBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="27">
-                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            FontSize="10"
-                                            Style="{StaticResource CaptionTextStyle}"
-                                            Text="{Binding Path=[Role_RadioLevel], Source={x:Static utils:LanguageManager.Instance}}" />
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            FontSize="{StaticResource FontSizeLg}"
-                                            FontWeight="Bold"
-                                            Text="{Binding RoleDetail.BattlePass.Level}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-
-                            <Grid>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Role_RadioStatus], Source={x:Static utils:LanguageManager.Instance}}" />
-                                    <TextBlock FontWeight="SemiBold" Text="{Binding Path=[Role_RadioPremium], Source={x:Static utils:LanguageManager.Instance}}" Visibility="{Binding RoleDetail.BattlePass.IsUnlock, Converter={StaticResource BoolToVisibility}}" />
-                                    <TextBlock FontWeight="SemiBold" Text="{Binding Path=[Role_RadioUnopened], Source={x:Static utils:LanguageManager.Instance}}" Visibility="{Binding RoleDetail.BattlePass.IsUnlock, Converter={StaticResource BoolToVisibility}, ConverterParameter=inverse}" />
-                                </StackPanel>
-                            </Grid>
+                            <TextBlock
+                                Margin="8,34"
+                                HorizontalAlignment="Center"
+                                Foreground="{DynamicResource TextMutedBrush}"
+                                Text="{Binding Path=[Guide_NoWeapons], Source={x:Static utils:LanguageManager.Instance}}"
+                                Visibility="{Binding HasWeapons, Converter={StaticResource BoolToVisibility}, ConverterParameter=inverse}" />
+                            <ItemsControl ItemTemplate="{StaticResource WeaponCardTemplate}" ItemsSource="{Binding Weapons}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </StackPanel>
-                    </Border>
-
-                    <Border
-                        Margin="0,0,0,16"
-                        Background="{DynamicResource SurfaceBrush}"
-                        BorderBrush="{DynamicResource BorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="{DynamicResource CornerRadiusCard}">
-                        <StackPanel Margin="12">
-                            <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
-                                <Image Width="30" Height="30" Source="{StaticResource LivenessImage}" />
-                                <TextBlock Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Role_Activity], Source={x:Static utils:LanguageManager.Instance}}" />
-                            </StackPanel>
-                            <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
-
-                            <Grid Margin="0,0,0,12">
-                                <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_ActivityToday], Source={x:Static utils:LanguageManager.Instance}}" />
-                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                    <TextBlock FontWeight="Bold" Text="{Binding RoleDetail.Base.Liveness}" />
-                                    <TextBlock Text="{Binding RoleDetail.Base.LivenessMaxCount, StringFormat={} / {0}}" />
-                                </StackPanel>
-                            </Grid>
-                            <ProgressBar
-                                Margin="0,0,0,12"
-                                Background="{DynamicResource SurfaceHoverBrush}"
-                                Maximum="{Binding RoleDetail.Base.LivenessMaxCount}"
-                                Style="{StaticResource ExpBarStyle}"
-                                Value="{Binding RoleDetail.Base.Liveness}" />
-
-                            <Grid>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Width="30" Height="30" Source="{StaticResource WeeklyInstImage}" />
-                                    <TextBlock Margin="10,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Role_WeeklyBossCount], Source={x:Static utils:LanguageManager.Instance}}" />
-                                </StackPanel>
-
-                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                    <TextBlock FontWeight="Bold" Text="{Binding RoleDetail.Base.WeeklyInstCount}" />
-                                    <TextBlock Text="{Binding Path=[Role_WeeklyBossLimit], Source={x:Static utils:LanguageManager.Instance}}" />
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </Grid>
-        </ScrollViewer>
-    </Grid>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

@@ -19,6 +19,7 @@ namespace WwTool.Services
         private readonly IConfigService _configService;
         private readonly ILoggerService _logger;
         private LoginContext _loginContext;
+        private LoginContext _latestAuthenticatedContext;
         private readonly Dictionary<string, LoginContext> _userContexts = new();
         private string _currentUid = string.Empty;
 
@@ -26,6 +27,7 @@ namespace WwTool.Services
         /// 登录过程的上下文，包含登录状态和相关数据，以便后续验证
         /// </summary>
         public LoginContext LoginContext => _loginContext;
+        public LoginContext LatestAuthenticatedContext => _latestAuthenticatedContext;
 
         public LoginService(IHttpService apiService, IConfigService configService, ILoggerService logger)
         {
@@ -33,6 +35,7 @@ namespace WwTool.Services
             _configService = configService;
             _logger = logger;
             _loginContext = new LoginContext();
+            _latestAuthenticatedContext = _loginContext;
         }
 
         /// <summary>
@@ -90,8 +93,13 @@ namespace WwTool.Services
 
             if (response != null)
             {
+                _latestAuthenticatedContext = _loginContext;
                 if (response.Code != null)
                     _loginContext.Code = response.Code;
+                if (!string.IsNullOrWhiteSpace(response.Cuid))
+                    _loginContext.CUid = response.Cuid;
+                if (!string.IsNullOrWhiteSpace(response.Username))
+                    _loginContext.CName = response.Username;
 
                 return response;
             }

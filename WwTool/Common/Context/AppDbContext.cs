@@ -18,6 +18,10 @@ namespace WwTool.Common.Context
         public DbSet<PlayerBattlePass> PlayerBattlePasses { get; set; } = null!;
         public DbSet<GachaImportBatch> GachaImportBatches { get; set; } = null!;
         public DbSet<SyncState> SyncStates { get; set; } = null!;
+        public DbSet<GuideAccountCredential> GuideAccountCredentials { get; set; } = null!;
+        public DbSet<GuidePlayerSnapshot> GuidePlayerSnapshots { get; set; } = null!;
+        public DbSet<GuideRoleSnapshot> GuideRoleSnapshots { get; set; } = null!;
+        public DbSet<GuideEquippedWeaponSnapshot> GuideEquippedWeaponSnapshots { get; set; } = null!;
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)

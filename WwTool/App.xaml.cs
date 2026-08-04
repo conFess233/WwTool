@@ -196,7 +196,8 @@ namespace WwTool
             containerRegistry.RegisterForNavigation<SettingsView, SettingsViewModel>();
             containerRegistry.RegisterForNavigation<AboutView, AboutViewModel>();
             containerRegistry.RegisterSingleton<RoleDataViewModel>();
-            containerRegistry.RegisterForNavigation<RoleDataView, RoleDataViewModel>();
+            containerRegistry.RegisterSingleton<GuideRoleDataViewModel>();
+            containerRegistry.RegisterForNavigation<RoleDataView, GuideRoleDataViewModel>();
             containerRegistry.RegisterForNavigation<ExplorationDataView, RoleDataViewModel>();
             containerRegistry.RegisterForNavigation<MotorDataView, RoleDataViewModel>();
             containerRegistry.RegisterDialog<AlertView, AlertViewModel>();
@@ -229,11 +230,14 @@ namespace WwTool
             containerRegistry.RegisterSingleton<IPlayerInfoRepository, PlayerInfoRepository>();
             containerRegistry.RegisterSingleton<IDatabaseWriteCoordinator, DatabaseWriteCoordinator>();
             containerRegistry.RegisterSingleton<IUserDataService, UserDataService>();
+            containerRegistry.RegisterSingleton<IGuideRepository, GuideRepository>();
             containerRegistry.RegisterSingleton<IGachaLogLocator, GachaLogLocator>();
 
             // 注册业务服务。
             containerRegistry.RegisterSingleton<IGachaStatisticsService, GachaStatisticsService>();
             containerRegistry.RegisterSingleton<IChartBuilderService, ChartBuilderService>();
+            containerRegistry.RegisterSingleton<IGuideApiClient, GuideApiClient>();
+            containerRegistry.RegisterSingleton<IGuideSyncService, GuideSyncService>();
 
             containerRegistry.RegisterSingleton<IConfigService, ConfigService>();
             containerRegistry.RegisterSingleton<ILoggerService, LoggerService>();

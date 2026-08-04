@@ -79,5 +79,7 @@ namespace WwTool.Common.Models.Config
         public string QueryRoleUrl { get; set; } = "https://pc-launcher-sdk-api.kurogame.net/game/queryRole";
         public string QueryPlayerInfoUrl { get; set; } = "https://pc-launcher-sdk-api.kurogame.net/game/queryPlayerInfo";
         public string H5LoginUrl { get; set; } = "https://api.kurobbs.com/user/loginForH5";
+        public string GuideBaseUrl { get; set; } = "https://guide-server.aki-game.net";
+        public string GuideFallbackBaseUrl { get; set; } = "https://guide-server-1.aki-game.net";
     }
 }
