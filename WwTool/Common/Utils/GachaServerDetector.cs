@@ -5,8 +5,8 @@ namespace WwTool.Common.Utils
 {
     public static class GachaServerDetector
     {
-        public const string ChinaHost = "gmserver-api.aki-game2.com";
-        public const string InternationalHost = "gmserver-api.aki-game2.net";
+        public const string ChinaHost = "aki-gm-resources.aki-game.com";
+        public const string InternationalHost = "aki-gm-resources-oversea.aki-game.net";
 
         private static readonly Regex UrlRegex = new(
             @"https://[^\s""'\r\n]+",
