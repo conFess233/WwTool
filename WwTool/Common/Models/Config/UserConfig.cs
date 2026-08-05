@@ -39,7 +39,7 @@ namespace WwTool.Common.Models.Config
         public int GlassOpacity
         {
             get => _glassOpacity;
-            set => SetProperty(ref _glassOpacity, Math.Clamp(value, 65, 95));
+            set => SetProperty(ref _glassOpacity, Math.Clamp(value, 10, 95));
         }
         public string CurrentTheme
         {

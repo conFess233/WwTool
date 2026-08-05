@@ -128,7 +128,7 @@ namespace WwTool.Services
                 HashSet<string> validAccents = ["FollowTheme", "BlueAccent", "GreenAccent", "PurpleAccent", "RedAccent", "OrangeAccent", "YellowAccent"];
                 if (!validAccents.Contains(User.AccentTheme)) { User.AccentTheme = "FollowTheme"; changed = true; }
                 if (!sourceThemeWasRecognized && User.AccentTheme != "FollowTheme") { User.AccentTheme = "FollowTheme"; changed = true; }
-                int opacity = Math.Clamp(User.GlassOpacity, 65, 95);
+                int opacity = Math.Clamp(User.GlassOpacity, 10, 95);
                 if (User.GlassOpacity != opacity) { User.GlassOpacity = opacity; changed = true; }
             }
             catch (Exception ex)

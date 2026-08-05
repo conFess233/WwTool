@@ -9,8 +9,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
     HorizontalAlignment="Stretch"
-    HorizontalContentAlignment="Stretch"
     VerticalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
     VerticalContentAlignment="Stretch"
     d:DesignHeight="1696.25"
     d:DesignWidth="747.5"
@@ -72,8 +72,16 @@
             </StackPanel>
         </Border>
 
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
-            <StackPanel MinWidth="0" MaxWidth="920" Margin="24,16,24,24" HorizontalAlignment="Stretch">
+        <ScrollViewer
+            Grid.Row="1"
+            VerticalAlignment="Stretch"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel
+                MinWidth="0"
+                MaxWidth="920"
+                Margin="24,16,24,24"
+                HorizontalAlignment="Stretch">
 
                 <Border
                     Margin="0,0,0,16"
@@ -199,16 +207,46 @@
                         <StackPanel Margin="0,0,0,16">
                             <TextBlock Margin="0,0,0,12" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_BaseTheme], Source={x:Static utils:LanguageManager.Instance}}" />
                             <ListBox SelectedValue="{Binding User.BaseTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Style="{StaticResource ThemeCardPickerStyle}">
-                                <ListBoxItem Background="{StaticResource PreviewWarmWhiteBackground}" BorderBrush="{StaticResource PreviewWarmWhiteSurface}" Content="{Binding Path=[Theme_WarmWhite], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewWarmWhiteAccent}" Tag="WarmWhite" />
-                                <ListBoxItem Background="{StaticResource PreviewDeepBlueBackground}" BorderBrush="{StaticResource PreviewDeepBlueSurface}" Content="{Binding Path=[Theme_DeepBlue], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewDeepBlueAccent}" Tag="DeepBlue" />
-                                <ListBoxItem Background="{StaticResource PreviewSoftGreenBackground}" BorderBrush="{StaticResource PreviewSoftGreenSurface}" Content="{Binding Path=[Theme_SoftGreen], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewSoftGreenAccent}" Tag="SoftGreen" />
-                                <ListBoxItem Background="{StaticResource PreviewSoftPinkBackground}" BorderBrush="{StaticResource PreviewSoftPinkSurface}" Content="{Binding Path=[Theme_SoftPink], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewSoftPinkAccent}" Tag="SoftPink" />
-                                <ListBoxItem Background="{StaticResource PreviewBlackGoldBackground}" BorderBrush="{StaticResource PreviewBlackGoldSurface}" Content="{Binding Path=[Theme_BlackGold], Source={x:Static utils:LanguageManager.Instance}}" Foreground="{StaticResource PreviewBlackGoldAccent}" Tag="BlackGold" />
+                                <ListBoxItem
+                                    Background="{StaticResource PreviewWarmWhiteBackground}"
+                                    BorderBrush="{StaticResource PreviewWarmWhiteSurface}"
+                                    Content="{Binding Path=[Theme_WarmWhite], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Foreground="{StaticResource PreviewWarmWhiteAccent}"
+                                    Tag="WarmWhite" />
+                                <ListBoxItem
+                                    Background="{StaticResource PreviewDeepBlueBackground}"
+                                    BorderBrush="{StaticResource PreviewDeepBlueSurface}"
+                                    Content="{Binding Path=[Theme_DeepBlue], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Foreground="{StaticResource PreviewDeepBlueAccent}"
+                                    Tag="DeepBlue" />
+                                <ListBoxItem
+                                    Background="{StaticResource PreviewSoftGreenBackground}"
+                                    BorderBrush="{StaticResource PreviewSoftGreenSurface}"
+                                    Content="{Binding Path=[Theme_SoftGreen], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Foreground="{StaticResource PreviewSoftGreenAccent}"
+                                    Tag="SoftGreen" />
+                                <ListBoxItem
+                                    Background="{StaticResource PreviewSoftPinkBackground}"
+                                    BorderBrush="{StaticResource PreviewSoftPinkSurface}"
+                                    Content="{Binding Path=[Theme_SoftPink], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Foreground="{StaticResource PreviewSoftPinkAccent}"
+                                    Tag="SoftPink" />
+                                <ListBoxItem
+                                    Background="{StaticResource PreviewBlackGoldBackground}"
+                                    BorderBrush="{StaticResource PreviewBlackGoldSurface}"
+                                    Content="{Binding Path=[Theme_BlackGold], Source={x:Static utils:LanguageManager.Instance}}"
+                                    Foreground="{StaticResource PreviewBlackGoldAccent}"
+                                    Tag="BlackGold" />
                             </ListBox>
                             <TextBlock Margin="0,16,0,12" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_AccentTheme], Source={x:Static utils:LanguageManager.Instance}}" />
                             <ListBox SelectedValue="{Binding User.AccentTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag" Style="{StaticResource AccentPickerStyle}">
                                 <ListBoxItem Background="{DynamicResource AccentBrush}" Content="{Binding Path=[Theme_Follow], Source={x:Static utils:LanguageManager.Instance}}" Tag="FollowTheme" />
-                                <ListBoxItem Background="{StaticResource PreviewAccentBlue}" Content="{Binding Path=[Theme_Blue], Source={x:Static utils:LanguageManager.Instance}}" Tag="BlueAccent" /><ListBoxItem Background="{StaticResource PreviewAccentGreen}" Content="{Binding Path=[Theme_Green], Source={x:Static utils:LanguageManager.Instance}}" Tag="GreenAccent" /><ListBoxItem Background="{StaticResource PreviewAccentPurple}" Content="{Binding Path=[Theme_Purple], Source={x:Static utils:LanguageManager.Instance}}" Tag="PurpleAccent" /><ListBoxItem Background="{StaticResource PreviewAccentRed}" Content="{Binding Path=[Theme_Red], Source={x:Static utils:LanguageManager.Instance}}" Tag="RedAccent" /><ListBoxItem Background="{StaticResource PreviewAccentOrange}" Content="{Binding Path=[Theme_Orange], Source={x:Static utils:LanguageManager.Instance}}" Tag="OrangeAccent" /><ListBoxItem Background="{StaticResource PreviewAccentYellow}" Content="{Binding Path=[Theme_Yellow], Source={x:Static utils:LanguageManager.Instance}}" Tag="YellowAccent" />
+                                <ListBoxItem Background="{StaticResource PreviewAccentBlue}" Content="{Binding Path=[Theme_Blue], Source={x:Static utils:LanguageManager.Instance}}" Tag="BlueAccent" />
+                                <ListBoxItem Background="{StaticResource PreviewAccentGreen}" Content="{Binding Path=[Theme_Green], Source={x:Static utils:LanguageManager.Instance}}" Tag="GreenAccent" />
+                                <ListBoxItem Background="{StaticResource PreviewAccentPurple}" Content="{Binding Path=[Theme_Purple], Source={x:Static utils:LanguageManager.Instance}}" Tag="PurpleAccent" />
+                                <ListBoxItem Background="{StaticResource PreviewAccentRed}" Content="{Binding Path=[Theme_Red], Source={x:Static utils:LanguageManager.Instance}}" Tag="RedAccent" />
+                                <ListBoxItem Background="{StaticResource PreviewAccentOrange}" Content="{Binding Path=[Theme_Orange], Source={x:Static utils:LanguageManager.Instance}}" Tag="OrangeAccent" />
+                                <ListBoxItem Background="{StaticResource PreviewAccentYellow}" Content="{Binding Path=[Theme_Yellow], Source={x:Static utils:LanguageManager.Instance}}" Tag="YellowAccent" />
                             </ListBox>
                         </StackPanel>
 
@@ -235,7 +273,7 @@
                             <Slider
                                 IsSnapToTickEnabled="True"
                                 Maximum="95"
-                                Minimum="65"
+                                Minimum="10"
                                 Style="{StaticResource ModernSliderStyle}"
                                 TickFrequency="1"
                                 Value="{Binding User.GlassOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -245,14 +283,26 @@
                         <StackPanel Margin="0,0,0,16" Orientation="Horizontal">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_ReducedMotion], Source={x:Static utils:LanguageManager.Instance}}" />
-                                <TextBlock Margin="0,4,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_ReducedMotionHint], Source={x:Static utils:LanguageManager.Instance}}" TextWrapping="Wrap" />
+                                <TextBlock
+                                    Margin="0,4,0,0"
+                                    Style="{StaticResource CaptionTextStyle}"
+                                    Text="{Binding Path=[Settings_ReducedMotionHint], Source={x:Static utils:LanguageManager.Instance}}"
+                                    TextWrapping="Wrap" />
                             </StackPanel>
-                            <ToggleButton Margin="10,0,0,0" HorizontalAlignment="Right" IsChecked="{Binding User.IsReducedMotionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SwitchToggleButtonStyle}" />
+                            <ToggleButton
+                                Margin="10,0,0,0"
+                                HorizontalAlignment="Right"
+                                IsChecked="{Binding User.IsReducedMotionEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource SwitchToggleButtonStyle}" />
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,16">
                             <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Settings_NotificationMode], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <TextBlock Margin="0,4,0,8" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Settings_NotificationModeHint], Source={x:Static utils:LanguageManager.Instance}}" TextWrapping="Wrap" />
+                            <TextBlock
+                                Margin="0,4,0,8"
+                                Style="{StaticResource CaptionTextStyle}"
+                                Text="{Binding Path=[Settings_NotificationModeHint], Source={x:Static utils:LanguageManager.Instance}}"
+                                TextWrapping="Wrap" />
                             <ComboBox
                                 MinWidth="180"
                                 HorizontalAlignment="Left"
