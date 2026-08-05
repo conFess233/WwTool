@@ -6,20 +6,25 @@
 
 ## Table of Contents
 
-- [1. Configure Game Installation Directory and Language](#1-configure-game-installation-directory-and-language)
-- [2. Account Login and Data Synchronization](#2-account-login-and-data-synchronization)
-  - [1. Account Login](#1-account-login)
-  - [2. Security Verification (Geetest Captcha)](#2-security-verification-geetest-captcha)
-  - [3. Sync Resonator and Exploration Data](#3-sync-resonator-and-exploration-data)
-- [3. Feature Overview](#3-feature-overview)
-  - [1. Home (Overview)](#1-home-overview)
-  - [2. Exploration Data](#2-exploration-data)
-  - [3. Vehicle (Motorcycle) Data](#3-vehicle-motorcycle-data)
-- [4. Convene History Import and Analysis](#4-convene-history-import-and-analysis)
-  - [1. In-Game Steps](#1-in-game-steps)
-  - [2. Auto Import Link (Recommended)](#2-auto-import-link-recommended)
-  - [3. Manual Import Link](#3-manual-import-link)
-  - [4. Retrieve Data and Statistics](#4-retrieve-data-and-statistics)
+- [Detailed Help Guide](#detailed-help-guide)
+  - [Table of Contents](#table-of-contents)
+  - [1. Configure Game Installation Directory and Language](#1-configure-game-installation-directory-and-language)
+    - [1.1 Configure Game Installation Directory](#11-configure-game-installation-directory)
+    - [1.2 Configure Display Language](#12-configure-display-language)
+  - [2. Account Login and Data Synchronization](#2-account-login-and-data-synchronization)
+    - [1. Account Login](#1-account-login)
+    - [2. Security Verification](#2-security-verification)
+    - [3. Sync Resonator and Exploration Data](#3-sync-resonator-and-exploration-data)
+  - [3. Feature Overview](#3-feature-overview)
+    - [1. Home (Overview)](#1-home-overview)
+    - [2. Exploration Data](#2-exploration-data)
+    - [3. Vehicle (Motorcycle) Data](#3-vehicle-motorcycle-data)
+    - [4. Resonator Data](#4-resonator-data)
+  - [4. Convene History Import and Analysis](#4-convene-history-import-and-analysis)
+    - [1. In-Game Steps](#1-in-game-steps)
+    - [2. Auto Import Link (Recommended)](#2-auto-import-link-recommended)
+    - [3. Manual Import Link](#3-manual-import-link)
+    - [4. Retrieve Data and Statistics](#4-retrieve-data-and-statistics)
 
 ---
 
@@ -102,6 +107,13 @@ Vehicle customization and music collection status:
 - **Skins / Stickers / Pendants / Frames / Albums tabs**:
   - Click on each tab to inspect specific unlocked item names, qualities, parts, etc.
   - The **Album** tab shows details of unlocked car music albums and track unlock progress.
+
+### 4. Resonator Data
+
+Displays the selected account's owned resonators, equipped weapons, Resonance Chains, and related information.
+
+- **Resonator List**: Shows every unlocked resonator, their rarity, and Resonance Chain activation status.
+- **Weapon List**: Shows all currently equipped weapons.
 
 ---
 
