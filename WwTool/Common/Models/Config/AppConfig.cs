@@ -10,7 +10,7 @@ namespace WwTool.Common.Models.Config
         public string GameItemsResourcesPath { get; set; } = Path.Combine("Local/Data", "GameItemsResources.json");
 
         public string GameLauncherFile { get; set; } = "Wuthering Waves.exe";
-        public string AppVersion { get; set; } = "1.0.0";
+        public string AppVersion { get; set; } = "1.2.0";
         public string AppAuther { get; set; } = "告白";
 
         // 日志系统配置

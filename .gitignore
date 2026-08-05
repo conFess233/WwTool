@@ -10,6 +10,8 @@
 
 WwTool/WwTool.csproj.user
 
-/.codex
 /.temp
+
 WwTool.Tests/
+
+publish/
