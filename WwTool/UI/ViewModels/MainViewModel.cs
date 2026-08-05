@@ -8,8 +8,8 @@ using System.Windows.Controls.Primitives;
 using WwTool.Common;
 using WwTool.Common.Events;
 using WwTool.Common.Models;
-using WwTool.Common.Models.Entities;
 using WwTool.Common.Models.Config;
+using WwTool.Common.Models.Entities;
 using WwTool.Common.Utils;
 using WwTool.Extensions;
 using WwTool.Services;
@@ -134,6 +134,7 @@ namespace WwTool.UI.ViewModels
                 {
                     case "IndexView": item.Title = LanguageManager.Instance["Nav_Home"]; break;
                     case "StatisticsView": item.Title = LanguageManager.Instance["Nav_Statistics"]; break;
+                    case "AccountDataView": item.Title = LanguageManager.Instance["Nav_AccountData"]; break;
                     case "RoleDataView": item.Title = LanguageManager.Instance["Nav_RoleData"]; break;
                     case "ExplorationDataView": item.Title = LanguageManager.Instance["Nav_Exploration"]; break;
                     case "MotorDataView": item.Title = LanguageManager.Instance["Nav_Motor"]; break;
@@ -162,6 +163,7 @@ namespace WwTool.UI.ViewModels
         {
             NavItems.Add(new NavItem { Icon = "HomeImage", Title = LanguageManager.Instance["Nav_Home"], NameSpace = "IndexView", IsBottomItem = false });
             NavItems.Add(new NavItem { Icon = "StatisticsImage", Title = LanguageManager.Instance["Nav_Statistics"], NameSpace = "StatisticsView", IsBottomItem = false });
+            NavItems.Add(new NavItem { Icon = "AccountImage", Title = LanguageManager.Instance["Nav_AccountData"], NameSpace = "AccountDataView", IsBottomItem = false });
             NavItems.Add(new NavItem { Icon = "RoleImage", Title = LanguageManager.Instance["Nav_RoleData"], NameSpace = "RoleDataView", IsBottomItem = false });
             NavItems.Add(new NavItem { Icon = "ChestImage", Title = LanguageManager.Instance["Nav_Exploration"], NameSpace = "ExplorationDataView", IsBottomItem = false });
             NavItems.Add(new NavItem { Icon = "MotorImage", Title = LanguageManager.Instance["Nav_Motor"], NameSpace = "MotorDataView", IsBottomItem = false });

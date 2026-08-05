@@ -24,6 +24,7 @@ namespace WwTool.Common.Models.Entities
         public int Liveness { get; set; }
         public int LivenessMaxCount { get; set; }
         public bool LivenessUnlock { get; set; }
+        public int ChapterId { get; set; }
         public int WeeklyInstCount { get; set; }
         public long CreatTime { get; set; }
         public int BirthMon { get; set; }
@@ -33,8 +34,13 @@ namespace WwTool.Common.Models.Entities
         public DateTimeOffset? LastSyncedAtUtc { get; set; }
 
         public string BoxesJson { get; set; } = "{}";
+        public bool HasBattlePassData { get; set; }
+        public bool HasBoxesData { get; set; }
         public string BasicBoxesJson { get; set; } = "{}";
+        public bool HasBasicBoxesData { get; set; }
         public string PhantomBoxesJson { get; set; } = "{}";
+        public bool HasPhantomBoxesData { get; set; }
+        public bool HasMusicData { get; set; }
 
         [ForeignKey("Uid")]
         public virtual UserAccount? UserAccount { get; set; }

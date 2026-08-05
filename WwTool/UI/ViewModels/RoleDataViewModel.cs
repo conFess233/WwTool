@@ -2,7 +2,10 @@ using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Globalization;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using WwTool.Common.Enums;
 using WwTool.Common.Models;
 using WwTool.Common.Models.Entities;
@@ -21,7 +24,9 @@ namespace WwTool.UI.ViewModels
     /// </summary>
     public class RoleDataViewModel : BindableBase, INavigationAware
     {
+        private const string AccountDataNavigationTarget = "AccountDataView";
         private CancellationTokenSource _navigationCts = new();
+        private readonly DispatcherTimer _recoveryTimer;
         /// <summary>
         /// 数据获取服务
         /// </summary>
@@ -100,10 +105,34 @@ namespace WwTool.UI.ViewModels
             get => _roleDetail;
             set
             {
-                _roleDetail = value;
-                RaisePropertyChanged();
+                if (SetProperty(ref _roleDetail, value))
+                {
+                    RaiseAccountOverviewProperties();
+                }
             }
         }
+
+        public string CreatedDateDisplay => FormatCreatedDate(RoleDetail?.Base?.CreatTime ?? 0);
+        public string EnergyRecoveryDisplay => FormatRecoveryTime(RoleDetail?.Base?.EnergyRecoverTime ?? 0);
+        public string StoreEnergyRecoveryDisplay => FormatRecoveryTime(RoleDetail?.Base?.StoreEnergyRecoverTime ?? 0);
+        public string ChapterIdDisplay => RoleDetail?.Base?.ChapterId > 0
+            ? RoleDetail.Base.ChapterId.ToString(GetDisplayCulture())
+            : UnavailableText;
+        public string BoxesTotalDisplay => FormatCollectionTotal(RoleDetail?.Base?.Boxes);
+        public string BasicBoxesTotalDisplay => FormatCollectionTotal(RoleDetail?.Base?.BasicBoxes);
+        public string PhantomBoxesTotalDisplay => FormatCollectionTotal(RoleDetail?.Base?.PhantomBoxes);
+        public string MusicProgressDisplay => FormatMusicProgress(RoleDetail?.MusicData);
+        public string BattlePassProgressDisplay => RoleDetail?.BattlePass is { } battlePass
+            ? string.Format(GetDisplayCulture(), LanguageManager.Instance["Role_CollectionProgress"], battlePass.Exp, battlePass.ExpLimit)
+            : UnavailableText;
+        public string BattlePassOpenDisplay => RoleDetail?.BattlePass is { } battlePass
+            ? LanguageManager.Instance[battlePass.IsOpen ? "Role_StatusOpen" : "Role_StatusClosed"]
+            : UnavailableText;
+        public string BattlePassUnlockDisplay => RoleDetail?.BattlePass is { } battlePass
+            ? LanguageManager.Instance[battlePass.IsUnlock ? "Role_RadioPremium" : "Role_RadioUnopened"]
+            : UnavailableText;
+
+        private static string UnavailableText => LanguageManager.Instance["Common_Unavailable"];
 
         /// <summary>
         /// 刷新本地角色数据命令
@@ -131,11 +160,130 @@ namespace WwTool.UI.ViewModels
             _userDataService = userDataService;
             _logger = logger;
             _configService = configService;
+            _recoveryTimer = new DispatcherTimer(DispatcherPriority.Background)
+            {
+                Interval = TimeSpan.FromMinutes(1)
+            };
+            _recoveryTimer.Tick += (_, _) => RaiseRecoveryTimeProperties();
+            LanguageManager.Instance.PropertyChanged += OnLanguageChanged;
             Users = new();
             RefreshCommand = new DelegateCommand(async () => await LoadDataAsync(showMessage: true));
             RefreshLocalAccountCommand = new DelegateCommand(async () => await RefreshLocalAccount(showMessage: true));
             SyncDataCommand = new DelegateCommand(async () => await SyncDataAsync());
         }
+
+        private void OnLanguageChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Item[]")
+            {
+                RaiseAccountOverviewProperties();
+            }
+        }
+
+        private void RaiseAccountOverviewProperties()
+        {
+            RaisePropertyChanged(nameof(CreatedDateDisplay));
+            RaiseRecoveryTimeProperties();
+            RaisePropertyChanged(nameof(ChapterIdDisplay));
+            RaisePropertyChanged(nameof(BoxesTotalDisplay));
+            RaisePropertyChanged(nameof(BasicBoxesTotalDisplay));
+            RaisePropertyChanged(nameof(PhantomBoxesTotalDisplay));
+            RaisePropertyChanged(nameof(MusicProgressDisplay));
+            RaisePropertyChanged(nameof(BattlePassProgressDisplay));
+            RaisePropertyChanged(nameof(BattlePassOpenDisplay));
+            RaisePropertyChanged(nameof(BattlePassUnlockDisplay));
+        }
+
+        private void RaiseRecoveryTimeProperties()
+        {
+            RaisePropertyChanged(nameof(EnergyRecoveryDisplay));
+            RaisePropertyChanged(nameof(StoreEnergyRecoveryDisplay));
+        }
+
+        private static string FormatCreatedDate(long unixMilliseconds)
+        {
+            if (unixMilliseconds <= 0)
+            {
+                return UnavailableText;
+            }
+
+            try
+            {
+                return DateTimeOffset.FromUnixTimeMilliseconds(unixMilliseconds)
+                    .ToLocalTime()
+                    .ToString("d", GetDisplayCulture());
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return UnavailableText;
+            }
+        }
+
+        private static string FormatRecoveryTime(long unixMilliseconds)
+        {
+            if (unixMilliseconds <= 0)
+            {
+                return UnavailableText;
+            }
+
+            DateTimeOffset target;
+            try
+            {
+                target = DateTimeOffset.FromUnixTimeMilliseconds(unixMilliseconds);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return UnavailableText;
+            }
+
+            TimeSpan remaining = target - DateTimeOffset.UtcNow;
+            if (remaining <= TimeSpan.Zero)
+            {
+                return UnavailableText;
+            }
+
+            int totalMinutes = Math.Max(1, (int)Math.Ceiling(remaining.TotalMinutes));
+            int days = totalMinutes / (24 * 60);
+            int hours = totalMinutes % (24 * 60) / 60;
+            int minutes = totalMinutes % 60;
+            CultureInfo culture = GetDisplayCulture();
+
+            if (days > 0)
+            {
+                return string.Format(culture, LanguageManager.Instance["Role_RecoveryDaysHours"], days, hours);
+            }
+
+            if (hours > 0)
+            {
+                return string.Format(culture, LanguageManager.Instance["Role_RecoveryHoursMinutes"], hours, minutes);
+            }
+
+            return string.Format(culture, LanguageManager.Instance["Role_RecoveryMinutes"], minutes);
+        }
+
+        private static string FormatCollectionTotal(IReadOnlyDictionary<string, int>? values) =>
+            values is null
+                ? UnavailableText
+                : values.Values.Sum(x => (long)x).ToString("N0", GetDisplayCulture());
+
+        private static string FormatMusicProgress(IReadOnlyCollection<RoleMusicData>? music)
+        {
+            if (music is null)
+            {
+                return UnavailableText;
+            }
+
+            long collected = music.Sum(x => (long)x.Count);
+            long total = music.Sum(x => (long)x.TotalCount);
+            return string.Format(GetDisplayCulture(), LanguageManager.Instance["Role_CollectionProgress"], collected, total);
+        }
+
+        private static CultureInfo GetDisplayCulture() => LanguageManager.Instance.CurrentLanguage switch
+        {
+            LanguageType.En => CultureInfo.GetCultureInfo("en-US"),
+            LanguageType.Ja => CultureInfo.GetCultureInfo("ja-JP"),
+            _ => CultureInfo.GetCultureInfo("zh-CN")
+        };
 
         /// <summary>
         /// 从本地数据库加载指定账号的角色数据
@@ -283,6 +431,15 @@ namespace WwTool.UI.ViewModels
         public async void OnNavigatedTo(NavigationContext navigationContext)
         {
             ResetNavigationCancellation();
+            if (navigationContext.Uri.ToString().EndsWith(AccountDataNavigationTarget, StringComparison.Ordinal))
+            {
+                RaiseRecoveryTimeProperties();
+                _recoveryTimer.Start();
+            }
+            else
+            {
+                _recoveryTimer.Stop();
+            }
             if (!_isLoaded)
             {
                 _isLoaded = true;
@@ -301,7 +458,11 @@ namespace WwTool.UI.ViewModels
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-        public void OnNavigatedFrom(NavigationContext navigationContext) => _navigationCts.Cancel();
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            _recoveryTimer.Stop();
+            _navigationCts.Cancel();
+        }
 
         private void ResetNavigationCancellation()
         {

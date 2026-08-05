@@ -1,10 +1,10 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -99,7 +99,7 @@ namespace WwTool
             {
                 logger.Error("后台数据服务初始化时发生错误", ex);
                 MessageBox.Show(
-                    "本地数据初始化失败。原数据库和迁移备份已保留，请查看脱敏日志后重试。",
+                    "本地数据初始化失败。原数据库和迁移备份已保留，请查看日志后重试。",
                     "WwTool",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -197,6 +197,7 @@ namespace WwTool
             containerRegistry.RegisterForNavigation<AboutView, AboutViewModel>();
             containerRegistry.RegisterSingleton<RoleDataViewModel>();
             containerRegistry.RegisterSingleton<GuideRoleDataViewModel>();
+            containerRegistry.RegisterForNavigation<AccountDataView, RoleDataViewModel>();
             containerRegistry.RegisterForNavigation<RoleDataView, GuideRoleDataViewModel>();
             containerRegistry.RegisterForNavigation<ExplorationDataView, RoleDataViewModel>();
             containerRegistry.RegisterForNavigation<MotorDataView, RoleDataViewModel>();

@@ -76,6 +76,8 @@ public sealed class PlayerInfoRepository(
                     db.PlayerBaseInfos.Add(baseInfo);
                 }
                 MapBaseInfo(baseInfo, roleDetail, playerRegionInfo, syncedAtUtc);
+                baseInfo.HasBattlePassData = roleDetail.BattlePass is not null;
+                baseInfo.HasMusicData = roleDetail.MusicData is not null;
 
                 PlayerMotorData? motor = await db.PlayerMotorData.FirstOrDefaultAsync(x => x.Uid == uid, token);
                 if (motor is null)
@@ -167,12 +169,16 @@ public sealed class PlayerInfoRepository(
         target.Liveness = value?.Liveness ?? 0;
         target.LivenessMaxCount = value?.LivenessMaxCount ?? 0;
         target.LivenessUnlock = value?.LivenessUnlock ?? false;
+        target.ChapterId = value?.ChapterId ?? 0;
         target.WeeklyInstCount = value?.WeeklyInstCount ?? 0;
         target.CreatTime = value?.CreatTime ?? 0;
         target.BirthMon = value?.BirthMon ?? 0;
         target.BirthDay = value?.BirthDay ?? 0;
         target.EnergyRecoverTime = value?.EnergyRecoverTime ?? 0;
         target.StoreEnergyRecoverTime = value?.StoreEnergyRecoverTime ?? 0;
+        target.HasBoxesData = value?.Boxes is not null;
+        target.HasBasicBoxesData = value?.BasicBoxes is not null;
+        target.HasPhantomBoxesData = value?.PhantomBoxes is not null;
         target.BoxesJson = JsonSerializer.Serialize(value?.Boxes ?? new Dictionary<string, int>());
         target.BasicBoxesJson = JsonSerializer.Serialize(value?.BasicBoxes ?? new Dictionary<string, int>());
         target.PhantomBoxesJson = JsonSerializer.Serialize(value?.PhantomBoxes ?? new Dictionary<string, int>());
@@ -236,13 +242,14 @@ public sealed class PlayerInfoRepository(
             Energy = baseInfo.Energy, MaxEnergy = baseInfo.MaxEnergy, StoreEnergy = baseInfo.StoreEnergy,
             MaxStoreEnergy = baseInfo.MaxStoreEnergy, Liveness = baseInfo.Liveness,
             LivenessMaxCount = baseInfo.LivenessMaxCount, LivenessUnlock = baseInfo.LivenessUnlock,
-            WeeklyInstCount = baseInfo.WeeklyInstCount, BirthMon = baseInfo.BirthMon, BirthDay = baseInfo.BirthDay,
+            ChapterId = baseInfo.ChapterId, WeeklyInstCount = baseInfo.WeeklyInstCount,
+            BirthMon = baseInfo.BirthMon, BirthDay = baseInfo.BirthDay,
             EnergyRecoverTime = baseInfo.EnergyRecoverTime, StoreEnergyRecoverTime = baseInfo.StoreEnergyRecoverTime,
-            Boxes = Deserialize<Dictionary<string, int>>(baseInfo.BoxesJson),
-            BasicBoxes = Deserialize<Dictionary<string, int>>(baseInfo.BasicBoxesJson),
-            PhantomBoxes = Deserialize<Dictionary<string, int>>(baseInfo.PhantomBoxesJson)
+            Boxes = baseInfo.HasBoxesData ? Deserialize<Dictionary<string, int>>(baseInfo.BoxesJson) : null,
+            BasicBoxes = baseInfo.HasBasicBoxesData ? Deserialize<Dictionary<string, int>>(baseInfo.BasicBoxesJson) : null,
+            PhantomBoxes = baseInfo.HasPhantomBoxesData ? Deserialize<Dictionary<string, int>>(baseInfo.PhantomBoxesJson) : null
         },
-        BattlePass = battlePass is null ? null : new RoleBattlePass
+        BattlePass = !baseInfo.HasBattlePassData || battlePass is null ? null : new RoleBattlePass
         {
             Level = battlePass.Level, WeekExp = battlePass.WeekExp, WeekMaxExp = battlePass.WeekMaxExp,
             IsUnlock = battlePass.IsUnlock, IsOpen = battlePass.IsOpen, Exp = battlePass.Exp, ExpLimit = battlePass.ExpLimit
@@ -254,7 +261,9 @@ public sealed class PlayerInfoRepository(
             Decorations = Deserialize<List<MotorDecoration>>(motor.DecorationsJson), Frames = Deserialize<List<MotorFrame>>(motor.FramesJson),
             EquipSkin = motor.EquipSkinId == 0 ? null : new MotorSkin { SkinId = motor.EquipSkinId, Quality = motor.EquipSkinQuality }
         },
-        MusicData = music.Select(x => new RoleMusicData { Id = x.AlbumId, Count = x.Count, TotalCount = x.TotalCount }).ToList()
+        MusicData = baseInfo.HasMusicData
+            ? music.Select(x => new RoleMusicData { Id = x.AlbumId, Count = x.Count, TotalCount = x.TotalCount }).ToList()
+            : null
     };
 
     private static T Deserialize<T>(string json) where T : new() =>
