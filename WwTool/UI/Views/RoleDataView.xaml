@@ -60,12 +60,24 @@
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Background" Value="{DynamicResource ResonanceZeroBrush}" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Sequence}" Value="1"><Setter Property="Background" Value="{DynamicResource ResonanceOneBrush}" /></DataTrigger>
-                <DataTrigger Binding="{Binding Sequence}" Value="2"><Setter Property="Background" Value="{DynamicResource ResonanceTwoBrush}" /></DataTrigger>
-                <DataTrigger Binding="{Binding Sequence}" Value="3"><Setter Property="Background" Value="{DynamicResource ResonanceThreeBrush}" /></DataTrigger>
-                <DataTrigger Binding="{Binding Sequence}" Value="4"><Setter Property="Background" Value="{DynamicResource ResonanceFourBrush}" /></DataTrigger>
-                <DataTrigger Binding="{Binding Sequence}" Value="5"><Setter Property="Background" Value="{DynamicResource ResonanceFiveBrush}" /></DataTrigger>
-                <DataTrigger Binding="{Binding Sequence}" Value="6"><Setter Property="Background" Value="{DynamicResource ResonanceSixBrush}" /></DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="1">
+                    <Setter Property="Background" Value="{DynamicResource ResonanceOneBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="2">
+                    <Setter Property="Background" Value="{DynamicResource ResonanceTwoBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="3">
+                    <Setter Property="Background" Value="{DynamicResource ResonanceThreeBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="4">
+                    <Setter Property="Background" Value="{DynamicResource ResonanceFourBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="5">
+                    <Setter Property="Background" Value="{DynamicResource ResonanceFiveBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Sequence}" Value="6">
+                    <Setter Property="Background" Value="{DynamicResource ResonanceSixBrush}" />
+                </DataTrigger>
             </Style.Triggers>
         </Style>
 
@@ -85,7 +97,11 @@
                     <Grid Grid.Row="0" ClipToBounds="True">
                         <Image Source="{Binding IconPath, Converter={StaticResource ImageConverter}, ConverterParameter=120, IsAsync=True}" Stretch="UniformToFill" />
                         <Border Style="{StaticResource GuideStarBadgeStyle}">
-                            <TextBlock FontSize="11" FontWeight="Bold" Foreground="White" Text="{Binding Star, StringFormat={}{0}★}" />
+                            <TextBlock
+                                FontSize="11"
+                                FontWeight="Bold"
+                                Foreground="White"
+                                Text="{Binding Star, StringFormat={}{0}★}" />
                         </Border>
                         <Border Style="{StaticResource GuideResonanceBadgeStyle}">
                             <TextBlock FontWeight="SemiBold" Foreground="White" Text="{Binding SequenceLabel}" />
@@ -118,7 +134,11 @@
                     <Grid Grid.Row="0" ClipToBounds="True">
                         <Image Source="{Binding IconPath, Converter={StaticResource ImageConverter}, ConverterParameter=120, IsAsync=True}" Stretch="Uniform" />
                         <Border Style="{StaticResource GuideStarBadgeStyle}">
-                            <TextBlock FontSize="11" FontWeight="Bold" Foreground="White" Text="{Binding Star, StringFormat={}{0}★}" />
+                            <TextBlock
+                                FontSize="11"
+                                FontWeight="Bold"
+                                Foreground="White"
+                                Text="{Binding Star, StringFormat={}{0}★}" />
                         </Border>
                     </Grid>
                     <Border Grid.Row="1" Background="#E6151517" CornerRadius="0,0,6,6">
@@ -230,14 +250,14 @@
                 BorderThickness="1"
                 CornerRadius="{DynamicResource CornerRadiusCard}">
                 <TabControl>
-                    <TabItem Header="{Binding Path=[Guide_RolesTab], Source={x:Static utils:LanguageManager.Instance}}">
+                    <TabItem Header="{Binding Path=[Guide_RolesTab], Source={x:Static utils:LanguageManager.Instance}}" Tag="{StaticResource RoleImage}">
                         <StackPanel Margin="0,16,0,0">
                             <StackPanel Margin="0,0,0,12" HorizontalAlignment="Right" Orientation="Horizontal">
                                 <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="{Binding Path=[Guide_Sort], Source={x:Static utils:LanguageManager.Instance}}" />
                                 <ComboBox
                                     Width="150"
-                                    ItemContainerStyle="{StaticResource GuideSortComboBoxItemStyle}"
                                     DisplayMemberPath="DisplayName"
+                                    ItemContainerStyle="{StaticResource GuideSortComboBoxItemStyle}"
                                     ItemsSource="{Binding RoleSortOptions}"
                                     SelectedItem="{Binding SelectedRoleSort}" />
                             </StackPanel>
@@ -256,14 +276,14 @@
                             </ItemsControl>
                         </StackPanel>
                     </TabItem>
-                    <TabItem Header="{Binding Path=[Guide_WeaponsTab], Source={x:Static utils:LanguageManager.Instance}}">
+                    <TabItem Header="{Binding Path=[Guide_WeaponsTab], Source={x:Static utils:LanguageManager.Instance}}" Tag="{StaticResource WeaponImage}">
                         <StackPanel Margin="0,16,0,0">
                             <StackPanel Margin="0,0,0,12" HorizontalAlignment="Right" Orientation="Horizontal">
                                 <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="{Binding Path=[Guide_Sort], Source={x:Static utils:LanguageManager.Instance}}" />
                                 <ComboBox
                                     Width="150"
-                                    ItemContainerStyle="{StaticResource GuideSortComboBoxItemStyle}"
                                     DisplayMemberPath="DisplayName"
+                                    ItemContainerStyle="{StaticResource GuideSortComboBoxItemStyle}"
                                     ItemsSource="{Binding WeaponSortOptions}"
                                     SelectedItem="{Binding SelectedWeaponSort}" />
                             </StackPanel>

@@ -298,16 +298,16 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
 
     private void SortRoles() => Replace(Roles, roleSortKey switch
     {
-        "name" => Roles.OrderBy(x => x.DisplayName, StringComparer.CurrentCulture).ThenBy(x => x.SourceOrder),
+        "name" => GuideCardSortHelper.OrderByName(Roles, x => x.DisplayName),
         "time" => GuideCardSortHelper.OrderByAcquisitionTime(Roles),
-        _ => Roles.OrderByDescending(x => x.Star).ThenBy(x => x.SourceOrder)
+        _ => GuideCardSortHelper.OrderByGlobalGroup(Roles)
     });
 
     private void SortWeapons() => Replace(Weapons, weaponSortKey switch
     {
-        "name" => Weapons.OrderBy(x => x.DisplayName, StringComparer.CurrentCulture).ThenBy(x => x.SourceOrder),
+        "name" => GuideCardSortHelper.OrderByName(Weapons, x => x.DisplayName),
         "time" => GuideCardSortHelper.OrderByAcquisitionTime(Weapons),
-        _ => Weapons.OrderByDescending(x => x.Star).ThenBy(x => x.SourceOrder)
+        _ => GuideCardSortHelper.OrderByGlobalGroup(Weapons)
     });
 
     private static void Replace<T>(ObservableCollection<T> target, IEnumerable<T> items)
@@ -439,12 +439,34 @@ public interface IGuideCard
 
 public static class GuideCardSortHelper
 {
-    public static IReadOnlyList<T> OrderByAcquisitionTime<T>(IEnumerable<T> items) where T : IGuideCard =>
-        items.OrderBy(x => x.IsLimitedFiveStar ? 0 : x.Star == 5 ? 1 : x.Star == 4 ? 2 : 3)
-            .ThenBy(x => x.IsLimitedFiveStar && x.FirstAcquiredAt.HasValue ? 0 : 1)
-            .ThenByDescending(x => x.FirstAcquiredAt)
+    /// <summary>
+    /// 所有展示排序均先固定为限定五星、常驻五星、四星，异常稀有度置于末尾。
+    /// </summary>
+    public static IReadOnlyList<T> OrderByGlobalGroup<T>(IEnumerable<T> items) where T : IGuideCard =>
+        items.OrderBy(x => GetGlobalGroupRank(x))
             .ThenBy(x => x.SourceOrder)
             .ToArray();
+
+    public static IReadOnlyList<T> OrderByName<T>(IEnumerable<T> items, Func<T, string> nameSelector) where T : IGuideCard =>
+        items.OrderBy(x => GetGlobalGroupRank(x))
+            .ThenBy(nameSelector, StringComparer.CurrentCulture)
+            .ThenBy(x => x.SourceOrder)
+            .ToArray();
+
+    public static IReadOnlyList<T> OrderByAcquisitionTime<T>(IEnumerable<T> items) where T : IGuideCard =>
+        items.OrderBy(x => GetGlobalGroupRank(x))
+            .ThenBy(x => x.IsLimitedFiveStar && x.FirstAcquiredAt.HasValue ? 0 : 1)
+            .ThenByDescending(x => x.IsLimitedFiveStar ? x.FirstAcquiredAt : null)
+            .ThenBy(x => x.SourceOrder)
+            .ToArray();
+
+    private static int GetGlobalGroupRank(IGuideCard item) => item switch
+    {
+        { Star: 5, IsLimitedFiveStar: true } => 0,
+        { Star: 5 } => 1,
+        { Star: 4 } => 2,
+        _ => 3
+    };
 }
 
 public sealed class GuideRoleCardViewModel : IGuideCard
