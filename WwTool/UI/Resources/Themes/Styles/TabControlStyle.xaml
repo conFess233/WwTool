@@ -5,7 +5,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="Margin" Value="3" />
-        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="Padding" Value="2,2,8,2" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Tag" Value="{StaticResource DefaultImage}" />
@@ -26,13 +26,22 @@
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal"
                                 TextElement.Foreground="{TemplateBinding Foreground}">
-                                <Image
+                                <Grid
                                     x:Name="headerIcon"
-                                    Width="16"
-                                    Height="16"
-                                    Margin="0,0,7,0"
-                                    Opacity="0.62"
-                                    Source="{TemplateBinding Tag}" />
+                                    Width="{Binding Path=(b:TabItemIconBehavior.IconSize), RelativeSource={RelativeSource TemplatedParent}}"
+                                    Height="{Binding Path=(b:TabItemIconBehavior.IconSize), RelativeSource={RelativeSource TemplatedParent}}"
+                                    Margin="0,0,3,0">
+                                    <Image
+                                        x:Name="originalHeaderIcon"
+                                        Source="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Stretch="Uniform"
+                                        Visibility="Collapsed" />
+                                    <Rectangle x:Name="maskedHeaderIcon" Fill="{DynamicResource TextPrimaryBrush}">
+                                        <Rectangle.OpacityMask>
+                                            <ImageBrush ImageSource="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                </Grid>
                                 <ContentPresenter
                                     x:Name="contentPresenter"
                                     VerticalAlignment="Center"
@@ -62,9 +71,13 @@
                             <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
                         </Trigger>
 
+                        <Trigger Property="b:TabItemIconBehavior.UseIconMask" Value="False">
+                            <Setter TargetName="maskedHeaderIcon" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="originalHeaderIcon" Property="Visibility" Value="Visible" />
+                        </Trigger>
+
                         <DataTrigger Binding="{Binding Path=(b:ResponsiveTabHeaderBehavior.IsCompact), RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" Value="True">
                             <Setter TargetName="contentPresenter" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="headerIcon" Property="Margin" Value="0" />
                             <Setter TargetName="mainBorder" Property="Padding" Value="10,8" />
                         </DataTrigger>
 
@@ -74,7 +87,6 @@
                                 <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="contentPresenter" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="headerIcon" Property="Margin" Value="0,0,7,0" />
                             <Setter TargetName="mainBorder" Property="Padding" Value="14,8" />
                         </MultiDataTrigger>
 
@@ -84,7 +96,6 @@
                                 <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="contentPresenter" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="headerIcon" Property="Margin" Value="0,0,7,0" />
                             <Setter TargetName="mainBorder" Property="Padding" Value="14,8" />
                         </MultiDataTrigger>
                     </ControlTemplate.Triggers>

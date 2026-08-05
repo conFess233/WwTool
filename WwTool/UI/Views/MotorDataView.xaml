@@ -2,13 +2,14 @@
     x:Class="WwTool.UI.Views.MotorDataView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="clr-namespace:WwTool.Common.Behaviors"
     xmlns:cv="clr-namespace:WwTool.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:WwTool.Common.Utils"
     HorizontalAlignment="Stretch"
-    HorizontalContentAlignment="Stretch"
     VerticalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
     VerticalContentAlignment="Stretch"
     d:DesignHeight="600"
     d:DesignWidth="800"
@@ -117,283 +118,431 @@
             Margin="24,16,24,24"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <Border
-                    Grid.Row="0"
-                    Margin="0,0,0,16"
-                    Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="{DynamicResource CornerRadiusCard}">
-                    <Grid Margin="20">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+            <Border
+                Grid.Row="0"
+                Margin="0,0,0,16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource CornerRadiusCard}">
+                <Grid Margin="20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                            <StackPanel Orientation="Horizontal">
-                                <Rectangle Width="30" Height="30" Fill="{DynamicResource TextPrimaryBrush}">
-                                    <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="{StaticResource MotorLevelImage}" Stretch="Uniform" />
-                                    </Rectangle.OpacityMask>
-                                </Rectangle>
-                                <TextBlock Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Motor_Level], Source={x:Static utils:LanguageManager.Instance}}" />
-
-                            </StackPanel>
-                            <Separator Margin="0,0,0,10" Background="{DynamicResource DividerBrush}" />
-
-                            <Grid Margin="0,12,0,4">
-                                <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_Exp], Source={x:Static utils:LanguageManager.Instance}}" />
-                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                    <TextBlock FontWeight="Bold" Text="{Binding RoleDetail.MotorData.Exp}" />
-                                    <TextBlock Text="{Binding RoleDetail.MotorData.NextExp, StringFormat={} / {0}}" />
-                                </StackPanel>
-                            </Grid>
-                            <ProgressBar
-                                Background="{DynamicResource SurfaceHoverBrush}"
-                                Maximum="{Binding RoleDetail.MotorData.NextExp}"
-                                Style="{StaticResource ExpBarStyle}"
-                                Value="{Binding RoleDetail.MotorData.Exp}" />
-                        </StackPanel>
-
-                        <Border
-                            Grid.Column="1"
-                            Width="70"
-                            Height="70"
-                            Margin="24,0,0,0"
-                            VerticalAlignment="Center"
-                            Background="{DynamicResource BorderBrush}"
-                            BorderBrush="{DynamicResource DividerBrush}"
-                            BorderThickness="2"
-                            CornerRadius="35">
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    FontSize="11"
-                                    Style="{StaticResource CaptionTextStyle}"
-                                    Text="{Binding Path=[Motor_CurrentLevel], Source={x:Static utils:LanguageManager.Instance}}" />
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    FontSize="20"
-                                    FontWeight="Bold"
-                                    Text="{Binding RoleDetail.MotorData.Level}" />
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Border>
-
-                <Border
-                    Grid.Row="1"
-                    Margin="0,0,0,16"
-                    Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="{DynamicResource CornerRadiusCard}">
-                    <StackPanel Margin="20">
-                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
-                            <Rectangle Width="40" Height="40" Fill="{DynamicResource TextPrimaryBrush}">
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Width="30" Height="30" Fill="{DynamicResource TextPrimaryBrush}">
                                 <Rectangle.OpacityMask>
-                                    <ImageBrush ImageSource="{StaticResource DIYImage}" Stretch="Uniform" />
+                                    <ImageBrush ImageSource="{StaticResource MotorLevelImage}" Stretch="Uniform" />
                                 </Rectangle.OpacityMask>
                             </Rectangle>
-                            <TextBlock Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Motor_UnlockStats], Source={x:Static utils:LanguageManager.Instance}}" />
-                        </StackPanel>
+                            <TextBlock Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Motor_Level], Source={x:Static utils:LanguageManager.Instance}}" />
 
+                        </StackPanel>
                         <Separator Margin="0,0,0,10" Background="{DynamicResource DividerBrush}" />
 
-                        <UniformGrid Columns="4">
-                            <StackPanel HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
-                                        <Rectangle.OpacityMask>
-                                            <ImageBrush ImageSource="{StaticResource MotorImage}" Stretch="Uniform" />
-                                        </Rectangle.OpacityMask>
-                                    </Rectangle>
-                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_UnlockedSkins], Source={x:Static utils:LanguageManager.Instance}}" />
-                                </StackPanel>
-
-                                <TextBlock
-                                    Margin="0,8,0,0"
-                                    HorizontalAlignment="Center"
-                                    FontSize="24"
-                                    FontWeight="Bold"
-                                    Text="{Binding RoleDetail.MotorData.Skins.Count, FallbackValue=0}" />
-                            </StackPanel>
-
-                            <StackPanel HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
-                                        <Rectangle.OpacityMask>
-                                            <ImageBrush ImageSource="{StaticResource StickerImage}" Stretch="Uniform" />
-                                        </Rectangle.OpacityMask>
-                                    </Rectangle>
-                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_UnlockedStickers], Source={x:Static utils:LanguageManager.Instance}}" />
-                                </StackPanel>
-
-                                <TextBlock
-                                    Margin="0,8,0,0"
-                                    HorizontalAlignment="Center"
-                                    FontSize="24"
-                                    FontWeight="Bold"
-                                    Text="{Binding RoleDetail.MotorData.Stickers.Count, FallbackValue=0}" />
-                            </StackPanel>
-
-                            <StackPanel HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
-                                        <Rectangle.OpacityMask>
-                                            <ImageBrush ImageSource="{StaticResource DecorationsImage}" Stretch="Uniform" />
-                                        </Rectangle.OpacityMask>
-                                    </Rectangle>
-                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_UnlockedOrnaments], Source={x:Static utils:LanguageManager.Instance}}" />
-                                </StackPanel>
-
-                                <TextBlock
-                                    Margin="0,8,0,0"
-                                    HorizontalAlignment="Center"
-                                    FontSize="24"
-                                    FontWeight="Bold"
-                                    Text="{Binding RoleDetail.MotorData.Decorations.Count, FallbackValue=0}" />
-                            </StackPanel>
-
-                            <StackPanel HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
-                                        <Rectangle.OpacityMask>
-                                            <ImageBrush ImageSource="{StaticResource MotorFrameImage}" Stretch="Uniform" />
-                                        </Rectangle.OpacityMask>
-                                    </Rectangle>
-                                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_UnlockedFrames], Source={x:Static utils:LanguageManager.Instance}}" />
-                                </StackPanel>
-
-                                <TextBlock
-                                    Margin="0,8,0,0"
-                                    HorizontalAlignment="Center"
-                                    FontSize="24"
-                                    FontWeight="Bold"
-                                    Text="{Binding RoleDetail.MotorData.Frames.Count, FallbackValue=0}" />
-                            </StackPanel>
-                        </UniformGrid>
-
-                        <Separator Margin="0,16,0,16" Background="{DynamicResource DividerBrush}" />
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_EquippedSkin], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <StackPanel Grid.Column="1" Margin="8,0,0,0" Orientation="Horizontal">
-                                <TextBlock FontWeight="Bold" Foreground="{DynamicResource WarningBrush}">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Text">
-                                                <Setter.Value>
-                                                    <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
-                                                        <Binding Path="RoleDetail.MotorData.EquipSkin.SkinId" />
-                                                        <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                                                    </MultiBinding>
-                                                </Setter.Value>
-                                            </Setter>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RoleDetail.MotorData.EquipSkin.SkinId}" Value="{x:Null}">
-                                                    <Setter Property="Text" Value="{Binding Path=[Motor_DefaultSkin], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                                <TextBlock Margin="12,0,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
-                                <TextBlock FontWeight="SemiBold">
-                                    <TextBlock.Style>
-                                        <Style BasedOn="{StaticResource CaptionTextStyle}" TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding RoleDetail.MotorData.EquipSkin.Quality}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RoleDetail.MotorData.EquipSkin.Quality}" Value="{x:Null}">
-                                                    <Setter Property="Text" Value="{Binding Path=[Motor_None], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                        <Grid Margin="0,12,0,4">
+                            <TextBlock Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_Exp], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                <TextBlock FontWeight="Bold" Text="{Binding RoleDetail.MotorData.Exp}" />
+                                <TextBlock Text="{Binding RoleDetail.MotorData.NextExp, StringFormat={} / {0}}" />
                             </StackPanel>
                         </Grid>
+                        <ProgressBar
+                            Background="{DynamicResource SurfaceHoverBrush}"
+                            Maximum="{Binding RoleDetail.MotorData.NextExp}"
+                            Style="{StaticResource ExpBarStyle}"
+                            Value="{Binding RoleDetail.MotorData.Exp}" />
                     </StackPanel>
-                </Border>
 
-                <TabControl
-                    Grid.Row="2"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
-                    HorizontalContentAlignment="Stretch"
-                    VerticalContentAlignment="Stretch">
+                    <Border
+                        Grid.Column="1"
+                        Width="70"
+                        Height="70"
+                        Margin="24,0,0,0"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource BorderBrush}"
+                        BorderBrush="{DynamicResource DividerBrush}"
+                        BorderThickness="2"
+                        CornerRadius="35">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="11"
+                                Style="{StaticResource CaptionTextStyle}"
+                                Text="{Binding Path=[Motor_CurrentLevel], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="20"
+                                FontWeight="Bold"
+                                Text="{Binding RoleDetail.MotorData.Level}" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
 
-                    <TabItem>
-                        <TabItem.Header>
-                            <TextBlock Text="{Binding Path=[Motor_Tab_Skin], Source={x:Static utils:LanguageManager.Instance}}" />
-                        </TabItem.Header>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl Margin="10" ItemsSource="{Binding RoleDetail.MotorData.Skins}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Margin="0,0,0,6"
-                                            Padding="10,6"
-                                            Background="{DynamicResource BackgroundBrush}"
-                                            BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4">
-                                            <Grid>
+            <Border
+                Grid.Row="1"
+                Margin="0,0,0,16"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource CornerRadiusCard}">
+                <StackPanel Margin="20">
+                    <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                        <Rectangle Width="40" Height="40" Fill="{DynamicResource TextPrimaryBrush}">
+                            <Rectangle.OpacityMask>
+                                <ImageBrush ImageSource="{StaticResource DIYImage}" Stretch="Uniform" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                        <TextBlock Margin="10,0,0,0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Motor_UnlockStats], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </StackPanel>
+
+                    <Separator Margin="0,0,0,10" Background="{DynamicResource DividerBrush}" />
+
+                    <UniformGrid Columns="4">
+                        <StackPanel HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{StaticResource MotorImage}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_UnlockedSkins], Source={x:Static utils:LanguageManager.Instance}}" />
+                            </StackPanel>
+
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="24"
+                                FontWeight="Bold"
+                                Text="{Binding RoleDetail.MotorData.Skins.Count, FallbackValue=0}" />
+                        </StackPanel>
+
+                        <StackPanel HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{StaticResource StickerImage}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_UnlockedStickers], Source={x:Static utils:LanguageManager.Instance}}" />
+                            </StackPanel>
+
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="24"
+                                FontWeight="Bold"
+                                Text="{Binding RoleDetail.MotorData.Stickers.Count, FallbackValue=0}" />
+                        </StackPanel>
+
+                        <StackPanel HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{StaticResource DecorationsImage}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_UnlockedOrnaments], Source={x:Static utils:LanguageManager.Instance}}" />
+                            </StackPanel>
+
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="24"
+                                FontWeight="Bold"
+                                Text="{Binding RoleDetail.MotorData.Decorations.Count, FallbackValue=0}" />
+                        </StackPanel>
+
+                        <StackPanel HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <Rectangle Width="25" Height="25" Fill="{DynamicResource TextPrimaryBrush}">
+                                    <Rectangle.OpacityMask>
+                                        <ImageBrush ImageSource="{StaticResource MotorFrameImage}" Stretch="Uniform" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_UnlockedFrames], Source={x:Static utils:LanguageManager.Instance}}" />
+                            </StackPanel>
+
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Center"
+                                FontSize="24"
+                                FontWeight="Bold"
+                                Text="{Binding RoleDetail.MotorData.Frames.Count, FallbackValue=0}" />
+                        </StackPanel>
+                    </UniformGrid>
+
+                    <Separator Margin="0,16,0,16" Background="{DynamicResource DividerBrush}" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_EquippedSkin], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <StackPanel Grid.Column="1" Margin="8,0,0,0" Orientation="Horizontal">
+                            <TextBlock FontWeight="Bold" Foreground="{DynamicResource WarningBrush}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text">
+                                            <Setter.Value>
+                                                <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
+                                                    <Binding Path="RoleDetail.MotorData.EquipSkin.SkinId" />
+                                                    <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
+                                                </MultiBinding>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RoleDetail.MotorData.EquipSkin.SkinId}" Value="{x:Null}">
+                                                <Setter Property="Text" Value="{Binding Path=[Motor_DefaultSkin], Source={x:Static utils:LanguageManager.Instance}}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <TextBlock Margin="12,0,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <TextBlock FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource CaptionTextStyle}" TargetType="TextBlock">
+                                        <Setter Property="Text" Value="{Binding RoleDetail.MotorData.EquipSkin.Quality}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RoleDetail.MotorData.EquipSkin.Quality}" Value="{x:Null}">
+                                                <Setter Property="Text" Value="{Binding Path=[Motor_None], Source={x:Static utils:LanguageManager.Instance}}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <TabControl
+                Grid.Row="2"
+                HorizontalContentAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
+                b:TabItemIconBehavior.UseIconMask="True"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1">
+
+                <TabItem Tag="{StaticResource MotorImage}">
+                    <TabItem.Header>
+                        <TextBlock Text="{Binding Path=[Motor_Tab_Skin], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </TabItem.Header>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl Margin="10" ItemsSource="{Binding RoleDetail.MotorData.Skins}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="0,0,0,6"
+                                        Padding="10,6"
+                                        Background="{DynamicResource BackgroundBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="30" Height="30" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                <TextBlock Margin="5,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_SkinLabel], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <TextBlock FontWeight="Bold">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
+                                                            <Binding Path="SkinId" />
+                                                            <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                                <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <TextBlock FontWeight="SemiBold" Text="{Binding Quality}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+
+                <TabItem Tag="{StaticResource StickerImage}">
+                    <TabItem.Header>
+                        <TextBlock Text="{Binding Path=[Motor_Tab_Sticker], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </TabItem.Header>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl Margin="10" ItemsSource="{Binding RoleDetail.MotorData.Stickers}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="0,0,0,6"
+                                        Padding="10,6"
+                                        Background="{DynamicResource BackgroundBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="30" Height="30" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                <TextBlock Margin="5,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_StickerLabel], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <TextBlock FontWeight="Bold">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
+                                                            <Binding Path="Id" />
+                                                            <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                                <TextBlock Margin="12,0,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_InstallPart], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <Rectangle
+                                                    Width="30"
+                                                    Height="30"
+                                                    Margin="4,0,0,0"
+                                                    Fill="{DynamicResource TextPrimaryBrush}"
+                                                    ToolTip="{Binding PartId}">
+                                                    <Rectangle.OpacityMask>
+                                                        <ImageBrush ImageSource="{Binding PartIconPath, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
+                                                    </Rectangle.OpacityMask>
+                                                </Rectangle>
+                                            </StackPanel>
+                                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                                <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <TextBlock FontWeight="SemiBold" Text="{Binding Quality}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+
+                <TabItem Tag="{StaticResource DecorationsImage}">
+                    <TabItem.Header>
+                        <TextBlock Text="{Binding Path=[Motor_Tab_Pendant], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </TabItem.Header>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl Margin="10" ItemsSource="{Binding RoleDetail.MotorData.Decorations}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="0,0,0,6"
+                                        Padding="10,6"
+                                        Background="{DynamicResource BackgroundBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="30" Height="30" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                <TextBlock Margin="5,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_OrnamentLabel], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <TextBlock FontWeight="Bold">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
+                                                            <Binding Path="Id" />
+                                                            <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                                <TextBlock Margin="12,0,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_InstallPart], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <Rectangle
+                                                    Width="30"
+                                                    Height="30"
+                                                    Margin="4,0,0,0"
+                                                    Fill="{DynamicResource TextPrimaryBrush}"
+                                                    ToolTip="{Binding PartId}">
+                                                    <Rectangle.OpacityMask>
+                                                        <ImageBrush ImageSource="{Binding PartIconPath, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
+                                                    </Rectangle.OpacityMask>
+                                                </Rectangle>
+                                            </StackPanel>
+                                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                                <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <TextBlock FontWeight="SemiBold" Text="{Binding Quality}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+
+                <TabItem Tag="{StaticResource MotorFrameImage}">
+                    <TabItem.Header>
+                        <TextBlock Text="{Binding Path=[Motor_Tab_Frame], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </TabItem.Header>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl Margin="10" ItemsSource="{Binding RoleDetail.MotorData.Frames}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="0,0,0,6"
+                                        Padding="10,6"
+                                        Background="{DynamicResource BackgroundBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="30" Height="30" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                <TextBlock Margin="5,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_FrameLabel], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <TextBlock FontWeight="Bold">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
+                                                            <Binding Path="Id" />
+                                                            <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </StackPanel>
+                                            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                                <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
+                                                <TextBlock FontWeight="SemiBold" Text="{Binding Quality}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+
+                <TabItem Tag="{StaticResource PhonographImage}">
+                    <TabItem.Header>
+                        <TextBlock Text="{Binding Path=[Motor_Tab_Album], Source={x:Static utils:LanguageManager.Instance}}" />
+                    </TabItem.Header>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding RoleDetail.MusicData}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="0,0,0,6"
+                                        Padding="10,6"
+                                        Background="{DynamicResource BackgroundBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                        <Grid Margin="0,0,0,10">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0" Margin="0,0,0,4">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Image Width="30" Height="30" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
-                                                    <TextBlock Margin="5,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_SkinLabel], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <TextBlock FontWeight="Bold">
-                                                        <TextBlock.Text>
-                                                            <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
-                                                                <Binding Path="SkinId" />
-                                                                <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                                                            </MultiBinding>
-                                                        </TextBlock.Text>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                    <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Quality}" />
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </TabItem>
+                                                    <Image Width="40" Height="40" Source="{Binding IconPath, Converter={StaticResource ImageConverter}}" />
 
-                    <TabItem>
-                        <TabItem.Header>
-                            <TextBlock Text="{Binding Path=[Motor_Tab_Sticker], Source={x:Static utils:LanguageManager.Instance}}" />
-                        </TabItem.Header>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl Margin="10" ItemsSource="{Binding RoleDetail.MotorData.Stickers}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Margin="0,0,0,6"
-                                            Padding="10,6"
-                                            Background="{DynamicResource BackgroundBrush}"
-                                            BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4">
-                                            <Grid>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="30" Height="30" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
-                                                    <TextBlock Margin="5,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_StickerLabel], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <TextBlock FontWeight="Bold">
+                                                    <TextBlock Margin="10,0,0,0" FontWeight="Bold">
                                                         <TextBlock.Text>
                                                             <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
                                                                 <Binding Path="Id" />
@@ -401,174 +550,27 @@
                                                             </MultiBinding>
                                                         </TextBlock.Text>
                                                     </TextBlock>
-                                                    <TextBlock Margin="12,0,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_InstallPart], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <Rectangle
-                                                        Width="30"
-                                                        Height="30"
-                                                        Margin="4,0,0,0"
-                                                        Fill="{DynamicResource TextPrimaryBrush}"
-                                                        ToolTip="{Binding PartId}">
-                                                        <Rectangle.OpacityMask>
-                                                            <ImageBrush ImageSource="{Binding PartIconPath, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
-                                                        </Rectangle.OpacityMask>
-                                                    </Rectangle>
                                                 </StackPanel>
                                                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                    <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Quality}" />
+                                                    <TextBlock FontWeight="Bold" Text="{Binding Count}" />
+                                                    <TextBlock Text="{Binding TotalCount, StringFormat={} / {0}}" />
                                                 </StackPanel>
                                             </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </TabItem>
-
-                    <TabItem>
-                        <TabItem.Header>
-                            <TextBlock Text="{Binding Path=[Motor_Tab_Pendant], Source={x:Static utils:LanguageManager.Instance}}" />
-                        </TabItem.Header>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl Margin="10" ItemsSource="{Binding RoleDetail.MotorData.Decorations}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Margin="0,0,0,6"
-                                            Padding="10,6"
-                                            Background="{DynamicResource BackgroundBrush}"
-                                            BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4">
-                                            <Grid>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="30" Height="30" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
-                                                    <TextBlock Margin="5,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_OrnamentLabel], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <TextBlock FontWeight="Bold">
-                                                        <TextBlock.Text>
-                                                            <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
-                                                                <Binding Path="Id" />
-                                                                <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                                                            </MultiBinding>
-                                                        </TextBlock.Text>
-                                                    </TextBlock>
-                                                    <TextBlock Margin="12,0,0,0" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_InstallPart], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <Rectangle
-                                                        Width="30"
-                                                        Height="30"
-                                                        Margin="4,0,0,0"
-                                                        Fill="{DynamicResource TextPrimaryBrush}"
-                                                        ToolTip="{Binding PartId}">
-                                                        <Rectangle.OpacityMask>
-                                                            <ImageBrush ImageSource="{Binding PartIconPath, Converter={StaticResource ResourceImageConverter}}" Stretch="Uniform" />
-                                                        </Rectangle.OpacityMask>
-                                                    </Rectangle>
-                                                </StackPanel>
-                                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                    <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Quality}" />
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </TabItem>
-
-                    <TabItem>
-                        <TabItem.Header>
-                            <TextBlock Text="{Binding Path=[Motor_Tab_Frame], Source={x:Static utils:LanguageManager.Instance}}" />
-                        </TabItem.Header>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl Margin="10" ItemsSource="{Binding RoleDetail.MotorData.Frames}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Margin="0,0,0,6"
-                                            Padding="10,6"
-                                            Background="{DynamicResource BackgroundBrush}"
-                                            BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4">
-                                            <Grid>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="30" Height="30" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
-                                                    <TextBlock Margin="5,0,0,0" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Motor_FrameLabel], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <TextBlock FontWeight="Bold">
-                                                        <TextBlock.Text>
-                                                            <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
-                                                                <Binding Path="Id" />
-                                                                <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                                                            </MultiBinding>
-                                                        </TextBlock.Text>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                    <TextBlock Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Motor_Quality], Source={x:Static utils:LanguageManager.Instance}}" />
-                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Quality}" />
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </TabItem>
-
-                    <TabItem>
-                        <TabItem.Header>
-                            <TextBlock Text="{Binding Path=[Motor_Tab_Album], Source={x:Static utils:LanguageManager.Instance}}" />
-                        </TabItem.Header>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding RoleDetail.MusicData}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Margin="0,0,0,6"
-                                            Padding="10,6"
-                                            Background="{DynamicResource BackgroundBrush}"
-                                            BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4">
-                                            <Grid Margin="0,0,0,10">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                </Grid.RowDefinitions>
-                                                <Grid Grid.Row="0" Margin="0,0,0,4">
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <Image Width="40" Height="40" Source="{Binding IconPath, Converter={StaticResource ImageConverter}}" />
-
-                                                        <TextBlock Margin="10,0,0,0" FontWeight="Bold">
-                                                            <TextBlock.Text>
-                                                                <MultiBinding Converter="{StaticResource ItemIdToNameConverter}">
-                                                                    <Binding Path="Id" />
-                                                                    <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                                                                </MultiBinding>
-                                                            </TextBlock.Text>
-                                                        </TextBlock>
-                                                    </StackPanel>
-                                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                        <TextBlock FontWeight="Bold" Text="{Binding Count}" />
-                                                        <TextBlock Text="{Binding TotalCount, StringFormat={} / {0}}" />
-                                                    </StackPanel>
-                                                </Grid>
-                                                <ProgressBar
-                                                    Grid.Row="1"
-                                                    Background="{DynamicResource BorderBrush}"
-                                                    Foreground="{DynamicResource AccentBrush}"
-                                                    Maximum="{Binding TotalCount}"
-                                                    Style="{StaticResource AlbumBar}"
-                                                    Value="{Binding Count}" />
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </TabItem>
-                </TabControl>
+                                            <ProgressBar
+                                                Grid.Row="1"
+                                                Background="{DynamicResource BorderBrush}"
+                                                Foreground="{DynamicResource AccentBrush}"
+                                                Maximum="{Binding TotalCount}"
+                                                Style="{StaticResource AlbumBar}"
+                                                Value="{Binding Count}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
         </Grid>
 
     </Grid>

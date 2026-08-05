@@ -28,6 +28,7 @@ namespace WwTool.UI.Views
         public MainView(IConfigService configService)
         {
             InitializeComponent();
+            leftNav.ConfigurePushTransition(MainRegionContent, NavigationColumn);
             _configService = configService;
             _configService.User.PropertyChanged += UserConfig_PropertyChanged;
             SystemParameters.StaticPropertyChanged += SystemParameters_StaticPropertyChanged;
@@ -37,7 +38,7 @@ namespace WwTool.UI.Views
         {
             if (e.PropertyName == nameof(SystemParameters.HighContrast))
             {
-                Dispatcher.Invoke(() => ApplyGlassEffect(_configService.User.IsGlassEffectEnabled));
+                Dispatcher.Invoke(ApplyGlassEffect);
             }
         }
 
@@ -45,27 +46,32 @@ namespace WwTool.UI.Views
         {
             base.OnSourceInitialized(e);
 
-            ApplyGlassEffect(_configService.User.IsGlassEffectEnabled);
+            ApplyGlassEffect();
         }
 
         private void UserConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            // 当且仅当“毛玻璃开关”发生变化时，执行切换逻辑
-            if (e.PropertyName == nameof(UserConfig.IsGlassEffectEnabled))
+            // 开关与透明度变化都需要立即同步到窗口材质。
+            if (e.PropertyName is nameof(UserConfig.IsGlassEffectEnabled) or nameof(UserConfig.GlassOpacity))
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    ApplyGlassEffect(_configService.User.IsGlassEffectEnabled);
+                    ApplyGlassEffect();
                 });
             }
         }
 
         /// <summary>
-        /// 应用或取消毛玻璃效果
+        /// 同步毛玻璃状态与主窗口底色透明度。
         /// </summary>
-        private void ApplyGlassEffect(bool isEnabled)
+        private void ApplyGlassEffect()
         {
-            if (isEnabled && !SystemParameters.HighContrast)
+            bool useGlass = _configService.User.IsGlassEffectEnabled && !SystemParameters.HighContrast;
+            WindowBackgroundLayer.Opacity = useGlass
+                ? Math.Clamp(_configService.User.GlassOpacity, 10, 95) / 100d
+                : 1d;
+
+            if (useGlass)
             {
                 WindowBlurHelper.EnableBlur(this);
             }

@@ -50,4 +50,7 @@
     <BitmapImage x:Key="LinkWeaponPullImage" UriSource="pack://application:,,,/UI/Resources/Images/LinkWeaponPull.png" />
     <BitmapImage x:Key="OverviewImage" UriSource="pack://application:,,,/UI/Resources/Images/Overview.png" />
     <BitmapImage x:Key="GraphImage" UriSource="pack://application:,,,/UI/Resources/Images/Graph.png" />
+    <BitmapImage x:Key="PhonographImage" UriSource="pack://application:,,,/UI/Resources/Images/Phonograph.png" />
+    <BitmapImage x:Key="AccountImage" UriSource="pack://application:,,,/UI/Resources/Images/Account.png" />
+    <BitmapImage x:Key="WeaponImage" UriSource="pack://application:,,,/UI/Resources/Images/Weapon.png" />
 </ResourceDictionary>

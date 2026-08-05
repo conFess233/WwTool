@@ -18,6 +18,11 @@ namespace WwTool.UI.Components
         private FrameworkElement? _circle;
         private DoubleAnimation _animation = null!;
         private TranslateTransform _transform = new();
+        private FrameworkElement? _pushTarget;
+        private TranslateTransform? _pushTransform;
+        private ColumnDefinition? _layoutColumn;
+        private int _transitionVersion;
+        private const double CollapsedWidth = 50;
         /// <summary>
         /// 展开宽度
         /// </summary>
@@ -66,6 +71,18 @@ namespace WwTool.UI.Components
                     Dispatcher.BeginInvoke(new Action(RecalculateWidths), System.Windows.Threading.DispatcherPriority.Loaded);
                 }
             };
+        }
+
+        /// <summary>
+        /// 配置主内容的视觉推移动画。动画期间只更新合成属性，结束时提交一次真实列宽。
+        /// </summary>
+        public void ConfigurePushTransition(FrameworkElement pushTarget, ColumnDefinition layoutColumn)
+        {
+            _pushTarget = pushTarget;
+            _layoutColumn = layoutColumn;
+            _pushTransform = new TranslateTransform();
+            _pushTarget.RenderTransform = _pushTransform;
+            ApplyFinalLayout(CollapsedWidth);
         }
 
         public override void OnApplyTemplate()
@@ -220,16 +237,17 @@ namespace WwTool.UI.Components
         /// </summary>
         private void AnimateToExpanded()
         {
-            DoubleAnimation navAnim = new DoubleAnimation
-            {
-                To = ExpandedWidth,
-                Duration = TimeSpan.FromSeconds(0.25),
-                EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut, Power = 2 }
-            };
-            this.BeginAnimation(WidthProperty, navAnim);
+            AnimateLayoutTransition(ExpandedWidth, TimeSpan.FromMilliseconds(250));
 
             if (_circle != null)
             {
+                if (IsReducedMotionEnabled())
+                {
+                    _circle.BeginAnimation(WidthProperty, null);
+                    _circle.Width = HighlightWidth;
+                    return;
+                }
+
                 DoubleAnimation rectAnim = new DoubleAnimation
                 {
                     To = HighlightWidth,
@@ -245,16 +263,17 @@ namespace WwTool.UI.Components
         /// </summary>
         private void AnimateToCollapsed()
         {
-            DoubleAnimation navAnim = new DoubleAnimation
-            {
-                To = 50,
-                Duration = TimeSpan.FromSeconds(0.2),
-                EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut, Power = 2 }
-            };
-            this.BeginAnimation(WidthProperty, navAnim);
+            AnimateLayoutTransition(CollapsedWidth, TimeSpan.FromMilliseconds(200));
 
             if (_circle != null)
             {
+                if (IsReducedMotionEnabled())
+                {
+                    _circle.BeginAnimation(WidthProperty, null);
+                    _circle.Width = 35;
+                    return;
+                }
+
                 DoubleAnimation rectAnim = new DoubleAnimation
                 {
                     To = 35,
@@ -263,6 +282,86 @@ namespace WwTool.UI.Components
                 };
                 _circle.BeginAnimation(WidthProperty, rectAnim);
             }
+        }
+
+        private void AnimateLayoutTransition(double targetWidth, TimeSpan duration)
+        {
+            int version = ++_transitionVersion;
+
+            if (_layoutColumn == null || _pushTarget == null || _pushTransform == null || IsReducedMotionEnabled())
+            {
+                ApplyFinalLayout(targetWidth);
+                return;
+            }
+
+            double currentWidth = Width;
+            if (double.IsNaN(currentWidth) || currentWidth <= 0)
+            {
+                currentWidth = ActualWidth > 0 ? ActualWidth : CollapsedWidth;
+            }
+
+            double currentPush = _pushTransform.X;
+            BeginAnimation(WidthProperty, null);
+            _pushTransform.BeginAnimation(TranslateTransform.XProperty, null);
+            Width = currentWidth;
+            _pushTransform.X = currentPush;
+
+            double committedWidth = _layoutColumn.Width.IsAbsolute
+                ? _layoutColumn.Width.Value
+                : CollapsedWidth;
+            var easing = new PowerEase { EasingMode = EasingMode.EaseInOut, Power = 2 };
+            var navAnimation = new DoubleAnimation(targetWidth, duration)
+            {
+                EasingFunction = easing,
+                FillBehavior = FillBehavior.HoldEnd
+            };
+            var pushAnimation = new DoubleAnimation(targetWidth - committedWidth, duration)
+            {
+                EasingFunction = easing,
+                FillBehavior = FillBehavior.HoldEnd
+            };
+            pushAnimation.Completed += (_, _) =>
+            {
+                if (version == _transitionVersion)
+                {
+                    ApplyFinalLayout(targetWidth);
+                }
+            };
+
+            BeginAnimation(WidthProperty, navAnimation, HandoffBehavior.SnapshotAndReplace);
+            _pushTransform.BeginAnimation(
+                TranslateTransform.XProperty,
+                pushAnimation,
+                HandoffBehavior.SnapshotAndReplace);
+        }
+
+        private void ApplyFinalLayout(double width)
+        {
+            BeginAnimation(WidthProperty, null);
+            Width = width;
+
+            if (_layoutColumn != null)
+            {
+                _layoutColumn.Width = new GridLength(width);
+            }
+
+            if (_pushTransform != null)
+            {
+                _pushTransform.BeginAnimation(TranslateTransform.XProperty, null);
+                _pushTransform.X = 0;
+            }
+        }
+
+        private static bool IsReducedMotionEnabled()
+        {
+            if (!SystemParameters.ClientAreaAnimation)
+            {
+                return true;
+            }
+
+            return Application.Current.TryFindResource("MotionNormal") is Duration duration &&
+                   duration.HasTimeSpan &&
+                   duration.TimeSpan <= TimeSpan.FromMilliseconds(100);
         }
 
         /// <summary>
@@ -286,8 +385,20 @@ namespace WwTool.UI.Components
             _animation.To = point.Y;
 
             var transform = _circle.RenderTransform as TranslateTransform;
+            if (transform == null)
+            {
+                return;
+            }
 
-            transform?.BeginAnimation(TranslateTransform.YProperty, _animation);
+            if (IsReducedMotionEnabled())
+            {
+                transform.BeginAnimation(TranslateTransform.YProperty, null);
+                transform.Y = point.Y;
+            }
+            else
+            {
+                transform.BeginAnimation(TranslateTransform.YProperty, _animation);
+            }
         }
     }
 }

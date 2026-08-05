@@ -423,6 +423,7 @@
     <None Remove="Local\Icons\T_ShopMotoIcon06.png" />
     <None Remove="Local\Icons\T_ShopMotoIcon08.png" />
     <None Remove="UI\Resources\Images\About.png" />
+    <None Remove="UI\Resources\Images\Account.png" />
     <None Remove="UI\Resources\Images\Add.png" />
     <None Remove="UI\Resources\Images\Astrite.png" />
     <None Remove="UI\Resources\Images\BattlePass.png" />
@@ -457,6 +458,7 @@
     <None Remove="UI\Resources\Images\Phantom1.png" />
     <None Remove="UI\Resources\Images\Phantom2.png" />
     <None Remove="UI\Resources\Images\Phantom3.png" />
+    <None Remove="UI\Resources\Images\Phonograph.png" />
     <None Remove="UI\Resources\Images\Refresh.png" />
     <None Remove="UI\Resources\Images\Role.png" />
     <None Remove="UI\Resources\Images\SoundBox.png" />
@@ -465,6 +467,7 @@
     <None Remove="UI\Resources\Images\Trash.png" />
     <None Remove="UI\Resources\Images\UpRolePull.png" />
     <None Remove="UI\Resources\Images\UpWeaponPull.png" />
+    <None Remove="UI\Resources\Images\Weapon.png" />
     <None Remove="UI\Resources\Images\WeeklyInst.png" />
   </ItemGroup>
 
@@ -1652,6 +1655,9 @@
     <Content Include="Local\Icons\999.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="UI\Resources\Images\Account.png" />
+    <Resource Include="UI\Resources\Images\Phonograph.png" />
+    <Resource Include="UI\Resources\Images\Weapon.png" />
     <Content Include="WwTool.ico" />
     <Resource Include="UI\Resources\Images\About.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -254,10 +254,11 @@
         <Grid Grid.Row="2">
             <TabControl
                 Padding="0"
+                b:TabItemIconBehavior.UseIconMask="True"
                 Background="Transparent"
                 BorderThickness="0"
                 SelectedIndex="{Binding SelectedStatisticsTabIndex, Mode=TwoWay}">
-                <TabItem Header="{Binding Path=[Stats_Overview], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='详细数据'}" Tag="{StaticResource OverviewImage}">
+                <TabItem b:TabItemIconBehavior.IconSize="20" Header="{Binding Path=[Stats_Overview], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='详细数据'}" Tag="{StaticResource OverviewImage}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -271,6 +272,7 @@
                             Margin="3"
                             Padding="0"
                             b:ResponsiveTabHeaderBehavior.EnableResponsiveHeaders="True"
+                            b:TabItemIconBehavior.UseIconMask="False"
                             ItemContainerStyle="{StaticResource ResponsivePoolTabItemStyle}"
                             ItemsSource="{Binding PoolStatistics}"
                             SelectedIndex="{Binding SelectedPoolStatisticsIndex, Mode=TwoWay}">
@@ -296,7 +298,7 @@
                     </Grid>
                 </TabItem>
 
-                <TabItem Header="{Binding Path=[Stats_Charts], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='图表统计'}" Tag="{StaticResource GraphImage}">
+                <TabItem b:TabItemIconBehavior.IconSize="15" Header="{Binding Path=[Stats_Charts], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='图表统计'}" Tag="{StaticResource GraphImage}">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="10">
                             <Border Style="{StaticResource ChartPanelStyle}">

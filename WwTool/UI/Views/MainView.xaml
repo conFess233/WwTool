@@ -33,8 +33,11 @@
 
 
     <Grid>
-        <!-- Material opacity belongs to background brushes; content remains fully opaque. -->
-        <Border Background="{DynamicResource BackgroundBrush}" CornerRadius="{DynamicResource CornerRadiusControl}" />
+        <!-- 主窗口底色单独控制透明度，避免与全局材质画刷的透明度重复叠加。 -->
+        <Border
+            x:Name="WindowBackgroundLayer"
+            Background="{DynamicResource SolidBgBrush}"
+            CornerRadius="{DynamicResource CornerRadiusControl}" />
         <Border Background="{DynamicResource BackgroundAtmosphereBrush}" CornerRadius="{DynamicResource CornerRadiusControl}" IsHitTestVisible="False" />
         <Border Background="{DynamicResource BackgroundTextureBrush}" CornerRadius="{DynamicResource CornerRadiusControl}" IsHitTestVisible="False" />
 
@@ -71,7 +74,7 @@
 
                 <Grid Grid.Row="1" Margin="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition x:Name="NavigationColumn" Width="50" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
@@ -88,6 +91,7 @@
                     </components:NavigationBar>
 
                     <ContentControl
+                        x:Name="MainRegionContent"
                         Grid.Column="1"
                         HorizontalContentAlignment="Stretch"
                         VerticalContentAlignment="Stretch"
