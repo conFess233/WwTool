@@ -65,7 +65,7 @@
 | WorldLevel | int | 8 | 索拉等级 | |
 | RoleNum | int | 34 | 角色数量 | 已拥有角色数 |
 | SoundBox | int | 11 | 声匣数量 | |
-| Energy | int | 156 | 当前体力（结晶玻片） | |
+| Energy | int | 156 | 当前体力（结晶波片） | |
 | MaxEnergy | int | 240 | 体力上限 | |
 | StoreEnergy | int | 173 | 储备体力（结晶单质） | |
 | StoreEnergyRecoverTime | long | 0 | 储备体力恢复时间 | |

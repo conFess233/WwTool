@@ -10,6 +10,7 @@
 - [自动登录](Login_autoToken.md) `https://sdkapi.kurogame-service.com/sdkcom/v2/login/auto.lg`
 - [查询账号大区信息](Role_GetUserInfo.md) `https://gar-service.aki-game.net/UserRegion/GetUserInfo`
 - [查询玩家角色详情](Role_QueryRole.md) `https://pc-launcher-sdk-api.kurogame.net/game/queryRole`
+- [攻略站](Guide.md) `https://wuwaguide.kurogames.com`
 
 #### 服务器ID
 

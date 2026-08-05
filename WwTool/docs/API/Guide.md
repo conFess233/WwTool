@@ -1,4 +1,4 @@
-# 攻略站角色数据 API
+## 攻略站角色数据
 
 本文记录鸣潮国际服官方攻略站的登录、玩家选择、角色拥有情况和角色养成详情接口。
 
@@ -8,9 +8,9 @@
 - 数据来源：用户提供的网络抓包、官方攻略站前端调用代码以及登录后的只读请求验证
 - 验证日期：2026-08-04
 
-> 这些接口不是公开、稳定的开发者 API，字段和行为可能随攻略站更新而改变。本文只给已观察字段赋予含义；未确认的枚举值保留原字段名，不推测映射。
+> 这些接口不是公开稳定的开发者 API，字段和行为可能随攻略站更新而改变。
 
-## 数据边界
+### 数据边界
 
 接口同时返回玩家实际数据和攻略推荐数据，两类数据不得混用。
 
@@ -21,24 +21,16 @@
 | 攻略推荐数据 | `recommendAmount`、`recommendLevel`、`echo.main`、`echo.spare`、`weapon.items`、`teammate.items` | 官方攻略方案，不代表玩家实际状态 |
 | 社区或评价数据 | `likeCount`、`collectCount`、`grade` | 攻略互动或评价信息，不代表角色面板属性 |
 
-除用户原始需求外，已确认还可获得武器、声骸、属性目标完成度、技能推荐等级、配队推荐、攻略点赞/收藏及评价信息。本文将这些字段纳入接口说明，但明确标注其数据性质。
+除用户原始需求外，已确认还可获得武器、声骸、属性目标完成度、技能推荐等级、配队推荐、攻略点赞/收藏及评价信息。
 
-## 配置约定
-
-固定 SDK 参数和通用请求头优先复用 `ApiConfig.FixedParams` 与 `ApiConfig.CommonHeaders`，不得为 Guide 接口创建同义副本。
-
-`ApiConfig.Urls` 只需要新增两个基础域名：
+### 配置约定
 
 | 字段 | 默认值 |
 | --- | --- |
 | `GuideBaseUrl` | `https://guide-server.aki-game.net` |
 | `GuideFallbackBaseUrl` | `https://guide-server-1.aki-game.net` |
 
-本文中的接口路径应作为 Guide 服务内部协议常量，不为每个接口重复配置完整 URL。`cUid`、`cName`、`accessToken` 和 Guide Token 都是运行时数据，不属于 `ApiConfig`。
-
-## 通用约定
-
-### 请求头
+### 通用请求头
 
 | 字段 | 是否必需 | 示例值 | 说明 |
 | --- | --- | --- | --- |
@@ -67,7 +59,7 @@
 
 客户端必须同时检查 HTTP 状态码与 `code`。`code == 200` 不保证 `data` 一定非空。
 
-## 认证流程
+### 认证流程
 
 Guide 接口复用现有库洛登录结果，不直接保存或再次提交邮箱密码。
 
@@ -76,15 +68,23 @@ Guide 接口复用现有库洛登录结果，不直接保存或再次提交邮�
 3. 后续请求通过 `x-token` 携带 Guide Token。
 4. Guide Token 可重复使用；本项目按库洛账号保存一份，不按 UID 重复保存。
 
-### Guide SDK 登录
+## Guide SDK 登录
 
-#### 请求地址
+### 请求地址
 
-`POST /user/login/sdk`
+`https://guide-server.aki-game.net/user/login/sdk`
 
-#### 认证方式
+### 请求方式
+
+`POST`
+
+### 认证方式
 
 请求体携带现有 SDK 登录上下文。
+
+#### 请求头
+
+使用[通用请求头](#通用请求头)，本接口不需要 `x-token`。
 
 #### 请求体
 
@@ -94,7 +94,15 @@ Guide 接口复用现有库洛登录结果，不直接保存或再次提交邮�
 | `cName` | string | SDK 邮箱登录响应 | SDK 用户名 |
 | `accessToken` | string | SDK GetToken 响应 | SDK 访问令牌 |
 
-#### 请求示例
+### 响应体
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `data.token` | string | Guide Token，供后续请求的 `x-token` 使用 |
+
+### 示例
+
+#### 请求
 
 ```http
 POST /user/login/sdk HTTP/1.1
@@ -109,11 +117,7 @@ x-language: zh-Hans
 }
 ```
 
-#### 响应体
-
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `data.token` | string | Guide Token，供后续请求的 `x-token` 使用 |
+#### 响应
 
 ```json
 {
@@ -125,26 +129,23 @@ x-language: zh-Hans
 }
 ```
 
-> `/user/login/game` 存在于攻略站前端，但未纳入当前 WwTool 认证流程。
-
-### Guide Token 本地化
-
-- 使用项目现有 Windows DPAPI `CurrentUser` 加密能力持久化，禁止明文保存。
-- Token 与本地库洛账号关联；同一账号下的多个游戏 UID 共用一份 Token。
-- 同步时优先使用本地 Token，不在每次请求前重新登录。
-- 收到 HTTP `401`、`403` 或明确的 Token 失效业务码时，删除旧 Token，重新调用 `/user/login/sdk` 并覆盖本地值。
-- 当前只确认 Token 可重复使用，未确认服务端有效期；不得虚构 `expiresAt` 或假定永久有效。
-- 日志不得记录 Token、SDK Access Token、密码或完整原始响应。
-
 ## 查询账号资料
 
 ### 请求地址
 
-`GET /user/profile`
+`https://guide-server.aki-game.net/user/profile`
+
+### 请求方式
+
+`GET`
 
 ### 认证方式
 
 `x-token`
+
+#### 请求头
+
+使用[通用请求头](#通用请求头)，必须携带 `x-token`。
 
 ### 响应体
 
@@ -168,11 +169,19 @@ x-language: zh-Hans
 
 ### 请求地址
 
-`GET /user/player/list`
+`https://guide-server.aki-game.net/user/player/list`
+
+### 请求方式
+
+`GET`
 
 ### 认证方式
 
 `x-token`
+
+#### 请求头
+
+使用[通用请求头](#通用请求头)，必须携带 `x-token`。
 
 ### 响应体
 
@@ -186,31 +195,31 @@ x-language: zh-Hans
 | `serverName` | string | 服务器名称 |
 | `level` | int / null | 玩家等级 |
 
-客户端必须用 WwTool 当前 UID 与非空 `playerId` 精确匹配，并同时取得该项的 `serverId`。不得默认选择数组第一项，也不得一次同步账号下的全部 UID。
 
 ## 选择玩家
 
 ### 请求地址
 
-`POST /user/player/choose`
+`https://guide-server.aki-game.net/user/player/choose`
+
+### 请求方式
+
+`POST`
 
 ### 认证方式
 
 `x-token`
 
-### 请求体
+#### 请求头
+
+使用[通用请求头](#通用请求头)，必须携带 `x-token`。
+
+#### 请求体
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `playerId` | int | 从 `/user/player/list` 精确匹配到的 UID |
 | `serverId` | string | 与该 UID 同一列表项中的服务器 ID |
-
-```json
-{
-  "playerId": 100000001,
-  "serverId": "<server-id>"
-}
-```
 
 ### 响应体
 
@@ -222,15 +231,56 @@ x-language: zh-Hans
 
 选择成功后才能查询该 UID 的角色实际数据。即使 `/user/profile` 显示的玩家与目标 UID 相同，也建议在同步流程中显式调用本接口，避免依赖攻略站会话中的旧选择状态。
 
+### 示例
+
+#### 请求
+
+```json
+{
+  "playerId": 100000001,
+  "serverId": "<server-id>"
+}
+```
+
+#### 响应
+
+```json
+{
+  "code": 200,
+  "message": "ok",
+  "data": {
+    "profile": {
+      "cUid": "<sdk-user-id>",
+      "channelId": 0,
+      "chosenPlayer": {
+        "playerId": 100000001,
+        "playerName": "<player-name>",
+        "serverId": "<server-id>",
+        "serverName": "<server-name>",
+        "level": 80
+      }
+    }
+  }
+}
+```
+
 ## 查询角色拥有情况
 
 ### 请求地址
 
-`GET /role/avatar/list`
+`https://guide-server.aki-game.net/role/avatar/list`
+
+### 请求方式
+
+`GET`
 
 ### 认证方式
 
 `x-token`
+
+#### 请求头
+
+使用[通用请求头](#通用请求头)，必须携带 `x-token`。
 
 ### 响应体
 
@@ -266,15 +316,25 @@ x-language: zh-Hans
 | `pictureUrl` | string | 图片地址 |
 | `secondPictureUrl` | string / null | 第二图片地址 |
 
-客户端应保存全部角色并保留 `isAcquired`。只对 `isAcquired == true` 的角色继续获取玩家详情；未拥有但可预览的角色可通过 `roleStatus` 单独展示，不得伪装为已拥有角色。
-
 ## 查询角色攻略列表
 
 ### 请求地址
 
-`GET /introduction/list?roleGbId={roleGbId}`
+`https://guide-server.aki-game.net/introduction/list`
 
-### 查询参数
+### 请求方式
+
+`GET`
+
+### 认证方式
+
+`x-token`
+
+#### 请求头
+
+使用[通用请求头](#通用请求头)，必须携带 `x-token`。
+
+#### 请求参数 (Query)
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
@@ -305,22 +365,33 @@ x-language: zh-Hans
 | `introductionSource` | string | 攻略来源 |
 | `introductionDescription` | string | 攻略描述 |
 
-方案选择规则：保持服务端返回顺序，先依次尝试包含当前 UI 语言文本的方案，再按服务端原顺序尝试其余方案；第一个返回非空详情的方案生效，并在本地记录其 `id` 和 `modifiedAt`。
 
 ## 查询角色养成详情
 
 ### 请求地址
 
-`GET /introduction/info?roleGbId={roleGbId}&id={id}`
+`https://guide-server.aki-game.net/introduction/info`
 
-### 查询参数
+### 请求方式
+
+`GET`
+
+### 认证方式
+
+`x-token`
+
+#### 请求头
+
+使用[通用请求头](#通用请求头)，必须携带 `x-token`。
+
+#### 请求参数 (Query)
 
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `roleGbId` | string | 角色业务 ID |
 | `id` | int | `/introduction/list` 选出的攻略方案 ID |
 
-### 响应体概览
+### 响应体
 
 | 字段 | 类型 | 数据性质 | 说明 |
 | --- | --- | --- | --- |
@@ -342,9 +413,9 @@ x-language: zh-Hans
 | `grade` | string / null | 评价数据 | 攻略站评价；不是角色面板属性 |
 | `calculationData` | object / null | 未确认 | 计算数据，当前样本可为空 |
 
-实测该接口可能返回 `code == 200` 且 `data == null`。这种情况不代表角色没有养成数据，客户端应继续尝试后续方案；仅当该角色的所有方案均为空或失败时，才判定整次同步失败并保留旧快照。
+实测该接口可能返回 `code == 200` 且 `data == null`。这种情况不代表角色没有养成数据。
 
-### 属性 `roleAttribute`
+#### 属性 `roleAttribute`
 
 | 字段 | 类型 | 数据性质 | 说明 |
 | --- | --- | --- | --- |
@@ -364,7 +435,7 @@ x-language: zh-Hans
 | `currentAmount` | string | 玩家实际数据 | 当前值 |
 | `isFinished` | boolean | 进度结果 | 是否达到推荐目标 |
 
-### 声骸 `echo`
+#### 声骸 `echo`
 
 | 字段 | 类型 | 数据性质 | 说明 |
 | --- | --- | --- | --- |
@@ -392,7 +463,7 @@ x-language: zh-Hans
 | `isFinishedMaxLevel` | boolean / null | 进度结果 | 当前装备对象表示是否达到最高等级；推荐对象中可为 `null` |
 | `isFinished` | boolean / null | 进度结果 | 当前装备对象表示是否达到方案要求；推荐对象中可为 `null` |
 
-### 技能 `roleSkill`
+#### 技能 `roleSkill`
 
 | 字段 | 类型 | 数据性质 | 说明 |
 | --- | --- | --- | --- |
@@ -410,9 +481,9 @@ x-language: zh-Hans
 | `recommendLevel` | int | 攻略推荐 | 推荐等级 |
 | `currentLevel` | int | 玩家实际数据 | 当前技能等级 |
 
-`addPointSequence[]` 还包含 `linkNextType`，其枚举含义未确认，不应自行映射。
+`addPointSequence[]` 还包含 `linkNextType`
 
-### 共鸣链 `roleResonance`
+#### 共鸣链 `roleResonance`
 
 | 字段 | 类型 | 数据性质 | 说明 |
 | --- | --- | --- | --- |
@@ -430,9 +501,7 @@ x-language: zh-Hans
 | `status` | int | 未确认 | 攻略站状态枚举 |
 | `isAcquired` | boolean | 玩家实际数据 | 当前 UID 是否已解锁该节点 |
 
-客户端展示的共鸣链数量应统计 `items[].isAcquired == true` 的节点数，不得使用角色列表中的 `sequence` 字段。
-
-### 武器 `weapon`
+#### 武器 `weapon`
 
 | 字段 | 类型 | 数据性质 | 说明 |
 | --- | --- | --- | --- |
@@ -442,7 +511,7 @@ x-language: zh-Hans
 
 武器公共字段包括 `gbId`、`pictureUrl`、`star`、`weaponType` 和 `texts`。推荐项还包含 `status`、`isAcquired` 与 `isFinished`；这些字段描述推荐项与当前玩家的关系，不能把 `items[0]` 当成当前装备。
 
-### 配队 `teammate`
+#### 配队 `teammate`
 
 `teammate.items[]` 属于攻略推荐，可包含：
 
@@ -465,30 +534,3 @@ x-language: zh-Hans
 5. 对每个已拥有角色调用 `/introduction/list`，按当前 UI 语言选择方案。
 6. 使用所选 `roleGbId` 和 `id` 调用 `/introduction/info`。
 7. 所有核心详情成功后，在一个事务中替换该 UID 的完整快照并写入 `LastSyncedAtUtc`。
-
-## WwTool 客户端实现约束
-
-- 第一版只提供手动同步；页面打开时读取本地快照，不自动请求攻略站。
-- 每个 UID 保存一份完整玩家快照；角色复杂详情以强类型对象序列化为 `DetailJson`，不保存 HTTP 响应信封或未知扩展字段。
-- 数据库以 `roleGbId` 等稳定 ID 建立关系；角色与武器名称只从 `Local/Data/GameItemsResources.json` 通过 `GameDataService` 解析，不持久化 Guide 本地化名称；ID 缺失时显示字面值 `None`。
-- 请求语言跟随 WwTool UI：`zh-Hans`、`en` 或 `ja`；本文示例使用 `zh-Hans`。
-- 角色详情最大并发数为 2，并支持取消。
-- 网络错误、超时和 HTTP `5xx` 可重试一次；HTTP `401`、`403`、`429` 不重试并停止本次同步。
-- 主域名仅在网络错误、超时或 HTTP `5xx` 时切换一次备用域名；认证错误、业务错误和 `429` 不切换。一次请求最多尝试两个域名。
-- 任一已拥有角色的核心详情失败、返回空数据或被取消时，不提交新快照，保留上一次成功数据。
-- 已知核心字段反序列化失败应终止同步；未知扩展字段忽略，并且日志只记录字段名，不保存完整原始响应。
-- API 返回顺序应作为快照的 `SourceOrder` 原样保存；展示层允许用户显式选择名称、星级或本地抽卡首次获取时间排序，但相同排序键与未匹配记录必须以 `SourceOrder` 稳定兜底。
-
-## 验证状态
-
-| 内容 | 状态 |
-| --- | --- |
-| `/user/login/sdk` 方法、请求体和响应体 | 抓包验证 |
-| Guide Token 可重复使用 | 三次独立只读请求验证 |
-| `/user/profile`、`/user/player/list` | 登录后请求验证 |
-| `/user/player/choose` 方法、请求体和响应体 | 官方前端代码与抓包双重验证 |
-| `/role/avatar/list` | 官方前端代码与登录后请求验证 |
-| `/introduction/list`、`/introduction/info` | 官方前端代码与登录后请求验证 |
-| `roleStatus`、`operation`、`status`、`linkNextType` 等枚举映射 | 待确认，文档未推测 |
-| Guide Token 服务端有效期 | 待确认 |
-| `modifiedAt` 时间单位 | 待确认 |
