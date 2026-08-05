@@ -31,6 +31,7 @@ namespace WwTool.UI.ViewModels
     public class StatisticsViewModel : BindableBase, INavigationAware
     {
         private CancellationTokenSource _navigationCts = new();
+        private bool _isActive;
         private readonly IGetDataService _getDataService;
         private readonly IDialogService _dialogService;
         private readonly IEventAggregator _eventAggregator;
@@ -39,15 +40,19 @@ namespace WwTool.UI.ViewModels
         private readonly GameDataService _gameData;
         private readonly IUserDataService _userDataService;
         private readonly IGachaStatisticsService _gachaStatisticsService;
-        private readonly IChartBuilderService _chartBuilderService;
         private readonly ILoggerService _logger;
         private readonly IGachaLogLocator _gachaLogLocator;
 
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
-        public void OnNavigatedFrom(NavigationContext navigationContext) => _navigationCts.Cancel();
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            _isActive = false;
+            _navigationCts.Cancel();
+            ReleaseChartResources();
+        }
 
-        public StatisticsViewModel(IEventAggregator eventAggregator, IUIStateService uIStateService, IGetDataService getDataService, IDialogService dialogService, IConfigService configService, GameDataService gameData, IUserDataService userDataService, IGachaStatisticsService gachaStatisticsService, IChartBuilderService chartBuilderService, ILoggerService logger, IGachaLogLocator gachaLogLocator)
+        public StatisticsViewModel(IEventAggregator eventAggregator, IUIStateService uIStateService, IGetDataService getDataService, IDialogService dialogService, IConfigService configService, GameDataService gameData, IUserDataService userDataService, IGachaStatisticsService gachaStatisticsService, ILoggerService logger, IGachaLogLocator gachaLogLocator)
         {
             _uiStateService = uIStateService;
             _eventAggregator = eventAggregator;
@@ -57,7 +62,6 @@ namespace WwTool.UI.ViewModels
             _gameData = gameData;
             _userDataService = userDataService;
             _gachaStatisticsService = gachaStatisticsService;
-            _chartBuilderService = chartBuilderService;
             _logger = logger;
             _gachaLogLocator = gachaLogLocator;
             _selectedGachaServerRegion = _configService.User.GachaServerRegion;
@@ -74,7 +78,7 @@ namespace WwTool.UI.ViewModels
             foreach (var type in Enum.GetValues<CardPoolType>())
             {
                 var filter = new PoolTypeFilterItem { PoolType = type, IsSelected = true };
-                filter.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(PoolTypeFilterItem.IsSelected)) _ = UpdateChartsAsync(); };
+                filter.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(PoolTypeFilterItem.IsSelected)) InvalidateCharts(); };
                 PoolFilters.Add(filter);
             }
 
@@ -88,7 +92,7 @@ namespace WwTool.UI.ViewModels
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            _ = UpdateChartsAsync();
+                            InvalidateCharts();
                         });
                     });
                 }
@@ -106,9 +110,13 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         async void IRegionAware.OnNavigatedTo(NavigationContext navigationContext)
         {
+            _isActive = true;
             ResetNavigationCancellation();
-            SelectedStatisticsTabIndex = 0;
-            SelectedPoolStatisticsIndex = 0;
+            if (!_isInitialized)
+            {
+                SelectedStatisticsTabIndex = 0;
+                SelectedPoolStatisticsIndex = 0;
+            }
             await setUp();
         }
 
@@ -323,7 +331,7 @@ namespace WwTool.UI.ViewModels
         public int SelectedDateRangeIndex
         {
             get => _selectedDateRangeIndex;
-            set { if (SetProperty(ref _selectedDateRangeIndex, value)) _ = UpdateChartsAsync(); }
+            set { if (SetProperty(ref _selectedDateRangeIndex, value)) InvalidateCharts(); }
         }
 
         public ObservableCollection<PoolTypeFilterItem> PoolFilters { get; set; } = new();
@@ -332,7 +340,7 @@ namespace WwTool.UI.ViewModels
         public string SelectedGoldName
         {
             get => _selectedGoldName;
-            set { if (SetProperty(ref _selectedGoldName, value)) _ = UpdateChartsAsync(); }
+            set { if (SetProperty(ref _selectedGoldName, value)) InvalidateCharts(); }
         }
 
         public ObservableCollection<string> AllGotGoldNames { get; set; } = new();
@@ -381,7 +389,13 @@ namespace WwTool.UI.ViewModels
         public int SelectedStatisticsTabIndex
         {
             get => _selectedStatisticsTabIndex;
-            set => SetProperty(ref _selectedStatisticsTabIndex, value);
+            set
+            {
+                if (SetProperty(ref _selectedStatisticsTabIndex, value) && value == 1)
+                {
+                    _ = EnsureChartsAsync();
+                }
+            }
         }
 
         private int _selectedPoolStatisticsIndex;
@@ -395,7 +409,7 @@ namespace WwTool.UI.ViewModels
         public bool IncludeIncompleteFeaturedSegment
         {
             get => _includeIncompleteFeaturedSegment;
-            set { if (SetProperty(ref _includeIncompleteFeaturedSegment, value)) _ = UpdateChartsAsync(); }
+            set { if (SetProperty(ref _includeIncompleteFeaturedSegment, value)) InvalidateCharts(); }
         }
 
         private ISeries[] _pityDistributionSeries = [];
@@ -819,53 +833,13 @@ namespace WwTool.UI.ViewModels
                     }
 
                     _uiStateService.ShowLoading(LanguageManager.Instance["Msg_SyncFinishedProcessing"]);
-                    var allGachaDatas = new List<GachaData>();
-                    await Task.Run(async () =>
-                    {
-                        foreach (var type in Enum.GetValues<CardPoolType>())
-                        {
-                            var data = await _userDataService.ReadGachaInSourceOrderAsync(SelectedUser.Uid, (int)type, _navigationCts.Token);
-                            if (data != null)
-                            {
-                                allGachaDatas.AddRange(data);
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    var pool = PoolStatistics.FirstOrDefault(x => x.PoolType == type);
-                                    if (pool != null)
-                                    {
-                                        var res = _gachaStatisticsService.OrganizeData(data, type, LanguageTypeExtensions.GetCode(_configService.User.AppLanguage));
-
-                                        pool.HitGoldDatas.Clear();
-                                        foreach (var d in res.PoolStatistics.HitGoldDatas) pool.HitGoldDatas.Add(d);
-
-                                        pool.Calculate = res.PoolStatistics.Calculate;
-
-                                        if (type == CardPoolType.CharacterEvent)
-                                        {
-                                            SuccessCount = res.SuccessCount;
-                                            MissCount = res.MissCount;
-                                            _featuredCharacterCount = res.FeaturedCount;
-                                        }
-
-                                        var chartData = PoolCharts.FirstOrDefault(x => x.PoolType == pool.PoolType);
-                                        if (chartData == null)
-                                        {
-                                            chartData = new CardPoolChartData { PoolType = pool.PoolType };
-                                            PoolCharts.Add(chartData);
-                                        }
-
-                                        chartData.GoldHistorySeries = _chartBuilderService.BuildGoldHistorySeries(res.GoldValues, LanguageManager.Instance["Msg_Pity"], chartData.GoldHistorySeries);
-                                        chartData.XAxes = _chartBuilderService.BuildGoldHistoryXAxes(res.GoldLabels, chartData.XAxes);
-                                    }
-                                });
-                            }
-                        }
-                    });
+                    GachaLoadSnapshot snapshot = await ReadAndCalculateAllPoolsAsync(SelectedUser.Uid);
+                    ApplyPoolSnapshot(snapshot);
 
                     _uiStateService.ShowLoading(LanguageManager.Instance["Msg_CalculatingData"]);
-                    await Statistics(allGachaDatas);
+                    await Statistics(snapshot.AllRecords);
 
-                    int addedRecordCount = Math.Max(0, allGachaDatas.Count - previousRecordCount);
+                    int addedRecordCount = Math.Max(0, snapshot.AllRecords.Count - previousRecordCount);
                     NotificationType resultType = addedRecordCount == 0 ? NotificationType.Info : NotificationType.Success;
                     ToastHelper.ShowActionResult(
                         _uiStateService,
@@ -911,10 +885,19 @@ namespace WwTool.UI.ViewModels
                 _allCachedGachaDatas = allGachaDatas;
             }
 
-            await UpdateChartsAsync();
+            _chartsDirty = true;
+            _chartInvalidationVersion++;
+            if (SelectedStatisticsTabIndex == 1)
+            {
+                await EnsureChartsAsync(showLoading: false);
+            }
         }
 
         private bool _isUpdatingCharts = false;
+        private bool _isEnsuringCharts;
+        private bool _chartsDirty = true;
+        private bool _chartsLoaded;
+        private int _chartInvalidationVersion;
         private bool _isLoadingLocalGachaLog;
         private bool _isStatisticsLoading;
         public bool IsStatisticsLoading { get => _isStatisticsLoading; set => SetProperty(ref _isStatisticsLoading, value); }
@@ -922,6 +905,61 @@ namespace WwTool.UI.ViewModels
         public bool HasStatisticsData { get => _hasStatisticsData; set => SetProperty(ref _hasStatisticsData, value); }
         private string? _statisticsErrorMessage;
         public string? StatisticsErrorMessage { get => _statisticsErrorMessage; set => SetProperty(ref _statisticsErrorMessage, value); }
+
+        private void InvalidateCharts()
+        {
+            // 图表构建会重建筛选项集合，绑定层可能短暂回写空选项。
+            // 这类内部回写不应再次触发图表构建，否则会形成无限刷新循环。
+            if (_isUpdatingCharts)
+            {
+                return;
+            }
+
+            _chartsDirty = true;
+            _chartInvalidationVersion++;
+            if (_isActive && SelectedStatisticsTabIndex == 1 && !_isEnsuringCharts)
+            {
+                _ = EnsureChartsAsync();
+            }
+        }
+
+        private async Task EnsureChartsAsync(bool showLoading = true)
+        {
+            if (!_isActive || SelectedStatisticsTabIndex != 1 || (!_chartsDirty && _chartsLoaded) || _isEnsuringCharts)
+            {
+                return;
+            }
+
+            _isEnsuringCharts = true;
+            if (showLoading)
+            {
+                _uiStateService.ShowLoading(LanguageManager.Instance["Msg_CalculatingData"]);
+                await Application.Current.Dispatcher.InvokeAsync(
+                    () => { },
+                    System.Windows.Threading.DispatcherPriority.Background);
+            }
+
+            try
+            {
+                do
+                {
+                    int version = _chartInvalidationVersion;
+                    await UpdateChartsAsync();
+                    _chartsLoaded = true;
+                    _chartsDirty = version != _chartInvalidationVersion;
+                }
+                while (_chartsDirty && _isActive && SelectedStatisticsTabIndex == 1);
+            }
+            finally
+            {
+                _isEnsuringCharts = false;
+                if (showLoading)
+                {
+                    _uiStateService.HideLoading();
+                }
+            }
+        }
+
         private async Task UpdateChartsAsync()
         {
             if (_isUpdatingCharts) return;
@@ -1262,6 +1300,53 @@ namespace WwTool.UI.ViewModels
             CurrentCharacterPity = 0;
         }
 
+        /// <summary>
+        /// 离开统计页时断开可重建的 LiveCharts/Skia 对象引用，保留原始记录与轻量汇总。
+        /// </summary>
+        private void ReleaseChartResources()
+        {
+            PoolCharts.Clear();
+            FilteredHitGoldFlow = new();
+            DailyPullLineSeries = [];
+            DailyXAxes = [];
+            DailyYAxes = [];
+            SuccessRatePieSeries = [];
+            FourStarPieSeries = [];
+            GlobalPoolCompareSeries = [];
+            GlobalPoolXAxes = [];
+            GlobalPoolYAxes = [];
+            ClearInsightCharts();
+
+            PityDistributionXAxes = [];
+            PityDistributionYAxes = [];
+            FiveStarTimelineXAxes = [];
+            FiveStarTimelineYAxes = [];
+            RarityStackedXAxes = [];
+            RarityStackedYAxes = [];
+            ActivityHeatXAxes = [];
+            ActivityHeatYAxes = [];
+            CumulativeTrendXAxes = [];
+            CumulativeTrendYAxes = [];
+            FeaturedExpectationXAxes = [];
+            FeaturedExpectationYAxes = [];
+
+            RaisePropertyChanged(nameof(PityDistributionXAxes));
+            RaisePropertyChanged(nameof(PityDistributionYAxes));
+            RaisePropertyChanged(nameof(FiveStarTimelineXAxes));
+            RaisePropertyChanged(nameof(FiveStarTimelineYAxes));
+            RaisePropertyChanged(nameof(RarityStackedXAxes));
+            RaisePropertyChanged(nameof(RarityStackedYAxes));
+            RaisePropertyChanged(nameof(ActivityHeatXAxes));
+            RaisePropertyChanged(nameof(ActivityHeatYAxes));
+            RaisePropertyChanged(nameof(CumulativeTrendXAxes));
+            RaisePropertyChanged(nameof(CumulativeTrendYAxes));
+            RaisePropertyChanged(nameof(FeaturedExpectationXAxes));
+            RaisePropertyChanged(nameof(FeaturedExpectationYAxes));
+
+            _chartsLoaded = false;
+            _chartsDirty = true;
+        }
+
         private void BuildInsightCharts(
             GachaInsights insights,
             SolidColorPaint axisTextPaint,
@@ -1485,6 +1570,67 @@ namespace WwTool.UI.ViewModels
             return 0;
         }
 
+        private sealed record GachaLoadSnapshot(
+            List<GachaData> AllRecords,
+            List<GachaStatisticsResult> PoolResults);
+
+        /// <summary>
+        /// 在后台按服务端原始顺序读取并计算所有卡池，完成后再由 UI 线程一次性提交。
+        /// </summary>
+        private Task<GachaLoadSnapshot> ReadAndCalculateAllPoolsAsync(string uid)
+        {
+            string languageCode = LanguageTypeExtensions.GetCode(_configService.User.AppLanguage);
+            CancellationToken token = _navigationCts.Token;
+
+            return Task.Run(async () =>
+            {
+                var allRecords = new List<GachaData>();
+                var poolResults = new List<GachaStatisticsResult>();
+
+                foreach (CardPoolType type in Enum.GetValues<CardPoolType>())
+                {
+                    token.ThrowIfCancellationRequested();
+                    var records = (await _userDataService.ReadGachaInSourceOrderAsync(
+                        uid,
+                        (int)type,
+                        token))?.ToList() ?? [];
+
+                    allRecords.AddRange(records);
+                    poolResults.Add(_gachaStatisticsService.OrganizeData(records, type, languageCode));
+                }
+
+                return new GachaLoadSnapshot(allRecords, poolResults);
+            }, token);
+        }
+
+        private void ApplyPoolSnapshot(GachaLoadSnapshot snapshot)
+        {
+            foreach (GachaStatisticsResult result in snapshot.PoolResults)
+            {
+                CardPoolStatistics? pool = PoolStatistics.FirstOrDefault(
+                    x => x.PoolType == result.PoolStatistics.PoolType);
+                if (pool == null)
+                {
+                    continue;
+                }
+
+                pool.HitGoldDatas.Clear();
+                foreach (HitGoldData hit in result.PoolStatistics.HitGoldDatas)
+                {
+                    pool.HitGoldDatas.Add(hit);
+                }
+
+                pool.Calculate = result.PoolStatistics.Calculate;
+
+                if (pool.PoolType == CardPoolType.CharacterEvent)
+                {
+                    SuccessCount = result.SuccessCount;
+                    MissCount = result.MissCount;
+                    _featuredCharacterCount = result.FeaturedCount;
+                }
+            }
+        }
+
         /// <summary>
         /// 从本地数据库加载当前账号的抽卡记录并重新统计
         /// </summary>
@@ -1514,60 +1660,18 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var allGachaDatas = new List<GachaData>();
-                    // 后台读取数据库文件
-                    await Task.Run(async () =>
-                    {
-                        foreach (var type in Enum.GetValues<CardPoolType>())
-                        {
-                            var localData = await _userDataService.ReadGachaInSourceOrderAsync(SelectedUser.Uid, (int)type, _navigationCts.Token);
-
-                            if (localData != null)
-                            {
-                                allGachaDatas.AddRange(localData);
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    var pool = PoolStatistics.FirstOrDefault(x => x.PoolType == type);
-                                    if (pool != null)
-                                    {
-                                        var res = _gachaStatisticsService.OrganizeData(localData, type, LanguageTypeExtensions.GetCode(_configService.User.AppLanguage));
-
-                                        pool.HitGoldDatas.Clear();
-                                        foreach (var d in res.PoolStatistics.HitGoldDatas) pool.HitGoldDatas.Add(d);
-
-                                        pool.Calculate = res.PoolStatistics.Calculate;
-
-                                        if (type == CardPoolType.CharacterEvent)
-                                        {
-                                            SuccessCount = res.SuccessCount;
-                                            MissCount = res.MissCount;
-                                            _featuredCharacterCount = res.FeaturedCount;
-                                        }
-
-                                        var chartData = PoolCharts.FirstOrDefault(x => x.PoolType == pool.PoolType);
-                                        if (chartData == null)
-                                        {
-                                            chartData = new CardPoolChartData { PoolType = pool.PoolType };
-                                            PoolCharts.Add(chartData);
-                                        }
-
-                                        chartData.GoldHistorySeries = _chartBuilderService.BuildGoldHistorySeries(res.GoldValues, LanguageManager.Instance["Msg_Pity"], chartData.GoldHistorySeries);
-                                        chartData.XAxes = _chartBuilderService.BuildGoldHistoryXAxes(res.GoldLabels, chartData.XAxes);
-                                    }
-                                });
-                            }
-                        }
-                    });
-                    await Statistics(allGachaDatas);
-                    HasStatisticsData = allGachaDatas.Count > 0;
+                    GachaLoadSnapshot snapshot = await ReadAndCalculateAllPoolsAsync(SelectedUser.Uid);
+                    ApplyPoolSnapshot(snapshot);
+                    await Statistics(snapshot.AllRecords);
+                    HasStatisticsData = snapshot.AllRecords.Count > 0;
 
                     if (showMessage)
                     {
-                        NotificationType resultType = allGachaDatas.Count == 0 ? NotificationType.Info : NotificationType.Success;
+                        NotificationType resultType = snapshot.AllRecords.Count == 0 ? NotificationType.Info : NotificationType.Success;
                         ToastHelper.ShowActionResult(
                             _uiStateService,
                             LanguageManager.Instance[resultType == NotificationType.Info ? "Toast_Info" : "Toast_Success"],
-                            allGachaDatas.Count == 0
+                            snapshot.AllRecords.Count == 0
                                 ? LanguageManager.Instance["Msg_ActionNoNewData"]
                                 : LanguageManager.Instance["Msg_LoadedLocalGacha"],
                             resultType,
