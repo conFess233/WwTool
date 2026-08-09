@@ -5,14 +5,9 @@
 - 攻略站入口：`https://wuwaguide.kurogames.com/zh-Hans`
 - 主 API 域名：`https://guide-server.aki-game.net`
 - 备用 API 域名：`https://guide-server-1.aki-game.net`
-- 数据来源：用户提供的网络抓包、官方攻略站前端调用代码以及登录后的只读请求验证
-- 验证日期：2026-08-04
-
-> 这些接口不是公开稳定的开发者 API，字段和行为可能随攻略站更新而改变。
+- 数据来源：网络抓包
 
 ### 数据边界
-
-接口同时返回玩家实际数据和攻略推荐数据，两类数据不得混用。
 
 | 分类 | 字段或对象 | 含义 |
 | --- | --- | --- |
@@ -39,8 +34,6 @@
 | `x-language` | 建议 | `zh-Hans` | 返回语言，随当前 UI 语言传递 |
 | `Accept-Language` | 建议 | `zh-Hans` | HTTP 语言偏好 |
 
-攻略站前端还会发送浏览器、来源和跟踪类请求头。实测省略这些请求头仍能成功，因此不列为 API 必需字段，也不应持久化其值。
-
 ### 通用响应
 
 ```json
@@ -60,8 +53,6 @@
 客户端必须同时检查 HTTP 状态码与 `code`。`code == 200` 不保证 `data` 一定非空。
 
 ### 认证流程
-
-Guide 接口复用现有库洛登录结果，不直接保存或再次提交邮箱密码。
 
 1. 使用现有 SDK 登录流程取得 `cUid`、`cName` 和 `accessToken`。
 2. 调用 `POST /user/login/sdk` 换取 Guide Token。
@@ -229,7 +220,7 @@ x-language: zh-Hans
 | `data.profile.channelId` | int | 渠道 ID |
 | `data.profile.chosenPlayer` | object | 选择后的玩家资料，结构与 `/user/profile` 相同 |
 
-选择成功后才能查询该 UID 的角色实际数据。即使 `/user/profile` 显示的玩家与目标 UID 相同，也建议在同步流程中显式调用本接口，避免依赖攻略站会话中的旧选择状态。
+选择成功后才能查询该 UID 的角色实际数据。
 
 ### 示例
 
@@ -284,7 +275,7 @@ x-language: zh-Hans
 
 ### 响应体
 
-`data` 返回当前官方在线角色全集，而非只有已拥有角色。
+`data` 返回当前官方在线角色全集。
 
 | 字段 | 类型 | 数据性质 | 说明 |
 | --- | --- | --- | --- |
@@ -509,7 +500,7 @@ x-language: zh-Hans
 | `items` | array | 攻略推荐 | 推荐武器列表 |
 | `isFinished` | boolean | 进度结果 | 当前武器是否达到方案目标 |
 
-武器公共字段包括 `gbId`、`pictureUrl`、`star`、`weaponType` 和 `texts`。推荐项还包含 `status`、`isAcquired` 与 `isFinished`；这些字段描述推荐项与当前玩家的关系，不能把 `items[0]` 当成当前装备。
+武器公共字段包括 `gbId`、`pictureUrl`、`star`、`weaponType` 和 `texts`。推荐项还包含 `status`、`isAcquired` 与 `isFinished`
 
 #### 配队 `teammate`
 
@@ -524,13 +515,3 @@ x-language: zh-Hans
 | `echoSetEffect2` | object / null | 两件套推荐 |
 | `echoSetEffect5` | object / null | 五件套推荐 |
 | `echoAttributes` | array | 推荐声骸属性 |
-
-## 推荐同步流程
-
-1. 从本地读取并解密账号级 Guide Token；不存在或失效时调用 `/user/login/sdk`。
-2. 调用 `/user/player/list`，用当前 WwTool UID 精确匹配玩家和服务器。
-3. 调用 `/user/player/choose` 显式选择该 UID。
-4. 调用一次 `/role/avatar/list`，保存全部角色及 `isAcquired`。
-5. 对每个已拥有角色调用 `/introduction/list`，按当前 UI 语言选择方案。
-6. 使用所选 `roleGbId` 和 `id` 调用 `/introduction/info`。
-7. 所有核心详情成功后，在一个事务中替换该 UID 的完整快照并写入 `LastSyncedAtUtc`。
