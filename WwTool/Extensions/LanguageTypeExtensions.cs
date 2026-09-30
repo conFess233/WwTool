@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 using WwTool.Common.Enums;
 
 namespace WwTool.Extensions
@@ -10,6 +11,14 @@ namespace WwTool.Extensions
     /// </summary>
     public static class LanguageTypeExtensions
     {
+        /// <summary>按应用语言选择日期和数字格式，避免受系统语言影响。</summary>
+        public static CultureInfo GetDisplayCulture(this LanguageType type) => CultureInfo.GetCultureInfo(type switch
+        {
+            LanguageType.En => "en-US",
+            LanguageType.Ja => "ja-JP",
+            _ => "zh-CN"
+        });
+
         /// <summary>
         /// 获取语言代码
         /// </summary>

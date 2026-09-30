@@ -2,7 +2,7 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using WwTool.Common.Enums;
 
-namespace WwTool.Common.Models
+namespace WwTool.UI.Models
 {
     public class CardPoolChartData
     {

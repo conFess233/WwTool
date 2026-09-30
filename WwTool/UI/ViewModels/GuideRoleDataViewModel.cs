@@ -8,11 +8,11 @@ using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models.ApiResponse;
 using WwTool.Common.Models.Domain;
-using WwTool.Common.Models.Entities;
 using WwTool.Common.Utils;
 using WwTool.Extensions;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
+using WwTool.Services.Presentation;
 
 namespace WwTool.UI.ViewModels;
 
@@ -27,9 +27,11 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
     private readonly IDialogService dialogService;
     private readonly GameDataService gameDataService;
     private readonly ILoggerService logger;
+    private readonly CatalogImageService? imageService;
     private CancellationTokenSource navigationCts = new();
     private bool isSelectingInitialAccount;
     private bool isBusy;
+    private int loadVersion;
     private AccountSummary? selectedUser;
     private string roleSortKey = "star";
     private string weaponSortKey = "star";
@@ -54,9 +56,11 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
         IUIStateService uiStateService,
         IDialogService dialogService,
         GameDataService gameDataService,
-        ILoggerService logger)
+        ILoggerService logger,
+        CatalogImageService? imageService = null)
     {
         this.userDataService = userDataService;
+        System.Windows.WeakEventManager<IUserDataService, AccountDeletedEventArgs>.AddHandler(userDataService, nameof(IUserDataService.AccountDeleted), OnAccountDeleted);
         this.guideRepository = guideRepository;
         this.guideSyncService = guideSyncService;
         this.loginService = loginService;
@@ -65,10 +69,14 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
         this.dialogService = dialogService;
         this.gameDataService = gameDataService;
         this.logger = logger;
+        this.imageService = imageService;
+        if (imageService is not null)
+            System.Windows.WeakEventManager<CatalogImageService, EventArgs>.AddHandler(imageService, nameof(CatalogImageService.RetryRequested), OnImageRetryRequested);
         SyncCommand = new DelegateCommand(Sync, () => !IsBusy && SelectedUser is not null)
             .ObservesProperty(() => IsBusy).ObservesProperty(() => SelectedUser);
         RefreshSortOptions();
         LanguageManager.Instance.PropertyChanged += OnLanguageChanged;
+        gameDataService.Changed += OnCatalogChanged;
     }
 
     public bool IsBusy
@@ -82,7 +90,12 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
         get => selectedUser;
         set
         {
-            if (!SetProperty(ref selectedUser, value) || value is null || isSelectingInitialAccount)
+            if (!SetProperty(ref selectedUser, value)) return;
+            navigationCts.Cancel();
+            navigationCts.Dispose();
+            navigationCts = new();
+            ++loadVersion;
+            if (value is null || isSelectingInitialAccount)
                 return;
             _ = SelectAccountAsync(value);
         }
@@ -122,6 +135,23 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
 
     public bool IsNavigationTarget(NavigationContext navigationContext) => true;
     public void OnNavigatedFrom(NavigationContext navigationContext) => navigationCts.Cancel();
+    /// <summary>账号删除后取消读取并释放页面上的账号内容。</summary>
+    private void OnAccountDeleted(object? sender, AccountDeletedEventArgs e)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            foreach (var user in Users.Where(x => x.Uid == e.Uid).ToArray()) Users.Remove(user);
+            if (SelectedUser?.Uid != e.Uid) return;
+            ++loadVersion;
+            navigationCts.Cancel();
+            navigationCts.Dispose();
+            navigationCts = new CancellationTokenSource();
+            SelectedUser = null;
+            Roles.Clear(); Weapons.Clear(); lastSyncedAtUtc = null;
+            hasRoleGachaRecords = hasWeaponGachaRecords = false;
+            RaiseCounts();
+        });
+    }
     public async void OnNavigatedTo(NavigationContext navigationContext)
     {
         if (navigationCts.IsCancellationRequested)
@@ -136,7 +166,9 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
     {
         try
         {
-            IReadOnlyList<AccountSummary> accounts = await userDataService.ListAccountsAsync(navigationCts.Token);
+            CancellationToken token = navigationCts.Token;
+            IReadOnlyList<AccountSummary> accounts = await userDataService.ListAccountsAsync(token);
+            if (token.IsCancellationRequested) return;
             isSelectingInitialAccount = true;
             Users.Clear();
             foreach (AccountSummary account in accounts) Users.Add(account);
@@ -145,22 +177,33 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
             if (SelectedUser is not null) await LoadSnapshotAsync(SelectedUser.Uid);
         }
         catch (OperationCanceledException) { }
+        catch (Exception ex) { logger.Warn("加载 Guide 本地账号失败。", ex); }
         finally { isSelectingInitialAccount = false; }
     }
 
     private async Task SelectAccountAsync(AccountSummary account)
     {
-        configService.User.LastUserId = account.Uid;
-        await configService.SaveAllAsync();
-        loginService.SwitchUserContext(account.Uid);
-        await LoadSnapshotAsync(account.Uid);
+        try
+        {
+            CancellationToken token = navigationCts.Token;
+            configService.User.LastUserId = account.Uid;
+            await configService.SaveAllAsync();
+            if (token.IsCancellationRequested || SelectedUser?.Uid != account.Uid) return;
+            loginService.SwitchUserContext(account.Uid);
+            await LoadSnapshotAsync(account.Uid);
+        }
+        catch (OperationCanceledException) { /* 账号切换或离开页面。 */ }
+        catch (Exception ex) { logger.Warn("加载 Guide 账号失败。", ex); }
     }
 
     private async Task LoadSnapshotAsync(string uid)
     {
-        GuideSnapshot snapshot = await guideRepository.LoadSnapshotAsync(uid, navigationCts.Token);
-        (Dictionary<int, DateTime> roleTimes, bool roleRecords) = await LoadAcquisitionTimesAsync(uid, GuideCardPools.Roles);
-        (Dictionary<int, DateTime> weaponTimes, bool weaponRecords) = await LoadAcquisitionTimesAsync(uid, GuideCardPools.Weapons);
+        int version = ++loadVersion;
+        CancellationToken token = navigationCts.Token;
+        GuideSnapshot snapshot = await guideRepository.LoadSnapshotAsync(uid, token);
+        (Dictionary<int, DateTime> roleTimes, bool roleRecords) = await LoadAcquisitionTimesAsync(uid, GuideCardPools.Roles, token);
+        (Dictionary<int, DateTime> weaponTimes, bool weaponRecords) = await LoadAcquisitionTimesAsync(uid, GuideCardPools.Weapons, token);
+        if (token.IsCancellationRequested || version != loadVersion || SelectedUser?.Uid != uid) return;
         hasRoleGachaRecords = roleRecords;
         hasWeaponGachaRecords = weaponRecords;
         if (roleSortKey == "time" && !hasRoleGachaRecords) roleSortKey = "star";
@@ -169,36 +212,43 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
         lastSyncedAtUtc = snapshot.LastSyncedAtUtc;
         string language = LanguageManager.Instance.CurrentLanguage.GetCode();
         Roles.Clear();
-        foreach (GuideRoleSnapshot role in snapshot.Roles)
+        foreach (GuideRoleData role in snapshot.Roles)
         {
             int resourceId = ParseResourceId(role.RoleGbId);
             var item = resourceId == 0 ? null : gameDataService.GetItemById(resourceId);
-            bool isLimitedFiveStar = role.Star == 5 && item?.IsUp == true;
+            bool isLimitedFiveStar = role.Star == 5 && gameDataService.GetLimitedStatus(resourceId, role.Star, true) == true;
             DateTime? acquiredAt = isLimitedFiveStar && roleTimes.TryGetValue(resourceId, out DateTime roleTime) ? roleTime : null;
             string displayName = GetItemName(role.RoleGbId, language);
             int sequence = ResolveSequence(role);
+            GuideRoleHoverDetails hover = GuideRoleHoverMapper.Map(role.DetailJson,
+                snapshot.Weapons.FirstOrDefault(x => x.OwnerRoleGbId == role.RoleGbId),
+                gameDataService, language, ex => logger.Warn("角色悬浮详情快照无法解析。", ex));
             Roles.Add(new GuideRoleCardViewModel
             {
                 RoleGbId = role.RoleGbId,
                 DisplayName = displayName,
-                IconPath = item is null
-                    ? role.CardPictureUrl
-                    : $"Local/Icons/{role.RoleGbId}.png",
+                IconPath = $"Local/Icons/{role.RoleGbId}.png",
                 Star = role.Star,
                 IsLimitedFiveStar = isLimitedFiveStar,
                 FirstAcquiredAt = acquiredAt,
                 ToolTipText = FormatToolTip(displayName, acquiredAt),
+                PortraitPath = CatalogJson.IsImageUrl(role.IllustrationPictureUrl) ? role.IllustrationPictureUrl : null,
+                Attributes = hover.Attributes,
+                EquippedWeapon = hover.Weapon,
+                AcquiredText = acquiredAt.HasValue
+                    ? string.Format(LanguageManager.Instance["Guide_FirstAcquired"], acquiredAt.Value.ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture))
+                    : LanguageManager.Instance["Guide_AcquiredUnknown"],
                 Sequence = sequence,
                 SequenceLabel = FormatSequence(sequence),
                 SourceOrder = role.SourceOrder
             });
         }
         Weapons.Clear();
-        foreach (GuideEquippedWeaponSnapshot weapon in snapshot.Weapons)
+        foreach (GuideWeaponData weapon in snapshot.Weapons)
         {
             int resourceId = ParseResourceId(weapon.WeaponGbId);
             var item = resourceId == 0 ? null : gameDataService.GetItemById(resourceId);
-            bool isLimitedFiveStar = weapon.Star == 5 && item?.IsUp == true;
+            bool isLimitedFiveStar = weapon.Star == 5 && gameDataService.GetLimitedStatus(resourceId, weapon.Star, false) == true;
             DateTime? acquiredAt = isLimitedFiveStar && weaponTimes.TryGetValue(resourceId, out DateTime weaponTime) ? weaponTime : null;
             string displayName = GetItemName(weapon.WeaponGbId, language);
             Weapons.Add(new GuideWeaponCardViewModel
@@ -217,11 +267,35 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
         SortRoles();
         SortWeapons();
         RaiseCounts();
+        _ = PrepareHoverImagesAsync(token);
+    }
+
+    /// <summary>在页面加载后预备静态图片，不因鼠标悬停触发请求。</summary>
+    private async Task PrepareHoverImagesAsync(CancellationToken token)
+    {
+        if (imageService is null) return;
+        string[] paths = Roles.SelectMany(x => new[] { x.PortraitPath, x.EquippedWeapon?.ImagePath })
+            .OfType<string>().ToArray();
+        try { await Task.Run(() => imageService.PrepareHoverImagesAsync(paths, token), token); }
+        catch (OperationCanceledException) { /* 页面离开或账号切换取消预载。 */ }
+        catch (Exception ex) { logger.Warn("角色悬浮卡片图片预载失败，使用已有缓存或头像。", ex); }
+    }
+
+    /// <summary>手动同步或清空缓存后，为仍在显示的账号重新准备图片，不重新请求账号资料。</summary>
+    private void OnImageRetryRequested(object? sender, EventArgs e)
+    {
+        System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
+        {
+            if (SelectedUser is null || navigationCts.IsCancellationRequested) return;
+            await PrepareHoverImagesAsync(navigationCts.Token);
+        });
     }
 
     private async void Sync()
     {
         if (SelectedUser is null || IsBusy) return;
+        string uid = SelectedUser.Uid;
+        CancellationToken token = navigationCts.Token;
         IsBusy = true;
         uiStateService.ShowLoading(LanguageManager.Instance["Guide_Syncing"]);
         try
@@ -229,16 +303,16 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
             string language = LanguageManager.Instance.CurrentLanguage.GetCode();
             try
             {
-                await guideSyncService.SyncAsync(SelectedUser.Uid, language, navigationCts.Token);
+                await guideSyncService.SyncAsync(uid, language, token);
             }
             catch (GuideAuthenticationRequiredException)
             {
-                bool captured = await TryCaptureCurrentSessionAsync(language);
+                bool captured = await TryCaptureCurrentSessionAsync(language, token);
                 if (captured)
                 {
                     try
                     {
-                        await guideSyncService.SyncAsync(SelectedUser.Uid, language, navigationCts.Token);
+                        await guideSyncService.SyncAsync(uid, language, token);
                     }
                     catch (GuideAuthenticationRequiredException)
                     {
@@ -251,12 +325,13 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
                     bool loginSucceeded = await ShowLoginAsync();
                     if (!loginSucceeded) return;
                     uiStateService.ShowLoading(LanguageManager.Instance["Guide_Syncing"]);
-                    if (!await TryCaptureCurrentSessionAsync(language))
+                    if (!await TryCaptureCurrentSessionAsync(language, token))
                         throw new GuideAuthenticationRequiredException(LanguageManager.Instance["Guide_LoginRequired"]);
-                    await guideSyncService.SyncAsync(SelectedUser.Uid, language, navigationCts.Token);
+                    await guideSyncService.SyncAsync(uid, language, token);
                 }
             }
-            await LoadSnapshotAsync(SelectedUser.Uid);
+            if (token.IsCancellationRequested || SelectedUser?.Uid != uid) return;
+            await LoadSnapshotAsync(uid);
             uiStateService.ShowToast(LanguageManager.Instance["Toast_Success"], LanguageManager.Instance["Guide_SyncSuccess"], NotificationType.Success);
         }
         catch (OperationCanceledException) { }
@@ -272,13 +347,13 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
         }
     }
 
-    private async Task<bool> TryCaptureCurrentSessionAsync(string language)
+    private async Task<bool> TryCaptureCurrentSessionAsync(string language, CancellationToken token)
     {
         LoginContext context = loginService.LatestAuthenticatedContext;
         if (string.IsNullOrWhiteSpace(context.CUid) || string.IsNullOrWhiteSpace(context.AccessToken)) return false;
         try
         {
-            await guideSyncService.CaptureSessionAsync(context.CUid, context.CName, context.AccessToken, language, navigationCts.Token);
+            await guideSyncService.CaptureSessionAsync(context.CUid, context.CName, context.AccessToken, language, token);
             return true;
         }
         catch (GuideAuthenticationRequiredException) { return false; }
@@ -327,22 +402,11 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
         : displayName;
 
     private async Task<(Dictionary<int, DateTime> Times, bool HasRecords)> LoadAcquisitionTimesAsync(
-        string uid, IReadOnlyList<CardPoolType> poolTypes)
+        string uid, IReadOnlyList<CardPoolType> poolTypes, CancellationToken token)
     {
-        IReadOnlyList<GachaData>[] pools = await Task.WhenAll(poolTypes.Select(type =>
-            userDataService.ReadGachaInSourceOrderAsync(uid, (int)type, navigationCts.Token)));
-        var times = new Dictionary<int, DateTime>();
-        bool hasRecords = pools.Any(x => x.Count > 0);
-        foreach (GachaData record in pools.SelectMany(x => x))
-        {
-            if (!DateTime.TryParse(record.Time, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime parsed))
-                continue;
-            if (!times.TryGetValue(record.ResourceId, out DateTime existing) || parsed < existing)
-                times[record.ResourceId] = parsed;
-        }
-        return (times, hasRecords);
+        var result = await userDataService.ReadAcquisitionTimesAsync(uid, poolTypes.Select(x => (int)x).ToArray(), token);
+        return (result.Times, result.HasRecords);
     }
-
     private string FormatSequence(int sequence)
     {
         if (sequence is < 0 or > 6)
@@ -358,7 +422,7 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
         };
     }
 
-    private int ResolveSequence(GuideRoleSnapshot role)
+    private int ResolveSequence(GuideRoleData role)
     {
         if (role.Sequence is >= 0 and <= 6) return role.Sequence;
         if (!string.IsNullOrWhiteSpace(role.DetailJson))
@@ -380,11 +444,28 @@ public sealed class GuideRoleDataViewModel : BindableBase, INavigationAware
 
     private static string ToChineseNumber(int number) => number switch { 1 => "一", 2 => "二", 3 => "三", 4 => "四", 5 => "五", 6 => "六", _ => "零" };
 
-    private void OnLanguageChanged(object? sender, PropertyChangedEventArgs e)
+    /// <summary>目录更新只重建本地展示，不触发账号网络同步。</summary>
+    private void OnCatalogChanged(object? sender, EventArgs e)
+    {
+        System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
+        {
+            if (SelectedUser is null || navigationCts.IsCancellationRequested) return;
+            try { await LoadSnapshotAsync(SelectedUser.Uid); }
+            catch (OperationCanceledException) { }
+            catch (Exception ex) { logger.Warn("目录更新后刷新角色展示失败。", ex); }
+        });
+    }
+
+    private async void OnLanguageChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != "Item[]") return;
         RefreshSortOptions();
-        if (SelectedUser is not null) _ = LoadSnapshotAsync(SelectedUser.Uid);
+        if (SelectedUser is not null && !navigationCts.IsCancellationRequested)
+        {
+            try { await LoadSnapshotAsync(SelectedUser.Uid); }
+            catch (OperationCanceledException) { /* 页面切换取消刷新。 */ }
+            catch (Exception ex) { logger.Warn("语言更新后刷新角色展示失败。", ex); }
+        }
         RaisePropertyChanged(nameof(LastSyncedText));
     }
 
@@ -471,6 +552,12 @@ public static class GuideCardSortHelper
 
 public sealed class GuideRoleCardViewModel : IGuideCard
 {
+    public string? PortraitPath { get; init; }
+    public IReadOnlyList<GuideHoverAttribute> Attributes { get; init; } = [];
+    public GuideHoverWeapon? EquippedWeapon { get; init; }
+    public bool HasAttributes => Attributes.Count > 0;
+    public bool HasEquippedWeapon => EquippedWeapon is not null;
+    public string AcquiredText { get; init; } = string.Empty;
     public string RoleGbId { get; init; } = string.Empty;
     public string DisplayName { get; init; } = "None";
     public string? IconPath { get; init; }

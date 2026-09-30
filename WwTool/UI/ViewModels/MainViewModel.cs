@@ -27,6 +27,8 @@ namespace WwTool.UI.ViewModels
         /// Prism 区域管理器，负责视图的导航切换
         /// </summary>
         private readonly IRegionManager _regionManager;
+        private readonly IConfigService _configService;
+        private bool _isClosing;
         /// <summary>
         /// Prism 弹窗服务，用于显示确认/警告等弹出式对话框
         /// </summary>
@@ -99,8 +101,9 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 构造函数，初始化服务依赖、导航命令和事件订阅
         /// </summary>
-        public MainViewModel(IRegionManager regionManager, IDialogService dialogService, IUIStateService uIStateService, IEventAggregator eventAggregator)
+        public MainViewModel(IRegionManager regionManager, IDialogService dialogService, IUIStateService uIStateService, IEventAggregator eventAggregator, IConfigService configService)
         {
+            _configService = configService;
             this._dialogService = dialogService;
             this._eventAggregator = eventAggregator;
             this._uiStateService = uIStateService;
@@ -186,6 +189,8 @@ namespace WwTool.UI.ViewModels
         /// <param name="confirmAction">确认后执行的关闭委托</param>
         public void RequestClose(Action confirmAction)
         {
+            if (_isClosing) return;
+            _isClosing = true;
             var parameters = new DialogParameters
             {
                 { "Title", LanguageManager.Instance["Dialog_ExitTitle"] },
@@ -193,12 +198,15 @@ namespace WwTool.UI.ViewModels
                 { "ShowCancel", true }
             };
 
-            _dialogService.ShowDialog("AlertView", parameters, result =>
+            _dialogService.ShowDialog("AlertView", parameters, async result =>
             {
                 if (result.Result == ButtonResult.OK)
                 {
-                    confirmAction?.Invoke();
+                    bool saved = false;
+                    await WwTool.Services.Presentation.ExceptionHelper.ExecuteAsync(async () => { await _configService.FlushAsync(); saved = true; }, "保存退出配置");
+                    if (saved) confirmAction?.Invoke();
                 }
+                _isClosing = false;
             });
         }
 

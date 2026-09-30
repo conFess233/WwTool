@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Windows.Threading;
 using WwTool.Common.Models.Config;
 using WwTool.Extensions;
+using WwTool.Common.Utils;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services
@@ -149,6 +150,18 @@ namespace WwTool.Services
             await SaveUserAsync();
         }
 
+        public async Task FlushAsync()
+        {
+            _autoSaveTimer.Stop();
+            User.PropertyChanged -= OnUserConfigChanged;
+            try { await SaveAllAsync(); }
+            catch
+            {
+                User.PropertyChanged += OnUserConfigChanged;
+                throw;
+            }
+        }
+
         public void SaveAll()
         {
             SaveSync(App, _appConfigPath);
@@ -199,7 +212,7 @@ namespace WwTool.Services
             {
                 Directory.CreateDirectory(_configFolder);
                 string json = JsonSerializer.Serialize(config, _jsonOptions);
-                WriteAtomically(path, json);
+                AtomicFile.WriteText(path, json);
             }
             finally
             {
@@ -209,70 +222,16 @@ namespace WwTool.Services
 
         private async Task SaveAsync<T>(T config, string path)
         {
-            await _saveLock.WaitAsync();
+            string json = JsonSerializer.Serialize(config, _jsonOptions);
+            await _saveLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 Directory.CreateDirectory(_configFolder);
-                string json = JsonSerializer.Serialize(config, _jsonOptions);
-                await WriteAtomicallyAsync(path, json);
+                await AtomicFile.WriteTextAsync(path, json).ConfigureAwait(false);
             }
             finally
             {
                 _saveLock.Release();
-            }
-        }
-
-        private static void WriteAtomically(string path, string content)
-        {
-            string tempPath = $"{path}.{Guid.NewGuid():N}.tmp";
-            try
-            {
-                using (var stream = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
-                {
-                    writer.Write(content);
-                    writer.Flush();
-                    stream.Flush(true);
-                }
-
-                File.Move(tempPath, path, true);
-            }
-            finally
-            {
-                if (File.Exists(tempPath))
-                {
-                    File.Delete(tempPath);
-                }
-            }
-        }
-
-        private static async Task WriteAtomicallyAsync(string path, string content)
-        {
-            string tempPath = $"{path}.{Guid.NewGuid():N}.tmp";
-            try
-            {
-                await using (var stream = new FileStream(
-                    tempPath,
-                    FileMode.CreateNew,
-                    FileAccess.Write,
-                    FileShare.None,
-                    4096,
-                    FileOptions.Asynchronous | FileOptions.WriteThrough))
-                await using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
-                {
-                    await writer.WriteAsync(content);
-                    await writer.FlushAsync();
-                    await stream.FlushAsync();
-                }
-
-                File.Move(tempPath, path, true);
-            }
-            finally
-            {
-                if (File.Exists(tempPath))
-                {
-                    File.Delete(tempPath);
-                }
             }
         }
 

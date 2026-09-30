@@ -12,10 +12,23 @@
     <CornerRadius x:Key="CornerRadiusControl">8</CornerRadius>
     <CornerRadius x:Key="CornerRadiusCard">12</CornerRadius>
     <CornerRadius x:Key="CornerRadiusDialog">16</CornerRadius>
+    <Thickness x:Key="PagePadding">16</Thickness>
+    <Thickness x:Key="CardPadding">16</Thickness>
+    <Thickness x:Key="MetricPadding">12,10</Thickness>
+    <Thickness x:Key="SectionMargin">0,0,0,16</Thickness>
     <Duration x:Key="MotionInstant">0:0:0.08</Duration>
     <Duration x:Key="MotionFast">0:0:0.15</Duration>
     <Duration x:Key="MotionNormal">0:0:0.22</Duration>
     <Duration x:Key="MotionPage">0:0:0.28</Duration>
+    <Duration x:Key="MotionRoleHoverEnter">0:0:0.18</Duration>
+    <Duration x:Key="MotionRoleHoverExit">0:0:0.12</Duration>
+    <sys:Double x:Key="RoleHoverDelayMs">500</sys:Double>
+    <sys:Double x:Key="RoleHoverLeaveDelayMs">150</sys:Double>
+    <sys:Double x:Key="RoleHoverWidth">460</sys:Double>
+    <sys:Double x:Key="RoleHoverPortraitHeight">280</sys:Double>
+    <Storyboard x:Key="PageEnterStoryboard">
+        <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="{DynamicResource MotionPage}" />
+    </Storyboard>
     <CubicEase x:Key="MotionEaseOut" EasingMode="EaseOut" />
     <CubicEase x:Key="MotionEaseInOut" EasingMode="EaseInOut" />
     <SolidColorBrush x:Key="TransparentHitTargetBrush" Color="#01000000" />

@@ -103,19 +103,11 @@ namespace WwTool.Common.Utils
         /// <returns>Base64字符串</returns>
         public static string Encrypt(string plainText)
         {
-            if (string.IsNullOrEmpty(plainText)) return string.Empty;
-            try
-            {
-                byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-                byte[] encryptedBytes = ProtectedData.Protect(plainBytes, null, DataProtectionScope.CurrentUser);
-                return Convert.ToBase64String(encryptedBytes);
-            }
-            catch
-            {
-                return string.Empty;
-            }
+            ArgumentException.ThrowIfNullOrEmpty(plainText);
+            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+            try { return Convert.ToBase64String(ProtectedData.Protect(plainBytes, null, DataProtectionScope.CurrentUser)); }
+            finally { CryptographicOperations.ZeroMemory(plainBytes); }
         }
-
         /// <summary>
         /// 使用 Windows DPAPI 解密数据
         /// </summary>

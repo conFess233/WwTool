@@ -1,3 +1,4 @@
+using WwTool.Common.Utils;
 using System.Diagnostics;
 using System.IO;
 using WwTool.Common.Enums;
@@ -5,7 +6,7 @@ using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Services.Interfaces;
 
-namespace WwTool.Common.Utils
+namespace WwTool.Services.Presentation
 {
     public static class ExceptionHelper
     {
@@ -32,7 +33,7 @@ namespace WwTool.Common.Utils
             catch (Exception ex)
             {
                 HandleException(ex, contextMessage);
-                onError?.Invoke(ex);
+                if (ex is not OperationCanceledException) onError?.Invoke(ex);
             }
         }
 
@@ -49,7 +50,7 @@ namespace WwTool.Common.Utils
             catch (Exception ex)
             {
                 HandleException(ex, contextMessage, notifyUser);
-                onError?.Invoke(ex);
+                if (ex is not OperationCanceledException) onError?.Invoke(ex);
             }
         }
 
@@ -62,7 +63,7 @@ namespace WwTool.Common.Utils
             catch (Exception ex)
             {
                 HandleException(ex, contextMessage);
-                onError?.Invoke(ex);
+                if (ex is not OperationCanceledException) onError?.Invoke(ex);
                 return default;
             }
         }
@@ -76,13 +77,14 @@ namespace WwTool.Common.Utils
             catch (Exception ex)
             {
                 HandleException(ex, contextMessage);
-                onError?.Invoke(ex);
+                if (ex is not OperationCanceledException) onError?.Invoke(ex);
                 return default;
             }
         }
 
         public static void HandleException(Exception ex, string? contextMessage = null, bool notifyUser = true)
         {
+            if (ex is OperationCanceledException) return;
             string errorId = $"{DateTime.UtcNow:yyMMddHHmmss}-{Guid.NewGuid():N}"[..20];
             string logMessage = string.IsNullOrEmpty(contextMessage)
                 ? LanguageManager.Instance["Exc_UnhandledSys"]

@@ -26,6 +26,7 @@ namespace WwTool
     /// </summary>
     public partial class App : PrismApplication
     {
+        private readonly CancellationTokenSource _catalogShutdown = new();
 
         public App()
         {
@@ -74,6 +75,8 @@ namespace WwTool
             // 初始化多语言
             LanguageManager.Instance.ChangeLanguage(configService.User.AppLanguage);
 
+            Resources["GameCatalog"] = Container.Resolve<GameDataService>();
+            Resources["CatalogImageLoader"] = Container.Resolve<CatalogImageService>();
             return Container.Resolve<MainView>();
         }
 
@@ -84,7 +87,7 @@ namespace WwTool
             // 初始化全局异常包装类
             var logger = Container.Resolve<ILoggerService>();
             var uiState = Container.Resolve<IUIStateService>();
-            WwTool.Common.Utils.ExceptionHelper.Initialize(logger, uiState, Container.Resolve<IConfigService>());
+            WwTool.Services.Presentation.ExceptionHelper.Initialize(logger, uiState, Container.Resolve<IConfigService>());
 
             logger.Info("WwTool 客户端应用程序初始化中...");
 
@@ -94,6 +97,7 @@ namespace WwTool
             {
                 await gameData.InitializeAsync();
                 await localDb.InitializeAsync();
+                await Container.Resolve<CatalogSyncService>().InitializeAsync();
             }
             catch (Exception ex)
             {
@@ -111,6 +115,7 @@ namespace WwTool
             {
                 await service.ConfigureAsync();
             }
+            _ = Container.Resolve<CatalogSyncService>().SyncAsync(false, _catalogShutdown.Token);
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -129,7 +134,7 @@ namespace WwTool
             {
                 var logger = Container.Resolve<ILoggerService>();
                 logger.Fatal("主 UI 线程捕获到未处理的致命异常", e.Exception);
-                WwTool.Common.Utils.ExceptionHelper.HandleException(e.Exception, "主UI线程异常");
+                WwTool.Services.Presentation.ExceptionHelper.HandleException(e.Exception, "主UI线程异常");
             }
             catch (Exception loggingException)
             {
@@ -148,7 +153,7 @@ namespace WwTool
                 if (e.ExceptionObject is Exception ex)
                 {
                     logger.Fatal("后台工作线程捕获到未处理的致命异常", ex);
-                    WwTool.Common.Utils.ExceptionHelper.HandleException(ex, "后台线程异常");
+                    WwTool.Services.Presentation.ExceptionHelper.HandleException(ex, "后台线程异常");
                 }
             }
             catch (Exception loggingException)
@@ -163,7 +168,7 @@ namespace WwTool
             {
                 var logger = Container.Resolve<ILoggerService>();
                 logger.Error("未观察的 Task 异步任务抛出异常", e.Exception);
-                WwTool.Common.Utils.ExceptionHelper.HandleException(e.Exception, "异步任务异常");
+                WwTool.Services.Presentation.ExceptionHelper.HandleException(e.Exception, "异步任务异常");
             }
             catch (Exception loggingException)
             {
@@ -176,6 +181,7 @@ namespace WwTool
 
         protected override void OnExit(ExitEventArgs e)
         {
+            _catalogShutdown.Cancel();
             var configService = Container.Resolve<IConfigService>();
             try
             {
@@ -185,6 +191,7 @@ namespace WwTool
             {
                 Trace.TraceError($"退出时保存配置失败: {ex}");
             }
+            if (Container.Resolve<ILoggerService>() is IDisposable logger) logger.Dispose();
             base.OnExit(e);
         }
 
@@ -215,6 +222,13 @@ namespace WwTool
                         DecompressionMethods.Brotli
                 });
 
+            services.AddHttpClient("CatalogClient", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(20);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("WwTool-Catalog/1.0");
+                client.DefaultRequestHeaders.Add("x-language", "zh-Hans");
+            });
+            services.AddHttpClient("CatalogImageClient", client => client.Timeout = TimeSpan.FromSeconds(10));
             var provider = services.BuildServiceProvider();
 
             containerRegistry.RegisterInstance(provider.GetRequiredService<IHttpClientFactory>());
@@ -224,6 +238,10 @@ namespace WwTool
             containerRegistry.RegisterInstance<IDbContextFactory<AppDbContext>>(contextFactory);
             containerRegistry.RegisterSingleton<LocalDataService>();
             containerRegistry.RegisterSingleton<GameDataService>();
+            containerRegistry.RegisterSingleton<CatalogRepositorySource>();
+            containerRegistry.RegisterSingleton<CatalogImageService>();
+            containerRegistry.RegisterSingleton<CatalogSyncService>();
+            containerRegistry.RegisterSingleton<CatalogSettingsViewModel>();
 
             // 注册数据仓储。
             containerRegistry.RegisterSingleton<IGachaRepository, GachaRepository>();
@@ -236,7 +254,7 @@ namespace WwTool
 
             // 注册业务服务。
             containerRegistry.RegisterSingleton<IGachaStatisticsService, GachaStatisticsService>();
-            containerRegistry.RegisterSingleton<IChartBuilderService, ChartBuilderService>();
+
             containerRegistry.RegisterSingleton<IGuideApiClient, GuideApiClient>();
             containerRegistry.RegisterSingleton<IGuideSyncService, GuideSyncService>();
 

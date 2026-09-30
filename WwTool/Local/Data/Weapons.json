@@ -1,0 +1,1369 @@
+{
+  "version": "3.7.0",
+  "items": {
+    "21010074": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "纹秋",
+        "en": "Autumntrace",
+        "ja": "秋の名残",
+        "ko": "가을의 무늬"
+      },
+      "isLimited": false
+    },
+    "21020074": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "飞景",
+        "en": "Lumingloss",
+        "ja": "万象変遷",
+        "ko": "천공의 광경"
+      },
+      "isLimited": false
+    },
+    "21030074": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "奔雷",
+        "en": "Thunderbolt",
+        "ja": "迸る雷霆",
+        "ko": "뇌전"
+      },
+      "isLimited": false
+    },
+    "21040074": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "金掌",
+        "en": "Stonard",
+        "ja": "黄金の拳",
+        "ko": "황금 권갑"
+      },
+      "isLimited": false
+    },
+    "21050074": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "清音",
+        "en": "Augment",
+        "ja": "清らかな音",
+        "ko": "청음"
+      },
+      "isLimited": false
+    },
+    "21010024": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "异响空灵",
+        "en": "Discord",
+        "ja": "霊感ディスコード",
+        "ko": "기묘한 울림"
+      },
+      "isLimited": false
+    },
+    "21020024": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "行进序曲",
+        "en": "Overture",
+        "ja": "行進オーバーチュア",
+        "ko": "행진의 서곡"
+      },
+      "isLimited": false
+    },
+    "21030024": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "华彩乐段",
+        "en": "Cadenza",
+        "ja": "華麗カテンツァ",
+        "ko": "화려한 악곡"
+      },
+      "isLimited": false
+    },
+    "21040024": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "呼啸重音",
+        "en": "Marcato",
+        "ja": "狂乱マルカート",
+        "ko": "바람의 악센트"
+      },
+      "isLimited": false
+    },
+    "21050024": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "奇幻变奏",
+        "en": "Variation",
+        "ja": "奇妙バリエーション",
+        "ko": "판타지 변주"
+      },
+      "isLimited": false
+    },
+    "21010013": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "暗夜长刃·玄明",
+        "en": "Broadblade of Night",
+        "ja": "暗夜の長刃・玄明",
+        "ko": "흑야의 대검 · 현명"
+      },
+      "isLimited": false
+    },
+    "21020013": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "暗夜迅刀·黑闪",
+        "en": "Sword of Night",
+        "ja": "暗夜の迅刀・黒閃",
+        "ko": "흑야의 직검 · 흑뢰"
+      },
+      "isLimited": false
+    },
+    "21030013": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "暗夜佩枪·暗星",
+        "en": "Pistols of Night",
+        "ja": "暗夜の拳銃・闇星",
+        "ko": "흑야의 권총 · 흑성"
+      },
+      "isLimited": false
+    },
+    "21040013": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "暗夜臂铠·夜芒",
+        "en": "Gauntlets of Night",
+        "ja": "暗夜の手甲・夜灯",
+        "ko": "흑야의 권갑 · 흑빛"
+      },
+      "isLimited": false
+    },
+    "21050013": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "暗夜矩阵·暝光",
+        "en": "Rectifier of Night",
+        "ja": "暗夜の増幅器・冥光",
+        "ko": "흑야의 증폭기 · 흑광"
+      },
+      "isLimited": false
+    },
+    "21010012": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "原初长刃·朴石",
+        "en": "Tyro Broadblade",
+        "ja": "原初の長刃・岩塊",
+        "ko": "태초의 대검"
+      },
+      "isLimited": false
+    },
+    "21020012": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "原初迅刀·鸣雨",
+        "en": "Tyro Sword",
+        "ja": "原初の迅刀・雨鳴",
+        "ko": "태초의 직검"
+      },
+      "isLimited": false
+    },
+    "21030012": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "原初佩枪·穿林",
+        "en": "Tyro Pistols",
+        "ja": "原初の拳銃・深森",
+        "ko": "태초의 권총"
+      },
+      "isLimited": false
+    },
+    "21040012": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "原初臂铠·磐岩",
+        "en": "Tyro Gauntlets",
+        "ja": "原初の手甲・磐石",
+        "ko": "태초의 권갑"
+      },
+      "isLimited": false
+    },
+    "21050012": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "原初音感仪·听浪",
+        "en": "Tyro Rectifier",
+        "ja": "原初の増幅器・波音",
+        "ko": "태초의 증폭기"
+      },
+      "isLimited": false
+    },
+    "21010011": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "教学长刃",
+        "en": "Training Broadblade",
+        "ja": "稽古用長刃",
+        "ko": "견습용 대검"
+      },
+      "isLimited": false
+    },
+    "21020011": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "教学迅刀",
+        "en": "Training Sword",
+        "ja": "稽古用迅刀",
+        "ko": "견습용 직검"
+      },
+      "isLimited": false
+    },
+    "21030011": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "教学佩枪",
+        "en": "Training Pistols",
+        "ja": "稽古用拳銃",
+        "ko": "견습용 권총"
+      },
+      "isLimited": false
+    },
+    "21040011": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "教学臂铠",
+        "en": "Training Gauntlets",
+        "ja": "稽古用手甲",
+        "ko": "견습용 권갑"
+      },
+      "isLimited": false
+    },
+    "21050011": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "教学音感仪",
+        "en": "Training Rectifier",
+        "ja": "稽古用増幅器",
+        "ko": "견습용 증폭기"
+      },
+      "isLimited": false
+    },
+    "21010023": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "源能长刃·测壹",
+        "en": "Originite: Type I",
+        "ja": "本源長刃・試作壱",
+        "ko": "원능의 대검 · 견습I"
+      },
+      "isLimited": false
+    },
+    "21020023": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "源能迅刀·测贰",
+        "en": "Originite: Type II",
+        "ja": "本源迅刀・試作弐",
+        "ko": "원능의 직검 · 견습II"
+      },
+      "isLimited": false
+    },
+    "21030023": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "源能佩枪·测叁",
+        "en": "Originite: Type III",
+        "ja": "本源拳銃・試作参",
+        "ko": "원능의 권총 · 견습III"
+      },
+      "isLimited": false
+    },
+    "21040023": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "源能臂铠·测肆",
+        "en": "Originite: Type IV",
+        "ja": "本源手甲・試作肆",
+        "ko": "원능의 권갑 · 견습IV"
+      },
+      "isLimited": false
+    },
+    "21050023": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "源能音感仪·测五",
+        "en": "Originite: Type V",
+        "ja": "本源増幅器・試作伍",
+        "ko": "원능의 증폭기 · 견습V"
+      },
+      "isLimited": false
+    },
+    "21010034": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "重破刃-41型",
+        "en": "Broadblade#41",
+        "ja": "重破刃＃41",
+        "ko": "41형 대검 · 무거운 책임"
+      },
+      "isLimited": false
+    },
+    "21020034": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "瞬斩刀-18型",
+        "en": "Sword#18",
+        "ja": "瞬斬刀＃18",
+        "ko": "18형 직검 · 순간의 칼빛"
+      },
+      "isLimited": false
+    },
+    "21030034": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "穿击枪-26型",
+        "en": "Pistols#26",
+        "ja": "穿撃銃＃26",
+        "ko": "26형 권총 · 맹렬한 돌격"
+      },
+      "isLimited": false
+    },
+    "21040034": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "钢影拳-21丁型",
+        "en": "Gauntlets#21D",
+        "ja": "鋼影拳＃21・四番",
+        "ko": "21형 권갑 · 아이언 팬텀"
+      },
+      "isLimited": false
+    },
+    "21050034": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "鸣动仪-25型",
+        "en": "Rectifier#25",
+        "ja": "鳴動機＃25",
+        "ko": "25형 증폭기 · 울림의 멜로디"
+      },
+      "isLimited": false
+    },
+    "21010044": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "永夜长明",
+        "en": "Dauntless Evernight",
+        "ja": "長夜の灯火",
+        "ko": "장야의 불빛"
+      },
+      "isLimited": false
+    },
+    "21020044": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "不归孤军",
+        "en": "Commando of Conviction",
+        "ja": "決死の一人戦",
+        "ko": "야귀의 신념"
+      },
+      "isLimited": false
+    },
+    "21030044": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "无眠烈火",
+        "en": "Undying Flame",
+        "ja": "燃え尽きぬ焔",
+        "ko": "불멸의 성화"
+      },
+      "isLimited": false
+    },
+    "21040044": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "袍泽之固",
+        "en": "Amity Accord",
+        "ja": "金鉄の志",
+        "ko": "전우의 의리"
+      },
+      "isLimited": false
+    },
+    "21050044": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "今州守望",
+        "en": "Jinzhou Keeper",
+        "ja": "今州の衛士",
+        "ko": "금주의 수호"
+      },
+      "isLimited": false
+    },
+    "21010043": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "远行者长刃·辟路",
+        "en": "Broadblade of Voyager",
+        "ja": "探索者長刃・開拓",
+        "ko": "수행자의 대검 · 벽로"
+      },
+      "isLimited": false
+    },
+    "21020043": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "远行者迅刀·旅迹",
+        "en": "Sword of Voyager",
+        "ja": "探索者迅刀・旅路",
+        "ko": "수행자의 직검 · 행적"
+      },
+      "isLimited": false
+    },
+    "21030043": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "远行者佩枪·洞察",
+        "en": "Pistols of Voyager",
+        "ja": "探索者拳銃・洞察",
+        "ko": "수행자의 권총 · 통찰"
+      },
+      "isLimited": false
+    },
+    "21040043": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "远行者臂铠·破障",
+        "en": "Gauntlets of Voyager",
+        "ja": "探索者手甲・排除",
+        "ko": "수행자의 권갑 · 파괴"
+      },
+      "isLimited": false
+    },
+    "21050043": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "远行者矩阵·探幽",
+        "en": "Rectifier of Voyager",
+        "ja": "探索者増幅器・発見",
+        "ko": "수행자의 증폭기 · 탐색"
+      },
+      "isLimited": false
+    },
+    "21010053": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "戍关长刃·定军",
+        "en": "Guardian Broadblade",
+        "ja": "辺守長刃・統率",
+        "ko": "수호자의 대검 · 근성"
+      },
+      "isLimited": false
+    },
+    "21020053": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "戍关迅刀·镇海",
+        "en": "Guardian Sword",
+        "ja": "辺守迅刀・鎮護",
+        "ko": "수호자의 직검 · 기민"
+      },
+      "isLimited": false
+    },
+    "21030053": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "戍关佩枪·平云",
+        "en": "Guardian Pistols",
+        "ja": "辺守拳銃・平定",
+        "ko": "수호자의 권총 · 용맹"
+      },
+      "isLimited": false
+    },
+    "21040053": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "戍关臂铠·拔山",
+        "en": "Guardian Gauntlets",
+        "ja": "辺守手甲・造設",
+        "ko": "수호자의 권갑 · 강력"
+      },
+      "isLimited": false
+    },
+    "21050053": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "戍关音感仪·留光",
+        "en": "Guardian Rectifier",
+        "ja": "辺守増幅器・伝承",
+        "ko": "수호자의 증폭기 · 모략"
+      },
+      "isLimited": false
+    },
+    "21010064": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "东落",
+        "en": "Helios Cleaver",
+        "ja": "逆行の星",
+        "ko": "저무는 동녘"
+      },
+      "isLimited": false
+    },
+    "21020064": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "西升",
+        "en": "Lunar Cutter",
+        "ja": "倒錯の星",
+        "ko": "상승의 서녘"
+      },
+      "isLimited": false
+    },
+    "21030064": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "飞逝",
+        "en": "Novaburst",
+        "ja": "疾走の星",
+        "ko": "천공의 순간"
+      },
+      "isLimited": false
+    },
+    "21040064": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "骇行",
+        "en": "Hollow Mirage",
+        "ja": "驚異の星",
+        "ko": "천공의 역행"
+      },
+      "isLimited": false
+    },
+    "21050064": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "异度",
+        "en": "Comet Flare",
+        "ja": "変化の星",
+        "ko": "굉음"
+      },
+      "isLimited": false
+    },
+    "21010015": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "浩境粼光",
+        "en": "Lustrous Razor",
+        "ja": "仙境の湖光",
+        "ko": "푸른물결의 빛"
+      },
+      "isLimited": false
+    },
+    "21020015": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "千古洑流",
+        "en": "Emerald of Genesis",
+        "ja": "千古の湖水",
+        "ko": "천년의 회류"
+      },
+      "isLimited": false
+    },
+    "21030015": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "停驻之烟",
+        "en": "Static Mist",
+        "ja": "不変の湖煙",
+        "ko": "부동의 안개"
+      },
+      "isLimited": false
+    },
+    "21040015": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "擎渊怒涛",
+        "en": "Abyss Surges",
+        "ja": "怒涛の湖音",
+        "ko": "물결의 파동"
+      },
+      "isLimited": false
+    },
+    "21050015": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漪澜浮录",
+        "en": "Cosmic Ripples",
+        "ja": "栄枯の湖岸",
+        "ko": "파도의 기록"
+      },
+      "isLimited": false
+    },
+    "21010016": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "苍鳞千嶂",
+        "en": "Verdant Summit",
+        "ja": "蒼鱗連峰",
+        "ko": "청룡의 천장"
+      },
+      "isLimited": true
+    },
+    "21050016": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "掣傀之手",
+        "en": "Stringmaster",
+        "ja": "糸繰りの奇術",
+        "ko": "꼭두각시의 손"
+      },
+      "isLimited": true
+    },
+    "21010026": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "时和岁稔",
+        "en": "Ages of Harvest",
+        "ja": "歳華調和",
+        "ko": "태평성대"
+      },
+      "isLimited": true
+    },
+    "21020016": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "赫奕流明",
+        "en": "Blazing Brilliance",
+        "ja": "赫く燃ゆる流光",
+        "ko": "솟아오르는 화염"
+      },
+      "isLimited": true
+    },
+    "21010063": {
+      "type": "Weapon",
+      "qualityLevel": 3,
+      "names": {
+        "zh-Hans": "钧天正音",
+        "en": "Beguiling Melody",
+        "ja": "天上の仙楽",
+        "ko": "천상의 음률"
+      },
+      "isLimited": false
+    },
+    "21050026": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "琼枝冰绡",
+        "en": "Rime-Draped Sprouts",
+        "ja": "氷華の雅印",
+        "ko": "옥수 비단"
+      },
+      "isLimited": true
+    },
+    "21040016": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "诸方玄枢",
+        "en": "Verity's Handle",
+        "ja": "万端の枢機",
+        "ko": "팔방의 천추"
+      },
+      "isLimited": true
+    },
+    "21050036": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "星序协响",
+        "en": "Stellar Symphony",
+        "ja": "星々のコンチェルト",
+        "ko": "뭇별의 교향곡"
+      },
+      "isLimited": true
+    },
+    "21010084": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "凋亡频移",
+        "en": "Waning Redshift",
+        "ja": "破滅に迫る赤方偏移",
+        "ko": "멸망의 주파수"
+      },
+      "isLimited": false
+    },
+    "21020084": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "永续坍缩",
+        "en": "Endless Collapse",
+        "ja": "永遠を砕く重力崩壊",
+        "ko": "영원의 붕괴"
+      },
+      "isLimited": false
+    },
+    "21030084": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "悖论喷流",
+        "en": "Relativistic Jet",
+        "ja": "悖理を説く宇宙ジェット",
+        "ko": "역설의 격류"
+      },
+      "isLimited": false
+    },
+    "21040084": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "尘云旋臂",
+        "en": "Celestial Spiral",
+        "ja": "星屑が捩れる渦巻腕",
+        "ko": "천상의 나선"
+      },
+      "isLimited": false
+    },
+    "21050084": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "核熔星盘",
+        "en": "Fusion Accretion",
+        "ja": "コアが溶融する降着円盤",
+        "ko": "융합의 원반"
+      },
+      "isLimited": false
+    },
+    "21020017": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "心之锚",
+        "en": "Somnoire Anchor",
+        "ja": "心の錨",
+        "ko": "마음의 닻"
+      },
+      "isLimited": false
+    },
+    "21020026": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "裁春",
+        "en": "Red Spring",
+        "ja": "春裁ち",
+        "ko": "날카로운 봄"
+      },
+      "isLimited": true
+    },
+    "21050017": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "渊海回声",
+        "en": "Call of the Abyss",
+        "ja": "海淵のリフレイン",
+        "ko": "심해의 메아리"
+      },
+      "isLimited": false
+    },
+    "21010094": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "容赦的沉思录",
+        "en": "Meditations on Mercy",
+        "ja": "寛恕のタ・エイス・ヘアウトン",
+        "ko": "용서의 명상록"
+      },
+      "isLimited": false
+    },
+    "21020094": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "风流的寓言诗",
+        "en": "Fables of Wisdom",
+        "ja": "風刺のファブリオー",
+        "ko": "풍류의 우화시"
+      },
+      "isLimited": false
+    },
+    "21030094": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "叙别的罗曼史",
+        "en": "Romance in Farewell",
+        "ja": "別れのメロス",
+        "ko": "작별의 로맨스"
+      },
+      "isLimited": false
+    },
+    "21040094": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "酩酊的英雄志",
+        "en": "Legend of Drunken Hero",
+        "ja": "酩酊のエポス",
+        "ko": "만취의 영웅지"
+      },
+      "isLimited": false
+    },
+    "21050094": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "虚饰的华尔兹",
+        "en": "Waltz in Masquerade",
+        "ja": "虚飾のワルツ",
+        "ko": "허위의 왈츠"
+      },
+      "isLimited": false
+    },
+    "21040026": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "悲喜剧",
+        "en": "Tragicomedy",
+        "ja": "トラジコメーディア",
+        "ko": "희비극"
+      },
+      "isLimited": true
+    },
+    "21030016": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "死与舞",
+        "en": "The Last Dance",
+        "ja": "ラストダンス",
+        "ko": "죽음과 춤"
+      },
+      "isLimited": true
+    },
+    "21020036": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "不灭航路",
+        "en": "Unflickering Valor",
+        "ja": "エンドレスボヤージュ",
+        "ko": "흔들리지 않는 용기"
+      },
+      "isLimited": true
+    },
+    "21050046": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "和光回唱",
+        "en": "Luminous Hymn",
+        "ja": "光のハルモニア",
+        "ko": "광휘의 찬송가"
+      },
+      "isLimited": true
+    },
+    "21050027": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "大海的馈赠",
+        "en": "Ocean's Gift",
+        "ja": "海の恩恵",
+        "ko": "바다의 선물"
+      },
+      "isLimited": false
+    },
+    "21050056": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "海的呢喃",
+        "en": "Whispers of Sirens",
+        "ja": "深海の囁き",
+        "ko": "바다의 속삭임"
+      },
+      "isLimited": true
+    },
+    "21020046": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "血誓盟约",
+        "en": "Bloodpact's Pledge",
+        "ja": "血の盟約",
+        "ko": "혈맹의 약속"
+      },
+      "isLimited": true
+    },
+    "21040036": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "焰光裁定",
+        "en": "Blazing Justice",
+        "ja": "焔光の裁き",
+        "ko": "불빛의 심판"
+      },
+      "isLimited": true
+    },
+    "21030026": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "林间的咏叹调",
+        "en": "Woodland Aria",
+        "ja": "森のアリア",
+        "ko": "숲속의 아리아"
+      },
+      "isLimited": true
+    },
+    "21020056": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "不屈命定之冠",
+        "en": "Defier's Thorn",
+        "ja": "定めを覆す荊冠",
+        "ko": "숙명에 맞서는 관"
+      },
+      "isLimited": true
+    },
+    "21010036": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "焰痕",
+        "en": "Wildfire Mark",
+        "ja": "闘炎の爪痕",
+        "ko": "불길"
+      },
+      "isLimited": true
+    },
+    "21050066": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "幽冥的忘忧章",
+        "en": "Lethean Elegy",
+        "ja": "幽冥の忘憂曲",
+        "ko": "잊혀진 피안의 슬픈 악장"
+      },
+      "isLimited": true
+    },
+    "21040046": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "万物持存的注释",
+        "en": "Moongazer's Sigil",
+        "ja": "万物を書き留める月相",
+        "ko": "세상 만물의 진리"
+      },
+      "isLimited": true
+    },
+    "21010046": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "驭冕铸雷之权",
+        "en": "Thunderflare Dominion",
+        "ja": "雷霆を統べし王剣",
+        "ko": "천둥벼락을 다스리는 권능"
+      },
+      "isLimited": true
+    },
+    "21010104": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "金穹",
+        "en": "Aureate Zenith",
+        "ja": "金の天穹",
+        "ko": "금빛 하늘"
+      },
+      "isLimited": false
+    },
+    "21020104": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "翼锋",
+        "en": "Feather Edge",
+        "ja": "鋭利な翼",
+        "ko": "예리한 날개깃"
+      },
+      "isLimited": false
+    },
+    "21030104": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "阳焰",
+        "en": "Solar Flame",
+        "ja": "紅炎",
+        "ko": "태양 불꽃"
+      },
+      "isLimited": false
+    },
+    "21040104": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "凌空",
+        "en": "Aether Strike",
+        "ja": "舞い上がる大空",
+        "ko": "거침없는 비상"
+      },
+      "isLimited": false
+    },
+    "21050104": {
+      "type": "Weapon",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "曜光",
+        "en": "Radiant Dawn",
+        "ja": "弾む輝き",
+        "ko": "눈부신 빛"
+      },
+      "isLimited": false
+    },
+    "21030036": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "光影双生",
+        "en": "Lux & Umbra",
+        "ja": "ルクス＆アンブラ",
+        "ko": "얽혀진 빛과 그림자"
+      },
+      "isLimited": true
+    },
+    "21020066": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "裁竹",
+        "en": "Emerald Sentence",
+        "ja": "破敵の鋭竹",
+        "ko": "푸른 의지"
+      },
+      "isLimited": true
+    },
+    "21010056": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "昙切",
+        "en": "Kumokiri",
+        "ja": "曇斬",
+        "ko": "쿠모키리(曇斬)"
+      },
+      "isLimited": true
+    },
+    "21030046": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "溢彩荧辉",
+        "en": "Spectrum Blaster",
+        "ja": "スペクトル・ブラスター",
+        "ko": "스펙트럼 블래스터"
+      },
+      "isLimited": true
+    },
+    "21010066": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "宙算仪轨",
+        "en": "Starfield Calibrator",
+        "ja": "スターキャリブレーター",
+        "ko": "별하늘 연산 측정기"
+      },
+      "isLimited": true
+    },
+    "21010045": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "源能机锋",
+        "en": "Radiance Cleaver",
+        "ja": "ラディアンスの切っ先",
+        "ko": "에너지 절단"
+      },
+      "isLimited": false
+    },
+    "21020045": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "镭射切变",
+        "en": "Laser Shearer",
+        "ja": "レーザーの鋭剣",
+        "ko": "레이저 변형"
+      },
+      "isLimited": false
+    },
+    "21030045": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "相位涟漪",
+        "en": "Phasic Homogenizer",
+        "ja": "フェーズのさざ波",
+        "ko": "위상의 파동"
+      },
+      "isLimited": false
+    },
+    "21040045": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "脉冲协臂",
+        "en": "Pulsation Bracer",
+        "ja": "パルスの機腕",
+        "ko": "격동의 조력"
+      },
+      "isLimited": false
+    },
+    "21050045": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "玻色星仪",
+        "en": "Boson Astrolabe",
+        "ja": "ボゾンの観測器",
+        "ko": "보손 관측기"
+      },
+      "isLimited": false
+    },
+    "21020076": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "永远的启明星",
+        "en": "Everbright Polestar",
+        "ja": "とこしえの明星",
+        "ko": "영원한 샛별"
+      },
+      "isLimited": true
+    },
+    "21040056": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "白昼之脊",
+        "en": "Daybreaker's Spine",
+        "ja": "デイブレイカースパイン",
+        "ko": "한낮의 의지"
+      },
+      "isLimited": true
+    },
+    "21040066": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "昭日译注",
+        "en": "Solsworn Ciphers",
+        "ja": "ソル・スウォーンの注釈",
+        "ko": "솔스원의 해석"
+      },
+      "isLimited": true
+    },
+    "21050076": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "赝作的矮星",
+        "en": "Forged Dwarf Star",
+        "ja": "偽物の矮星",
+        "ko": "위조된 작은별"
+      },
+      "isLimited": true
+    },
+    "21020086": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "灼霜",
+        "en": "Frostburn",
+        "ja": "灼霜",
+        "ko": "서린 불꽃"
+      },
+      "isLimited": true
+    },
+    "21030056": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "蜃影",
+        "en": "Spectral Trigger",
+        "ja": "スペクトラル・トリガー",
+        "ko": "스펙트럴 트리거"
+      },
+      "isLimited": true
+    },
+    "21030066": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "碎骨",
+        "en": "Skull Thrasher",
+        "ja": "スカル・ポッパー",
+        "ko": "스컬 스래셔"
+      },
+      "isLimited": true
+    },
+    "21050086": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "存帧",
+        "en": "Freeze Frame",
+        "ja": "フリーズフレーム",
+        "ko": "프리즈 프레임"
+      },
+      "isLimited": true
+    },
+    "21020096": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "天之苍苍",
+        "en": "Azure Oath",
+        "ja": "天つ蒼淵",
+        "ko": "아득히 푸른 하늘"
+      },
+      "isLimited": true
+    },
+    "21050096": {
+      "type": "Weapon",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "栖霞饮露",
+        "en": "Firstlight's Herald",
+        "ja": "夕霞の飲露",
+        "ko": "노을에 깃든 이슬"
+      },
+      "isLimited": true
+    },
+    "21010076": {
+      "type": "Weapon",
+      "names": {
+        "zh-Hans": "千般渡",
+        "en": "Thousandfold Deliverance",
+        "ja": "幾千の導き",
+        "ko": "수많은 인도"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    },
+    "21020106": {
+      "type": "Weapon",
+      "names": {
+        "zh-Hans": "云琅",
+        "en": "Glint of Clouds",
+        "ja": "雲琅",
+        "ko": "옥빛 구름"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    },
+    "21020107": {
+      "type": "Weapon",
+      "names": {
+        "zh-Hans": "沉冥",
+        "en": "Unspoken Rue",
+        "ja": "沈冥",
+        "ko": "적막한 어둠"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    },
+    "21050116": {
+      "type": "Weapon",
+      "names": {
+        "zh-Hans": "玉阙玄华",
+        "en": "Blooming Jadehaven",
+        "ja": "玉殿に咲き満ちる玄華",
+        "ko": "옥궐에 피는 꽃"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    }
+  }
+}

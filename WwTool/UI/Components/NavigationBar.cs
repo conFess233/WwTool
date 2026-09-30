@@ -64,15 +64,12 @@ namespace WwTool.UI.Components
 
         public NavigationBar()
         {
-            LanguageManager.Instance.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == "Item[]")
-                {
-                    Dispatcher.BeginInvoke(new Action(RecalculateWidths), System.Windows.Threading.DispatcherPriority.Loaded);
-                }
-            };
+            System.ComponentModel.PropertyChangedEventManager.AddHandler(LanguageManager.Instance, OnLanguageChanged, "Item[]");
         }
 
+        /// <summary>弱事件订阅避免语言单例保留已卸载的导航控件。</summary>
+        private void OnLanguageChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) =>
+            Dispatcher.BeginInvoke(new Action(RecalculateWidths), System.Windows.Threading.DispatcherPriority.Loaded);
         /// <summary>
         /// 配置主内容的视觉推移动画。动画期间只更新合成属性，结束时提交一次真实列宽。
         /// </summary>

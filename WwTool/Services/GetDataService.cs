@@ -1,3 +1,4 @@
+using WwTool.Common.Models.Domain;
 using System.Security.Cryptography;
 using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
@@ -45,7 +46,7 @@ namespace WwTool.Services
         /// <param name="req">请求体</param>
         /// <returns>抽卡数据列表</returns>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<IEnumerable<GachaData>> GetGachaLogAsync(GachaRequest req, GachaServerRegion serverRegion, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<GachaPull>> GetGachaLogAsync(GachaRequest req, GachaServerRegion serverRegion, CancellationToken cancellationToken = default)
         {
             _logger.Info($"开始获取抽卡记录 (卡池类型: {req.CardPoolType})");
             string endpoint = serverRegion == GachaServerRegion.International
@@ -57,7 +58,11 @@ namespace WwTool.Services
 
             if (response != null && response.Code == 0)
             {
-                return response.Data ?? new List<GachaData>();
+                return (response.Data ?? []).Select(x => new GachaPull
+                {
+                    CardPoolType = x.CardPoolType, ResourceId = x.ResourceId, ResourceType = x.ResourceType,
+                    Name = x.Name, Count = x.Count, Time = x.Time, QualityLevel = x.QualityLevel
+                }).ToList();
             }
 
             throw new WwToolApiException("数据获取失败: " + (response?.Message ?? "未知错误"));
@@ -102,7 +107,7 @@ namespace WwTool.Services
                     throw new WwToolApiException("查询账号大区信息请求未返回数据");
                 return response;
             }
-            catch (Exception ex) when (!(ex is WwToolException))
+            catch (Exception ex) when (ex is not WwToolException and not OperationCanceledException)
             {
                 throw new WwToolApiException("查询账号大区信息发生异常", ex);
             }
@@ -114,77 +119,36 @@ namespace WwTool.Services
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<QueryPlayerInfoResponse?> QueryPlayerInfoAsync(QueryPlayerInfoRequest request, CancellationToken cancellationToken = default)
+        public Task<QueryPlayerInfoResponse?> QueryPlayerInfoAsync(QueryPlayerInfoRequest request, CancellationToken cancellationToken = default) =>
+            QueryWithRetryAsync(() => _apiService.PostAsync<QueryPlayerInfoRequest, QueryPlayerInfoResponse>(
+                _configService.Api.Urls.QueryPlayerInfoUrl, request, cancellationToken: cancellationToken), x => x.Message, cancellationToken);
+
+        public Task<QueryRoleResponse?> QueryRoleAsync(QueryRoleRequest request, CancellationToken cancellationToken = default) =>
+            QueryWithRetryAsync(() => _apiService.PostAsync<QueryRoleRequest, QueryRoleResponse>(
+                _configService.Api.Urls.QueryRoleUrl, request, cancellationToken: cancellationToken), x => x.Message, cancellationToken);
+
+        /// <summary>只对读取请求的瞬态故障或服务端 retrying 信号做有限重试。</summary>
+        private async Task<T?> QueryWithRetryAsync<T>(Func<Task<T?>> query, Func<T, string?> message, CancellationToken token) where T : class
         {
-            _logger.Debug("带重试地查询玩家基本信息...");
-            for (int i = 0; i < _configService.Api.MaxRetries; i++)
+            int attempts = Math.Max(1, _configService.Api.MaxRetries);
+            for (int attempt = 0; attempt < attempts; attempt++)
             {
+                token.ThrowIfCancellationRequested();
                 try
                 {
-                    var apiConf = _configService.Api;
-                    var response = await _apiService.PostAsync<QueryPlayerInfoRequest, QueryPlayerInfoResponse>(apiConf.Urls.QueryPlayerInfoUrl, request, cancellationToken: cancellationToken);
-                    if (response == null)
-                        throw new WwToolApiException("查询玩家信息请求未返回数据");
-
-                    if (response.Message != null && response.Message.Contains("retrying", StringComparison.OrdinalIgnoreCase) && i < _configService.Api.MaxRetries - 1)
-                    {
-                        await Task.Delay(_configService.Api.DelayMs, cancellationToken);
-                        continue;
-                    }
-                    return response;
+                    T response = await query() ?? throw new WwToolApiException("查询未返回数据。");
+                    if (message(response)?.Contains("retrying", StringComparison.OrdinalIgnoreCase) != true) return response;
+                    if (attempt == attempts - 1) throw new WwToolApiException("查询重试次数已达上限。");
                 }
-                catch (Exception ex) when (!(ex is WwToolException))
+                catch (Exception ex) when (!token.IsCancellationRequested &&
+                    ex is System.Net.Http.HttpRequestException or TimeoutException or TaskCanceledException)
                 {
-                    if (i < _configService.Api.MaxRetries - 1)
-                    {
-                        await Task.Delay(_configService.Api.DelayMs, cancellationToken);
-                        continue;
-                    }
-                    throw new WwToolApiException("查询玩家信息发生异常", ex);
+                    if (attempt == attempts - 1) throw new WwToolApiException("查询远端数据失败。", ex);
                 }
+                await Task.Delay(Math.Max(0, _configService.Api.DelayMs), token);
             }
-            throw new WwToolApiException("查询玩家信息失败，重试次数超限");
+            throw new WwToolApiException("查询重试次数已达上限。");
         }
-
-        /// <summary>
-        /// 查询角色详细信息
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        /// <exception cref="WwToolApiException"></exception>
-        public async Task<QueryRoleResponse?> QueryRoleAsync(QueryRoleRequest request, CancellationToken cancellationToken = default)
-        {
-            for (int i = 0; i < _configService.Api.MaxRetries; i++)
-            {
-                try
-                {
-                    var apiConf = _configService.Api;
-                    var response = await _apiService.PostAsync<QueryRoleRequest, QueryRoleResponse>(apiConf.Urls.QueryRoleUrl, request, cancellationToken: cancellationToken);
-                    if (response == null)
-                        throw new WwToolApiException("查询玩家角色详情请求未返回数据");
-
-                    if (response.Message != null && response.Message.Contains("retrying", StringComparison.OrdinalIgnoreCase) && i < _configService.Api.MaxRetries - 1)
-                    {
-                        await Task.Delay(_configService.Api.DelayMs, cancellationToken);
-                        continue;
-                    }
-
-
-                    return response;
-                }
-                catch (Exception ex) when (!(ex is WwToolException))
-                {
-                    if (i < _configService.Api.MaxRetries - 1)
-                    {
-                        await Task.Delay(_configService.Api.DelayMs, cancellationToken);
-                        continue;
-                    }
-                    throw new WwToolApiException("查询玩家角色详情发生异常", ex);
-                }
-            }
-            throw new WwToolApiException("查询玩家角色详情失败，重试次数超限");
-        }
-
         /// <summary>
         /// 读取角色信息，并按需先从服务器同步。
         /// </summary>
@@ -192,7 +156,7 @@ namespace WwTool.Services
         /// <param name="forceRefresh">是否从服务器同步数据</param>
         /// <returns></returns>
         /// <exception cref="WwToolDatabaseException"></exception>
-        public async Task<RoleDetailInfo?> GetRoleDetailAsync(string uid, bool forceRefresh = false, CancellationToken cancellationToken = default)
+        public async Task<PlayerSnapshot?> GetRoleDetailAsync(string uid, bool forceRefresh = false, CancellationToken cancellationToken = default)
         {
             if (forceRefresh)
             {
@@ -219,7 +183,7 @@ namespace WwTool.Services
         /// <returns></returns>
         /// <exception cref="WwToolAuthException"></exception>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<PlayerRegionInfo?> FetchAndSavePlayerRegionInfoAsync(string? uid = null, string? oauthCode = null, CancellationToken cancellationToken = default)
+        public async Task<PlayerRegionSummary?> FetchAndSavePlayerRegionInfoAsync(string? uid = null, string? oauthCode = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(oauthCode))
             {
@@ -239,15 +203,19 @@ namespace WwTool.Services
 
             foreach (var kv in playerInfoResponse.Data)
             {
+                var candidate = System.Text.Json.JsonSerializer.Deserialize<PlayerRegionInfo>(kv.Value);
+                if (candidate is null || (!string.IsNullOrEmpty(uid) && candidate.RoleId != uid)) continue;
                 targetRegion = kv.Key;
                 targetRegionDataJson = kv.Value;
                 break;
             }
 
-            var playerRegion = System.Text.Json.JsonSerializer.Deserialize<PlayerRegionInfo>(targetRegionDataJson);
+            if (string.IsNullOrEmpty(targetRegionDataJson))
+                throw new WwToolAuthException("授权信息中没有当前账号，请重新登录该账号。");
+            var playerRegion = PlayerSnapshotMapper.Map(System.Text.Json.JsonSerializer.Deserialize<PlayerRegionInfo>(targetRegionDataJson));
             if (playerRegion == null) throw new WwToolApiException("解析玩家角色信息失败");
 
-            _loginService.SwitchUserContext(playerRegion.RoleId);
+            if (string.IsNullOrEmpty(uid)) _loginService.SwitchUserContext(playerRegion.RoleId);
 
             await _playerInfoRepository.SavePlayerRegionInfoAsync(playerRegion, targetRegion, oauthCode, cancellationToken);
             return playerRegion;
@@ -262,7 +230,7 @@ namespace WwTool.Services
         /// <returns></returns>
         /// <exception cref="WwToolAuthException"></exception>
         /// <exception cref="WwToolApiException"></exception>
-        public async Task<RoleDetailInfo?> FetchAndSaveRoleDetailAsync(string uid, string region, string? oauthCode = null, CancellationToken cancellationToken = default)
+        public async Task<PlayerSnapshot?> FetchAndSaveRoleDetailAsync(string uid, string region, string? oauthCode = null, CancellationToken cancellationToken = default)
         {
             _logger.Info($"获取并保存角色详情 (UID: {uid}, 大区: {region})");
             if (string.IsNullOrEmpty(oauthCode))
@@ -297,11 +265,11 @@ namespace WwTool.Services
             if (string.IsNullOrWhiteSpace(roleDetailJson))
                 throw new WwToolApiException("未找到玩家角色详情数据");
 
-            var roleDetail = System.Text.Json.JsonSerializer.Deserialize<RoleDetailInfo>(roleDetailJson);
+            var roleDetail = PlayerSnapshotMapper.Map(System.Text.Json.JsonSerializer.Deserialize<WwTool.Common.Models.ApiResponse.RoleDetailInfo>(roleDetailJson));
             if (roleDetail == null) throw new WwToolApiException("解析玩家角色详细信息失败");
 
             var account = await _userRepository.GetUserAccountAsync(uid, cancellationToken);
-            var playerRegion = new PlayerRegionInfo
+            var playerRegion = new PlayerRegionSummary
             {
                 RoleId = uid,
                 RoleName = account?.Name ?? "",
@@ -334,6 +302,7 @@ namespace WwTool.Services
 
                 await FetchAndSaveRoleDetailAsync(regionInfo.RoleId, region, oauthCode, cancellationToken);
 
+                cancellationToken.ThrowIfCancellationRequested();
                 _configService.User.LastUserId = regionInfo.RoleId;
                 await _configService.SaveAllAsync();
             }

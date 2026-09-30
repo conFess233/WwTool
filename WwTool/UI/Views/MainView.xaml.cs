@@ -112,7 +112,7 @@ namespace WwTool.UI.Views
                 vm.RequestClose(() =>
                 {
                     _isConfirmed = true;
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    _ = Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                     {
                         this.Close();
                     }));

@@ -22,6 +22,7 @@
     Background="Transparent"
     Closing="Window_Closing"
     FontFamily="{StaticResource GlobalFontFamily}"
+    FontSize="{StaticResource FontSizeBase}"
     WindowStyle="None"
     mc:Ignorable="d">
 

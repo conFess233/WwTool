@@ -1,3 +1,5 @@
+using WwTool.Common.Models.Domain;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using WwTool.Common.Context;
 using WwTool.Common.Exceptions;
@@ -13,27 +15,33 @@ public sealed class UserRepository(
     IDatabaseWriteCoordinator writeCoordinator,
     ILoggerService logger) : IUserRepository
 {
-    public async Task<UserAccount?> GetUserAccountAsync(string uid, CancellationToken cancellationToken = default)
+    private static readonly Expression<Func<UserAccount, AccountSummary>> AccountProjection = account => new()
+    {
+        Uid = account.Uid, Region = account.Region, Name = account.Name, Level = account.Level,
+        Sex = account.Sex, HeadPhoto = account.HeadPhoto, LastSyncedAtUtc = account.LastSyncedAtUtc
+    };
+
+    public async Task<AccountSummary?> GetUserAccountAsync(string uid, CancellationToken cancellationToken = default)
     {
         try
         {
             await using AppDbContext db = await contextFactory.CreateDbContextAsync(cancellationToken);
-            return await db.UserAccounts.AsNoTracking().FirstOrDefaultAsync(x => x.Uid == uid, cancellationToken);
+            return await db.UserAccounts.AsNoTracking().Where(x => x.Uid == uid).Select(AccountProjection).FirstOrDefaultAsync(cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException($"获取本地账号信息失败(Uid: {MaskUid(uid)})", ex);
         }
     }
 
-    public async Task<IReadOnlyList<UserAccount>> GetAllUserAccountAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<AccountSummary>> GetAllUserAccountAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             await using AppDbContext db = await contextFactory.CreateDbContextAsync(cancellationToken);
-            return await db.UserAccounts.AsNoTracking().OrderBy(x => x.Uid).ToListAsync(cancellationToken);
+            return await db.UserAccounts.AsNoTracking().OrderBy(x => x.Uid).Select(AccountProjection).ToListAsync(cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException("获取本地已存储账号列表失败", ex);
         }
@@ -48,11 +56,16 @@ public sealed class UserRepository(
                 UserAccount? account = await db.UserAccounts.FirstOrDefaultAsync(x => x.Uid == uid, token);
                 if (account is not null)
                 {
+                    string? cUid = await db.GuidePlayerSnapshots.Where(x => x.Uid == uid).Select(x => x.CUid).FirstOrDefaultAsync(token);
                     db.UserAccounts.Remove(account);
+                    await db.SaveChangesAsync(token);
+                    // 同一个 SDK 账号可关联多个 UID，只清理已没有玩家引用的凭据。
+                    if (cUid is not null && !await db.GuidePlayerSnapshots.AnyAsync(x => x.CUid == cUid, token))
+                        await db.GuideAccountCredentials.Where(x => x.CUid == cUid).ExecuteDeleteAsync(token);
                 }
             }, cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException($"删除本地账号及数据失败(Uid: {MaskUid(uid)})", ex);
         }
@@ -74,7 +87,7 @@ public sealed class UserRepository(
                 account.EncryptedOauthCode = Crypto.Encrypt(oauthCode);
             }, cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException($"本地保存授权凭据失败(Uid: {MaskUid(uid)})", ex);
         }
@@ -95,7 +108,7 @@ public sealed class UserRepository(
         {
             throw;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             logger.Error($"读取账号授权凭据失败(Uid: {MaskUid(uid)})", ex);
             throw new WwToolDatabaseException("无法读取本地授权凭据，请重新登录。", ex);

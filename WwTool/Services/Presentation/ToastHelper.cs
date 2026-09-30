@@ -1,8 +1,9 @@
+using WwTool.Common.Utils;
 using WwTool.Common.Enums;
 using WwTool.Common.Models;
 using WwTool.Services.Interfaces;
 
-namespace WwTool.Common.Utils
+namespace WwTool.Services.Presentation
 {
     /// <summary>
     /// 为用户主动触发的操作创建统一的结果 Toast。

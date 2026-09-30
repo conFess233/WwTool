@@ -34,7 +34,7 @@ namespace WwTool.Services
                 Interval = TickInterval
             };
             _notificationTimer.Tick += OnNotificationTimerTick;
-            _notificationTimer.Start();
+            Notifications.CollectionChanged += (_, _) => UpdateNotificationTimer();
         }
 
         public bool IsLoading
@@ -262,6 +262,17 @@ namespace WwTool.Services
                 request.Action();
                 RemoveToast(model);
             });
+        }
+
+        /// <summary>只在有可见通知时驱动倒计时，空闲时不唤醒 Dispatcher。</summary>
+        private void UpdateNotificationTimer()
+        {
+            if (Notifications.Count == 0) _notificationTimer.Stop();
+            else if (!_notificationTimer.IsEnabled)
+            {
+                _lastTick = DateTime.UtcNow;
+                _notificationTimer.Start();
+            }
         }
 
         private void OnNotificationTimerTick(object? sender, EventArgs e)

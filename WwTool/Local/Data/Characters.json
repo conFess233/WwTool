@@ -1,0 +1,709 @@
+{
+  "version": "3.7.0",
+  "items": {
+    "1102": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "散华",
+        "en": "Sanhua",
+        "ja": "散華",
+        "ko": "산화"
+      },
+      "isLimited": false
+    },
+    "1103": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "白芷",
+        "en": "Baizhi",
+        "ja": "白芷",
+        "ko": "설지"
+      },
+      "isLimited": false
+    },
+    "1106": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "釉瑚",
+        "en": "Youhu",
+        "ja": "釉瑚",
+        "ko": "유호"
+      },
+      "isLimited": false
+    },
+    "1202": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "炽霞",
+        "en": "Chixia",
+        "ja": "熾霞",
+        "ko": "치샤"
+      },
+      "isLimited": false
+    },
+    "1204": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "莫特斐",
+        "en": "Mortefi",
+        "ja": "モルトフィー",
+        "ko": "모르테피"
+      },
+      "isLimited": false
+    },
+    "1303": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "渊武",
+        "en": "Yuanwu",
+        "ja": "淵武",
+        "ko": "연무"
+      },
+      "isLimited": false
+    },
+    "1402": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "秧秧",
+        "en": "Yangyang",
+        "ja": "秧秧",
+        "ko": "양양"
+      },
+      "isLimited": false
+    },
+    "1403": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "秋水",
+        "en": "Aalto",
+        "ja": "アールト",
+        "ko": "알토"
+      },
+      "isLimited": false
+    },
+    "1504": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "灯灯",
+        "en": "Lumi",
+        "ja": "灯灯",
+        "ko": "루미"
+      },
+      "isLimited": false
+    },
+    "1601": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "桃祈",
+        "en": "Taoqi",
+        "ja": "桃祈",
+        "ko": "도기"
+      },
+      "isLimited": false
+    },
+    "1602": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "丹瑾",
+        "en": "Danjin",
+        "ja": "丹瑾",
+        "ko": "단근"
+      },
+      "isLimited": false
+    },
+    "1104": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "凌阳",
+        "en": "Lingyang",
+        "ja": "凌陽",
+        "ko": "능양"
+      },
+      "isLimited": false
+    },
+    "1203": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "安可",
+        "en": "Encore",
+        "ja": "アンコ",
+        "ko": "앙코"
+      },
+      "isLimited": false
+    },
+    "1301": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "卡卡罗",
+        "en": "Calcharo",
+        "ja": "カカロ",
+        "ko": "카카루"
+      },
+      "isLimited": false
+    },
+    "1405": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "鉴心",
+        "en": "Jianxin",
+        "ja": "鑑心",
+        "ko": "감심"
+      },
+      "isLimited": false
+    },
+    "1503": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "维里奈",
+        "en": "Verina",
+        "ja": "ヴェリーナ",
+        "ko": "벨리나"
+      },
+      "isLimited": false
+    },
+    "1108": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "绯雪",
+        "en": "Hiyuki",
+        "ja": "緋雪",
+        "ko": "히유키"
+      },
+      "isLimited": true
+    },
+    "1409": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "卡提希娅",
+        "en": "Cartethyia",
+        "ja": "カルテジア",
+        "ko": "카르티시아"
+      },
+      "isLimited": true
+    },
+    "1506": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "菲比",
+        "en": "Phoebe",
+        "ja": "フィービー",
+        "ko": "페비"
+      },
+      "isLimited": true
+    },
+    "1408": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漂泊者·气动",
+        "en": "Rover: Aero",
+        "ja": "漂泊者・気動",
+        "ko": "방랑자 · 기류"
+      },
+      "isLimited": false
+    },
+    "1410": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "尤诺",
+        "en": "Iuno",
+        "ja": "ユーノ",
+        "ko": "유노"
+      },
+      "isLimited": true
+    },
+    "1603": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "椿",
+        "en": "Camellya",
+        "ja": "ツバキ",
+        "ko": "카멜리아"
+      },
+      "isLimited": true
+    },
+    "1604": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漂泊者·湮灭",
+        "en": "Rover: Havoc",
+        "ja": "漂泊者・消滅",
+        "ko": "방랑자 · 인멸"
+      },
+      "isLimited": false
+    },
+    "1605": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漂泊者·湮灭",
+        "en": "Rover: Havoc",
+        "ja": "漂泊者・消滅",
+        "ko": "방랑자 · 인멸"
+      },
+      "isLimited": false
+    },
+    "1606": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "洛可可",
+        "en": "Roccia",
+        "ja": "ロココ",
+        "ko": "로코코"
+      },
+      "isLimited": true
+    },
+    "1607": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "坎特蕾拉",
+        "en": "Cantarella",
+        "ja": "カンタレラ",
+        "ko": "칸타렐라"
+      },
+      "isLimited": true
+    },
+    "1608": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "弗洛洛",
+        "en": "Phrolova",
+        "ja": "フローヴァ",
+        "ko": "플로로"
+      },
+      "isLimited": true
+    },
+    "1105": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "折枝",
+        "en": "Zhezhi",
+        "ja": "折枝",
+        "ko": "절지"
+      },
+      "isLimited": true
+    },
+    "1107": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "珂莱塔",
+        "en": "Carlotta",
+        "ja": "カルロッタ",
+        "ko": "카를로타"
+      },
+      "isLimited": true
+    },
+    "1302": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "吟霖",
+        "en": "Yinlin",
+        "ja": "吟霖",
+        "ko": "음림"
+      },
+      "isLimited": true
+    },
+    "1304": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "今汐",
+        "en": "Jinhsi",
+        "ja": "今汐",
+        "ko": "금희"
+      },
+      "isLimited": true
+    },
+    "1305": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "相里要",
+        "en": "Xiangli Yao",
+        "ja": "相里要",
+        "ko": "상리요"
+      },
+      "isLimited": true
+    },
+    "1306": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "奥古斯塔",
+        "en": "Augusta",
+        "ja": "オーガスタ",
+        "ko": "아우구스타"
+      },
+      "isLimited": true
+    },
+    "1501": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漂泊者·衍射",
+        "en": "Rover: Spectro",
+        "ja": "漂泊者・回折",
+        "ko": "방랑자 · 회절"
+      },
+      "isLimited": false
+    },
+    "1502": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漂泊者·衍射",
+        "en": "Rover: Spectro",
+        "ja": "漂泊者・回折",
+        "ko": "방랑자"
+      },
+      "isLimited": false
+    },
+    "1505": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "守岸人",
+        "en": "Shorekeeper",
+        "ja": "ショアキーパー",
+        "ko": "파수인"
+      },
+      "isLimited": true
+    },
+    "1507": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "赞妮",
+        "en": "Zani",
+        "ja": "ザンニー",
+        "ko": "젠니"
+      },
+      "isLimited": true
+    },
+    "1205": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "长离",
+        "en": "Changli",
+        "ja": "長離",
+        "ko": "장리"
+      },
+      "isLimited": true
+    },
+    "1206": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "布兰特",
+        "en": "Brant",
+        "ja": "ブラント",
+        "ko": "브렌트"
+      },
+      "isLimited": true
+    },
+    "1207": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "露帕",
+        "en": "Lupa",
+        "ja": "ルパ",
+        "ko": "루파"
+      },
+      "isLimited": true
+    },
+    "1404": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "忌炎",
+        "en": "Jiyan",
+        "ja": "忌炎",
+        "ko": "기염"
+      },
+      "isLimited": true
+    },
+    "1406": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漂泊者·气动",
+        "en": "Rover: Aero",
+        "ja": "漂泊者・気動",
+        "ko": "방랑자 · 기류"
+      },
+      "isLimited": false
+    },
+    "1407": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "夏空",
+        "en": "Ciaccona",
+        "ja": "シャコンヌ",
+        "ko": "샤콘"
+      },
+      "isLimited": true
+    },
+    "1211": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "达妮娅",
+        "en": "Denia",
+        "ja": "ダーニャ",
+        "ko": "데니아"
+      },
+      "isLimited": true
+    },
+    "1509": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "琳奈",
+        "en": "Lynae",
+        "ja": "リンネー",
+        "ko": "린네"
+      },
+      "isLimited": true
+    },
+    "1209": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "莫宁",
+        "en": "Mornye",
+        "ja": "モーニエ",
+        "ko": "모니에"
+      },
+      "isLimited": true
+    },
+    "1510": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "陆·赫斯",
+        "en": "Luuk Herssen",
+        "ja": "リューク・ヘルセン",
+        "ko": "루크 · 헤르센"
+      },
+      "isLimited": true
+    },
+    "1210": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "爱弥斯",
+        "en": "Aemeath",
+        "ja": "エイメス",
+        "ko": "에이메스"
+      },
+      "isLimited": true
+    },
+    "1411": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "仇远",
+        "en": "Qiuyuan",
+        "ja": "仇遠",
+        "ko": "구원"
+      },
+      "isLimited": true
+    },
+    "1307": {
+      "type": "Character",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "卜灵",
+        "en": "Buling",
+        "ja": "卜霊",
+        "ko": "복링"
+      },
+      "isLimited": false
+    },
+    "1208": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "嘉贝莉娜",
+        "en": "Galbrena",
+        "ja": "ガルブレーナ",
+        "ko": "갈브레나"
+      },
+      "isLimited": true
+    },
+    "1508": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "千咲",
+        "en": "Chisa",
+        "ja": "千咲",
+        "ko": "치사"
+      },
+      "isLimited": true
+    },
+    "1412": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "西格莉卡",
+        "en": "Sigrika",
+        "ja": "シグリカ",
+        "ko": "시그리카"
+      },
+      "isLimited": true
+    },
+    "1109": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "洛瑟菈",
+        "en": "Lucilla",
+        "ja": "ルシラー",
+        "ko": "루실라"
+      },
+      "isLimited": true
+    },
+    "1308": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "丽贝卡",
+        "en": "Rebecca",
+        "ja": "レベッカ",
+        "ko": "레베카"
+      },
+      "isLimited": true
+    },
+    "1511": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "露西",
+        "en": "Lucy",
+        "ja": "ルーシー",
+        "ko": "루시"
+      },
+      "isLimited": true
+    },
+    "1610": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "秧秧·玄翎",
+        "en": "Yangyang: Xuanling",
+        "ja": "秧秧・玄翎",
+        "ko": "양양 · 현령"
+      },
+      "isLimited": true
+    },
+    "1110": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "穗穗",
+        "en": "Suisui",
+        "ja": "穂穂",
+        "ko": "수수"
+      },
+      "isLimited": true
+    },
+    "1309": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漂泊者·导电",
+        "en": "Rover: Electro",
+        "ja": "漂泊者・電導",
+        "ko": "방랑자 · 전도"
+      },
+      "isLimited": true
+    },
+    "1310": {
+      "type": "Character",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "漂泊者·导电",
+        "en": "Rover: Electro",
+        "ja": "漂泊者・電導",
+        "ko": "방랑자 · 전도"
+      },
+      "isLimited": true
+    },
+    "1413": {
+      "type": "Character",
+      "names": {
+        "zh-Hans": "清宵",
+        "en": "Qingxiao",
+        "ja": "清宵",
+        "ko": "청초"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    },
+    "1311": {
+      "type": "Character",
+      "names": {
+        "zh-Hans": "心",
+        "en": "Hsin",
+        "ja": "心",
+        "ko": "여우의 별자리"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    },
+    "1212": {
+      "type": "Character",
+      "names": {
+        "zh-Hans": "景燃",
+        "en": "Jingran",
+        "ja": "景燃",
+        "ko": "경연"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    },
+    "1312": {
+      "type": "Character",
+      "names": {
+        "zh-Hans": "锁暝",
+        "en": "Suoming",
+        "ja": "鎖暝",
+        "ko": "쇄명"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    }
+  }
+}

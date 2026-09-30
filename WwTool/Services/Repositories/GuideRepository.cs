@@ -1,3 +1,4 @@
+using WwTool.Common.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 using WwTool.Common.Context;
 using WwTool.Common.Exceptions;
@@ -12,7 +13,7 @@ public sealed class GuideRepository(
     IDbContextFactory<AppDbContext> contextFactory,
     IDatabaseWriteCoordinator writeCoordinator) : IGuideRepository
 {
-    public async Task SaveCredentialAndPlayersAsync(string cUid, string token, IReadOnlyList<GuidePlayer> players, CancellationToken cancellationToken = default)
+    public async Task SaveCredentialAndPlayersAsync(string cUid, string token, IReadOnlyList<GuidePlayerIdentity> players, CancellationToken cancellationToken = default)
     {
         string encrypted = Crypto.Encrypt(token);
         if (string.IsNullOrWhiteSpace(encrypted))
@@ -29,7 +30,7 @@ public sealed class GuideRepository(
             credential.EncryptedGuideToken = encrypted;
 
             HashSet<string> localUids = await db.UserAccounts.Select(x => x.Uid).ToHashSetAsync(ct);
-            foreach (GuidePlayer player in players.Where(x => x.PlayerId.HasValue && !string.IsNullOrWhiteSpace(x.ServerId)))
+            foreach (GuidePlayerIdentity player in players.Where(x => x.PlayerId.HasValue && !string.IsNullOrWhiteSpace(x.ServerId)))
             {
                 string uid = player.PlayerId!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 if (!localUids.Contains(uid))
@@ -41,7 +42,7 @@ public sealed class GuideRepository(
                     db.GuidePlayerSnapshots.Add(mapping);
                 }
                 mapping.CUid = cUid;
-                mapping.ServerId = player.ServerId;
+                mapping.ServerId = player.ServerId!;
             }
         }, cancellationToken);
     }
@@ -67,14 +68,14 @@ public sealed class GuideRepository(
                 credential.EncryptedGuideToken = string.Empty;
         }, cancellationToken);
 
-    public Task ReplaceSnapshotAsync(string uid, IReadOnlyList<GuideRoleSnapshot> roles, IReadOnlyList<GuideEquippedWeaponSnapshot> weapons, DateTimeOffset syncedAtUtc, CancellationToken cancellationToken = default) =>
+    public Task ReplaceSnapshotAsync(string uid, IReadOnlyList<GuideRoleData> roles, IReadOnlyList<GuideWeaponData> weapons, DateTimeOffset syncedAtUtc, CancellationToken cancellationToken = default) =>
         writeCoordinator.ExecuteAsync(async (db, ct) =>
         {
             GuidePlayerSnapshot player = await db.GuidePlayerSnapshots.FirstAsync(x => x.Uid == uid, ct);
             await db.GuideEquippedWeaponSnapshots.Where(x => x.Uid == uid).ExecuteDeleteAsync(ct);
             await db.GuideRoleSnapshots.Where(x => x.Uid == uid).ExecuteDeleteAsync(ct);
-            db.GuideRoleSnapshots.AddRange(roles);
-            db.GuideEquippedWeaponSnapshots.AddRange(weapons);
+            db.GuideRoleSnapshots.AddRange(roles.Select(GuideSnapshotMapper.ToEntity));
+            db.GuideEquippedWeaponSnapshots.AddRange(weapons.Select(GuideSnapshotMapper.ToEntity));
             player.LastSyncedAtUtc = syncedAtUtc;
         }, cancellationToken);
 
@@ -87,6 +88,6 @@ public sealed class GuideRepository(
             .Where(x => x.Uid == uid && x.IsAcquired).OrderBy(x => x.SourceOrder).ToListAsync(cancellationToken);
         List<GuideEquippedWeaponSnapshot> weapons = await db.GuideEquippedWeaponSnapshots.AsNoTracking()
             .Where(x => x.Uid == uid).OrderBy(x => x.SourceOrder).ToListAsync(cancellationToken);
-        return new GuideSnapshot(syncedAt, roles, weapons);
+        return new GuideSnapshot(syncedAt, roles.Select(GuideSnapshotMapper.ToData).ToList(), weapons.Select(GuideSnapshotMapper.ToData).ToList());
     }
 }

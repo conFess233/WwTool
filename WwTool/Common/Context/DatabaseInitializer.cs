@@ -27,6 +27,7 @@ namespace WwTool.Common.Context
             await BaselineLegacyDatabaseAsync(db, cancellationToken);
             await CreateMigrationBackupIfNeededAsync(db, cancellationToken);
             await db.Database.MigrateAsync(cancellationToken);
+            await LegacyGachaRepair.RepairAsync(db, cancellationToken);
             await db.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys=ON;", cancellationToken);
             await db.Database.ExecuteSqlRawAsync("PRAGMA journal_mode=WAL;", cancellationToken);
             await db.Database.ExecuteSqlRawAsync("PRAGMA busy_timeout=5000;", cancellationToken);

@@ -111,6 +111,7 @@
     </Style>
 
     <Style TargetType="{x:Type ComboBox}">
+        <Setter Property="MinHeight" Value="40" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />

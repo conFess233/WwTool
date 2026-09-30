@@ -1,3 +1,4 @@
+using WwTool.Common.Models.Domain;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
@@ -19,7 +20,18 @@ public sealed class GachaRepository(
     IDatabaseWriteCoordinator writeCoordinator,
     ILoggerService logger) : IGachaRepository
 {
-    public async Task<IReadOnlyList<GachaData>> GetAllRecordsByUidAsync(
+    /// <summary>只查询每个物品的最早时间，避免把整份抽卡记录带到 UI。</summary>
+    public Task<WwTool.Common.Models.Domain.AcquisitionTimes> ReadAcquisitionTimesAsync(string uid, int[] pools, CancellationToken cancellationToken = default) => Task.Run(async () =>
+    {
+        await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+        var rows = await db.GachaRecords.AsNoTracking().Where(x => x.Uid == uid && pools.Contains(x.PoolType))
+            .GroupBy(x => x.ResourceId).Select(g => new { Id = g.Key, Time = g.Min(x => x.Time) }).ToListAsync(cancellationToken);
+        var times = new Dictionary<int, DateTime>();
+        foreach (var row in rows)
+            if (DateTime.TryParse(row.Time, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out var time)) times[row.Id] = time;
+        return new WwTool.Common.Models.Domain.AcquisitionTimes(times, rows.Count > 0);
+    }, cancellationToken);
+    public async Task<IReadOnlyList<GachaPull>> GetAllRecordsByUidAsync(
         string uid,
         CancellationToken cancellationToken = default)
     {
@@ -30,15 +42,15 @@ public sealed class GachaRepository(
                 .Where(x => x.Uid == uid)
                 .OrderBy(x => x.SourceOrder)
                 .ToListAsync(cancellationToken);
-            return records.Select(x => ToApiModel(x)).ToList();
+            return records.Select(x => ToReadModel(x)).ToList();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException("读取本地抽卡记录失败。", ex);
         }
     }
 
-    public async Task<IReadOnlyList<GachaData>> GetPoolRecordsByUidAsync(
+    public async Task<IReadOnlyList<GachaPull>> GetPoolRecordsByUidAsync(
         string uid,
         int poolType,
         CancellationToken cancellationToken = default)
@@ -50,9 +62,9 @@ public sealed class GachaRepository(
                 .Where(x => x.Uid == uid && x.PoolType == poolType)
                 .OrderBy(x => x.SourceOrder)
                 .ToListAsync(cancellationToken);
-            return records.Select(x => ToApiModel(x, poolType)).ToList();
+            return records.Select(x => ToReadModel(x, poolType)).ToList();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException("读取指定卡池的本地记录失败。", ex);
         }
@@ -61,7 +73,7 @@ public sealed class GachaRepository(
     public async Task<int> SyncGachaDataAsync(
         string uid,
         int poolType,
-        IEnumerable<GachaData> records,
+        IEnumerable<GachaPull> records,
         string source = "remote",
         CancellationToken cancellationToken = default)
     {
@@ -133,14 +145,14 @@ public sealed class GachaRepository(
                     accepted++;
                 }
 
-                await UpsertSyncStateAsync(db, uid, poolType, DateTimeOffset.UtcNow, token);
+                await SyncStateWriter.UpsertAsync(db, uid, "Gacha", poolType.ToString(CultureInfo.InvariantCulture), DateTimeOffset.UtcNow, token);
                 return accepted;
             }, cancellationToken);
 
             logger.Info($"抽卡同步已完整提交，卡池 {poolType}，接收 {prepared.Count} 条，新增 {inserted} 条。");
             return inserted;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException($"卡池 {poolType} 的抽卡记录未能完整提交，已保留原数据。", ex);
         }
@@ -149,13 +161,13 @@ public sealed class GachaRepository(
     private static List<PreparedRecord> PrepareInSourceOrder(
         string uid,
         int poolType,
-        IEnumerable<GachaData> records,
+        IEnumerable<GachaPull> records,
         CancellationToken cancellationToken)
     {
         var result = new List<PreparedRecord>();
         var occurrences = new Dictionary<string, int>(StringComparer.Ordinal);
         int responseItemIndex = 0;
-        foreach (GachaData record in records)
+        foreach (GachaPull record in records)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (record.ResourceId <= 0 || record.QualityLevel <= 0 || string.IsNullOrWhiteSpace(record.Time))
@@ -163,10 +175,10 @@ public sealed class GachaRepository(
                 throw new InvalidDataException($"抽卡响应第 {responseItemIndex} 条记录缺少必填字段。");
             }
 
-            string normalized = $"{uid}|{poolType}|{record.Time.Trim()}|{record.ResourceId}|{record.ResourceType.Trim()}|{record.QualityLevel}";
+            string normalized = LegacyGachaRepair.ContentKey(uid, poolType, record.Time, record.ResourceId, record.ResourceType, record.QualityLevel);
             occurrences.TryGetValue(normalized, out int occurrenceIndex);
             occurrences[normalized] = occurrenceIndex + 1;
-            string fingerprint = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes($"v1|{normalized}|{occurrenceIndex}")));
+            string fingerprint = LegacyGachaRepair.Fingerprint(normalized, occurrenceIndex);
             DateTimeOffset? occurredAtUtc = DateTimeOffset.TryParse(
                 record.Time,
                 CultureInfo.InvariantCulture,
@@ -179,28 +191,7 @@ public sealed class GachaRepository(
         return result;
     }
 
-    private static async Task UpsertSyncStateAsync(
-        AppDbContext db,
-        string uid,
-        int poolType,
-        DateTimeOffset completedAtUtc,
-        CancellationToken cancellationToken)
-    {
-        string scopeKey = poolType.ToString(CultureInfo.InvariantCulture);
-        SyncState? state = db.SyncStates.Local.FirstOrDefault(x => x.Uid == uid && x.DataKind == "Gacha" && x.ScopeKey == scopeKey);
-        state ??= await db.SyncStates.FirstOrDefaultAsync(
-            x => x.Uid == uid && x.DataKind == "Gacha" && x.ScopeKey == scopeKey,
-            cancellationToken);
-        if (state is null)
-        {
-            state = new SyncState { Uid = uid, DataKind = "Gacha", ScopeKey = scopeKey };
-            db.SyncStates.Add(state);
-        }
-
-        state.LastSuccessfulSyncAtUtc = completedAtUtc;
-    }
-
-    private static GachaData ToApiModel(GachaRecord record, int? poolType = null) => new()
+    private static GachaPull ToReadModel(GachaRecord record, int? poolType = null) => new()
     {
         CardPoolType = poolType is null ? string.Empty : ((CardPoolType)poolType.Value).GetDescription(),
         ResourceId = record.ResourceId,
@@ -211,7 +202,7 @@ public sealed class GachaRepository(
     };
 
     private sealed record PreparedRecord(
-        GachaData Record,
+        GachaPull Record,
         int ResponseItemIndex,
         int DuplicateOccurrenceIndex,
         string Fingerprint,

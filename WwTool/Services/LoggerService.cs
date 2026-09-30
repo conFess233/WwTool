@@ -21,7 +21,7 @@ namespace WwTool.Services
             public DateTime Time { get; set; }
             public LogLevel Level { get; set; }
             public string Message { get; set; }
-            public Exception? Exception { get; set; }
+            public string? Exception { get; set; }
         }
 
         private readonly IConfigService _configService;
@@ -38,13 +38,18 @@ namespace WwTool.Services
             }
         }
         private readonly Channel<LogEntry> _logChannel;
+        private readonly Channel<LogEntry> _important = Channel.CreateBounded<LogEntry>(64);
+        private readonly Channel<bool> _signal = Channel.CreateBounded<bool>(new BoundedChannelOptions(1) { FullMode = BoundedChannelFullMode.DropWrite });
         private readonly CancellationTokenSource _cts = new();
+        private int _disposed;
+        private long _dropped;
+        private int _cleanupRunning;
         private readonly Task _writeTask;
 
         public LoggerService(IConfigService configService)
         {
             _configService = configService;
-            _logChannel = Channel.CreateUnbounded<LogEntry>(new UnboundedChannelOptions
+            _logChannel = Channel.CreateBounded<LogEntry>(new BoundedChannelOptions(512)
             {
                 SingleWriter = false,
                 SingleReader = true
@@ -54,7 +59,7 @@ namespace WwTool.Services
             _writeTask = Task.Run(ProcessLogQueueAsync);
 
             // 异步触发日志清理
-            Task.Run(CleanOldLogs);
+            ScheduleCleanup();
         }
 
         public void Debug(string message, Exception? ex = null) => Log(LogLevel.Debug, message, ex);
@@ -78,11 +83,18 @@ namespace WwTool.Services
             {
                 Time = DateTime.Now,
                 Level = level,
-                Message = message,
-                Exception = ex
+                Message = message.Length > 8192 ? message[..8192] : message,
+                Exception = ex?.ToString() is { } detail ? detail[..Math.Min(detail.Length, 8192)] : null
             };
 
-            _logChannel.Writer.TryWrite(entry);
+            if (Volatile.Read(ref _disposed) != 0) return;
+            var writer = level >= LogLevel.Warn ? _important.Writer : _logChannel.Writer;
+            if (!writer.TryWrite(entry))
+            {
+                Interlocked.Increment(ref _dropped);
+                if (level >= LogLevel.Warn) Trace.TraceError("重要日志缓冲已满：{0}", entry.Message);
+            }
+            _signal.Writer.TryWrite(true);
         }
 
         /// <summary>
@@ -91,66 +103,52 @@ namespace WwTool.Services
         /// <returns></returns>
         private async Task ProcessLogQueueAsync()
         {
-            var reader = _logChannel.Reader;
             try
             {
-                while (await reader.WaitToReadAsync(_cts.Token))
+                while (await _signal.Reader.WaitToReadAsync(_cts.Token).ConfigureAwait(false))
                 {
-                    while (reader.TryRead(out var entry))
+                    while (_signal.Reader.TryRead(out _)) { }
+                    var batch = new List<LogEntry>(128);
+                    while (true)
                     {
+                        while (batch.Count < 128 && _important.Reader.TryRead(out var important)) batch.Add(important);
+                        while (batch.Count < 128 && _logChannel.Reader.TryRead(out var normal)) batch.Add(normal);
+                        if (batch.Count == 0) break;
                         try
                         {
-                            await WriteEntryToFileAsync(entry);
+                            foreach (var group in batch.GroupBy(x => x.Time.Date))
+                            {
+                                await WriteBatchToFileAsync(group.ToList()).ConfigureAwait(false);
+                            }
                         }
-                        catch (Exception writeException)
-                        {
-                            Trace.TraceError($"写入日志失败: {writeException}");
-                        }
+                        catch (Exception ex) when (ex is not OperationCanceledException) { Trace.TraceError($"写入日志失败: {ex}"); }
+                        batch.Clear();
                     }
                 }
             }
-            catch (OperationCanceledException)
-            {
-                // 关闭时消费完队列中剩余的所有日志
-                while (reader.TryRead(out var entry))
-                {
-                    try
-                    {
-                        await WriteEntryToFileAsync(entry);
-                    }
-                    catch (Exception writeException)
-                    {
-                        Trace.TraceError($"关闭时刷新日志失败: {writeException}");
-                    }
-                }
-            }
+            catch (OperationCanceledException) { Trace.TraceWarning("日志排空超时，停止后台写入。"); }
         }
-
         /// <summary>
         /// 异步写入日志到文件中
         /// </summary>
-        /// <param name="entry"></param>
+        /// <param name="entries">同一天的一批日志。</param>
         /// <returns></returns>
-        private async Task WriteEntryToFileAsync(LogEntry entry)
+        private async Task WriteBatchToFileAsync(IReadOnlyList<LogEntry> entries)
         {
             Directory.CreateDirectory(LogsFolder);
 
-            string dateStr = entry.Time.ToString("yyyyMMdd");
+            string dateStr = entries[0].Time.ToString("yyyyMMdd");
             string activeLogFileName = $"wwtool_{dateStr}.log";
             string activeLogPath = Path.Combine(LogsFolder, activeLogFileName);
 
             // 格式化日志内容
             var sb = new StringBuilder();
-            sb.Append($"[{entry.Time:yyyy-MM-dd HH:mm:ss.fff}] ");
-            sb.Append($"[{entry.Level.ToString().ToUpper()}] ");
-            sb.Append(entry.Message);
-            if (entry.Exception != null)
+            foreach (LogEntry entry in entries)
             {
-                sb.AppendLine();
-                sb.Append($"--- 异常详情 ---\n{entry.Exception}");
+                sb.Append($"[{entry.Time:yyyy-MM-dd HH:mm:ss.fff}] [{entry.Level.ToString().ToUpperInvariant()}] ");
+                sb.AppendLine(entry.Message);
+                if (entry.Exception is not null) sb.AppendLine(entry.Exception);
             }
-            sb.AppendLine();
-
             string formattedMessage = sb.ToString();
             byte[] messageBytes = Encoding.UTF8.GetBytes(formattedMessage);
 
@@ -182,21 +180,31 @@ namespace WwTool.Services
                     }
 
                     // 触发定期清理
-                    _ = Task.Run(CleanOldLogs);
+                    ScheduleCleanup();
                 }
             }
 
             // 追加写入日志文件
             using (var fs = new FileStream(activeLogPath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, useAsync: true))
             {
-                await fs.WriteAsync(messageBytes, 0, messageBytes.Length);
-                await fs.FlushAsync();
+                await fs.WriteAsync(messageBytes, _cts.Token).ConfigureAwait(false);
+                await fs.FlushAsync(_cts.Token).ConfigureAwait(false);
             }
         }
 
         /// <summary>
         /// 清理旧日志
         /// </summary>
+        private void ScheduleCleanup()
+        {
+            if (Interlocked.CompareExchange(ref _cleanupRunning, 1, 0) != 0) return;
+            _ = Task.Run(() =>
+            {
+                try { CleanOldLogs(); }
+                finally { Volatile.Write(ref _cleanupRunning, 0); }
+            });
+        }
+
         private void CleanOldLogs()
         {
             try
@@ -249,20 +257,14 @@ namespace WwTool.Services
         /// </summary>
         public void Dispose()
         {
-            try
-            {
-                _logChannel.Writer.Complete();
-                _cts.Cancel();
-                _writeTask.Wait(1000);
-            }
-            catch (Exception disposeException)
-            {
-                Trace.TraceError($"停止日志写入队列失败: {disposeException}");
-            }
-            finally
-            {
-                _cts.Dispose();
-            }
+            if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
+            _logChannel.Writer.TryComplete();
+            _important.Writer.TryComplete();
+            _signal.Writer.TryWrite(true);
+            _signal.Writer.TryComplete();
+            if (!_writeTask.Wait(TimeSpan.FromSeconds(2))) _cts.Cancel();
+            if (Interlocked.Read(ref _dropped) > 0) Trace.TraceWarning($"日志缓冲满，已丢弃 {_dropped} 条日志。");
+            _ = _writeTask.ContinueWith(_ => _cts.Dispose(), TaskScheduler.Default);
         }
     }
 }

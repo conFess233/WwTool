@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using Prism.Ioc;
 using WwTool.Services;
 using WwTool.Common.Utils;
 using WwTool.Extensions;
@@ -10,28 +9,14 @@ namespace WwTool.Common.Converters
 {
     public class ItemIdToNameConverter : IValueConverter, IMultiValueConverter
     {
+        public GameDataService? Catalog { get; set; }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is int id)
             {
-                try
-                {
-                    var gameDataService = ContainerLocator.Current.Resolve<GameDataService>();
-                    if (gameDataService != null)
-                    {
-                        var itemInfo = gameDataService.GetItemById(id);
-                        if (itemInfo != null)
-                        {
-                            string code = LanguageManager.Instance.CurrentLanguage.GetCode();
-                            return itemInfo.GetName(code);
-                        }
-                    }
-                }
-                catch
-                {
-                    // 忽略解析错误
-                }
-                
+                var item = Catalog?.GetItemById(id);
+                string? name = item?.GetName(LanguageManager.Instance.CurrentLanguage.GetCode());
+                if (!string.IsNullOrWhiteSpace(name)) return name;
                 return id.ToString();
             }
 

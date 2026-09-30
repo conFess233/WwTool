@@ -11,10 +11,15 @@ public sealed class UserDataService(
     IUserRepository userRepository,
     IPlayerInfoRepository playerInfoRepository,
     IGachaRepository gachaRepository,
-    IConfigService configService) : IUserDataService
+    IConfigService configService, ILoginService loginService) : IUserDataService
 {
+    public event EventHandler<AccountDeletedEventArgs>? AccountDeleted;
+
     public async Task<IReadOnlyList<AccountSummary>> ListAccountsAsync(CancellationToken cancellationToken = default) =>
-        (await userRepository.GetAllUserAccountAsync(cancellationToken)).Select(MapAccount).ToList();
+        await userRepository.GetAllUserAccountAsync(cancellationToken);
+
+    public Task<AcquisitionTimes> ReadAcquisitionTimesAsync(string uid, int[] pools, CancellationToken cancellationToken = default) =>
+        gachaRepository.ReadAcquisitionTimesAsync(uid, pools, cancellationToken);
 
     public Task<string?> GetCredentialAsync(string uid, CancellationToken cancellationToken = default) =>
         userRepository.GetOauthCodeAsync(uid, cancellationToken);
@@ -22,6 +27,8 @@ public sealed class UserDataService(
     public async Task DeleteAccountAsync(string uid, CancellationToken cancellationToken = default)
     {
         await userRepository.DeleteUserAccountAsync(uid, cancellationToken);
+        loginService.RemoveUserContext(uid);
+        AccountDeleted?.Invoke(this, new AccountDeletedEventArgs(uid));
         if (configService.User.LastUserId == uid)
         {
             configService.User.LastUserId = string.Empty;
@@ -29,23 +36,13 @@ public sealed class UserDataService(
         }
     }
 
-    public Task<RoleDetailInfo?> LoadRoleSnapshotAsync(string uid, CancellationToken cancellationToken = default) =>
+    public Task<PlayerSnapshot?> LoadRoleSnapshotAsync(string uid, CancellationToken cancellationToken = default) =>
         playerInfoRepository.LoadPlayerRoleDataAsync(uid, cancellationToken);
 
-    public Task<IReadOnlyList<GachaData>> ReadGachaInSourceOrderAsync(string uid, int poolType, CancellationToken cancellationToken = default) =>
+    public Task<IReadOnlyList<GachaPull>> ReadGachaInSourceOrderAsync(string uid, int poolType, CancellationToken cancellationToken = default) =>
         gachaRepository.GetPoolRecordsByUidAsync(uid, poolType, cancellationToken);
 
-    public Task<int> ImportGachaAsync(string uid, int poolType, IEnumerable<GachaData> records, string source, CancellationToken cancellationToken = default) =>
+    public Task<int> ImportGachaAsync(string uid, int poolType, IEnumerable<GachaPull> records, string source, CancellationToken cancellationToken = default) =>
         gachaRepository.SyncGachaDataAsync(uid, poolType, records, source, cancellationToken);
 
-    private static AccountSummary MapAccount(UserAccount account) => new()
-    {
-        Uid = account.Uid,
-        Region = account.Region,
-        Name = account.Name,
-        Level = account.Level,
-        Sex = account.Sex,
-        HeadPhoto = account.HeadPhoto,
-        LastSyncedAtUtc = account.LastSyncedAtUtc
-    };
 }

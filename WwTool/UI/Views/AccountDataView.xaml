@@ -2,6 +2,7 @@
     x:Class="WwTool.UI.Views.AccountDataView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:catalog="clr-namespace:WwTool.UI.Components"
     xmlns:cv="clr-namespace:WwTool.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,44 +16,11 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <cv:ImageConverter x:Key="ImageConverter" />
     </UserControl.Resources>
-
-    <UserControl.RenderTransform>
-        <ScaleTransform x:Name="PageTransform" ScaleX="0.8" ScaleY="0.8" />
-    </UserControl.RenderTransform>
 
     <UserControl.Triggers>
         <EventTrigger RoutedEvent="UserControl.Loaded">
-            <BeginStoryboard>
-                <Storyboard>
-                    <DoubleAnimation
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="1"
-                        Duration="{StaticResource MotionPage}" />
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleY"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleX"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                </Storyboard>
-            </BeginStoryboard>
+            <BeginStoryboard Storyboard="{StaticResource PageEnterStoryboard}" />
         </EventTrigger>
     </UserControl.Triggers>
 
@@ -62,11 +30,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
             <Grid>
-                <TextBlock Margin="20,15" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[AccountData_Title], Source={x:Static utils:LanguageManager.Instance}}" />
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <ComboBox Height="30" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <TextBlock Margin="20,15" VerticalAlignment="Center" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[AccountData_Title], Source={x:Static utils:LanguageManager.Instance}}" />
+                <WrapPanel Grid.Column="1" Margin="16,12,20,12" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                    <ComboBox MinHeight="40" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
@@ -76,33 +45,30 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <Button
-                        Height="32"
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                        MinHeight="40"
                         Margin="20,0,0,0"
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshLocalAccountCommand}"
                         Content="{Binding Path=[Action_RefreshRoleList], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Tag="{StaticResource RefreshImage}" />
-                    <Button
-                        Height="32"
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                        MinHeight="40"
                         Margin="10,0,0,0"
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshCommand}"
                         Content="{Binding Path=[Action_RefreshLocalData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
-                        Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource RefreshImage}" />
                     <Button
-                        Height="32"
-                        Margin="10,0,20,0"
+                        MinHeight="40"
+                        Margin="10,0,0,0"
                         HorizontalAlignment="Right"
                         Command="{Binding SyncDataCommand}"
                         Content="{Binding Path=[Action_GetCloudData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
+
                         Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource CloudImage}" />
-                </StackPanel>
+                </WrapPanel>
 
             </Grid>
         </Border>
@@ -124,12 +90,12 @@
                     BorderThickness="1"
                     CornerRadius="{DynamicResource CornerRadiusCard}">
                     <StackPanel Margin="16">
-                        <Image
+                        <catalog:CatalogImage
                             Width="80"
                             Height="80"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Source="{Binding SelectedUser.IconPath, Converter={StaticResource ImageConverter}}" />
+                            Loader="{DynamicResource CatalogImageLoader}" Path="{Binding SelectedUser.IconPath}" />
 
                         <TextBlock
                             HorizontalAlignment="Center"
@@ -306,7 +272,7 @@
                                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <TextBlock
                                             HorizontalAlignment="Center"
-                                            FontSize="10"
+                                            FontSize="{StaticResource FontSizeSm}"
                                             Style="{StaticResource CaptionTextStyle}"
                                             Text="{Binding Path=[Role_RadioLevel], Source={x:Static utils:LanguageManager.Instance}}" />
                                         <TextBlock

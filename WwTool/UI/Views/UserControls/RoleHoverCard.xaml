@@ -1,0 +1,62 @@
+<UserControl x:Class="WwTool.UI.Views.UserControls.RoleHoverCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:catalog="clr-namespace:WwTool.UI.Components"
+    xmlns:cv="clr-namespace:WwTool.Common.Converters"
+    xmlns:utils="clr-namespace:WwTool.Common.Utils"
+    Focusable="False" KeyboardNavigation.TabNavigation="None">
+    <UserControl.Resources>
+        <cv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+        <DataTemplate x:Key="AttributeTemplate">
+            <Grid Margin="0,0,0,8">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Name}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,8,0" />
+                <TextBlock Grid.Column="1" Text="{Binding Value}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Border Padding="{DynamicResource CardPadding}" Background="{DynamicResource SurfaceElevatedBrush}"
+        BorderBrush="{DynamicResource BorderStrongBrush}" BorderThickness="1"
+        CornerRadius="{DynamicResource CornerRadiusCard}">
+        <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="2*" /><ColumnDefinition Width="3*" /></Grid.ColumnDefinitions>
+            <Grid Margin="0,0,16,0">
+                <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                <catalog:CatalogImage Loader="{DynamicResource CatalogImageLoader}" CacheOnly="True"
+                    Path="{Binding PortraitPath}" FallbackPath="{Binding IconPath}" Stretch="Uniform" DecodeWidth="360"
+                    MaxHeight="{DynamicResource RoleHoverPortraitHeight}" />
+                <TextBlock Grid.Row="1" Margin="0,8,0,0" Text="{Binding DisplayName}" TextWrapping="Wrap"
+                    TextAlignment="Center" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
+                    Foreground="{DynamicResource TextPrimaryBrush}" />
+            </Grid>
+            <ScrollViewer x:Name="DetailsScroller" Grid.Column="1" VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled" Focusable="False" PreviewMouseWheel="OnDetailsMouseWheel">
+                <StackPanel>
+                    <TextBlock Margin="0,0,0,8" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"
+                        Text="{Binding Path=[Guide_HoverAttributes], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <ItemsControl ItemsSource="{Binding Attributes}" ItemTemplate="{StaticResource AttributeTemplate}" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextMutedBrush}"
+                        Visibility="{Binding HasAttributes, Converter={StaticResource BoolToVisibility}, ConverterParameter=inverse}"
+                        Text="{Binding Path=[Guide_NoAttributeData], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <Border Height="1" Margin="0,16,0,16" Background="{DynamicResource BorderBrush}" />
+                    <TextBlock Margin="0,0,0,8" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"
+                        Text="{Binding Path=[Guide_HoverWeapon], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <StackPanel Visibility="{Binding DataContext.HasEquippedWeapon, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}" DataContext="{Binding EquippedWeapon}">
+                        <catalog:CatalogImage Loader="{DynamicResource CatalogImageLoader}" CacheOnly="True"
+                            Path="{Binding ImagePath}" Height="64" Stretch="Uniform" DecodeWidth="128" />
+                        <TextBlock Margin="0,8,0,0" Text="{Binding Name}" TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" />
+                        <TextBlock Text="{Binding Star, StringFormat={}{0}★}" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <ItemsControl Margin="0,8,0,0" ItemsSource="{Binding Fields}" ItemTemplate="{StaticResource AttributeTemplate}" />
+                    </StackPanel>
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextMutedBrush}"
+                        Visibility="{Binding HasEquippedWeapon, Converter={StaticResource BoolToVisibility}, ConverterParameter=inverse}"
+                        Text="{Binding Path=[Guide_NoEquippedWeaponData], Source={x:Static utils:LanguageManager.Instance}}" />
+                </StackPanel>
+            </ScrollViewer>
+            <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,16,0,0" HorizontalAlignment="Right"
+                Text="{Binding AcquiredText}" TextWrapping="Wrap" TextAlignment="Right"
+                FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextMutedBrush}" />
+        </Grid>
+    </Border>
+</UserControl>

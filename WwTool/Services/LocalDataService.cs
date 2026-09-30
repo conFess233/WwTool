@@ -50,7 +50,7 @@ namespace WwTool.Services
                 _initialized = true;
                 _logger.Info("Local database is ready.");
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 throw new WwToolDatabaseException("Failed to initialize the local database.", ex);
             }

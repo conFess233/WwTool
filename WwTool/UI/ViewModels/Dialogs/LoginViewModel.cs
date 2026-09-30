@@ -16,7 +16,7 @@ using WwTool.Common.Models.ApiResponse;
 using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
-using ExceptionHelper = WwTool.Common.Utils.ExceptionHelper;
+using ExceptionHelper = WwTool.Services.Presentation.ExceptionHelper;
 
 namespace WwTool.UI.ViewModels.Dialogs
 {
@@ -83,6 +83,7 @@ namespace WwTool.UI.ViewModels.Dialogs
         /// <summary>
         /// 登录操作是否正在执行，用于控制输入框和按钮的启用状态
         /// </summary>
+        private readonly CancellationTokenSource _lifetime = new();
         private bool _isBusy = false;
         public bool IsBusy
         {
@@ -168,7 +169,7 @@ namespace WwTool.UI.ViewModels.Dialogs
                         Password = Crypto.EncodePassword(Password)
                     };
 
-                    var response = await _loginService.EmailLoginAsync(request);
+                    var response = await _loginService.EmailLoginAsync(request, _lifetime.Token);
 
                     if (response == null)
                     {
@@ -181,7 +182,7 @@ namespace WwTool.UI.ViewModels.Dialogs
                         _uiStateService.ShowToast(LanguageManager.Instance["Login_RiskTitle"],
                             LanguageManager.Instance["Login_RiskMsg"], NotificationType.Warning);
 
-                        var geetestData = await GeetestServer.SolveGeetestAsync(_configService.App.GeetestPort);
+                        var geetestData = await GeetestServer.SolveGeetestAsync(_configService.App.GeetestPort, _lifetime.Token);
 
                         if (geetestData == null || geetestData.Count == 0)
                         {
@@ -197,7 +198,7 @@ namespace WwTool.UI.ViewModels.Dialogs
                         if (geetestData.TryGetValue("pass_token", out var passToken))
                             request.GeetestPassToken = passToken;
 
-                        response = await _loginService.EmailLoginAsync(request);
+                        response = await _loginService.EmailLoginAsync(request, _lifetime.Token);
 
                         if (response == null)
                         {
@@ -213,7 +214,7 @@ namespace WwTool.UI.ViewModels.Dialogs
                     }
 
                     // 生成授权码
-                    var oauthResponse = await _loginService.GenerateAsync(new GenerateRequest());
+                    var oauthResponse = await _loginService.GenerateAsync(new GenerateRequest(), _lifetime.Token);
                     if (oauthResponse == null || oauthResponse.Codes != 0 ||
                         string.IsNullOrEmpty(oauthResponse.OauthCode))
                     {
@@ -222,7 +223,7 @@ namespace WwTool.UI.ViewModels.Dialogs
                     }
 
                     // 同步玩家关联角色数据并更新到本地数据库
-                    await _getDataService.SyncAllUserDataAsync(oauthCode: oauthResponse.OauthCode);
+                    await _getDataService.SyncAllUserDataAsync(oauthCode: oauthResponse.OauthCode, cancellationToken: _lifetime.Token);
 
                     // 登录成功，关闭弹窗并返回 OK
                     RequestClose.Invoke(new DialogResult { Result = ButtonResult.OK });
@@ -242,10 +243,11 @@ namespace WwTool.UI.ViewModels.Dialogs
         /// </summary>
         private void Cancel()
         {
+            _lifetime.Cancel();
             RequestClose.Invoke(new DialogResult(ButtonResult.Cancel));
         }
 
-        public bool CanCloseDialog() => !IsBusy;
+        public bool CanCloseDialog() => true;
 
         /// <summary>
         /// 弹窗打开时触发，启用全局背景模糊
@@ -260,6 +262,8 @@ namespace WwTool.UI.ViewModels.Dialogs
         /// </summary>
         public void OnDialogClosed()
         {
+            _lifetime.Cancel();
+            Password = string.Empty;
             _eventAggregator.GetEvent<GlobalBlurEvent>().Publish(false);
         }
     }

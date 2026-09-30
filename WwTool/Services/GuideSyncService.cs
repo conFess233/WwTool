@@ -3,7 +3,7 @@ using System.Text.Json;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models.ApiRequest;
 using WwTool.Common.Models.ApiResponse;
-using WwTool.Common.Models.Entities;
+using WwTool.Common.Models.Domain;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services;
@@ -25,7 +25,7 @@ public sealed class GuideSyncService(
             AccessToken = accessToken
         }, language, cancellationToken);
         IReadOnlyList<GuidePlayer> players = await apiClient.GetPlayersAsync(token, language, cancellationToken);
-        await repository.SaveCredentialAndPlayersAsync(cUid, token, players, cancellationToken);
+        await repository.SaveCredentialAndPlayersAsync(cUid, token, players.Select(x => new GuidePlayerIdentity(x.PlayerId, x.ServerId)).ToList(), cancellationToken);
     }
 
     public async Task SyncAsync(string uid, string language, CancellationToken cancellationToken = default)
@@ -39,7 +39,7 @@ public sealed class GuideSyncService(
                 ?? throw new GuideApiException("Guide 账号中未找到当前 UID。");
             if (string.IsNullOrWhiteSpace(player.ServerId))
                 throw new GuideApiException("Guide 玩家记录缺少服务器标识。");
-            await repository.SaveCredentialAndPlayersAsync(credential.CUid, credential.Token, players, cancellationToken);
+            await repository.SaveCredentialAndPlayersAsync(credential.CUid, credential.Token, players.Select(x => new GuidePlayerIdentity(x.PlayerId, x.ServerId)).ToList(), cancellationToken);
             await apiClient.ChoosePlayerAsync(credential.Token, language, new GuideChoosePlayerRequest
             {
                 PlayerId = player.PlayerId!.Value,
@@ -48,7 +48,7 @@ public sealed class GuideSyncService(
 
             IReadOnlyList<GuideAvatar> avatars = await apiClient.GetAvatarsAsync(credential.Token, language, cancellationToken);
             var owned = avatars.Select((avatar, index) => (avatar, index)).Where(x => x.avatar.IsAcquired).ToList();
-            var results = new ConcurrentDictionary<int, (GuideRoleSnapshot Role, GuideEquippedWeaponSnapshot? Weapon)>();
+            var results = new ConcurrentDictionary<int, (GuideRoleData Role, GuideWeaponData? Weapon)>();
             using var gate = new SemaphoreSlim(2, 2);
             Task[] tasks = owned.Select(async entry =>
             {
@@ -64,11 +64,11 @@ public sealed class GuideSyncService(
             }).ToArray();
             await Task.WhenAll(tasks);
 
-            List<GuideRoleSnapshot> roles = avatars.Select((avatar, index) =>
+            List<GuideRoleData> roles = avatars.Select((avatar, index) =>
                 results.TryGetValue(index, out var loaded)
                     ? loaded.Role
                     : CreateRoleSnapshot(uid, avatar, index)).ToList();
-            List<GuideEquippedWeaponSnapshot> weapons = results.OrderBy(x => x.Key).Where(x => x.Value.Weapon is not null).Select(x => x.Value.Weapon!).ToList();
+            List<GuideWeaponData> weapons = results.OrderBy(x => x.Key).Where(x => x.Value.Weapon is not null).Select(x => x.Value.Weapon!).ToList();
             await repository.ReplaceSnapshotAsync(uid, roles, weapons, DateTimeOffset.UtcNow, cancellationToken);
         }
         catch (GuideAuthenticationRequiredException)
@@ -78,7 +78,7 @@ public sealed class GuideSyncService(
         }
     }
 
-    private async Task<(GuideRoleSnapshot Role, GuideEquippedWeaponSnapshot? Weapon)> LoadRoleAsync(
+    private async Task<(GuideRoleData Role, GuideWeaponData? Weapon)> LoadRoleAsync(
         string uid, string token, string language, GuideAvatar avatar, int sourceOrder, CancellationToken cancellationToken)
     {
         IReadOnlyList<GuideIntroductionSummary> introductions = await apiClient.GetIntroductionsAsync(token, language, avatar.RoleGbId, cancellationToken);
@@ -101,13 +101,13 @@ public sealed class GuideSyncService(
         if (detail is null || selected is null)
             throw new GuideApiException($"角色 {avatar.RoleGbId} 的所有攻略方案均未返回详情。");
 
-        GuideRoleSnapshot role = CreateRoleSnapshot(uid, avatar, sourceOrder);
+        GuideRoleData role = CreateRoleSnapshot(uid, avatar, sourceOrder);
         role.Sequence = detail.RoleResonance?.Items.Count(x => x.IsAcquired) ?? 0;
         role.StrategyId = selected.Id;
         role.StrategyModifiedAt = selected.ModifiedAt;
         role.DetailJson = JsonSerializer.Serialize(detail, DetailJsonOptions);
         GuideWeapon? current = detail.Weapon?.Current;
-        GuideEquippedWeaponSnapshot? weapon = current is null || string.IsNullOrWhiteSpace(current.GbId) ? null : new GuideEquippedWeaponSnapshot
+        GuideWeaponData? weapon = current is null || string.IsNullOrWhiteSpace(current.GbId) ? null : new GuideWeaponData
         {
             Uid = uid,
             OwnerRoleGbId = avatar.RoleGbId,
@@ -119,7 +119,7 @@ public sealed class GuideSyncService(
         return (role, weapon);
     }
 
-    private static GuideRoleSnapshot CreateRoleSnapshot(string uid, GuideAvatar avatar, int sourceOrder) => new()
+    private static GuideRoleData CreateRoleSnapshot(string uid, GuideAvatar avatar, int sourceOrder) => new()
     {
         Uid = uid,
         RoleGbId = avatar.RoleGbId,

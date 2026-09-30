@@ -25,5 +25,4 @@ public sealed record FeaturedPullInsight(
     string Name,
     int CumulativePulls,
     double ExpectedCumulativePulls,
-    double RunningAverage,
-    bool IsIncomplete);
+    double RunningAverage);

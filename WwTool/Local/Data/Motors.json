@@ -1,0 +1,1255 @@
+{
+  "version": "3.7.0",
+  "items": {
+    "89400001": {
+      "type": "MotorFrame",
+      "qualityLevel": 0,
+      "names": {
+        "zh-Hans": "崭新出厂",
+        "en": "Factory New",
+        "ja": "ブランニュー",
+        "ko": "신상 출하"
+      }
+    },
+    "89400002": {
+      "type": "MotorFrame",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "远航星",
+        "en": "Voyaging Star",
+        "ja": "旅立つ星",
+        "ko": "먼 길을 떠나는 별"
+      }
+    },
+    "89400003": {
+      "type": "MotorFrame",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "「霁」",
+        "en": "Crystal Sky",
+        "ja": "「雪晴れ」",
+        "ko": "「눈이 갠 뒤」"
+      }
+    },
+    "89400004": {
+      "names": {
+        "zh-Hans": "「霁」",
+        "en": "Crystal Sky",
+        "ja": "「雪晴れ」",
+        "ko": "「눈이 갠 뒤」"
+      },
+      "type": "MotorFrame",
+      "qualityLevel": 5
+    },
+    "89400005": {
+      "names": {
+        "zh-Hans": "云帛机骑",
+        "en": "Cloud Ride",
+        "ja": "雲帛機騎",
+        "ko": "운백기(雲帛騎)"
+      },
+      "type": "MotorFrame",
+      "qualityLevel": 5
+    },
+    "89101001": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "布要上学！",
+        "en": "Student Abby!",
+        "ja": "このアブ様も学校行きたいっ！",
+        "ko": "아브도 학교 갈래!"
+      }
+    },
+    "89102001": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "布要上学！",
+        "en": "Student Abby!",
+        "ja": "このアブ様も学校行きたいっ！",
+        "ko": "아브도 학교 갈래!"
+      }
+    },
+    "89103001": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "布要上学！",
+        "en": "Student Abby!",
+        "ja": "このアブ様も学校行きたいっ！",
+        "ko": "아브도 학교 갈래!"
+      }
+    },
+    "89103002": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "旅鼠冲击",
+        "en": "Lemming Charge",
+        "ja": "レミングストライク",
+        "ko": "레밍 쇼크"
+      }
+    },
+    "89101999": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "漆黑",
+        "en": "Ink Black",
+        "ja": "漆黒",
+        "ko": "잉크 블랙"
+      }
+    },
+    "89101998": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "靛蓝",
+        "en": "Blue Indigo",
+        "ja": "群青",
+        "ko": "인디고 블루"
+      }
+    },
+    "89101996": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "深紫",
+        "en": "Deep Purple",
+        "ja": "紫紺",
+        "ko": "딥 퍼플"
+      }
+    },
+    "89101995": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "朱红",
+        "en": "Vermilion",
+        "ja": "真朱",
+        "ko": "버밀리온 레드"
+      }
+    },
+    "89101994": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "亮黄",
+        "en": "Bright Yellow",
+        "ja": "日黄",
+        "ko": "레몬 옐로우"
+      }
+    },
+    "89102999": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "漆黑",
+        "en": "Ink Black",
+        "ja": "漆黒",
+        "ko": "잉크 블랙"
+      }
+    },
+    "89102998": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "靛蓝",
+        "en": "Blue Indigo",
+        "ja": "群青",
+        "ko": "인디고 블루"
+      }
+    },
+    "89102996": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "深紫",
+        "en": "Deep Purple",
+        "ja": "紫紺",
+        "ko": "딥 퍼플"
+      }
+    },
+    "89102995": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "朱红",
+        "en": "Vermilion",
+        "ja": "真朱",
+        "ko": "버밀리온 레드"
+      }
+    },
+    "89102994": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "亮黄",
+        "en": "Bright Yellow",
+        "ja": "日黄",
+        "ko": "레몬 옐로우"
+      }
+    },
+    "89103999": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "漆黑",
+        "en": "Ink Black",
+        "ja": "漆黒",
+        "ko": "잉크 블랙"
+      }
+    },
+    "89103998": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "靛蓝",
+        "en": "Blue Indigo",
+        "ja": "群青",
+        "ko": "인디고 블루"
+      }
+    },
+    "89103996": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "深紫",
+        "en": "Deep Purple",
+        "ja": "紫紺",
+        "ko": "딥 퍼플"
+      }
+    },
+    "89103995": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "朱红",
+        "en": "Vermilion",
+        "ja": "真朱",
+        "ko": "버밀리온 레드"
+      }
+    },
+    "89103994": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "亮黄",
+        "en": "Bright Yellow",
+        "ja": "日黄",
+        "ko": "레몬 옐로우"
+      }
+    },
+    "89101002": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "随心色彩",
+        "en": "Carefree Rainbow",
+        "ja": "フリーペイント",
+        "ko": "프리 페인팅"
+      }
+    },
+    "89101003": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "挥别昨日",
+        "en": "Farewell to Yesterday",
+        "ja": "昨日にサヨナラ",
+        "ko": "그리운 어제여, 안녕"
+      }
+    },
+    "89102002": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "随心色彩",
+        "en": "Carefree Rainbow",
+        "ja": "フリーペイント",
+        "ko": "프리 페인팅"
+      }
+    },
+    "89102003": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "挥别昨日",
+        "en": "Farewell to Yesterday",
+        "ja": "昨日にサヨナラ",
+        "ko": "그리운 어제여, 안녕"
+      }
+    },
+    "89103003": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "随心色彩",
+        "en": "Carefree Rainbow",
+        "ja": "フリーペイント",
+        "ko": "프리 페인팅"
+      }
+    },
+    "89103004": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "挥别昨日",
+        "en": "Farewell to Yesterday",
+        "ja": "昨日にサヨナラ",
+        "ko": "그리운 어제여, 안녕"
+      }
+    },
+    "89103005": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "立方达人",
+        "en": "Cube Expert",
+        "ja": "キューブマスター",
+        "ko": "큐브 마스터"
+      }
+    },
+    "89103006": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "啾啾！啾噜？",
+        "en": "Chuu! Chuluu?",
+        "ja": "チュチュ！チュル！",
+        "ko": "츄츄! 츄르?"
+      }
+    },
+    "89103007": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "相随",
+        "en": "Companionship",
+        "ja": "伴走",
+        "ko": "동행"
+      }
+    },
+    "89103008": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "车手一号",
+        "en": "No. 1 Biker",
+        "ja": "ライダーNo.1",
+        "ko": "라이더 No.1"
+      }
+    },
+    "89103010": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "日灵大家族",
+        "en": "Happy Soliskin Family",
+        "ja": "太陽の精霊大家族",
+        "ko": "태양의 정령 대가족"
+      }
+    },
+    "89103011": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "日灵学习中",
+        "en": "Studious Soliskin",
+        "ja": "レッスン中の精霊",
+        "ko": "태양의 정령 공부 중"
+      }
+    },
+    "89103012": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "已燃尽",
+        "en": "Low Fuel",
+        "ja": "バーンアウト",
+        "ko": "번아웃"
+      }
+    },
+    "89103013": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "吃饱喝足",
+        "en": "Repletion",
+        "ja": "満腹",
+        "ko": "배부름"
+      }
+    },
+    "89103014": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "德莉珐的微笑",
+        "en": "Dhalifa's Smile",
+        "ja": "ディリファの微笑み",
+        "ko": "달리파의 미소"
+      }
+    },
+    "89103015": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "危险拂光",
+        "en": "The Shimmer Comes",
+        "ja": "危ういシマー",
+        "ko": "위태로운 희미한 빛"
+      }
+    },
+    "89103016": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "结城理",
+        "en": "Makoto Yuki",
+        "ja": "結城理",
+        "ko": "유키 마코토"
+      }
+    },
+    "89103017": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "埃癸斯",
+        "en": "Aigis",
+        "ja": "アイギス",
+        "ko": "아이기스"
+      }
+    },
+    "89103018": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "JOKER",
+        "en": "Joker",
+        "ja": "ジョーカー",
+        "ko": "JOKER"
+      }
+    },
+    "89103019": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "MONA",
+        "en": "Mona",
+        "ja": "モナ",
+        "ko": "MONA"
+      }
+    },
+    "89103020": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "索尼克",
+        "en": "Sonic",
+        "ja": "ソニック",
+        "ko": "소닉"
+      }
+    },
+    "89103021": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "夏特",
+        "en": "Shadow",
+        "ja": "シャドウ",
+        "ko": "섀도우"
+      }
+    },
+    "89103022": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "滑行中的好奇心",
+        "en": "Curiosity Takes Flight",
+        "ja": "コース上の好奇心",
+        "ko": "활주 도중의 호기심"
+      }
+    },
+    "89103023": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "温暖小憩",
+        "en": "A Cozy Break",
+        "ja": "あったか休憩タイム",
+        "ko": "따스한 휴식 시간"
+      }
+    },
+    "89103024": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "阿布暖烘烘",
+        "en": "Warmed Up Abby",
+        "ja": "ぽかぽかアブ",
+        "ko": "포근한 아브"
+      }
+    },
+    "89103025": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "飞驰邂逅",
+        "en": "A Fleeting Encounter",
+        "ja": "駆け抜ける出会い",
+        "ko": "스쳐가는 만남"
+      }
+    },
+    "89101004": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "隧者与少女",
+        "en": "Girl with Exostrider",
+        "ja": "エクソストライダーと少女と",
+        "ko": "엑소스트라이더와 소녀"
+      }
+    },
+    "89102004": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "隧者与少女",
+        "en": "Girl with Exostrider",
+        "ja": "エクソストライダーと少女と",
+        "ko": "엑소스트라이더와 소녀"
+      }
+    },
+    "89103926": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "隧者与少女",
+        "en": "Girl with Exostrider",
+        "ja": "エクソストライダーと少女と",
+        "ko": "엑소스트라이더와 소녀"
+      }
+    },
+    "89101005": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "深空与歌者",
+        "en": "Singer in Deepspace",
+        "ja": "深宇宙と歌う者",
+        "ko": "스페이스트렉 · 하늘과 가수"
+      }
+    },
+    "89101006": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "若以月为因果",
+        "en": "Lunar Causality",
+        "ja": "月を因果とするなら",
+        "ko": "인과의 닻이 맺은 달"
+      }
+    },
+    "89101007": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "眺望境界之线",
+        "en": "Horizon Lookout",
+        "ja": "境界線を眺めて",
+        "ko": "경계선을 바라보며"
+      }
+    },
+    "89101008": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "心心相鸣",
+        "en": "Wuther as One",
+        "ja": "鳴り合う潮の心",
+        "ko": "이심전심"
+      }
+    },
+    "89102005": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "深空与歌者",
+        "en": "Singer in Deepspace",
+        "ja": "深宇宙と歌う者",
+        "ko": "스페이스트렉 · 하늘과 가수"
+      }
+    },
+    "89102006": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "若以月为因果",
+        "en": "Lunar Causality",
+        "ja": "月を因果とするなら",
+        "ko": "인과의 닻이 맺은 달"
+      }
+    },
+    "89102007": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "眺望境界之线",
+        "en": "Horizon Lookout",
+        "ja": "境界線を眺めて",
+        "ko": "경계선을 바라보며"
+      }
+    },
+    "89103927": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "深空与歌者",
+        "en": "Singer in Deepspace",
+        "ja": "深宇宙と歌う者",
+        "ko": "스페이스트렉 · 하늘과 가수"
+      }
+    },
+    "89103928": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "若以月为因果",
+        "en": "Lunar Causality",
+        "ja": "月を因果とするなら",
+        "ko": "인과의 닻이 맺은 달"
+      }
+    },
+    "89103929": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "眺望境界之线",
+        "en": "Horizon Lookout",
+        "ja": "境界線を眺めて",
+        "ko": "경계선을 바라보며"
+      }
+    },
+    "89103026": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "炉芯掠影",
+        "en": "Reactor Shadow",
+        "ja": "ドライブの影",
+        "ko": "리액터 드라이브 스냅"
+      }
+    },
+    "89103027": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "测界之眼",
+        "en": "Observer's Eye",
+        "ja": "観測者の目",
+        "ko": "관측의 눈"
+      }
+    },
+    "89103029": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "极速冰点",
+        "en": "Flash Freeze",
+        "ja": "フラッシュフリーズ",
+        "ko": "초고속 빙점"
+      }
+    },
+    "89103030": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "巧思妙解",
+        "en": "Ingenuity",
+        "ja": "天才の発想",
+        "ko": "기발한 아이디어"
+      }
+    },
+    "89103031": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "踩雪大冒险",
+        "en": "On Thin Ice",
+        "ja": "雪踏み大冒険",
+        "ko": "눈 밟기 대모험"
+      }
+    },
+    "89103032": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "流变双翼",
+        "en": "Flux Wings",
+        "ja": "フラックスウィング",
+        "ko": "변화의 날개 한 쌍"
+      }
+    },
+    "89103033": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "循此日光",
+        "en": "Follow the Sunlight",
+        "ja": "陽の光を辿って",
+        "ko": "이 햇빛을 따라"
+      }
+    },
+    "89103034": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "莫莫狐",
+        "en": "MOOMOOSSI",
+        "ja": "ムムシ",
+        "ko": "무무씨"
+      }
+    },
+    "89101009": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "QUEEN",
+        "en": "QUEEN",
+        "ja": "クイーン",
+        "ko": "QUEEN"
+      }
+    },
+    "89101010": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "VIOLET",
+        "en": "VIOLET",
+        "ja": "ヴァイオレット",
+        "ko": "VIOLET"
+      }
+    },
+    "89101011": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "星海彼岸的呼唤",
+        "en": "Call from Beyond the Stars",
+        "ja": "星海を越える呼びかけ",
+        "ko": "별바다 건너의 부름"
+      }
+    },
+    "89102008": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "QUEEN",
+        "en": "QUEEN",
+        "ja": "クイーン",
+        "ko": "QUEEN"
+      }
+    },
+    "89102009": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "VIOLET",
+        "en": "VIOLET",
+        "ja": "ヴァイオレット",
+        "ko": "VIOLET"
+      }
+    },
+    "89102010": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "星海彼岸的呼唤",
+        "en": "Call from Beyond the Stars",
+        "ja": "星海を越える呼びかけ",
+        "ko": "별바다 건너의 부름"
+      }
+    },
+    "89103035": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "QUEEN",
+        "en": "QUEEN",
+        "ja": "クイーン",
+        "ko": "QUEEN"
+      }
+    },
+    "89103036": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "VIOLET",
+        "en": "VIOLET",
+        "ja": "ヴァイオレット",
+        "ko": "VIOLET"
+      }
+    },
+    "89103038": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "消融于钴蓝雪线",
+        "en": "Melting into the Cobalt Blue Snow",
+        "ja": "コバルトの雪に溶けて",
+        "ko": "시리도록 푸른 설선에 녹아들다"
+      }
+    },
+    "89103039": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "散场后的欢笑巡游",
+        "en": "After Party Smiles",
+        "ja": "終幕のラフパレード",
+        "ko": "축제의 끝, 만개한 미소"
+      }
+    },
+    "89103040": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "星星的记忆",
+        "en": "Memories of the Stars",
+        "ja": "星の記憶",
+        "ko": "별의 기억"
+      }
+    },
+    "89101012": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "「雪月花」",
+        "en": "Snow, Moon, and Flowers",
+        "ja": "「雪月花」",
+        "ko": "「설월화」"
+      }
+    },
+    "89101013": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "献给你的花束",
+        "en": "Flowers For You",
+        "ja": "あなたへ贈る花束",
+        "ko": "그대에게 바치는 꽃다발"
+      }
+    },
+    "89102011": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "「雪月花」",
+        "en": "Snow, Moon, and Flowers",
+        "ja": "「雪月花」",
+        "ko": "「설월화」"
+      }
+    },
+    "89102012": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "献给你的花束",
+        "en": "Flowers For You",
+        "ja": "あなたへ贈る花束",
+        "ko": "그대에게 바치는 꽃다발"
+      }
+    },
+    "89103041": {
+      "type": "MotorSticker",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "「雪月花」",
+        "en": "Snow, Moon, and Flowers",
+        "ja": "「雪月花」",
+        "ko": "「설월화」"
+      }
+    },
+    "89103042": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "献给你的花束",
+        "en": "Flowers For You",
+        "ja": "あなたへ贈る花束",
+        "ko": "그대에게 바치는 꽃다발"
+      }
+    },
+    "89103043": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "Resident Evil",
+        "en": "Resident Evil",
+        "ja": "バイオハザード",
+        "ko": "Biohazard"
+      }
+    },
+    "89103044": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "PRAGMATA",
+        "en": "PRAGMATA",
+        "ja": "PRAGMATA",
+        "ko": "PRAGMATA"
+      }
+    },
+    "89103045": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "日向翔阳",
+        "en": "Hinata Shoyo",
+        "ja": "日向翔陽",
+        "ko": "히나타 소요"
+      }
+    },
+    "89103046": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "影山飞雄",
+        "en": "Kageyama Tobio",
+        "ja": "影山飛雄",
+        "ko": "카게야마 토비오"
+      }
+    },
+    "89103047": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "保科宗四郎",
+        "en": "Soshiro Hoshina",
+        "ja": "保科宗四郎",
+        "ko": "호시나 소우시로"
+      }
+    },
+    "89103048": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "怪兽8号",
+        "en": "Kaiju No. 8",
+        "ja": "怪獣８号",
+        "ko": "괴수 8호"
+      }
+    },
+    "89103049": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "极限国度",
+        "en": "Riders Republic",
+        "ja": "ライダーズ リパブリック",
+        "ko": "라이더스 리퍼블릭"
+      }
+    },
+    "89103050": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "愤怒的小鸟",
+        "en": "Angry Birds",
+        "ja": "アングリーバード",
+        "ko": "앵그리버드"
+      }
+    },
+    "89103051": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "极光远境",
+        "en": "Far Reaches of Aurora",
+        "ja": "オーロラ舞う最果て",
+        "ko": "먼 곳에 닿은 오로라"
+      }
+    },
+    "89103052": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "我心永恒",
+        "en": "Ever True",
+        "ja": "色褪せぬ永遠の意志",
+        "ko": "My Heart Will Go On"
+      }
+    },
+    "89103053": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "使命必达",
+        "en": "We Promise, We Deliver",
+        "ja": "届けるまでが配送",
+        "ko": "반드시 임무완수!"
+      }
+    },
+    "89103054": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "光驰向更深处",
+        "en": "Radiate into the Depths",
+        "ja": "光はさらに深みへ",
+        "ko": "더 깊은 곳으로 향하는 빛"
+      }
+    },
+    "89103055": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "这颗心脏的来处",
+        "en": "Where This Heart Comes From",
+        "ja": "この心臓の故郷",
+        "ko": "심장의 출처"
+      }
+    },
+    "89103056": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "天衣无缝",
+        "en": "Seamless",
+        "ja": "完璧な嘘",
+        "ko": "완전무결"
+      }
+    },
+    "89103028": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "静默阵列",
+        "en": "Silent Array",
+        "ja": "サイレントアレー",
+        "ko": "침묵 배열"
+      }
+    },
+    "89103058": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "冲线时刻",
+        "en": "Finish Line",
+        "ja": "チェッカーフラッグ",
+        "ko": "체크 플래그"
+      }
+    },
+    "89103059": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "阁中傀",
+        "en": "Pagoda Puppet",
+        "ja": "楼閣に潜む機傀",
+        "ko": "누각 속 기관 인형"
+      }
+    },
+    "89103060": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "机傀集结！",
+        "en": "Autopuppets, Unite!",
+        "ja": "機傀大集結！",
+        "ko": "기관 인형 집결!"
+      }
+    },
+    "89103061": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "机甲帝国重建日",
+        "en": "Rebuilding Auto Empire",
+        "ja": "機巧帝国再建の日",
+        "ko": "기관 제국 재건일"
+      }
+    },
+    "89103062": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "风纹羽息",
+        "en": "Wind-Laced Feathers",
+        "ja": "風の紋様、翼の息吹",
+        "ko": "바람에 남은 깃털의 숨결"
+      }
+    },
+    "89103063": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "余霞成绮",
+        "en": "Silky Afterglow",
+        "ja": "錦織る夕映え",
+        "ko": "노을빛 비단"
+      }
+    },
+    "89103064": {
+      "type": "MotorSticker",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "逃离鸭科夫",
+        "en": "Escape From Duckov",
+        "ja": "エスケープ フロム ダッコフ",
+        "ko": "이스케이프 프롬 덕코프"
+      }
+    },
+    "89300001": {
+      "type": "MotorDecoration",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "“小小救世主”",
+        "en": "\"Little Savior\"",
+        "ja": "「小さき救世主」",
+        "ko": "「작은 구세주」"
+      }
+    },
+    "89300002": {
+      "type": "MotorDecoration",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "绯雪团子",
+        "en": "Hiyuki Cube",
+        "ja": "緋雪団子",
+        "ko": "히유키 새알심"
+      }
+    },
+    "89300003": {
+      "type": "MotorDecoration",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "莫宁团子",
+        "en": "Mornye Cube",
+        "ja": "モーニエ団子",
+        "ko": "모니에 새알심"
+      }
+    },
+    "89200000": {
+      "type": "MotorSkin",
+      "qualityLevel": 4,
+      "names": {
+        "zh-Hans": "TERM-X",
+        "en": "TERM-X",
+        "ja": "TERM-X",
+        "ko": "TERM-X"
+      }
+    },
+    "89200001": {
+      "type": "MotorSkin",
+      "qualityLevel": 5,
+      "names": {
+        "zh-Hans": "玄夜启明",
+        "en": "Nightveil Piercer",
+        "ja": "黒き夜に差す光",
+        "ko": "어두운 밤을 밝히는 샛별"
+      }
+    },
+    "89400006": {
+      "type": "MotorFrame",
+      "names": {
+        "zh-Hans": null,
+        "en": null,
+        "ja": null,
+        "ko": null
+      },
+      "qualityLevel": null
+    },
+    "89300004": {
+      "type": "MotorDecoration",
+      "names": {
+        "zh-Hans": "心团子",
+        "en": "Hsin Cube",
+        "ja": "心団子",
+        "ko": "여우의 별자리 새알심"
+      },
+      "qualityLevel": 5
+    },
+    "89103065": {
+      "type": "MotorSticker",
+      "names": {
+        "zh-Hans": "云海飞渡",
+        "en": "Cloud Voyage",
+        "ja": "雲海を飛び越えて",
+        "ko": "구름 바다를 날아"
+      },
+      "qualityLevel": 4
+    },
+    "89103066": {
+      "type": "MotorSticker",
+      "names": {
+        "zh-Hans": "最强机傀小玉",
+        "en": "Jadie the Mightiest Autopuppet",
+        "ja": "最強機傀・玉",
+        "ko": "최강 기관 인형 소옥"
+      },
+      "qualityLevel": 4
+    },
+    "89103067": {
+      "type": "MotorSticker",
+      "names": {
+        "zh-Hans": "千灯狐影",
+        "en": "Fox Before the Lanterns",
+        "ja": "千灯の狐影",
+        "ko": "수많은 등불 · 여우 그림자"
+      },
+      "qualityLevel": 4
+    },
+    "89103068": {
+      "type": "MotorSticker",
+      "names": {
+        "zh-Hans": "月落闻笛音",
+        "en": "Flute Song at Moonset",
+        "ja": "沈む月に響く笛音",
+        "ko": "달이 지자 들려오는 피리 소리"
+      },
+      "qualityLevel": 4
+    },
+    "89103069": {
+      "type": "MotorSticker",
+      "names": {
+        "zh-Hans": "幻寂狐影",
+        "en": "Illusive Fox Shadow",
+        "ja": "幻寂の狐影",
+        "ko": "적막한 환상 · 여우 그림자"
+      },
+      "qualityLevel": 4
+    },
+    "89103070": {
+      "type": "MotorSticker",
+      "names": {
+        "zh-Hans": "落日狐影",
+        "en": "Fox Shadow at Sunset",
+        "ja": "斜陽と狐影",
+        "ko": "황혼의 태양 · 여우 그림자"
+      },
+      "qualityLevel": 4
+    },
+    "89103071": {
+      "type": "MotorSticker",
+      "names": {
+        "zh-Hans": "千灯明",
+        "en": "Shine of Thousand Lanterns",
+        "ja": "幾千もの灯火",
+        "ko": "수많은 등불이 밝아오니"
+      },
+      "qualityLevel": 4
+    },
+    "89103072": {
+      "type": "MotorSticker",
+      "names": {
+        "zh-Hans": "望心归",
+        "en": "Return of Longing Heart",
+        "ja": "心の帰る方へ",
+        "ko": "마음이 돌아보는 곳"
+      },
+      "qualityLevel": 4
+    }
+  }
+}

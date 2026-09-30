@@ -1,6 +1,7 @@
 <UserControl
     x:Class="WwTool.UI.Views.ExplorationDataView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:catalog="clr-namespace:WwTool.UI.Components"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -17,41 +18,9 @@
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </UserControl.Resources>
 
-    <UserControl.RenderTransform>
-        <ScaleTransform x:Name="PageTransform" ScaleX="0.8" ScaleY="0.8" />
-    </UserControl.RenderTransform>
-
     <UserControl.Triggers>
         <EventTrigger RoutedEvent="UserControl.Loaded">
-            <BeginStoryboard>
-                <Storyboard>
-                    <DoubleAnimation
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="1"
-                        Duration="{StaticResource MotionPage}" />
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleY"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleX"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                </Storyboard>
-            </BeginStoryboard>
+            <BeginStoryboard Storyboard="{StaticResource PageEnterStoryboard}" />
         </EventTrigger>
     </UserControl.Triggers>
 
@@ -61,11 +30,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
             <Grid>
-                <TextBlock Margin="20,15" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Exploration_Title], Source={x:Static utils:LanguageManager.Instance}}" />
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <ComboBox Height="30" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <TextBlock Margin="20,15" VerticalAlignment="Center" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Exploration_Title], Source={x:Static utils:LanguageManager.Instance}}" />
+                <WrapPanel Grid.Column="1" Margin="16,12,20,12" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                    <ComboBox MinHeight="40" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
@@ -75,33 +45,30 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <Button
-                        Height="32"
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                        MinHeight="40"
                         Margin="20,0,0,0"
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshLocalAccountCommand}"
                         Content="{Binding Path=[Action_RefreshRoleList], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
                         Tag="{StaticResource RefreshImage}" />
-                    <Button
-                        Height="32"
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                        MinHeight="40"
                         Margin="10,0,0,0"
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshCommand}"
                         Content="{Binding Path=[Action_RefreshLocalData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
-                        Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource RefreshImage}" />
                     <Button
-                        Height="32"
-                        Margin="10,0,20,0"
+                        MinHeight="40"
+                        Margin="10,0,0,0"
                         HorizontalAlignment="Right"
                         Command="{Binding SyncDataCommand}"
                         Content="{Binding Path=[Action_GetCloudData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
+
                         Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource CloudImage}" />
-                </StackPanel>
+                </WrapPanel>
             </Grid>
         </Border>
 
@@ -152,7 +119,7 @@
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Exploration_Boxes], Source={x:Static utils:LanguageManager.Instance}}" />
                         <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
-                        <UniformGrid Columns="4">
+                        <catalog:ResponsiveUniformGrid MaximumColumns="4" MinimumItemWidth="180">
                             <StackPanel HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
                                     <Rectangle Width="30" Height="30" Fill="{DynamicResource TextPrimaryBrush}">
@@ -221,7 +188,7 @@
                                     FontWeight="Bold"
                                     Text="{Binding RoleDetail.Base.Boxes[4], FallbackValue=0}" />
                             </StackPanel>
-                        </UniformGrid>
+                        </catalog:ResponsiveUniformGrid>
                     </StackPanel>
                 </Border>
 
@@ -235,7 +202,7 @@
                         <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Exploration_BasicBoxes], Source={x:Static utils:LanguageManager.Instance}}" />
                         <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
-                        <UniformGrid Columns="4">
+                        <catalog:ResponsiveUniformGrid MaximumColumns="4" MinimumItemWidth="180">
                             <StackPanel HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal">
                                     <Rectangle Width="30" Height="30" Fill="{DynamicResource TextPrimaryBrush}">
@@ -303,7 +270,7 @@
                                     FontWeight="Bold"
                                     Text="{Binding RoleDetail.Base.BasicBoxes[4], FallbackValue=0}" />
                             </StackPanel>
-                        </UniformGrid>
+                        </catalog:ResponsiveUniformGrid>
                     </StackPanel>
                 </Border>
 
@@ -317,7 +284,7 @@
                         <TextBlock Margin="0,0,0,16" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Exploration_PhantomBoxes], Source={x:Static utils:LanguageManager.Instance}}" />
                         <Separator Margin="0,0,0,12" Background="{DynamicResource DividerBrush}" />
 
-                        <UniformGrid Columns="3">
+                        <catalog:ResponsiveUniformGrid MaximumColumns="3" MinimumItemWidth="180">
                             <StackPanel HorizontalAlignment="Center">
                                 <Image Width="40" Height="40" Source="{StaticResource Phantom1Image}" />
                                 <TextBlock
@@ -347,7 +314,7 @@
                                     FontWeight="Bold"
                                     Text="{Binding RoleDetail.Base.PhantomBoxes[3], FallbackValue=0}" />
                             </StackPanel>
-                        </UniformGrid>
+                        </catalog:ResponsiveUniformGrid>
                     </StackPanel>
                 </Border>
             </StackPanel>

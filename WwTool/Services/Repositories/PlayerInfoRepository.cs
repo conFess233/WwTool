@@ -1,3 +1,4 @@
+using WwTool.Common.Models.Domain;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WwTool.Common.Context;
@@ -16,7 +17,7 @@ public sealed class PlayerInfoRepository(
     ILoggerService logger) : IPlayerInfoRepository
 {
     public async Task SavePlayerRegionInfoAsync(
-        PlayerRegionInfo playerRegionInfo,
+        PlayerRegionSummary playerRegionInfo,
         string region,
         string oauthCode,
         CancellationToken cancellationToken = default)
@@ -42,10 +43,10 @@ public sealed class PlayerInfoRepository(
                 baseInfo.RoleName = playerRegionInfo.RoleName;
                 baseInfo.Level = playerRegionInfo.Level;
                 baseInfo.LastSyncedAtUtc = DateTimeOffset.UtcNow;
-                await UpsertSyncStateAsync(db, uid, "Account", string.Empty, token);
+                await SyncStateWriter.UpsertAsync(db, uid, "Account", string.Empty, DateTimeOffset.UtcNow, token);
             }, cancellationToken);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException("本地保存玩家大区数据失败。", ex);
         }
@@ -53,9 +54,9 @@ public sealed class PlayerInfoRepository(
 
     public async Task SavePlayerRoleDataAsync(
         string uid,
-        RoleDetailInfo roleDetail,
+        PlayerSnapshot roleDetail,
         string playerRegion,
-        PlayerRegionInfo playerRegionInfo,
+        PlayerRegionSummary playerRegionInfo,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(roleDetail);
@@ -97,7 +98,7 @@ public sealed class PlayerInfoRepository(
 
                 List<PlayerMusicData> oldMusic = await db.PlayerMusicData.Where(x => x.Uid == uid).ToListAsync(token);
                 db.PlayerMusicData.RemoveRange(oldMusic);
-                foreach (RoleMusicData music in roleDetail.MusicData ?? [])
+                foreach (MusicSnapshot music in roleDetail.MusicData ?? [])
                 {
                     db.PlayerMusicData.Add(new PlayerMusicData
                     {
@@ -108,17 +109,17 @@ public sealed class PlayerInfoRepository(
                         LastSyncedAtUtc = syncedAtUtc
                     });
                 }
-                await UpsertSyncStateAsync(db, uid, "Role", string.Empty, token);
+                await SyncStateWriter.UpsertAsync(db, uid, "Role", string.Empty, DateTimeOffset.UtcNow, token);
             }, cancellationToken);
             logger.Info("玩家角色快照已完整提交。");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException("玩家角色快照未能完整提交，已保留原数据。", ex);
         }
     }
 
-    public async Task<RoleDetailInfo?> LoadPlayerRoleDataAsync(string uid, CancellationToken cancellationToken = default)
+    public async Task<PlayerSnapshot?> LoadPlayerRoleDataAsync(string uid, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -130,7 +131,7 @@ public sealed class PlayerInfoRepository(
             List<PlayerMusicData> music = await db.PlayerMusicData.AsNoTracking().Where(x => x.Uid == uid).OrderBy(x => x.AlbumId).ToListAsync(cancellationToken);
             return MapRoleDetail(baseInfo, motor, battlePass, music);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
             throw new WwToolDatabaseException("加载本地玩家角色快照失败。", ex);
         }
@@ -143,7 +144,7 @@ public sealed class PlayerInfoRepository(
         return account;
     }
 
-    private static void ApplyAccount(UserAccount account, PlayerRegionInfo source, string region)
+    private static void ApplyAccount(UserAccount account, PlayerRegionSummary source, string region)
     {
         account.Name = source.RoleName;
         account.Level = source.Level;
@@ -153,9 +154,9 @@ public sealed class PlayerInfoRepository(
         account.LastSyncedAtUtc = DateTimeOffset.UtcNow;
     }
 
-    private static void MapBaseInfo(PlayerBaseInfo target, RoleDetailInfo source, PlayerRegionInfo region, DateTimeOffset syncedAtUtc)
+    private static void MapBaseInfo(PlayerBaseInfo target, PlayerSnapshot source, PlayerRegionSummary region, DateTimeOffset syncedAtUtc)
     {
-        RoleBaseInfo? value = source.Base;
+        PlayerBaseSnapshot? value = source.Base;
         target.RoleName = region.RoleName;
         target.Level = value?.Level ?? region.Level;
         target.WorldLevel = value?.WorldLevel ?? 0;
@@ -185,9 +186,9 @@ public sealed class PlayerInfoRepository(
         target.LastSyncedAtUtc = syncedAtUtc;
     }
 
-    private static void MapMotor(PlayerMotorData target, RoleDetailInfo source, DateTimeOffset syncedAtUtc)
+    private static void MapMotor(PlayerMotorData target, PlayerSnapshot source, DateTimeOffset syncedAtUtc)
     {
-        RoleMotorData? value = source.MotorData;
+        MotorSnapshot? value = source.MotorData;
         target.Level = value?.Level ?? 0;
         target.Exp = value?.Exp ?? 0;
         target.NextExp = value?.NextExp ?? 0;
@@ -200,9 +201,9 @@ public sealed class PlayerInfoRepository(
         target.LastSyncedAtUtc = syncedAtUtc;
     }
 
-    private static void MapBattlePass(PlayerBattlePass target, RoleDetailInfo source, DateTimeOffset syncedAtUtc)
+    private static void MapBattlePass(PlayerBattlePass target, PlayerSnapshot source, DateTimeOffset syncedAtUtc)
     {
-        RoleBattlePass? value = source.BattlePass;
+        BattlePassSnapshot? value = source.BattlePass;
         target.Level = value?.Level ?? 0;
         target.WeekExp = value?.WeekExp ?? 0;
         target.WeekMaxExp = value?.WeekMaxExp ?? 0;
@@ -213,28 +214,9 @@ public sealed class PlayerInfoRepository(
         target.LastSyncedAtUtc = syncedAtUtc;
     }
 
-    private static async Task UpsertSyncStateAsync(
-        AppDbContext db,
-        string uid,
-        string dataKind,
-        string scopeKey,
-        CancellationToken cancellationToken)
+    private static PlayerSnapshot MapRoleDetail(PlayerBaseInfo baseInfo, PlayerMotorData? motor, PlayerBattlePass? battlePass, IReadOnlyList<PlayerMusicData> music) => new()
     {
-        SyncState? state = db.SyncStates.Local.FirstOrDefault(x => x.Uid == uid && x.DataKind == dataKind && x.ScopeKey == scopeKey);
-        state ??= await db.SyncStates.FirstOrDefaultAsync(
-            x => x.Uid == uid && x.DataKind == dataKind && x.ScopeKey == scopeKey,
-            cancellationToken);
-        if (state is null)
-        {
-            state = new SyncState { Uid = uid, DataKind = dataKind, ScopeKey = scopeKey };
-            db.SyncStates.Add(state);
-        }
-        state.LastSuccessfulSyncAtUtc = DateTimeOffset.UtcNow;
-    }
-
-    private static RoleDetailInfo MapRoleDetail(PlayerBaseInfo baseInfo, PlayerMotorData? motor, PlayerBattlePass? battlePass, IReadOnlyList<PlayerMusicData> music) => new()
-    {
-        Base = new RoleBaseInfo
+        Base = new PlayerBaseSnapshot
         {
             Name = baseInfo.RoleName, Id = long.TryParse(baseInfo.Uid, out long id) ? id : 0,
             CreatTime = baseInfo.CreatTime, ActiveDays = baseInfo.ActiveDays, Level = baseInfo.Level,
@@ -249,20 +231,20 @@ public sealed class PlayerInfoRepository(
             BasicBoxes = baseInfo.HasBasicBoxesData ? Deserialize<Dictionary<string, int>>(baseInfo.BasicBoxesJson) : null,
             PhantomBoxes = baseInfo.HasPhantomBoxesData ? Deserialize<Dictionary<string, int>>(baseInfo.PhantomBoxesJson) : null
         },
-        BattlePass = !baseInfo.HasBattlePassData || battlePass is null ? null : new RoleBattlePass
+        BattlePass = !baseInfo.HasBattlePassData || battlePass is null ? null : new BattlePassSnapshot
         {
             Level = battlePass.Level, WeekExp = battlePass.WeekExp, WeekMaxExp = battlePass.WeekMaxExp,
             IsUnlock = battlePass.IsUnlock, IsOpen = battlePass.IsOpen, Exp = battlePass.Exp, ExpLimit = battlePass.ExpLimit
         },
-        MotorData = motor is null ? null : new RoleMotorData
+        MotorData = motor is null ? null : new MotorSnapshot
         {
             Level = motor.Level, Exp = motor.Exp, NextExp = motor.NextExp,
-            Skins = Deserialize<List<MotorSkin>>(motor.SkinsJson), Stickers = Deserialize<List<MotorSticker>>(motor.StickersJson),
-            Decorations = Deserialize<List<MotorDecoration>>(motor.DecorationsJson), Frames = Deserialize<List<MotorFrame>>(motor.FramesJson),
-            EquipSkin = motor.EquipSkinId == 0 ? null : new MotorSkin { SkinId = motor.EquipSkinId, Quality = motor.EquipSkinQuality }
+            Skins = Deserialize<List<MotorSkinSnapshot>>(motor.SkinsJson), Stickers = Deserialize<List<MotorStickerSnapshot>>(motor.StickersJson),
+            Decorations = Deserialize<List<MotorDecorationSnapshot>>(motor.DecorationsJson), Frames = Deserialize<List<MotorFrameSnapshot>>(motor.FramesJson),
+            EquipSkin = motor.EquipSkinId == 0 ? null : new MotorSkinSnapshot { SkinId = motor.EquipSkinId, Quality = motor.EquipSkinQuality }
         },
         MusicData = baseInfo.HasMusicData
-            ? music.Select(x => new RoleMusicData { Id = x.AlbumId, Count = x.Count, TotalCount = x.TotalCount }).ToList()
+            ? music.Select(x => new MusicSnapshot { Id = x.AlbumId, Count = x.Count, TotalCount = x.TotalCount }).ToList()
             : null
     };
 

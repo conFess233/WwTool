@@ -7,7 +7,7 @@ namespace WwTool.Common.Models.Config
 
         public string GameLogPath { get; set; } = @"Client\Saved\Logs\";
         public string GameLogFile { get; set; } = "Client.log";
-        public string GameItemsResourcesPath { get; set; } = Path.Combine("Local/Data", "GameItemsResources.json");
+        public string CatalogDirectory { get; set; } = Path.Combine("Local", "Data");
 
         public string GameLauncherFile { get; set; } = "Wuthering Waves.exe";
         public string AppVersion { get; set; } = "1.2.0";

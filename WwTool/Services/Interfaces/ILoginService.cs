@@ -18,12 +18,13 @@ namespace WwTool.Services.Interfaces
         LoginContext LatestAuthenticatedContext { get; }
 
         void SwitchUserContext(string uid);
+        void RemoveUserContext(string uid);
 
-        Task<EmailLoginResponse?> EmailLoginAsync(EmailLoginRequest request);
-        Task<GenerateResponse?> GenerateAsync(GenerateRequest request);
+        Task<EmailLoginResponse?> EmailLoginAsync(EmailLoginRequest request, CancellationToken cancellationToken = default);
+        Task<GenerateResponse?> GenerateAsync(GenerateRequest request, CancellationToken cancellationToken = default);
 
-        Task<GetTokenResponse?> GetTokenAsync(GetTokenRequest request);
+        Task<GetTokenResponse?> GetTokenAsync(GetTokenRequest request, CancellationToken cancellationToken = default);
 
-        Task<AutoTokenResponse?> AutoTokenAsync(AutoTokenRequest request);
+        Task<AutoTokenResponse?> AutoTokenAsync(AutoTokenRequest request, CancellationToken cancellationToken = default);
     }
 }

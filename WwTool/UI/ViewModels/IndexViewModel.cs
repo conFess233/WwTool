@@ -1,3 +1,4 @@
+using WwTool.Services.Presentation;
 using Microsoft.EntityFrameworkCore;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -17,7 +18,7 @@ using WwTool.Services;
 using WwTool.Services.Interfaces;
 using WwTool.Services.Repositories;
 using WwTool.Common.Utils;
-using ExceptionHelper = WwTool.Common.Utils.ExceptionHelper;
+using ExceptionHelper = WwTool.Services.Presentation.ExceptionHelper;
 
 namespace WwTool.UI.ViewModels
 {
@@ -67,6 +68,7 @@ namespace WwTool.UI.ViewModels
             _uiStateService = uiStateService;
             _getDataService = getDataService;
             _userDataService = userDataService;
+            System.Windows.WeakEventManager<IUserDataService, AccountDeletedEventArgs>.AddHandler(userDataService, nameof(IUserDataService.AccountDeleted), OnAccountDeleted);
             _logger = logger;
 
             ShowLoginDialogCommand = new DelegateCommand(ShowLoginDialog);
@@ -372,38 +374,15 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var oauthCode = await _userDataService.GetCredentialAsync(SelectedUser.Uid, _navigationCts.Token);
-                    await _getDataService.SyncAllUserDataAsync(SelectedUser.Uid, oauthCode, _navigationCts.Token);
-                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(SelectedUser.Uid, _navigationCts.Token);
-                    if (roleDetail?.Base != null && roleDetail.BattlePass != null)
+                    string syncUid = SelectedUser.Uid;
+                    CancellationToken syncToken = _navigationCts.Token;
+                    var oauthCode = await _userDataService.GetCredentialAsync(syncUid, syncToken);
+                    await _getDataService.SyncAllUserDataAsync(syncUid, oauthCode, syncToken);
+                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(syncUid, syncToken);
+                    if (syncToken.IsCancellationRequested || SelectedUser?.Uid != syncUid) return;
+                    if (roleDetail?.Base != null)
                     {
-                        RoleName = SelectedUser.Name;
-                        Uid = SelectedUser.Uid;
-                        Level = SelectedUser.Level;
-                        CreateTime = roleDetail.Base.CreatTime;
-                        ActiceDays = roleDetail.Base.ActiveDays;
-                        BirthDay = roleDetail.Base.BirthDay;
-                        BirthMon = roleDetail.Base.BirthMon;
-                        Energy = roleDetail.Base.Energy;
-                        EnergyRecoverTime = roleDetail.Base.EnergyRecoverTime;
-                        StorgeEnergyRecoverTime = roleDetail.Base.StoreEnergyRecoverTime;
-                        StorgeEnergy = roleDetail.Base.StoreEnergy;
-                        MaxEnergy = roleDetail.Base.MaxEnergy;
-                        MaxStorgeEnergy = roleDetail.Base.MaxStoreEnergy;
-                        Liveness = roleDetail.Base.Liveness;
-                        LivenessMaxCount = roleDetail.Base.LivenessMaxCount;
-                        LivenessUnlock = roleDetail.Base.LivenessUnlock;
-                        WeeklyInstCount = roleDetail.Base.WeeklyInstCount;
-                        WorldLevel = roleDetail.Base.WorldLevel;
-                        RoleNum = roleDetail.Base.RoleNum;
-                        BpExp = roleDetail.BattlePass.Exp;
-                        BpExpLimit = roleDetail.BattlePass.ExpLimit;
-                        BpIsOpen = roleDetail.BattlePass.IsOpen;
-                        BpIsUnlock = roleDetail.BattlePass.IsUnlock;
-                        BpLevel = roleDetail.BattlePass.Level;
-                        BpWeekUp = roleDetail.BattlePass.WeekExp;
-                        BpWeekMaxUp = roleDetail.BattlePass.WeekMaxExp;
-                        Region = SelectedUser.Region ?? string.Empty;
+                        ApplyRoleSnapshot(roleDetail);
 
                         if (showMessage)
                         {
@@ -439,6 +418,38 @@ namespace WwTool.UI.ViewModels
         /// <param name="uid">用户唯一标识</param>
         /// <param name="showLoading">是否显示加载动画</param>
         /// <param name="showMessage">是否显示操作结果的 Toast 提示</param>
+        private void ApplyRoleSnapshot(PlayerSnapshot roleDetail)
+        {
+            if (roleDetail.Base is null) return;
+            RoleName = SelectedUser.Name;
+            Uid = SelectedUser.Uid;
+            Level = SelectedUser.Level;
+            CreateTime = roleDetail.Base.CreatTime;
+            ActiceDays = roleDetail.Base.ActiveDays;
+            BirthDay = roleDetail.Base.BirthDay;
+            BirthMon = roleDetail.Base.BirthMon;
+            Energy = roleDetail.Base.Energy;
+            EnergyRecoverTime = roleDetail.Base.EnergyRecoverTime;
+            StorgeEnergyRecoverTime = roleDetail.Base.StoreEnergyRecoverTime;
+            StorgeEnergy = roleDetail.Base.StoreEnergy;
+            MaxEnergy = roleDetail.Base.MaxEnergy;
+            MaxStorgeEnergy = roleDetail.Base.MaxStoreEnergy;
+            Liveness = roleDetail.Base.Liveness;
+            LivenessMaxCount = roleDetail.Base.LivenessMaxCount;
+            LivenessUnlock = roleDetail.Base.LivenessUnlock;
+            WeeklyInstCount = roleDetail.Base.WeeklyInstCount;
+            WorldLevel = roleDetail.Base.WorldLevel;
+            RoleNum = roleDetail.Base.RoleNum;
+            BpExp = roleDetail.BattlePass?.Exp ?? 0;
+            BpExpLimit = roleDetail.BattlePass?.ExpLimit ?? 0;
+            BpIsOpen = roleDetail.BattlePass?.IsOpen ?? false;
+            BpIsUnlock = roleDetail.BattlePass?.IsUnlock ?? false;
+            BpLevel = roleDetail.BattlePass?.Level ?? 0;
+            BpWeekUp = roleDetail.BattlePass?.WeekExp ?? 0;
+            BpWeekMaxUp = roleDetail.BattlePass?.WeekMaxExp ?? 0;
+            Region = SelectedUser.Region ?? string.Empty;
+        }
+
         private async Task LoadLocalAccountInfoAsync(string uid, bool showLoading = true, bool showMessage = true)
         {
             if (string.IsNullOrEmpty(uid))
@@ -454,36 +465,12 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(uid, _navigationCts.Token);
-                    if (roleDetail?.Base != null && roleDetail.BattlePass != null)
+                    var token = _navigationCts.Token;
+                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(uid, token);
+                    if (SelectedUser?.Uid != uid || token.IsCancellationRequested) return;
+                    if (roleDetail?.Base != null)
                     {
-                        RoleName = SelectedUser.Name;
-                        Uid = SelectedUser.Uid;
-                        Level = SelectedUser.Level;
-                        CreateTime = roleDetail.Base.CreatTime;
-                        ActiceDays = roleDetail.Base.ActiveDays;
-                        BirthDay = roleDetail.Base.BirthDay;
-                        BirthMon = roleDetail.Base.BirthMon;
-                        Energy = roleDetail.Base.Energy;
-                        EnergyRecoverTime = roleDetail.Base.EnergyRecoverTime;
-                        StorgeEnergyRecoverTime = roleDetail.Base.StoreEnergyRecoverTime;
-                        StorgeEnergy = roleDetail.Base.StoreEnergy;
-                        MaxEnergy = roleDetail.Base.MaxEnergy;
-                        MaxStorgeEnergy = roleDetail.Base.MaxStoreEnergy;
-                        Liveness = roleDetail.Base.Liveness;
-                        LivenessMaxCount = roleDetail.Base.LivenessMaxCount;
-                        LivenessUnlock = roleDetail.Base.LivenessUnlock;
-                        WeeklyInstCount = roleDetail.Base.WeeklyInstCount;
-                        WorldLevel = roleDetail.Base.WorldLevel;
-                        RoleNum = roleDetail.Base.RoleNum;
-                        BpExp = roleDetail.BattlePass.Exp;
-                        BpExpLimit = roleDetail.BattlePass.ExpLimit;
-                        BpIsOpen = roleDetail.BattlePass.IsOpen;
-                        BpIsUnlock = roleDetail.BattlePass.IsUnlock;
-                        BpLevel = roleDetail.BattlePass.Level;
-                        BpWeekUp = roleDetail.BattlePass.WeekExp;
-                        BpWeekMaxUp = roleDetail.BattlePass.WeekMaxExp;
-                        Region = SelectedUser.Region ?? string.Empty;
+                        ApplyRoleSnapshot(roleDetail);
 
                         if (showMessage)
                         {
@@ -529,22 +516,9 @@ namespace WwTool.UI.ViewModels
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        Users.Clear();
-                        foreach (var user in users)
+                        if (AccountList.Refresh(Users, users, _configService.User.LastUserId) is { } selected)
                         {
-                            Users.Add(user);
-                        }
-
-                        if (Users.Any())
-                        {
-                            if (!string.IsNullOrEmpty(_configService.User.LastUserId))
-                            {
-                                SelectedUser = Users.FirstOrDefault(u => u.Uid == _configService.User.LastUserId) ?? Users.First();
-                            }
-                            else
-                            {
-                                SelectedUser = Users.First();
-                            }
+                            SelectedUser = selected;
                         }
                     });
 
@@ -586,6 +560,21 @@ namespace WwTool.UI.ViewModels
 
         }
 
+        /// <summary>只使被删除账号的缓存失效，其他账号不受影响。</summary>
+        private void OnAccountDeleted(object? sender, AccountDeletedEventArgs e)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                foreach (var user in Users.Where(x => x.Uid == e.Uid).ToArray()) Users.Remove(user);
+                if (SelectedUser?.Uid != e.Uid) return;
+                _navigationCts.Cancel();
+                _navigationCts.Dispose();
+                _navigationCts = new CancellationTokenSource();
+                ApplyRoleSnapshot(new PlayerSnapshot { Base = new(), BattlePass = new() }); RoleName = string.Empty; Uid = string.Empty; Level = 0; Region = string.Empty;
+                SelectedUser = null!;
+                _isLoaded = false;
+            });
+        }
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
         public void OnNavigatedFrom(NavigationContext navigationContext) => _navigationCts.Cancel();
 

@@ -2,10 +2,10 @@
     x:Class="WwTool.UI.Views.StatisticsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:catalog="clr-namespace:WwTool.UI.Components"
     xmlns:b="clr-namespace:WwTool.Common.Behaviors"
     xmlns:cv="clr-namespace:WwTool.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:enums="clr-namespace:WwTool.Common.Enums"
     xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
     xmlns:local="clr-namespace:WwTool.UI.Views"
     xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
@@ -19,129 +19,55 @@
 
     <UserControl.Resources>
         <cv:EnumDescriptionConverter x:Key="enumDescriptionConverter" />
-        <cv:ImageConverter x:Key="ImageConverter" />
-        <cv:ItemIdToNameConverter x:Key="ItemIdToNameConverter" />
+        <cv:ItemIdToNameConverter x:Key="ItemIdToNameConverter" Catalog="{StaticResource GameCatalog}" />
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
         <Style x:Key="ChartPanelStyle" TargetType="Border">
-            <Setter Property="Margin" Value="0,0,0,12" />
-            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="{StaticResource SectionMargin}" />
+            <Setter Property="Padding" Value="{StaticResource CardPadding}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusCard}" />
         </Style>
 
         <Style x:Key="MetricPanelStyle" TargetType="Border">
             <Setter Property="MinHeight" Value="78" />
             <Setter Property="Margin" Value="0,0,8,12" />
-            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Padding" Value="{StaticResource MetricPadding}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusCard}" />
         </Style>
 
         <Style x:Key="MetricValueStyle" BasedOn="{StaticResource HeaderTextStyle}" TargetType="TextBlock">
             <Setter Property="Margin" Value="0,4,0,0" />
-            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontSize" Value="{StaticResource FontSizeXxl}" />
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
         </Style>
 
-        <Style x:Key="ResponsivePoolTabItemStyle" BasedOn="{StaticResource {x:Type TabItem}}" TargetType="{x:Type TabItem}">
-            <Setter Property="Tag" Value="{StaticResource PrePullImage}" />
-            <Setter Property="ToolTipService.IsEnabled" Value="{Binding Path=(b:ResponsiveTabHeaderBehavior.IsCompact), RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" />
-            <Setter Property="ToolTip">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource enumDescriptionConverter}">
-                        <Binding Path="PoolType" />
-                        <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="AutomationProperties.Name">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource enumDescriptionConverter}">
-                        <Binding Path="PoolType" />
-                        <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding PoolType}" Value="{x:Static enums:CardPoolType.CharacterEvent}">
-                    <Setter Property="Tag" Value="{StaticResource UpRolePullImage}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding PoolType}" Value="{x:Static enums:CardPoolType.WeaponEvent}">
-                    <Setter Property="Tag" Value="{StaticResource UpWeaponPullImage}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding PoolType}" Value="{x:Static enums:CardPoolType.CharacterCollaboration}">
-                    <Setter Property="Tag" Value="{StaticResource LinkRolePullImage}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding PoolType}" Value="{x:Static enums:CardPoolType.WeaponCollaboration}">
-                    <Setter Property="Tag" Value="{StaticResource LinkWeaponPullImage}" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
     </UserControl.Resources>
-
-    <UserControl.RenderTransform>
-        <ScaleTransform x:Name="PageTransform" ScaleX="0.8" ScaleY="0.8" />
-    </UserControl.RenderTransform>
 
     <UserControl.Triggers>
         <EventTrigger RoutedEvent="UserControl.Loaded">
-            <BeginStoryboard>
-                <Storyboard>
-                    <DoubleAnimation
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="1"
-                        Duration="{StaticResource MotionPage}" />
-
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleY"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleX"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                </Storyboard>
-            </BeginStoryboard>
+            <BeginStoryboard Storyboard="{StaticResource PageEnterStoryboard}" />
         </EventTrigger>
     </UserControl.Triggers>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="1">
-            <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
+            <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Margin="10,8" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Stat_Title], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                    <TextBlock Margin="20,15" VerticalAlignment="Center" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Stat_Title], Source={x:Static utils:LanguageManager.Instance}}" />
                     <WrapPanel
-                        Grid.Row="1"
-                        Margin="5,0,5,6"
-                        HorizontalAlignment="Stretch"
+                        Grid.Column="1" Margin="16,12,15,12" HorizontalAlignment="Right"
                         VerticalAlignment="Center">
 
                         <TextBlock Style="{StaticResource BaseTextBlockStyle}" Text="{Binding Path=[Stat_LocalStored], Source={x:Static utils:LanguageManager.Instance}}" />
@@ -154,17 +80,15 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <Button
+                        <Button Style="{StaticResource SecondaryButtonStyle}"
                             Margin="5,0"
                             Command="{Binding LoadLocalDataCommand}"
                             Content="{Binding Path=[Stat_LoadLocalData], Source={x:Static utils:LanguageManager.Instance}}"
                             Tag="{StaticResource LoadImage}" />
-                        <Button
+                        <Button Style="{StaticResource SecondaryButtonStyle}"
                             Margin="5,0"
                             Command="{Binding RefreshUsersCommand}"
                             Content="{Binding Path=[Stat_Refresh], Source={x:Static utils:LanguageManager.Instance}}"
-                            Foreground="{DynamicResource TextOnAccentBrush}"
-                            Style="{StaticResource OkButtonStyle}"
                             Tag="{StaticResource RefreshImage}" />
 
                         <Button
@@ -172,7 +96,6 @@
                             Command="{Binding GetGachaLogCommand}"
                             Content="{Binding Path=[Stat_GetCloudData], Source={x:Static utils:LanguageManager.Instance}}"
                             Foreground="{DynamicResource TextOnAccentBrush}"
-                            Style="{StaticResource OkButtonStyle}"
                             Tag="{StaticResource CloudImage}" />
                     </WrapPanel>
                 </Grid>
@@ -180,78 +103,9 @@
             </Border>
         </StackPanel>
 
-        <Expander
-            Grid.Row="1"
-            Margin="10,10,10,0"
-            Header="{Binding Path=[Stats_DataFetch], Source={x:Static utils:LanguageManager.Instance}}"
-            IsExpanded="True">
-            <Grid Margin="10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <WrapPanel Grid.Row="0" Margin="0,0,0,5">
-
-                    <TextBlock Grid.Column="0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_ImportUrl], Source={x:Static utils:LanguageManager.Instance}}" />
-                    <TextBox
-                        Grid.Column="1"
-                        Width="260"
-                        Margin="10,0"
-                        Text="{Binding LogUrl, UpdateSourceTrigger=PropertyChanged}" />
-
-                    <Button
-                        Grid.Column="2"
-                        Margin="5,0"
-                        Command="{Binding AutoImportUrlCommand}"
-                        Content="{Binding Path=[Stat_AutoImportUrl], Source={x:Static utils:LanguageManager.Instance}}"
-                        Tag="{StaticResource ImportImage}" />
-                    <CheckBox
-                        Grid.Column="3"
-                        Margin="5,0"
-                        VerticalAlignment="Center"
-                        Content="{Binding Path=[Stat_ImportFullLine], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='导入整行'}"
-                        IsChecked="{Binding ImportFullLine, Mode=TwoWay}" />
-                </WrapPanel>
-                <WrapPanel Grid.Row="1" Margin="0,8,0,0">
-                    <TextBlock
-                        Margin="0,0,8,0"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource BaseTextBlockStyle}"
-                        Text="{Binding Path=[Stat_GachaServer], Source={x:Static utils:LanguageManager.Instance}}" />
-                    <RadioButton
-                        Margin="0,0,12,0"
-                        VerticalAlignment="Center"
-                        Content="{Binding Path=[Stat_GachaServerCN], Source={x:Static utils:LanguageManager.Instance}}"
-                        GroupName="GachaServer"
-                        IsChecked="{Binding IsChinaGachaServer, Mode=TwoWay}"
-                        IsEnabled="{Binding IsGachaServerSelectionEnabled}" />
-                    <RadioButton
-                        Margin="0,0,16,0"
-                        VerticalAlignment="Center"
-                        Content="{Binding Path=[Stat_GachaServerInternational], Source={x:Static utils:LanguageManager.Instance}}"
-                        GroupName="GachaServer"
-                        IsChecked="{Binding IsInternationalGachaServer, Mode=TwoWay}"
-                        IsEnabled="{Binding IsGachaServerSelectionEnabled}" />
-                    <Button
-                        Grid.Column="4"
-                        Margin="5,0"
-                        Command="{Binding ImportUrlCommand}"
-                        Content="{Binding Path=[Stat_ManualImportUrl], Source={x:Static utils:LanguageManager.Instance}}" />
-                    <Button
-                        Grid.Column="5"
-                        Margin="5,0"
-                        Command="{Binding ClearDataCommand}"
-                        Content="{Binding Path=[Stat_ClearData], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
-                        Style="{StaticResource CancelButtonStyle}"
-                        Tag="{StaticResource TrashImage}" />
-                </WrapPanel>
 
 
-            </Grid>
-        </Expander>
-
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1">
             <TabControl
                 Padding="0"
                 b:TabItemIconBehavior.UseIconMask="True"
@@ -260,71 +114,52 @@
                 SelectedIndex="{Binding SelectedStatisticsTabIndex, Mode=TwoWay}">
                 <TabItem b:TabItemIconBehavior.IconSize="20" Header="{Binding Path=[Stats_Overview], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='详细数据'}" Tag="{StaticResource OverviewImage}">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
 
-                        <uc:GlobalStatisticsControl DataContext="{Binding}" />
-
-                        <TabControl
-                            Grid.Row="1"
-                            Margin="3"
-                            Padding="0"
-                            b:ResponsiveTabHeaderBehavior.EnableResponsiveHeaders="True"
-                            b:TabItemIconBehavior.UseIconMask="False"
-                            ItemContainerStyle="{StaticResource ResponsivePoolTabItemStyle}"
-                            ItemsSource="{Binding PoolStatistics}"
-                            SelectedIndex="{Binding SelectedPoolStatisticsIndex, Mode=TwoWay}">
-                            <TabControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock>
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource enumDescriptionConverter}">
-                                                <Binding Path="PoolType" />
-                                                <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </TabControl.ItemTemplate>
-
-                            <TabControl.ContentTemplate>
-                                <DataTemplate>
-                                    <uc:GachaPoolStatisticsControl DataContext="{Binding}" />
-                                </DataTemplate>
-                            </TabControl.ContentTemplate>
-                        </TabControl>
+                        <Grid>
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition /></Grid.RowDefinitions>
+                            <ComboBox x:Name="PoolSelector" Margin="12,4,12,8" HorizontalAlignment="Left" MinWidth="240"
+                                      ItemsSource="{Binding PoolStatistics}" SelectedIndex="{Binding SelectedPoolStatisticsIndex, Mode=TwoWay}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock><TextBlock.Text><MultiBinding Converter="{StaticResource enumDescriptionConverter}">
+                                            <Binding Path="PoolType" /><Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
+                                        </MultiBinding></TextBlock.Text></TextBlock>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <ContentControl Grid.Row="1" Content="{Binding SelectedItem, ElementName=PoolSelector}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                                <ContentControl.ContentTemplate><DataTemplate><uc:GachaPoolStatisticsControl /></DataTemplate></ContentControl.ContentTemplate>
+                            </ContentControl>
+                        </Grid>
                     </Grid>
                 </TabItem>
 
                 <TabItem b:TabItemIconBehavior.IconSize="15" Header="{Binding Path=[Stats_Charts], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='图表统计'}" Tag="{StaticResource GraphImage}">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="10">
-                            <Border Style="{StaticResource ChartPanelStyle}">
-                                <WrapPanel>
-                                    <Button
+                        <StackPanel Margin="{StaticResource PagePadding}">
+                            <WrapPanel Margin="0,0,0,8">
+                                    <Button Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,6"
                                         Click="OnChartSectionClick"
                                         Content="{Binding Path=[Stat_SectionTrend], Source={x:Static utils:LanguageManager.Instance}}"
                                         Tag="TrendSection" />
-                                    <Button
+                                    <Button Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,6"
                                         Click="OnChartSectionClick"
                                         Content="{Binding Path=[Stat_SectionDistribution], Source={x:Static utils:LanguageManager.Instance}}"
                                         Tag="DistributionSection" />
-                                    <Button
+                                    <Button Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,6"
                                         Click="OnChartSectionClick"
                                         Content="{Binding Path=[Stat_SectionLuck], Source={x:Static utils:LanguageManager.Instance}}"
                                         Tag="LuckSection" />
                                 </WrapPanel>
-                            </Border>
                             <!--  筛选栏  -->
+                            <Expander Margin="0,0,0,12" Header="{Binding Path=[Stat_ChartFilters], Source={x:Static utils:LanguageManager.Instance}}" IsExpanded="False">
                             <Border Style="{StaticResource ChartPanelStyle}">
                                 <StackPanel>
                                     <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_Filter_DateRange], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='时间范围'}" />
-                                    <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                                    <WrapPanel Margin="0,0,0,10">
                                         <ComboBox Width="150" SelectedIndex="{Binding SelectedDateRangeIndex}">
                                             <ComboBoxItem Content="{Binding Path=[Stat_Filter_DateAll], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='全部记录'}" />
                                             <ComboBoxItem Content="{Binding Path=[Stat_Filter_Date1Month], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='最近 1 个月'}" />
@@ -337,7 +172,7 @@
                                             Style="{StaticResource TitleTextStyle}"
                                             Text="{Binding Path=[Stat_Filter_Item], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='过滤特定五星 (明细时间轴)'}" />
                                         <ComboBox Width="150" ItemsSource="{Binding AllGotGoldNames}" SelectedItem="{Binding SelectedGoldName}" />
-                                    </StackPanel>
+                                    </WrapPanel>
 
                                     <TextBlock Margin="0,10,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_Filter_PoolType], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='筛选卡池'}" />
                                     <ItemsControl ItemsSource="{Binding PoolFilters}">
@@ -348,7 +183,7 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <CheckBox Margin="0,0,15,0" IsChecked="{Binding IsSelected}">
+                                                <CheckBox MinHeight="32" Margin="0,0,16,4" IsChecked="{Binding IsSelected}">
                                                     <CheckBox.Content>
                                                         <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{Binding PoolType, Converter={StaticResource enumDescriptionConverter}}" />
                                                     </CheckBox.Content>
@@ -359,9 +194,10 @@
                                 </StackPanel>
                             </Border>
 
+                            </Expander>
                             <!--  展示当前筛选条件下的关键指标。  -->
                             <TextBlock Margin="2,4,0,8" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_FilterSummary], Source={x:Static utils:LanguageManager.Instance}}" />
-                            <UniformGrid Columns="5">
+                            <catalog:ResponsiveUniformGrid MaximumColumns="5" MinimumItemWidth="200">
                                 <Border Style="{StaticResource MetricPanelStyle}">
                                     <StackPanel>
                                         <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Path=[Stat_FilteredPulls], Source={x:Static utils:LanguageManager.Instance}}" />
@@ -377,7 +213,7 @@
                                 <Border Style="{StaticResource MetricPanelStyle}">
                                     <StackPanel>
                                         <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Path=[Stat_FilteredAvgPity], Source={x:Static utils:LanguageManager.Instance}}" />
-                                        <TextBlock Style="{StaticResource MetricValueStyle}" Text="{Binding FilteredAveragePity, StringFormat=F1}" />
+                                        <TextBlock Style="{StaticResource MetricValueStyle}" Text="{Binding FilteredAveragePity, TargetNullValue=—, StringFormat=F1}" />
                                     </StackPanel>
                                 </Border>
                                 <Border Style="{StaticResource MetricPanelStyle}">
@@ -392,14 +228,14 @@
                                         <TextBlock Style="{StaticResource MetricValueStyle}" Text="{Binding PeakDaySummary}" />
                                     </StackPanel>
                                 </Border>
-                            </UniformGrid>
+                            </catalog:ResponsiveUniformGrid>
 
                             <StackPanel x:Name="TrendSection">
                                 <TextBlock Margin="2,12,0,10" Style="{StaticResource HeaderTextStyle}" Text="{Binding Path=[Stat_SectionTrend], Source={x:Static utils:LanguageManager.Instance}}" />
                                 <Border Style="{StaticResource ChartPanelStyle}">
                                     <StackPanel>
                                         <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_ActivityHeatmap], Source={x:Static utils:LanguageManager.Instance}}" />
-                                        <lvc:CartesianChart
+                                        <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                             Height="300"
                                             Margin="0,10,0,0"
                                             Background="Transparent"
@@ -417,7 +253,7 @@
                                 <Border Style="{StaticResource ChartPanelStyle}">
                                     <StackPanel>
                                         <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_CumulativeTrend], Source={x:Static utils:LanguageManager.Instance}}" />
-                                        <lvc:CartesianChart
+                                        <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                             Height="320"
                                             Margin="0,10,0,0"
                                             Background="Transparent"
@@ -436,18 +272,13 @@
                                     <StackPanel>
                                         <DockPanel>
                                             <TextBlock DockPanel.Dock="Left" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_FeaturedExpectation], Source={x:Static utils:LanguageManager.Instance}}" />
-                                            <CheckBox
-                                                HorizontalAlignment="Right"
-                                                Content="{Binding Path=[Stat_IncludeIncomplete], Source={x:Static utils:LanguageManager.Instance}}"
-                                                DockPanel.Dock="Right"
-                                                IsChecked="{Binding IncludeIncompleteFeaturedSegment, Mode=TwoWay}" />
                                         </DockPanel>
                                         <TextBlock
                                             Margin="0,5,0,0"
                                             Foreground="{DynamicResource TextSecondaryBrush}"
                                             Text="{Binding Path=[Stat_FeaturedExpectationHint], Source={x:Static utils:LanguageManager.Instance}}"
                                             TextWrapping="Wrap" />
-                                        <lvc:CartesianChart
+                                        <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                             Height="340"
                                             Margin="0,10,0,0"
                                             Background="Transparent"
@@ -469,7 +300,7 @@
                                 <Border Style="{StaticResource ChartPanelStyle}">
                                     <StackPanel>
                                         <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_PityDistribution], Source={x:Static utils:LanguageManager.Instance}}" />
-                                        <lvc:CartesianChart
+                                        <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                             Height="300"
                                             Margin="0,10,0,0"
                                             Background="Transparent"
@@ -487,7 +318,7 @@
                                 <Border Style="{StaticResource ChartPanelStyle}">
                                     <StackPanel>
                                         <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_RarityStacked], Source={x:Static utils:LanguageManager.Instance}}" />
-                                        <lvc:CartesianChart
+                                        <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                             Height="320"
                                             Margin="0,10,0,0"
                                             Background="Transparent"
@@ -509,7 +340,7 @@
                                 <Border Style="{StaticResource ChartPanelStyle}">
                                     <StackPanel>
                                         <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_FiveStarTimeline], Source={x:Static utils:LanguageManager.Instance}}" />
-                                        <lvc:CartesianChart
+                                        <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                             Height="300"
                                             Margin="0,10,0,0"
                                             Background="Transparent"
@@ -526,7 +357,7 @@
                                 </Border>
                                 <Border Style="{StaticResource ChartPanelStyle}">
                                     <Grid>
-                                        <lvc:PieChart
+                                        <lvc:PieChart LegendTextSize="14" TooltipTextSize="14" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                             Height="260"
                                             Background="Transparent"
                                             LegendBackgroundPaint="{Binding ChartLegendBackgroundPaint}"
@@ -538,8 +369,8 @@
                                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <TextBlock
                                                 HorizontalAlignment="Center"
-                                                FontSize="30"
-                                                FontWeight="Bold"
+                                                FontSize="{StaticResource FontSizeGiant}"
+                                                FontWeight="SemiBold"
                                                 Foreground="{DynamicResource TextPrimaryBrush}"
                                                 Text="{Binding CurrentCharacterPity}" />
                                             <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding Path=[Stat_CurrentPity], Source={x:Static utils:LanguageManager.Instance}}" />
@@ -564,7 +395,7 @@
                                         Foreground="{DynamicResource TextSecondaryBrush}"
                                         Text="{Binding Path=[Stat_DailyTrendHint], Source={x:Static utils:LanguageManager.Instance}}" />
                                     <Grid Grid.Row="2">
-                                        <lvc:CartesianChart
+                                        <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                             Background="Transparent"
                                             LegendBackgroundPaint="{Binding ChartLegendBackgroundPaint}"
                                             LegendPosition="Top"
@@ -615,82 +446,66 @@
                                 </Grid>
                             </Border>
 
-                            <!--  展示卡池对比和获取结构。  -->
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*" />
-                                    <ColumnDefinition Width="2*" />
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0">
-                                    <Border Margin="0,0,10,12" Style="{StaticResource ChartPanelStyle}">
-                                        <StackPanel>
-                                            <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_MissRatePie], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='不歪概率环形图'}" />
-                                            <Grid Height="220">
-                                                <lvc:PieChart
-                                                    Background="Transparent"
-                                                    LegendBackgroundPaint="{Binding ChartLegendBackgroundPaint}"
-                                                    LegendPosition="Bottom"
-                                                    LegendTextPaint="{Binding ChartLegendTextPaint}"
-                                                    Series="{Binding SuccessRatePieSeries}"
-                                                    TooltipBackgroundPaint="{Binding ChartTooltipBackgroundPaint}"
-                                                    TooltipTextPaint="{Binding ChartTooltipTextPaint}" />
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-                                    <Border Margin="0,0,10,12" Style="{StaticResource ChartPanelStyle}">
-                                        <StackPanel>
-                                            <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_FourStarPieChart], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='四星获取比例'}" />
-                                            <Grid Height="220">
-                                                <lvc:PieChart
-                                                    Background="Transparent"
-                                                    LegendBackgroundPaint="{Binding ChartLegendBackgroundPaint}"
-                                                    LegendPosition="Bottom"
-                                                    LegendTextPaint="{Binding ChartLegendTextPaint}"
-                                                    Series="{Binding FourStarPieSeries}"
-                                                    TooltipBackgroundPaint="{Binding ChartTooltipBackgroundPaint}"
-                                                    TooltipTextPaint="{Binding ChartTooltipTextPaint}" />
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-                                </StackPanel>
-
-                                <Border Grid.Column="1" Style="{StaticResource ChartPanelStyle}">
+                            <catalog:ResponsiveUniformGrid MaximumColumns="2" MinimumItemWidth="440">
+                                <Border Style="{StaticResource ChartPanelStyle}" Margin="0,0,8,16">
                                     <StackPanel>
-                                        <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_PoolCompareChart], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='卡池综合对比分析'}" />
-                                        <Grid Height="474">
-                                            <lvc:CartesianChart
-                                                Background="Transparent"
+                                        <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_MissRatePie], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <lvc:PieChart LegendTextSize="14" TooltipTextSize="14" Height="240" LegendPosition="Bottom" Series="{Binding SuccessRatePieSeries}" Background="Transparent" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
                                                 LegendBackgroundPaint="{Binding ChartLegendBackgroundPaint}"
                                                 LegendTextPaint="{Binding ChartLegendTextPaint}"
-                                                Series="{Binding GlobalPoolCompareSeries}"
                                                 TooltipBackgroundPaint="{Binding ChartTooltipBackgroundPaint}"
-                                                TooltipPosition="Top"
-                                                TooltipTextPaint="{Binding ChartTooltipTextPaint}"
-                                                XAxes="{Binding GlobalPoolXAxes}"
-                                                YAxes="{Binding GlobalPoolYAxes}" />
-                                        </Grid>
+                                                TooltipTextPaint="{Binding ChartTooltipTextPaint}" />
                                     </StackPanel>
                                 </Border>
-                            </Grid>
+                                <Border Style="{StaticResource ChartPanelStyle}" Margin="0,0,8,16">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_FourStarPieChart], Source={x:Static utils:LanguageManager.Instance}}" />
+                                        <lvc:PieChart LegendTextSize="14" TooltipTextSize="14" Height="240" LegendPosition="Bottom" Series="{Binding FourStarPieSeries}" Background="Transparent" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
+                                                LegendBackgroundPaint="{Binding ChartLegendBackgroundPaint}"
+                                                LegendTextPaint="{Binding ChartLegendTextPaint}"
+                                                TooltipBackgroundPaint="{Binding ChartTooltipBackgroundPaint}"
+                                                TooltipTextPaint="{Binding ChartTooltipTextPaint}" />
+                                    </StackPanel>
+                                </Border>
+                            </catalog:ResponsiveUniformGrid>
+                            <Border Style="{StaticResource ChartPanelStyle}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_PoolCompareChart], Source={x:Static utils:LanguageManager.Instance}}" />
+                                    <TextBlock Margin="0,12,0,4" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_TotalTides], Source={x:Static utils:LanguageManager.Instance}}" />
+                                    <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" Height="{Binding PoolComparisonHeight}" LegendPosition="Hidden" Series="{Binding GlobalPoolCompareSeries}"
+                                        XAxes="{Binding GlobalPoolXAxes}" YAxes="{Binding GlobalPoolYAxes}" Background="Transparent" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
+                                                LegendBackgroundPaint="{Binding ChartLegendBackgroundPaint}"
+                                                LegendTextPaint="{Binding ChartLegendTextPaint}"
+                                                TooltipBackgroundPaint="{Binding ChartTooltipBackgroundPaint}"
+                                                TooltipTextPaint="{Binding ChartTooltipTextPaint}" />
+                                    <TextBlock Margin="0,12,0,4" Style="{StaticResource SubtitleTextStyle}" Text="{Binding Path=[Stat_AvgGold], Source={x:Static utils:LanguageManager.Instance}}" />
+                                    <lvc:CartesianChart LegendTextSize="14" TooltipTextSize="14" Height="{Binding PoolComparisonHeight}" LegendPosition="Hidden" Series="{Binding PoolAverageSeries}"
+                                        XAxes="{Binding PoolAverageXAxes}" YAxes="{Binding PoolAverageYAxes}" Background="Transparent" AnimationsSpeed="{Binding DataContext.ChartAnimationsSpeed, RelativeSource={RelativeSource AncestorType={x:Type local:StatisticsView}}}"
+                                                LegendBackgroundPaint="{Binding ChartLegendBackgroundPaint}"
+                                                LegendTextPaint="{Binding ChartLegendTextPaint}"
+                                                TooltipBackgroundPaint="{Binding ChartTooltipBackgroundPaint}"
+                                                TooltipTextPaint="{Binding ChartTooltipTextPaint}" />
+                                </StackPanel>
+                            </Border>
 
                             <!--  微观明细流  -->
                             <Border Margin="0" Style="{StaticResource ChartPanelStyle}">
                                 <StackPanel>
                                     <TextBlock Margin="0,0,0,10" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_PityBar], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='抽卡周期 (Pity)'}" />
-                                    <ItemsControl
+                                    <ListBox MaxHeight="480" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                         ItemsSource="{Binding FilteredHitGoldFlow}"
                                         ScrollViewer.CanContentScroll="True"
                                         VirtualizingStackPanel.IsVirtualizing="True"
                                         VirtualizingStackPanel.VirtualizationMode="Recycling">
-                                        <ItemsControl.ItemTemplate>
+                                        <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+                                        <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Border
                                                     Margin="0,3"
                                                     Padding="8"
                                                     HorizontalAlignment="Stretch"
                                                     Background="{DynamicResource SurfaceElevatedBrush}"
-                                                    CornerRadius="6">
+                                                    CornerRadius="{DynamicResource CornerRadiusCard}">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
@@ -715,17 +530,17 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <StackPanel Grid.Column="0" Margin="10,0,0,0" HorizontalAlignment="Center">
-                                                            <Image
+                                                            <catalog:CatalogImage
                                                                 Width="48"
                                                                 Height="48"
                                                                 HorizontalAlignment="Center"
                                                                 VerticalAlignment="Center"
-                                                                Source="{Binding GachaData.IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                                Loader="{DynamicResource CatalogImageLoader}" Path="{Binding GachaData.IconPath}" />
                                                             <TextBlock
                                                                 Width="49"
                                                                 Margin="0,4,0,0"
                                                                 HorizontalAlignment="Center"
-                                                                FontSize="9"
+                                                                FontSize="{StaticResource FontSizeSm}"
                                                                 Style="{StaticResource CaptionTextStyle}"
                                                                 Text="{Binding GachaData.Time}"
                                                                 TextAlignment="Center"
@@ -749,6 +564,7 @@
                                                                             <Binding Path="GachaData.ResourceId" />
                                                                             <Binding Path="CurrentLanguage" Source="{x:Static utils:LanguageManager.Instance}" />
                                                                             <Binding Path="GachaData.Name" />
+                                                                            <Binding Path="Revision" Source="{StaticResource GameCatalog}" />
                                                                         </MultiBinding>
                                                                     </TextBlock.Text>
                                                                 </TextBlock>
@@ -771,11 +587,11 @@
                                                                     <ItemsControl.ItemTemplate>
                                                                         <DataTemplate>
                                                                             <StackPanel Margin="0,0,8,0" Orientation="Horizontal">
-                                                                                <Image Width="16" Height="16" Source="{Binding IconPath, Converter={StaticResource ImageConverter}, IsAsync=True}" />
+                                                                                <catalog:CatalogImage Width="16" Height="16" Loader="{DynamicResource CatalogImageLoader}" Path="{Binding IconPath}" />
                                                                                 <TextBlock
                                                                                     Margin="2,0,0,0"
                                                                                     VerticalAlignment="Center"
-                                                                                    FontSize="10"
+                                                                                    FontSize="{StaticResource FontSizeSm}"
                                                                                     Foreground="{DynamicResource TextPrimaryBrush}"
                                                                                     Text="{Binding Count, StringFormat='x{0}'}" />
                                                                             </StackPanel>
@@ -787,11 +603,82 @@
                                                     </Grid>
                                                 </Border>
                                             </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="{Binding Path=[Stat_GlobalSummary], Source={x:Static utils:LanguageManager.Instance}}" Tag="{StaticResource OverviewImage}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><uc:GlobalStatisticsControl /></ScrollViewer>
+                </TabItem>
+                <TabItem Header="{Binding Path=[Stats_DataFetch], Source={x:Static utils:LanguageManager.Instance}}" Tag="{StaticResource ImportImage}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <WrapPanel Grid.Row="0" Margin="0,0,0,5">
+
+                    <TextBlock Grid.Column="0" Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Stat_ImportUrl], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <TextBox
+                        Grid.Column="1"
+                        Width="260"
+                        Margin="10,0"
+                        Text="{Binding LogUrl, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                        Grid.Column="2"
+                        Margin="5,0"
+                        Command="{Binding AutoImportUrlCommand}"
+                        Content="{Binding Path=[Stat_AutoImportUrl], Source={x:Static utils:LanguageManager.Instance}}"
+                        Tag="{StaticResource ImportImage}" />
+                    <CheckBox
+                        Grid.Column="3"
+                        Margin="5,0"
+                        VerticalAlignment="Center"
+                        Content="{Binding Path=[Stat_ImportFullLine], Source={x:Static utils:LanguageManager.Instance}, FallbackValue='导入整行'}"
+                        IsChecked="{Binding ImportFullLine, Mode=TwoWay}" />
+                </WrapPanel>
+                <WrapPanel Grid.Row="1" Margin="0,8,0,0">
+                    <TextBlock
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource BaseTextBlockStyle}"
+                        Text="{Binding Path=[Stat_GachaServer], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <RadioButton
+                        Margin="0,0,12,0"
+                        VerticalAlignment="Center"
+                        Content="{Binding Path=[Stat_GachaServerCN], Source={x:Static utils:LanguageManager.Instance}}"
+                        GroupName="GachaServer"
+                        IsChecked="{Binding IsChinaGachaServer, Mode=TwoWay}"
+                        IsEnabled="{Binding IsGachaServerSelectionEnabled}" />
+                    <RadioButton
+                        Margin="0,0,16,0"
+                        VerticalAlignment="Center"
+                        Content="{Binding Path=[Stat_GachaServerInternational], Source={x:Static utils:LanguageManager.Instance}}"
+                        GroupName="GachaServer"
+                        IsChecked="{Binding IsInternationalGachaServer, Mode=TwoWay}"
+                        IsEnabled="{Binding IsGachaServerSelectionEnabled}" />
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                        Grid.Column="4"
+                        Margin="5,0"
+                        Command="{Binding ImportUrlCommand}"
+                        Content="{Binding Path=[Stat_ManualImportUrl], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <Button
+                        Grid.Column="5"
+                        Margin="5,0"
+                        Command="{Binding ClearDataCommand}"
+                        Content="{Binding Path=[Stat_ClearData], Source={x:Static utils:LanguageManager.Instance}}"
+
+                        Style="{StaticResource CancelButtonStyle}"
+                        Tag="{StaticResource TrashImage}" />
+                </WrapPanel>
+
+
+            </Grid>
                     </ScrollViewer>
                 </TabItem>
             </TabControl>
@@ -846,7 +733,7 @@
                         Foreground="{DynamicResource DangerBrush}"
                         Text="{Binding StatisticsErrorMessage}"
                         TextWrapping="Wrap" />
-                    <Button Command="{Binding LoadLocalDataCommand}" Content="{Binding Path=[State_Retry], Source={x:Static utils:LanguageManager.Instance}}" />
+                    <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding LoadLocalDataCommand}" Content="{Binding Path=[State_Retry], Source={x:Static utils:LanguageManager.Instance}}" />
                 </StackPanel>
             </Border>
         </Grid>

@@ -1,129 +1,136 @@
+<div align="center">
+
 # WwTool
 
-> 鸣潮工具箱(?)
+鸣潮工具箱 · 账号资料、角色详情与抽卡统计
 
-[English](WwTool/docs/README_en.md) | [日本語](WwTool/docs/README_ja.md) | 简体中文
+![Version 1.2.1](https://img.shields.io/badge/version-1.2.1-blue)
+![Windows x64](https://img.shields.io/badge/platform-Windows%2010%2B%20x64-0078D4)
+![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
+[![MIT License](https://img.shields.io/badge/license-MIT-green)](LICENSE.txt)
 
-## 简介
+简体中文 | [English](WwTool/docs/README_en.md) | [日本語](WwTool/docs/README_ja.md)
 
-因为国际服想快速查看角色信息有点麻烦，又不想去用各种机器人，所以干脆做了个小工具，方便查看抽卡记录什么的。
+[功能](#features) · [快速开始](#quick-start) · [使用流程](#usage) · [设置](#settings) · [数据与隐私](#data) · [常见限制](#limitations) · [预览](#preview) · [文档](#docs) · [更新日志](CHANGELOG.md)
 
+</div>
+
+用于查看《鸣潮》账号资料和整理唤取记录的 Windows 桌面工具。支持多个账号与 UID、本地数据存档，以及简体中文、英文和日文界面。
+
+<a id="features"></a>
 ## 功能
 
-> 由于官方未开放国际服获取角色所有信息的接口，所以只能获取到部分信息。
+| 功能 | 内容 |
+| --- | --- |
+| 账号概览 | 昵称、UID、等级、索拉等级、活跃情况、周本奖励次数与先约电台信息 |
+| 角色资料 | 已拥有角色、共鸣链激活情况、当前装备武器；悬停卡片展示立绘和攻略站返回的部分属性 |
+| 抽卡统计 | 自动或手动导入历史链接，按卡池查看出金记录、当前已垫抽数、平均出金抽数与全局汇总 |
+| 统计图表 | 卡池对比、稀有度分布、抽卡时间线与活动热力图，支持筛选 |
+| 探索与摩托 | 接口返回的收集数量、宝箱与潮汐之遗记录，以及摩托、外观和车载音乐解锁情况 |
+| 游戏资料 | 角色、武器、摩托和音乐专辑资料按类别从本仓库同步，图片按需缓存 |
 
-1. 账号基本信息
-   - 头像，昵称，UID，性别等
-   - 角色等级，索拉等级，已解锁的角色数量，创建日期等
-   - 活跃天数，活跃度，周本奖励次数，周本奖励次数上限等
+账号资料功能目前面向国际服，需通过邮箱账号密码登录；抽卡记录支持国服和国际服，可单独使用。
 
-2. 角色信息
-   - 已拥有的角色，已装备的武器信息。
-   - 角色的共鸣链激活情况。
+<a id="quick-start"></a>
+## 快速开始
 
-3. 先约电台
-   - 等级，经验，开通状态，高级电台状态等
-   - 本周先约电台经验
+1. 准备 Windows 10 或以上的 x64 系统，安装 [.NET Desktop Runtime 10（Windows x64）](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)。在下载页选择桌面运行时。
+2. 从 [Releases](https://github.com/conFess233/WwTool/releases) 下载 `WwTool.zip`，完整解压到可写目录。
+3. 运行 `WwTool.exe`。不要只移动单个 EXE，程序需要随包资源和本地数据目录。
+4. 按下面的流程添加账号或导入抽卡记录。详细操作见 [使用帮助](WwTool/docs/Help.md)。
 
-4. 大世界探索度
-   - 声匣收集数量（不确定是哪的，目前推测应该是背包里的）
-   - 已开启的宝箱数量
-   - 已开启的潮汐之遗数量
+<details>
+<summary>从源码编译</summary>
 
-5. 摩托数据
-   - 摩托等级，经验，皮肤，饰品数据等
-   - 车载音乐专辑解锁情况
+安装 [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)，在 Windows 上执行：
 
-> 以上功能均需登录账号后才能获取。目前仅支持邮箱账号密码登录。
+```powershell
+git clone https://github.com/conFess233/WwTool.git
+cd WwTool
+dotnet build WwTool/WwTool.csproj -c Release
+```
 
-6. 抽卡记录
-   - 获取抽卡记录并进行简单分析整理。
-   - 支持手动导入链接，以及选择游戏根目录后自动从游戏日志自动导入链接。
-   - [点我查看教程](WwTool/docs/Help.md)
+运行 `WwTool/bin/Release/net10.0-windows/WwTool.exe`。也可使用支持 .NET 10 的开发环境打开 `WwTool.slnx`。
 
-## 如何使用？
+</details>
 
-#### 开箱即用（需安装.NET 10.0 Runtime）
+<a id="usage"></a>
+## 使用流程
 
-> [下载 Microsoft .NET 10.0 Runtime - Windows x64](https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.8/windowsdesktop-runtime-10.0.8-win-x64.exe)
+### 查看账号和角色
 
-1. 从 [Releases](https://github.com/conFess233/WwTool/releases) 下载并解压最新版 `WwTool.zip`。
-2. 双击运行 `WwTool.exe`。
+1. 在首页添加账号，输入邮箱与密码；需要验证码时，在打开的浏览器中完成验证。
+2. 选择对应的 UID，获取云端数据，然后进入账号、角色、探索或摩托页面。
 
-#### 自行编译
+### 导入抽卡记录
 
-1. 克隆源码到本地：`git clone https://github.com/conFess233/WwTool.git`
-2. 使用 Visual Studio 2022 或更高版本打开 `WwTool.slnx`，编译生成项目。
-3. 运行输出目录中的 `WwTool.exe`。
-   > 开发环境: .NET 10.0
+1. 如需自动导入，在设置中选择游戏目录，并在游戏内打开一次唤取历史。
+2. 在抽卡统计页面自动读取日志中的链接，或手动粘贴历史链接并选择服务器。
+3. 获取云端记录后，查看总览和图表；之后可按 UID 加载已保存的本地数据。
 
-## 运行环境
+重复导入不会重复累加同一条记录。同一时间的十连记录保留来源顺序，合法重复结果会保留。平均出金抽数统计截至最近一次出金，当前未出金的已垫抽数单独显示；没有出金记录时显示空值。
 
-- 仅支持 Windows 10 及以上版本。
-- 需要安装 .NET 10.0 桌面运行时 [下载 Microsoft .NET 10.0 Runtime - Windows x64](https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.8/windowsdesktop-runtime-10.0.8-win-x64.exe)
+<a id="settings"></a>
+## 设置
 
-## 整理的文档
+| 项目 | 用途 |
+| --- | --- |
+| 游戏路径 | 自动读取抽卡链接；可选择包含 `Wuthering Waves Game` 的启动器目录或游戏目录 |
+| 语言与外观 | 切换中、英、日文，调整主题、强调色、毛玻璃、透明度及动效 |
+| 同步游戏资料 | 立即检查四类资料，查看版本、数量、同步结果和上次成功时间；可取消同步 |
+| 图片缓存 | 清空已缓存图片，之后在使用时重新下载 |
 
-- [鸣潮API文档](./WwTool/docs/API/WW_API.md)
-- [角色资源](./WwTool/docs/Resource/Characters.md)
-- [武器资源](./WwTool/docs/Resource/Weapons.md)
-- [摩托资源](./WwTool/docs/Resource/Motorcycle.md)
+游戏资料会在启动后按各类别的上次成功时间检查，间隔为 24 小时。同步仅使用本仓库默认分支中的资料文件，失败保留已有数据。这里的资料版本（如 `3.7.0`）与工具版本（`1.2.1`）分别维护。
 
+<a id="data"></a>
+## 数据与隐私
+
+- 配置、账号快照和抽卡记录保存在程序目录下；更新前请退出程序并备份本地数据，避免用新压缩包覆盖存档。
+- 保存的登录凭据使用 Windows DPAPI，以当前 Windows 用户加密。迁移到其他电脑或 Windows 用户后可能需要重新登录；这不代表整个数据库都已加密。
+- 登录和获取云端资料需要访问对应游戏服务，静态资料同步与缺失图标下载需要访问 GitHub，半身立绘使用攻略站快照中的官方图片地址。
+- 抽卡历史链接可能包含认证信息。反馈问题时请隐去密码、令牌、完整历史链接和个人账号信息。
+- 图片缓存位于 `Local/Cache/Images`，默认日志位于 `Local/Logs`；清理图片缓存不会删除抽卡记录。
+
+<a id="limitations"></a>
+## 常见限制
+
+- **资料不完整：**只展示接口实际返回的数据，不保证完整角色面板或声骸词条；未知值不会当作零。探索计数也不等同于完整地图探索度。
+- **获取时间不确定：**由已有抽卡记录推导的时间只在可确定时显示；未导入记录或不适用的角色会显示未知。
+- **历史记录有限：**只能导入服务端当前提供的历史，本地存档无法找回从未导入且已不再提供的记录。
+- **同步失败：**网络、登录状态或接口变化可能导致获取失败；静态资料和图片更新失败时保留有效旧数据，可稍后重试。
+- **图片或名称缺失：**使用已有缓存、头像或默认图回退；没有可用名称的未完成资料保留原记录并暂时跳过显示。
+
+更多操作与问题排查见 [使用帮助](WwTool/docs/Help.md)。
+
+<a id="preview"></a>
 ## 预览
 
-![WwTool](./WwTool/docs/Img/1.png)
-![WwTool](./WwTool/docs/Img/2.png)
-![WwTool](./WwTool/docs/Img/3.png)
-![WwTool](./WwTool/docs/Img/4.png)
-![WwTool](./WwTool/docs/Img/5.png)
-![WwTool](./WwTool/docs/Img/6.png)
+以下为已有版本截图，布局和内容可能与最新版本不同。
 
-## 简单的教程
+![首页](WwTool/docs/Img/1.png)
+![抽卡统计](WwTool/docs/Img/2.png)
 
-1. **设置游戏路径**：
-   - 切换到 **设置** 页面。
-   - 在 **游戏安装目录** 处点击 **选择路径**，选中包含 `Wuthering Waves Game` 文件夹的《鸣潮》游戏目录（例如 `D:\Wuthering Waves`），然后点击 **保存设置**。
-2. **同步游戏数据**（角色、探索度、摩托）：
-   - 切换到 **首页**。
-   - 点击 **添加账号**，输入 **邮箱** 与 **密码** 进行登录。
-   - _若触发风控，软件将自动打开本地浏览器窗口，在网页中完成滑块验证码即可。_
-   - 登录成功后，在下拉菜单中选择您的 UID，点击 **获取云端数据** 进行数据同步。
-3. **同步抽卡历史记录**：
-   - 确保在游戏内**至少打开过一次**抽卡历史记录页面。
-   - 切换到 **抽卡统计** 页面。
-   - 点击 **自动导入链接**，软件会自动读取日志并填充 API 链接。
-   - 解析出 UID 后，点击 **获取云端数据** 即可拉取并开始抽卡分析。
+<details>
+<summary>更多页面截图</summary>
 
-> 更加详细的步骤及常见问题排查，请参阅： [详细使用教程](WwTool/docs/Help.md)
+![页面预览 3](WwTool/docs/Img/3.png)
+![页面预览 4](WwTool/docs/Img/4.png)
+![页面预览 5](WwTool/docs/Img/5.png)
+![页面预览 6](WwTool/docs/Img/6.png)
 
-## 问题反馈
+</details>
 
-欢迎通过 [Issue](https://github.com/conFess233/WwTool/issues) 提出建议或反馈问题，或提交PR。
+<a id="docs"></a>
+## 文档与反馈
 
-> ~~改不改不一定哈，我比较懒~~
+- [使用帮助](WwTool/docs/Help.md)
+- [更新日志](CHANGELOG.md)
+- [鸣潮 API 整理](WwTool/docs/API/WW_API.md) · [攻略站接口](WwTool/docs/API/Guide.md)
+- [角色资源](WwTool/docs/Resource/Characters.md) · [武器资源](WwTool/docs/Resource/Weapons.md) · [摩托资源](WwTool/docs/Resource/Motorcycle.md)
+- [游戏资料同步规则](WwTool/docs/Resource/CatalogSync.md)
 
-## 已知缺陷
+遇到问题可提交 [Issue](https://github.com/conFess233/WwTool/issues)
 
-> 由于很多功能都只经过作者单个账号测试，实际运行中可能会发生各种bug
+## LICENSE
 
-- 目前仅支持邮箱账号密码登录。
-- 目前仅支持国际服（抽卡统计功能除外）。
-- 获取角色数据较少，且部分数据（如角色属性，声骸的具体属性等）无法获取。
-- 由于部分游戏物品我没有，所以懒得去找资源了，后续可能补充。
-
-## 更新日志
-
-- 2026/06/10 同步3.4版本卡池资源，修复了读取日志文件时出错的问题，修复了几处文本错误。
-- 2026/06/20 新增了抽卡数据的图表统计功能，优化了内存占用。
-- 2026/08/06 新增获取对应账号拥有的角色/已装备的武器/共鸣链的功能。优化UI。添加了攻略站的API，同步3.5版本资源。
-
-#### 后续开发计划
-
-- [ ] 在首页添加获取游戏公告的功能。
-- [ ] 添加自定义背景。
-- [ ] 添加一些便捷的操作，如快速打开游戏截图目录，一键获取解密后的日志等。
-      <br>...
-
-## 免责声明
-
-本工具完全免费开源。仅供学习交流使用，请勿用于任何商业或非法用途。数据和UI资源均通过客户端逆向解包及公开网络资料收集整理获取，侵删。
+[MIT License](LICENSE.txt)。

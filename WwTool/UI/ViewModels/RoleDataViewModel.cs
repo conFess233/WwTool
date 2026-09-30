@@ -1,9 +1,11 @@
+using WwTool.Services.Presentation;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using WwTool.Extensions;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using WwTool.Common.Enums;
@@ -15,7 +17,7 @@ using WwTool.Services;
 using WwTool.Services.Interfaces;
 using WwTool.Services.Repositories;
 using WwTool.Common.Utils;
-using ExceptionHelper = WwTool.Common.Utils.ExceptionHelper;
+using ExceptionHelper = WwTool.Services.Presentation.ExceptionHelper;
 
 namespace WwTool.UI.ViewModels
 {
@@ -47,7 +49,7 @@ namespace WwTool.UI.ViewModels
         /// <summary>
         /// 当前加载的角色详情数据
         /// </summary>
-        private RoleDetailInfo? _roleDetail;
+        private PlayerSnapshot? _roleDetail;
 
         /// <summary>
         /// 本地用户账号列表
@@ -77,6 +79,9 @@ namespace WwTool.UI.ViewModels
             {
                 if (SetProperty(ref _selectedUser, value))
                 {
+                    _navigationCts.Cancel();
+                    _navigationCts.Dispose();
+                    _navigationCts = new();
                     OnSelectedUserChanged(value);
                 }
             }
@@ -100,7 +105,7 @@ namespace WwTool.UI.ViewModels
         }
 
 
-        public RoleDetailInfo? RoleDetail
+        public PlayerSnapshot? RoleDetail
         {
             get => _roleDetail;
             set
@@ -158,6 +163,7 @@ namespace WwTool.UI.ViewModels
             _getDataService = getDataService;
             _uiStateService = uiStateService;
             _userDataService = userDataService;
+            System.Windows.WeakEventManager<IUserDataService, AccountDeletedEventArgs>.AddHandler(userDataService, nameof(IUserDataService.AccountDeleted), OnAccountDeleted);
             _logger = logger;
             _configService = configService;
             _recoveryTimer = new DispatcherTimer(DispatcherPriority.Background)
@@ -266,7 +272,7 @@ namespace WwTool.UI.ViewModels
                 ? UnavailableText
                 : values.Values.Sum(x => (long)x).ToString("N0", GetDisplayCulture());
 
-        private static string FormatMusicProgress(IReadOnlyCollection<RoleMusicData>? music)
+        private static string FormatMusicProgress(IReadOnlyCollection<MusicSnapshot>? music)
         {
             if (music is null)
             {
@@ -278,12 +284,7 @@ namespace WwTool.UI.ViewModels
             return string.Format(GetDisplayCulture(), LanguageManager.Instance["Role_CollectionProgress"], collected, total);
         }
 
-        private static CultureInfo GetDisplayCulture() => LanguageManager.Instance.CurrentLanguage switch
-        {
-            LanguageType.En => CultureInfo.GetCultureInfo("en-US"),
-            LanguageType.Ja => CultureInfo.GetCultureInfo("ja-JP"),
-            _ => CultureInfo.GetCultureInfo("zh-CN")
-        };
+        private static CultureInfo GetDisplayCulture() => LanguageManager.Instance.CurrentLanguage.GetDisplayCulture();
 
         /// <summary>
         /// 从本地数据库加载指定账号的角色数据
@@ -306,7 +307,10 @@ namespace WwTool.UI.ViewModels
                 _uiStateService.ShowLoading(LanguageManager.Instance["Msg_LoadingRoleData"]);
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(SelectedUser.Uid, _navigationCts.Token);
+                    string requestUid = SelectedUser.Uid;
+                    var token = _navigationCts.Token;
+                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(requestUid, token);
+                    if (token.IsCancellationRequested || SelectedUser?.Uid != requestUid) return;
                     if (roleDetail != null)
                     {
                         RoleDetail = roleDetail;
@@ -361,9 +365,14 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
-                    var oauthCode = await _userDataService.GetCredentialAsync(SelectedUser.Uid, _navigationCts.Token);
-                    await _getDataService.SyncAllUserDataAsync(SelectedUser.Uid, oauthCode, _navigationCts.Token);
-                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(SelectedUser.Uid, _navigationCts.Token);
+                    string syncUid = SelectedUser.Uid;
+                    CancellationToken syncToken = _navigationCts.Token;
+                    var oauthCode = await _userDataService.GetCredentialAsync(syncUid, syncToken);
+                    await _getDataService.SyncAllUserDataAsync(syncUid, oauthCode, syncToken);
+                    string requestUid = syncUid;
+                    var token = syncToken;
+                    var roleDetail = await _userDataService.LoadRoleSnapshotAsync(requestUid, token);
+                    if (token.IsCancellationRequested || SelectedUser?.Uid != requestUid) return;
                     if (roleDetail != null)
                     {
                         RoleDetail = roleDetail;
@@ -392,22 +401,9 @@ namespace WwTool.UI.ViewModels
         private async Task RefreshLocalAccount(bool showMessage = false)
         {
             var localAccounts = await _userDataService.ListAccountsAsync(_navigationCts.Token);
-            Users.Clear();
-            foreach (var user in localAccounts ?? [])
+            if (AccountList.Refresh(Users, localAccounts, _configService.User.LastUserId) is { } selected)
             {
-                Users.Add(user);
-            }
-
-            if (Users != null && Users.Any())
-            {
-                if (!string.IsNullOrEmpty(_configService.User.LastUserId))
-                {
-                    SelectedUser = Users.FirstOrDefault(u => u.Uid == _configService.User.LastUserId) ?? Users.First();
-                }
-                else
-                {
-                    SelectedUser = Users.First();
-                }
+                SelectedUser = selected;
             }
             if (showMessage)
             {
@@ -456,6 +452,21 @@ namespace WwTool.UI.ViewModels
 
         }
 
+        /// <summary>只使被删除账号的缓存失效，其他账号不受影响。</summary>
+        private void OnAccountDeleted(object? sender, AccountDeletedEventArgs e)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                foreach (var user in Users.Where(x => x.Uid == e.Uid).ToArray()) Users.Remove(user);
+                if (SelectedUser?.Uid != e.Uid) return;
+                _navigationCts.Cancel();
+                _navigationCts.Dispose();
+                _navigationCts = new CancellationTokenSource();
+                RoleDetail = null;
+                SelectedUser = null!;
+                _isLoaded = false;
+            });
+        }
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
 
         public void OnNavigatedFrom(NavigationContext navigationContext)

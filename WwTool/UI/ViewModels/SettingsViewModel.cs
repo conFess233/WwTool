@@ -1,3 +1,4 @@
+using WwTool.Services.Presentation;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
 using WwTool.Services.Repositories;
-using ExceptionHelper = WwTool.Common.Utils.ExceptionHelper;
+using ExceptionHelper = WwTool.Services.Presentation.ExceptionHelper;
 
 namespace WwTool.UI.ViewModels
 {
@@ -26,6 +27,7 @@ namespace WwTool.UI.ViewModels
     public class SettingsViewModel : BindableBase, INavigationAware
     {
         private CancellationTokenSource _navigationCts = new();
+        public CatalogSettingsViewModel Catalog { get; }
         /// <summary>
         /// UI 状态服务（Toast / Loading）
         /// </summary>
@@ -117,12 +119,15 @@ namespace WwTool.UI.ViewModels
             IConfigService configService,
             IDialogService dialogService,
             IUserDataService userDataService,
-            ILoggerService logger)
+            ILoggerService logger,
+            CatalogSettingsViewModel catalog)
         {
+            Catalog = catalog;
             _uiStateService = uIStateService;
             _dialogService = dialogService;
             _configService = configService;
             _userDataService = userDataService;
+            System.Windows.WeakEventManager<IUserDataService, AccountDeletedEventArgs>.AddHandler(userDataService, nameof(IUserDataService.AccountDeleted), OnAccountDeleted);
             _logger = logger;
 
             SelectGamePathCommand = new DelegateCommand(SelectGamePath);
@@ -365,15 +370,9 @@ namespace WwTool.UI.ViewModels
         {
             _logger.Debug("在设置视图中刷新本地用户账号");
             var localAccounts = await _userDataService.ListAccountsAsync(_navigationCts.Token);
-            Users.Clear();
-            foreach (var user in localAccounts ?? [])
+            if (AccountList.Refresh(Users, localAccounts) is { } selected)
             {
-                Users.Add(user);
-            }
-
-            if (Users != null && Users.Any())
-            {
-                SelectedUser = Users.First(); // 默认选中第一个用户
+                SelectedUser = selected;
             }
             if (showMessage)
             {
@@ -402,6 +401,7 @@ namespace WwTool.UI.ViewModels
                 return;
             }
 
+            string uid = SelectedUser.Uid;
             var p = new DialogParameters
             {
                 { "Title", LanguageManager.Instance["Dialog_DeleteUser"] },
@@ -413,11 +413,11 @@ namespace WwTool.UI.ViewModels
             {
                 if (result.Result == ButtonResult.OK)
                 {
-                    await _userDataService.DeleteAccountAsync(SelectedUser.Uid, _navigationCts.Token);
+                    await _userDataService.DeleteAccountAsync(uid, _navigationCts.Token);
                     _uiStateService.ShowToast(new NotificationRequest
                     {
                         Title = LanguageManager.Instance["Toast_Success"],
-                        Message = string.Format(LanguageManager.Instance["Toast_UserDeleted"], SelectedUser.Uid),
+                        Message = string.Format(LanguageManager.Instance["Toast_UserDeleted"], uid),
                         Type = NotificationType.Success,
                         Priority = NotificationPriority.Important,
                         Source = nameof(SettingsViewModel),
@@ -460,6 +460,21 @@ namespace WwTool.UI.ViewModels
             }
         }
 
+        /// <summary>只使被删除账号的缓存失效，其他账号不受影响。</summary>
+        private void OnAccountDeleted(object? sender, AccountDeletedEventArgs e)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                foreach (var user in Users.Where(x => x.Uid == e.Uid).ToArray()) Users.Remove(user);
+                if (SelectedUser?.Uid != e.Uid) return;
+                _navigationCts.Cancel();
+                _navigationCts.Dispose();
+                _navigationCts = new CancellationTokenSource();
+
+                SelectedUser = null!;
+                _isLoaded = false;
+            });
+        }
         public bool IsNavigationTarget(NavigationContext navigationContext) => true;
         public void OnNavigatedFrom(NavigationContext navigationContext) => _navigationCts.Cancel();
 

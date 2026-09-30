@@ -11,7 +11,7 @@ namespace WwTool.Common.Models
         // 总出金数
         private int _hitGoldCount;
         // 平均每金
-        private double _avgGoldTide;
+        private double? _avgGoldTide;
 
         public int Tides
         {
@@ -38,7 +38,7 @@ namespace WwTool.Common.Models
             }
         }
 
-        public double AvgGoldTide
+        public double? AvgGoldTide
         {
             get
             {
@@ -56,7 +56,7 @@ namespace WwTool.Common.Models
         {
             Tides = 0;
             HitGoldCount = 0;
-            AvgGoldTide = 0;
+            AvgGoldTide = null;
         }
     }
 }

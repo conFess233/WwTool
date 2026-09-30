@@ -76,8 +76,9 @@ public sealed class GuideApiClient(
                 if (!response.IsSuccessStatusCode)
                     throw new GuideApiException($"Guide API 请求失败：HTTP {(int)response.StatusCode} ({method} {path})");
 
-                await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                GuideEnvelope<T>? envelope = await JsonSerializer.DeserializeAsync<GuideEnvelope<T>>(stream, JsonOptions, cancellationToken);
+                await response.Content.LoadIntoBufferAsync(8 * 1024 * 1024, timeout.Token);
+                await using Stream stream = await response.Content.ReadAsStreamAsync(timeout.Token);
+                GuideEnvelope<T>? envelope = await JsonSerializer.DeserializeAsync<GuideEnvelope<T>>(stream, JsonOptions, timeout.Token);
                 if (envelope is null)
                     throw new GuideApiException($"Guide API 返回了无法解析的响应 ({method} {path})");
                 if (envelope.Code is 401 or 403)

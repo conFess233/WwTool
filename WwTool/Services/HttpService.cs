@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using WwTool.Services.Interfaces;
@@ -27,23 +28,10 @@ namespace WwTool.Services
         /// <summary>
         /// GET 请求
         /// </summary>
-        /// <summary>
-        /// GET 请求
-        /// </summary>
         public async Task<T?> GetAsync<T>(string url, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default)
         {
-            var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-
-            ApplyHeaders(request, dynamicHeaders);
-
-            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-            using var response = await client.SendAsync(request, cts.Token);
-            response.EnsureSuccessStatusCode();
-
-            string json = await response.Content.ReadAsStringAsync(cts.Token);
-            return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+            return await SendAsync<T>(request, dynamicHeaders, null, cancellationToken);
         }
 
         /// <summary>
@@ -51,27 +39,10 @@ namespace WwTool.Services
         /// </summary>
         public async Task<TResponse?> PostAsync<TRequest, TResponse>(string url, TRequest data, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default)
         {
-            var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Post, url);
-
-            ApplyHeaders(request, dynamicHeaders);
-
             string json = JsonSerializer.Serialize(data, _camelCaseOptions);
             request.Content = new StringContent(json, Encoding.UTF8, _configService.Api.CommonHeaders.DefaultContentType);
-
-            _logger.Debug($"HTTP POST 请求: {GetEndpointCategory(url)}");
-            var startTime = DateTime.Now;
-            
-            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-            using var response = await client.SendAsync(request, cts.Token);
-            var duration = (DateTime.Now - startTime).TotalMilliseconds;
-            _logger.Debug($"HTTP POST 响应: {(int)response.StatusCode} (耗时: {duration}ms)");
-
-            response.EnsureSuccessStatusCode();
-
-            string result = await response.Content.ReadAsStringAsync(cts.Token);
-            return JsonSerializer.Deserialize<TResponse>(result, _jsonOptions);
+            return await SendAsync<TResponse>(request, dynamicHeaders, "POST", cancellationToken);
         }
 
         /// <summary>
@@ -79,26 +50,28 @@ namespace WwTool.Services
         /// </summary>
         public async Task<TResponse?> PostFormAsync<TResponse>(string url, Dictionary<string, string> formData, Dictionary<string, string>? dynamicHeaders = null, CancellationToken cancellationToken = default)
         {
-            var client = CreateClient();
             using var request = new HttpRequestMessage(HttpMethod.Post, url);
-
-            ApplyHeaders(request, dynamicHeaders);
-
             request.Content = new FormUrlEncodedContent(formData);
+            return await SendAsync<TResponse>(request, dynamicHeaders, "POST FORM", cancellationToken);
+        }
 
-            _logger.Debug($"HTTP POST FORM 请求: {GetEndpointCategory(url)}");
-            var startTime = DateTime.Now;
-            
+        /// <summary>统一请求头、超时、取消、响应校验和反序列化；请求内容仍由各入口构建。</summary>
+        private async Task<T?> SendAsync<T>(HttpRequestMessage request,
+            Dictionary<string, string>? dynamicHeaders, string? logCategory, CancellationToken cancellationToken)
+        {
+            using var client = CreateClient();
+            ApplyHeaders(request, dynamicHeaders);
+            if (logCategory is not null)
+                _logger.Debug($"HTTP {logCategory} 请求: {GetEndpointCategory(request.RequestUri?.OriginalString ?? string.Empty)}");
+            long startTime = Stopwatch.GetTimestamp();
             using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_configService.Api.TimeoutSeconds));
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-            using var response = await client.SendAsync(request, cts.Token);
-            var duration = (DateTime.Now - startTime).TotalMilliseconds;
-            _logger.Debug($"HTTP POST FORM 响应: {(int)response.StatusCode} (耗时: {duration}ms)");
-
+            using var response = await client.SendAsync(request, cts.Token).ConfigureAwait(false);
+            if (logCategory is not null)
+                _logger.Debug($"HTTP {logCategory} 响应: {(int)response.StatusCode} (耗时: {Stopwatch.GetElapsedTime(startTime).TotalMilliseconds}ms)");
             response.EnsureSuccessStatusCode();
-
-            string result = await response.Content.ReadAsStringAsync(cts.Token);
-            return JsonSerializer.Deserialize<TResponse>(result, _jsonOptions);
+            string result = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+            return JsonSerializer.Deserialize<T>(result, _jsonOptions);
         }
 
         /// <summary>

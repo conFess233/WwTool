@@ -1,0 +1,266 @@
+{
+  "version": "3.7.0",
+  "items": {
+    "1": {
+      "names": {
+        "zh-Hans": "致新世界",
+        "en": "To the New World",
+        "ja": "To the New World",
+        "ko": "새로운 세계에게"
+      },
+      "type": "Album"
+    },
+    "2": {
+      "names": {
+        "zh-Hans": "五浔深处",
+        "en": "Into the Depths",
+        "ja": "Into the Depths",
+        "ko": "다섯 강의 깊은 곳"
+      },
+      "type": "Album"
+    },
+    "3": {
+      "names": {
+        "zh-Hans": "缄默欢歌",
+        "en": "Through the Silent Veil",
+        "ja": "Through the Silent Veil",
+        "ko": "침묵에 바치는 노랫소리"
+      },
+      "type": "Album"
+    },
+    "4": {
+      "names": {
+        "zh-Hans": "Waking of a World",
+        "en": "Waking of a World",
+        "ja": "Waking of a World",
+        "ko": "Waking of a World"
+      },
+      "type": "Album"
+    },
+    "6": {
+      "names": {
+        "zh-Hans": "真伪之塔",
+        "en": "Duplicitous Tower",
+        "ja": "Duplicitous Tower",
+        "ko": "진위의 탑"
+      },
+      "type": "Album"
+    },
+    "7": {
+      "names": {
+        "zh-Hans": "白日的入梦曲",
+        "en": "Daydream Lullaby",
+        "ja": "Daydream Lullaby",
+        "ko": "대낮의 자장가"
+      },
+      "type": "Album"
+    },
+    "8": {
+      "names": {
+        "zh-Hans": "弦汐未央",
+        "en": "The Waves Play On",
+        "ja": "The Waves Play On",
+        "ko": "The Waves Play On"
+      },
+      "type": "Album"
+    },
+    "9": {
+      "names": {
+        "zh-Hans": "呼嚎于山麓之巅",
+        "en": "Applause Greets the Hill",
+        "ja": "Applause Greets the Hill",
+        "ko": "Applause Greets the Hill"
+      },
+      "type": "Album"
+    },
+    "10": {
+      "names": {
+        "zh-Hans": "无悼荣辉",
+        "en": "Glory Unwept",
+        "ja": "Glory Unwept",
+        "ko": "Glory Unwept"
+      },
+      "type": "Album"
+    },
+    "11": {
+      "names": {
+        "zh-Hans": "千岛余音",
+        "en": "Thousand Island Aftertune",
+        "ja": "千の島の調べ",
+        "ko": "수많은 섬의 여음"
+      },
+      "type": "Album"
+    },
+    "12": {
+      "names": {
+        "zh-Hans": "夏日尽头",
+        "en": "Summer's End",
+        "ja": "Summer's End",
+        "ko": "이 여름의 끝을 넘어"
+      },
+      "type": "Album"
+    },
+    "999": {
+      "names": {
+        "zh-Hans": "今天的你，想为拉古那带来何种音乐？",
+        "en": "What kind of music will you bring to Ragunna today?",
+        "ja": "我が友よ、今日はラグーナにどんな音楽を響かせてくれるんだい？",
+        "ko": "오늘의 당신은 라군나에 어떤 음악을 들려주고 싶나요?"
+      },
+      "type": "Album"
+    },
+    "13": {
+      "names": {
+        "zh-Hans": "Pioneer's Roadtrip Mix",
+        "en": "Pioneer's Roadtrip Mix",
+        "ja": "Pioneer's Roadtrip Mix",
+        "ko": "Pioneer's Roadtrip Mix"
+      },
+      "type": "Album"
+    },
+    "14": {
+      "names": {
+        "zh-Hans": "引星为炬",
+        "en": "Our Torch, The Stars",
+        "ja": "Star as Torch",
+        "ko": "Star as Torch"
+      },
+      "type": "Album"
+    },
+    "15": {
+      "names": {
+        "zh-Hans": "女神异闻录５ 皇家版 联动专辑",
+        "en": "Persona 5 Royal: Collab Album",
+        "ja": "ペルソナ５ ザ・ロイヤル コラボアルバム",
+        "ko": "페르소나5 더 로열 콜라보 앨범"
+      },
+      "type": "Album"
+    },
+    "16": {
+      "names": {
+        "zh-Hans": "女神异闻录３ Reload联动专辑",
+        "en": "Persona 3 Reload: Collab Album",
+        "ja": "ペルソナ３ リロード コラボアルバム",
+        "ko": "페르소나3 리로드 콜라보 앨범"
+      },
+      "type": "Album"
+    },
+    "17": {
+      "names": {
+        "zh-Hans": "刺猬索尼克 联动专辑",
+        "en": "Sonic the Hedgehog: Collab Album",
+        "ja": "ソニック・ザ・ヘッジホッグ コラボアルバム",
+        "ko": "소닉 더 헤지혹 콜라보 앨범"
+      },
+      "type": "Album"
+    },
+    "18": {
+      "names": {
+        "zh-Hans": "For Ya",
+        "en": "For Ya",
+        "ja": "For Ya",
+        "ko": "For Ya"
+      },
+      "type": "Album"
+    },
+    "19": {
+      "names": {
+        "zh-Hans": "Neo-Tide | Remix Album",
+        "en": "Neo-Tide | Remix Album",
+        "ja": "Neo-Tide | Remix Album",
+        "ko": "Neo-Tide | Remix Album"
+      },
+      "type": "Album"
+    },
+    "20": {
+      "names": {
+        "zh-Hans": "行至漫漫雪色",
+        "en": "To the Snowland",
+        "ja": "To the Snowland",
+        "ko": "To the Snowland"
+      },
+      "type": "Album"
+    },
+    "21": {
+      "names": {
+        "zh-Hans": "若期待鎏金",
+        "en": "Gilded Expectations",
+        "ja": "Gilded Expectations",
+        "ko": "Gilded Expectations"
+      },
+      "type": "Album"
+    },
+    "22": {
+      "names": {
+        "zh-Hans": "旧夜群星闪耀时",
+        "en": "Beneath the Stars of the Old Night",
+        "ja": "Beneath the Stars of the Old Night",
+        "ko": "어젯밤 뭇별들의 순간"
+      },
+      "type": "Album"
+    },
+    "23": {
+      "names": {
+        "zh-Hans": "倘若相拥于月",
+        "en": "To Hold You on the Moon",
+        "ja": "To Hold You on the Moon",
+        "ko": "To Hold You on the Moon"
+      },
+      "type": "Album"
+    },
+    "24": {
+      "names": {
+        "zh-Hans": "Cyberpunk: Edgerunners",
+        "en": "Cyberpunk: Edgerunners",
+        "ja": "Cyberpunk: Edgerunners",
+        "ko": "Cyberpunk: Edgerunners"
+      },
+      "type": "Album"
+    },
+    "25": {
+      "names": {
+        "zh-Hans": "回响弦歌 Vol.3",
+        "en": "Echoes of Melodies Vol. 3",
+        "ja": "Echoes of Melodies Vol. 3",
+        "ko": "Echoes of Melodies Vol. 3"
+      },
+      "type": "Album"
+    },
+    "26": {
+      "names": {
+        "zh-Hans": "万声弥新",
+        "en": "PhonographMusic_Name26_Text",
+        "ja": "PhonographMusic_Name26_Text",
+        "ko": "Myriad Notes, Ever New"
+      },
+      "type": "Album"
+    },
+    "27": {
+      "type": "Album",
+      "names": {
+        "zh-Hans": "云影仙迹",
+        "en": "Traces of the Transcendent",
+        "ja": "Traces of the Transcendent",
+        "ko": "When Snow Melts into Spring"
+      }
+    },
+    "28": {
+      "type": "Album",
+      "names": {
+        "zh-Hans": "梦枢心相由心生",
+        "en": "Simulacrum of the Heart",
+        "ja": "夢枢の有り様、心のまま生ず",
+        "ko": "몽주의 궤적, 마음이 그리는 대로"
+      }
+    },
+    "29": {
+      "type": "Album",
+      "names": {
+        "zh-Hans": "回响弦歌 Vol.4",
+        "en": "Echoes of Melodies Vol. 4",
+        "ja": "Echoes of Melodies Vol. 4",
+        "ko": "Echoes of Melodies Vol. 4"
+      }
+    }
+  }
+}

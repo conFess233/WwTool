@@ -22,7 +22,7 @@ public sealed partial class GachaLogLocator : IGachaLogLocator
         string logPath = Path.Combine(root, relativeLogPath, logFileName);
         if (!File.Exists(logPath)) throw new FileNotFoundException("未找到游戏日志文件。", logPath);
 
-        string? line = ReadLines.ReadLinesDecrypt(logPath)
+        string? line = ReadLines.ReadLinesDecrypt(logPath, cancellationToken)
             .LastOrDefault(value => value.Contains(urlMarker, StringComparison.Ordinal));
         if (string.IsNullOrWhiteSpace(line)) throw new WwToolException("游戏日志中没有抽卡查询地址。");
         Match match = QueryUrlRegex().Match(line);

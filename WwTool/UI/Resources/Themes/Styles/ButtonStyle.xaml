@@ -6,15 +6,19 @@
 
     <Style TargetType="Button">
         <Style.Resources>
-            <Style TargetType="{x:Type TextBlock}" />
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+            </Style>
         </Style.Resources>
 
         <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
         <Setter Property="Opacity" Value="1" />
         <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
-        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="MinHeight" Value="40" />
         <Setter Property="Padding" Value="12,6" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -49,7 +53,14 @@
                                         <ImageBrush ImageSource="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <ContentPresenter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <ContentPresenter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                                            <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
                             </Grid>
                         </Grid>
                     </Grid>
@@ -156,6 +167,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -175,7 +187,14 @@
                             CornerRadius="{DynamicResource CornerRadiusSmall}"
                             Opacity="0"
                             SnapsToDevicePixels="True" />
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                                            <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
                     </Grid>
 
                     <ControlTemplate.Triggers>
@@ -211,14 +230,18 @@
 
     <Style x:Key="CancelButtonStyle" TargetType="Button">
         <Style.Resources>
-            <Style TargetType="{x:Type TextBlock}" />
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+            </Style>
         </Style.Resources>
         <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource DangerHoverBrush}" />
-        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="MinHeight" Value="40" />
         <Setter Property="Padding" Value="12,6" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -257,7 +280,14 @@
                                         <ImageBrush ImageSource="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <ContentPresenter x:Name="contentPresenter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" />
+                                <ContentPresenter x:Name="contentPresenter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" TextElement.Foreground="{TemplateBinding Foreground}">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                                            <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
                             </Grid>
                         </Grid>
                     </Grid>
@@ -353,14 +383,18 @@
 
     <Style x:Key="OkButtonStyle" TargetType="Button">
         <Style.Resources>
-            <Style TargetType="{x:Type TextBlock}" />
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+            </Style>
         </Style.Resources>
         <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
         <Setter Property="Opacity" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
-        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="MinHeight" Value="40" />
         <Setter Property="Padding" Value="12,6" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
         <Setter Property="b:ButtonIconBehavior.UseNavigationColors" Value="True" />
 
         <Setter Property="Template">
@@ -411,7 +445,14 @@
                                         </Rectangle.OpacityMask>
                                     </Rectangle>
                                 </Grid>
-                                <ContentPresenter x:Name="contentPresenter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" />
+                                <ContentPresenter x:Name="contentPresenter" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False" TextElement.Foreground="{TemplateBinding Foreground}">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                                            <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
                             </Grid>
                         </Grid>
                     </Grid>
@@ -524,6 +565,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
 
         <Setter Property="Template">
@@ -637,6 +679,48 @@
                             <Setter TargetName="ImageIconBase" Property="Fill" Value="{DynamicResource TextMutedBrush}" />
                             <Setter TargetName="ImageIconActive" Property="Visibility" Value="Collapsed" />
                         </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- 次级操作保留清晰的键盘焦点与主题状态，不抢占主要操作层级。 -->
+    <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+        <Style.Resources><Style TargetType="{x:Type TextBlock}"><Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" /><Setter Property="FontSize" Value="{StaticResource FontSizeBase}" /></Style></Style.Resources>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource StandardFocusVisualStyle}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{DynamicResource CornerRadiusControl}" Padding="{TemplateBinding Padding}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Rectangle x:Name="Icon" Width="16" Height="16" Margin="0,0,8,0" Fill="{TemplateBinding Foreground}">
+                                <Rectangle.OpacityMask><ImageBrush ImageSource="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" /></Rectangle.OpacityMask>
+                            </Rectangle>
+                            <ContentPresenter VerticalAlignment="Center" RecognizesAccessKey="True" TextElement.Foreground="{TemplateBinding Foreground}">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}" />
+                                            <Setter Property="FontSize" Value="{StaticResource FontSizeBase}" />
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Tag" Value="{x:Null}"><Setter TargetName="Icon" Property="Visibility" Value="Collapsed" /></Trigger>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource SurfaceHoverBrush}" /></Trigger>
+                        <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource AccentContainerBrush}" /></Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" /></Trigger>
+                        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" /><Setter Property="Opacity" Value="0.6" /></Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

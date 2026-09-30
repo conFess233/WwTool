@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace WwTool.Common.Models.ApiResponse;
@@ -152,6 +153,8 @@ public sealed class GuideRoleAttribute
 
 public sealed class GuideAttributeItem
 {
+    [JsonPropertyName("texts")]
+    public List<GuideText> Texts { get; set; } = [];
     [JsonPropertyName("gbId")]
     public string GbId { get; set; } = string.Empty;
     [JsonPropertyName("pictureUrl")]
@@ -224,6 +227,15 @@ public sealed class GuideWeaponSection
 
 public sealed class GuideWeapon
 {
+    [JsonPropertyName("currentLevel")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public JsonElement? CurrentLevel { get; set; }
+    [JsonPropertyName("currentBreakthrough")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public JsonElement? CurrentBreakthrough { get; set; }
+    [JsonPropertyName("currentResonanceRank")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public JsonElement? CurrentResonanceRank { get; set; }
     [JsonPropertyName("gbId")]
     public string GbId { get; set; } = string.Empty;
     [JsonPropertyName("pictureUrl")]

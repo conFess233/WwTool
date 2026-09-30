@@ -37,37 +37,41 @@ namespace WwTool.Common.Utils
         /// </summary>
         /// <param name="path">加密的日志文件路径</param>
         /// <returns>解密后的明文日志行</returns>
-        public static IEnumerable<string> ReadLinesDecrypt(string path)
+        public static IEnumerable<string> ReadLinesDecrypt(string path, CancellationToken cancellationToken = default)
         {
-            // 检查文件是否存在，如果不存在则直接结束
             if (!File.Exists(path)) yield break;
-            byte[] encryptedData;
-
-            // 以共享读写方式打开文件流，防止文件被其他进程（如游戏）锁死而抛出异常
-            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using var stream = new DecryptStream(path, cancellationToken);
+            using var reader = new StreamReader(stream, Encoding.UTF8);
+            while (reader.ReadLine() is { } line)
             {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    fs.CopyTo(ms);
-                    encryptedData = ms.ToArray();
-                }
+                cancellationToken.ThrowIfCancellationRequested();
+                yield return line;
             }
-            byte[] decryptedData = new byte[encryptedData.Length];
+        }
 
-            // 遍历所有字节，根据字节的奇偶性进行对应的异或解密
-            for (int i = 0; i < encryptedData.Length; i++)
+        /// <summary>随 StreamReader 分块读取并原地变换，不复制整个日志。</summary>
+        private sealed class DecryptStream(string path, CancellationToken token)
+            : Stream
+        {
+            private readonly FileStream _source = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            public override bool CanRead => true;
+            public override bool CanSeek => false;
+            public override bool CanWrite => false;
+            public override long Length => throw new NotSupportedException();
+            public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+            public override void Flush() { }
+            public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+            public override void SetLength(long value) => throw new NotSupportedException();
+            public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+            protected override void Dispose(bool disposing) { if (disposing) _source.Dispose(); base.Dispose(disposing); }
+            public override int Read(byte[] buffer, int offset, int count) => Read(buffer.AsSpan(offset, count));
+            public override int Read(Span<byte> buffer)
             {
-                byte b = encryptedData[i];
-                // 奇数字节异或 0xA5，偶数字节异或 0xEF
-                decryptedData[i] = (byte)((b & 1) != 0 ? b ^ 0xA5 : b ^ 0xEF);
-            }
-
-            // 将解密后的字节数组导入内存流，并使用 UTF-8 编码逐行读取返回
-            using var decryptedMs = new MemoryStream(decryptedData);
-            using var reader = new StreamReader(decryptedMs, Encoding.UTF8);
-            while (!reader.EndOfStream)
-            {
-                yield return reader.ReadLine()!;
+                token.ThrowIfCancellationRequested();
+                int read = _source.Read(buffer);
+                for (int i = 0; i < read; i++)
+                    buffer[i] = (byte)(buffer[i] ^ ((buffer[i] & 1) != 0 ? 0xA5 : 0xEF));
+                return read;
             }
         }
     }

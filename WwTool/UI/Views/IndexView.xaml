@@ -2,6 +2,7 @@
     x:Class="WwTool.UI.Views.IndexView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:catalog="clr-namespace:WwTool.UI.Components"
     xmlns:b="clr-namespace:WwTool.Common.Behaviors"
     xmlns:converters="clr-namespace:WwTool.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -17,44 +18,11 @@
         <converters:TimeStampToDateStringConverter x:Key="TimeStampToDateString" />
         <converters:TimeStampToTimeString x:Key="TimeStampToTimeString" />
         <converters:LongToStringConverter x:Key="LongToString" />
-        <converters:ImageConverter x:Key="ImageConverter" />
     </UserControl.Resources>
-
-    <UserControl.RenderTransform>
-        <ScaleTransform x:Name="PageTransform" ScaleX="0.8" ScaleY="0.8" />
-    </UserControl.RenderTransform>
 
     <UserControl.Triggers>
         <EventTrigger RoutedEvent="UserControl.Loaded">
-            <BeginStoryboard>
-                <Storyboard>
-                    <DoubleAnimation
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="1"
-                        Duration="{StaticResource MotionPage}" />
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleY"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleX"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                </Storyboard>
-            </BeginStoryboard>
+            <BeginStoryboard Storyboard="{StaticResource PageEnterStoryboard}" />
         </EventTrigger>
     </UserControl.Triggers>
 
@@ -64,37 +32,35 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,2">
+        <Border Grid.Row="0" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1">
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+
 
                 <TextBlock
-                    Grid.Column="0"
-                    Margin="20,5"
+                    Grid.Row="0"
+                    Margin="20,15" VerticalAlignment="Center"
                     HorizontalAlignment="Left"
                     Style="{StaticResource HeaderTextStyle}"
                     Text="{Binding Path=[Index_Home], Source={x:Static utils:LanguageManager.Instance}}" />
-                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                <WrapPanel Grid.Column="1" Margin="16,12,20,12" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
                     <Button
-                        Height="30"
+                        MinHeight="40"
                         Margin="0,0,20,0"
                         HorizontalAlignment="Right"
                         Command="{Binding ShowLoginDialogCommand}"
                         Content="{Binding Path=[Index_AddAccount], Source={x:Static utils:LanguageManager.Instance}}"
-                        Foreground="{DynamicResource TextOnAccentBrush}"
+
                         Style="{StaticResource OkButtonStyle}"
                         Tag="{StaticResource AddImage}" />
-                    <Button
-                        Height="30"
-                        Margin="0,0,20,0"
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                        MinHeight="40"
+                        Margin="0"
                         HorizontalAlignment="Right"
                         Command="{Binding RefreshLocalAccountCommand}"
                         Content="{Binding Path=[Index_RefreshAccountList], Source={x:Static utils:LanguageManager.Instance}}"
                         Tag="{StaticResource RefreshImage}" />
-                </StackPanel>
+                </WrapPanel>
 
             </Grid>
         </Border>
@@ -133,11 +99,11 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Orientation="Vertical">
-                                        <Image
+                                        <catalog:CatalogImage
                                             Width="60"
                                             Height="60"
                                             Margin="0,5"
-                                            Source="{Binding SelectedUser.IconPath, Converter={StaticResource ImageConverter}}" />
+                                            Loader="{DynamicResource CatalogImageLoader}" Path="{Binding SelectedUser.IconPath}" />
 
                                     </StackPanel>
 
@@ -159,7 +125,7 @@
                                                     Margin="5,0,0,0"
                                                     HorizontalAlignment="Left"
                                                     VerticalAlignment="Bottom"
-                                                    FontSize="11"
+                                                    FontSize="{StaticResource FontSizeSm}"
                                                     FontWeight="Bold"
                                                     Text="{Binding Level, StringFormat='LV.{0}', TargetNullValue='LV.---'}" />
                                             </StackPanel>
@@ -168,7 +134,7 @@
                                                 Margin="2,2,0,5"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
-                                                FontSize="9"
+                                                FontSize="{StaticResource FontSizeSm}"
                                                 Style="{StaticResource CaptionTextStyle}"
                                                 Text="{Binding Uid, StringFormat='UID: {0}', TargetNullValue='UID: ---'}" />
                                         </StackPanel>
@@ -212,7 +178,7 @@
                                             <Image Width="40" Height="40" Source="{StaticResource EnergyImage}" />
                                             <TextBlock
                                                 HorizontalAlignment="Center"
-                                                FontSize="11"
+                                                FontSize="{StaticResource FontSizeSm}"
                                                 Style="{StaticResource CaptionTextStyle}"
                                                 Text="{Binding Path=[Index_CrystalSheet], Source={x:Static utils:LanguageManager.Instance}}" />
                                         </StackPanel>
@@ -249,7 +215,7 @@
                                             <Image Width="40" Height="40" Source="{StaticResource StorgeEnergyImage}" />
                                             <TextBlock
                                                 HorizontalAlignment="Center"
-                                                FontSize="11"
+                                                FontSize="{StaticResource FontSizeSm}"
                                                 Style="{StaticResource CaptionTextStyle}"
                                                 Text="{Binding Path=[Index_CrystalElement], Source={x:Static utils:LanguageManager.Instance}}" />
                                         </StackPanel>
@@ -288,7 +254,7 @@
                                             <Image Width="40" Height="40" Source="{StaticResource LivenessImage}" />
                                             <TextBlock
                                                 HorizontalAlignment="Center"
-                                                FontSize="11"
+                                                FontSize="{StaticResource FontSizeSm}"
                                                 Style="{StaticResource CaptionTextStyle}"
                                                 Text="{Binding Path=[Index_Active], Source={x:Static utils:LanguageManager.Instance}}" />
                                         </StackPanel>
@@ -336,7 +302,7 @@
                                                 Source="{StaticResource BattlePassImage}" />
                                             <TextBlock
                                                 HorizontalAlignment="Center"
-                                                FontSize="11"
+                                                FontSize="{StaticResource FontSizeSm}"
                                                 Style="{StaticResource CaptionTextStyle}"
                                                 Text="{Binding Path=[Index_Radio], Source={x:Static utils:LanguageManager.Instance}}" />
                                         </StackPanel>
@@ -399,7 +365,7 @@
                                             <Image Width="40" Height="40" Source="{StaticResource WeeklyInstImage}" />
                                             <TextBlock
                                                 HorizontalAlignment="Center"
-                                                FontSize="11"
+                                                FontSize="{StaticResource FontSizeSm}"
                                                 Style="{StaticResource CaptionTextStyle}"
                                                 Text="{Binding Path=[Index_WeeklyBoss], Source={x:Static utils:LanguageManager.Instance}}" />
                                         </StackPanel>
@@ -425,7 +391,7 @@
                                                     <ImageBrush ImageSource="{StaticResource RoleImage}" Stretch="Uniform" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
-                                            <TextBlock FontSize="11" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Index_OwnedRoles], Source={x:Static utils:LanguageManager.Instance}}" />
+                                            <TextBlock FontSize="{StaticResource FontSizeSm}" Style="{StaticResource CaptionTextStyle}" Text="{Binding Path=[Index_OwnedRoles], Source={x:Static utils:LanguageManager.Instance}}" />
                                         </StackPanel>
                                         <StackPanel
                                             Margin="10,0,0,0"

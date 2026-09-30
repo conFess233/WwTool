@@ -19,9 +19,9 @@ namespace WwTool.Services.Interfaces
 
     public interface IGachaStatisticsService
     {
-        GachaStatisticsResult OrganizeData(IEnumerable<GachaData> data, CardPoolType poolType, string languageCode);
+        GachaStatisticsResult OrganizeData(IEnumerable<GachaPull> data, CardPoolType poolType, string languageCode);
         GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount, int featuredCount);
-        GachaInsights CalculateInsights(IEnumerable<GachaData> data, bool includeIncompleteFeaturedSegment = false);
+        GachaInsights CalculateInsights(IEnumerable<GachaPull> data);
     }
 
     public class GlobalStatisticsResult
@@ -31,7 +31,7 @@ namespace WwTool.Services.Interfaces
         public int TotalHitGold { get; set; }
         public double SuccessRate { get; set; }
         public int LimitedGoldCount { get; set; }
-        public double AvgCharaTide { get; set; }
-        public double AvgLimitCharaTide { get; set; }
+        public double? AvgCharaTide { get; set; }
+        public double? AvgLimitCharaTide { get; set; }
     }
 }

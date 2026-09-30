@@ -16,46 +16,14 @@
     d:DesignWidth="747.5"
     mc:Ignorable="d">
 
-    <UserControl.RenderTransform>
-        <ScaleTransform x:Name="PageTransform" ScaleX="0.8" ScaleY="0.8" />
-    </UserControl.RenderTransform>
-
-    <UserControl.Resources>
+<UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     </UserControl.Resources>
 
     <UserControl.Triggers>
         <EventTrigger RoutedEvent="UserControl.Loaded">
-            <BeginStoryboard>
-                <Storyboard>
-                    <DoubleAnimation
-                        Storyboard.TargetProperty="Opacity"
-                        From="0"
-                        To="1"
-                        Duration="{StaticResource MotionPage}" />
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleY"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                    <DoubleAnimation
-                        Storyboard.TargetName="PageTransform"
-                        Storyboard.TargetProperty="ScaleX"
-                        From="0.8"
-                        To="1"
-                        Duration="{StaticResource MotionPage}">
-                        <DoubleAnimation.EasingFunction>
-                            <CubicEase EasingMode="EaseInOut" />
-                        </DoubleAnimation.EasingFunction>
-                    </DoubleAnimation>
-                </Storyboard>
-            </BeginStoryboard>
+            <BeginStoryboard Storyboard="{StaticResource PageEnterStoryboard}" />
         </EventTrigger>
     </UserControl.Triggers>
 
@@ -82,6 +50,36 @@
                 MaxWidth="920"
                 Margin="24,16,24,24"
                 HorizontalAlignment="Stretch">
+
+                <Border Margin="0,0,0,16" Padding="16" DataContext="{Binding Catalog}"
+                        Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1" CornerRadius="{DynamicResource CornerRadiusCard}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource TitleTextStyle}" Text="{Binding Path=[Catalog_Title], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <TextBlock Margin="0,6,0,12" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{Binding Path=[Catalog_Hint], Source={x:Static utils:LanguageManager.Instance}}" />
+                        <WrapPanel>
+                            <Button Margin="0,0,8,8" Padding="12,6" Command="{Binding SyncCommand}" Content="{Binding Path=[Catalog_Sync], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <Button Margin="0,0,8,8" Padding="12,6" Command="{Binding CancelCommand}" Content="{Binding Path=[Catalog_Cancel], Source={x:Static utils:LanguageManager.Instance}}" />
+                            <Button Margin="0,0,8,8" Padding="12,6" Command="{Binding ClearCommand}" Content="{Binding Path=[Catalog_Clear], Source={x:Static utils:LanguageManager.Instance}}" />
+                        </WrapPanel>
+                        <ItemsControl ItemsSource="{Binding Rows}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,6,0,6">
+                                        <WrapPanel>
+                                            <TextBlock Margin="0,0,12,0" FontWeight="SemiBold" Text="{Binding Name}" />
+                                            <TextBlock Margin="0,0,12,0" Text="{Binding Version}" />
+                                            <TextBlock Text="{Binding Status}" />
+                                        </WrapPanel>
+                                        <TextBlock Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding LastSuccess}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{Binding Message}" />
+                    </StackPanel>
+                </Border>
 
                 <Border
                     Margin="0,0,0,16"
@@ -155,7 +153,7 @@
                                     Margin="10,0,0,0"
                                     Command="{Binding DeleteLocalAccountCommand}"
                                     Content="{Binding Path=[Action_Delete], Source={x:Static utils:LanguageManager.Instance}}"
-                                    Foreground="{DynamicResource TextOnAccentBrush}"
+
                                     Style="{StaticResource CancelButtonStyle}"
                                     Tag="{StaticResource TrashImage}" />
                             </StackPanel>
@@ -480,7 +478,7 @@
                 Command="{Binding SaveCommand}"
                 Content="{Binding Path=[Action_SaveSettings], Source={x:Static utils:LanguageManager.Instance}}"
                 FontSize="{StaticResource FontSizeLg}"
-                Foreground="{DynamicResource TextOnAccentBrush}"
+
                 Style="{StaticResource OkButtonStyle}"
                 Tag="{StaticResource SaveImage}" />
         </StackPanel>

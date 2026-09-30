@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,15 +10,18 @@ namespace WwTool.UI.Components
     public partial class TitleBar : UserControl
     {
         private Window? _parentWindow;
+        private HwndSource? _source;
 
         public TitleBar()
         {
             InitializeComponent();
             this.Loaded += TitleBar_Loaded;
+            Unloaded += (_, _) => DetachWindow();
         }
 
         private void TitleBar_Loaded(object sender, RoutedEventArgs e)
         {
+            DetachWindow();
             // 自动获取当前标题栏所属的 Window
             _parentWindow = Window.GetWindow(this);
             if (_parentWindow != null)
@@ -27,8 +30,18 @@ namespace WwTool.UI.Components
                 _parentWindow.StateChanged += ParentWindow_StateChanged;
 
                 IntPtr handle = new WindowInteropHelper(_parentWindow).Handle;
-                HwndSource.FromHwnd(handle)?.AddHook(WindowProc);
+                _source = HwndSource.FromHwnd(handle);
+                _source?.AddHook(WindowProc);
             }
+        }
+
+        /// <summary>卸载或重新挂载时对称释放窗口事件和原生钩子。</summary>
+        private void DetachWindow()
+        {
+            if (_parentWindow is not null) _parentWindow.StateChanged -= ParentWindow_StateChanged;
+            _source?.RemoveHook(WindowProc);
+            _source = null;
+            _parentWindow = null;
         }
 
         // 拖拽逻辑
@@ -49,8 +62,9 @@ namespace WwTool.UI.Components
                 {
                     _parentWindow.DragMove();
                 }
-                catch (Exception)
+                catch (InvalidOperationException ex)
                 {
+                    System.Diagnostics.Trace.TraceInformation(ex.Message);
                 }
             }
         }

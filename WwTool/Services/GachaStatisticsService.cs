@@ -22,17 +22,12 @@ namespace WwTool.Services
             _gameData = gameData;
         }
 
-        public GachaStatisticsResult OrganizeData(IEnumerable<GachaData> data, CardPoolType poolType, string languageCode)
+        public GachaStatisticsResult OrganizeData(IEnumerable<GachaPull> data, CardPoolType poolType, string languageCode)
         {
             var result = new GachaStatisticsResult();
             result.PoolStatistics.PoolType = poolType;
             bool isCharacterEventPool = poolType == CardPoolType.CharacterEvent;
-            List<GachaData> orderedNewestFirst = data
-                .Select((item, index) => new { Item = item, Index = index, Time = ParseTime(item.Time) })
-                .OrderByDescending(x => x.Time)
-                .ThenBy(x => x.Index)
-                .Select(x => x.Item)
-                .ToList();
+            List<GachaPull> ordered = OrderChronologically(data);
 
             int pity = 0;
             int successCount = 0;
@@ -44,7 +39,7 @@ namespace WwTool.Services
             var tempDatas = new List<HitGoldData>();
             var tempFourStars = new Dictionary<int, FourStarHistoryItem>();
 
-            foreach (var item in orderedNewestFirst.AsEnumerable().Reverse())
+            foreach (var item in ordered)
             {
                 pity++;
                 var itemInfo = _gameData.GetItemById(item.ResourceId);
@@ -70,12 +65,14 @@ namespace WwTool.Services
                 if (item.QualityLevel == 5)
                 {
                     bool? isMiss = null;
-                    if (itemInfo != null)
+                    bool? isLimited = _gameData.GetLimitedStatus(item.ResourceId, item.QualityLevel,
+                        isCharacterEventPool || itemInfo?.Type == "Character");
+                    if (isLimited is not null)
                     {
-                        isMiss = !itemInfo.IsUp;
+                        isMiss = !isLimited.Value;
                         if (isCharacterEventPool)
                         {
-                            if (itemInfo.IsUp)
+                            if (isLimited.Value)
                             {
                                 featuredCount++;
                                 if (!isGuaranteedFeatured)
@@ -102,7 +99,8 @@ namespace WwTool.Services
                     });
 
                     result.GoldValues.Add(pity);
-                    string name = itemInfo != null ? itemInfo.GetName(languageCode) : item.Name;
+                    string name = itemInfo?.GetName(languageCode) ?? string.Empty;
+                    if (string.IsNullOrWhiteSpace(name)) name = item.Name;
                     result.GoldLabels.Add(name);
 
                     hitGoldCount++;
@@ -111,19 +109,19 @@ namespace WwTool.Services
                 }
             }
 
-            if (pity > 0 && orderedNewestFirst.Count > 0)
+            if (pity > 0 && ordered.Count > 0)
             {
                 tempDatas.Add(new HitGoldData
                 {
-                    GachaData = new GachaData
+                    GachaData = new GachaPull
                     {
-                        CardPoolType = orderedNewestFirst[0].CardPoolType,
+                        CardPoolType = ordered[^1].CardPoolType,
                         ResourceId = 0,
                         Count = 1,
                         Name = LanguageManager.Instance["Msg_Pity"] ?? "Pity",
                         QualityLevel = 1,
                         ResourceType = LanguageManager.Instance["Msg_Pity"] ?? "Pity",
-                        Time = orderedNewestFirst[0].Time
+                        Time = ordered[^1].Time
                     },
                     Pity = pity,
                     FourStarHistories = new System.Collections.ObjectModel.ObservableCollection<FourStarHistoryItem>(tempFourStars.Values)
@@ -135,9 +133,9 @@ namespace WwTool.Services
                 result.PoolStatistics.HitGoldDatas.Add(tempDatas[i]);
             }
 
-            result.PoolStatistics.Calculate.Tides = orderedNewestFirst.Count;
+            result.PoolStatistics.Calculate.Tides = ordered.Count;
             result.PoolStatistics.Calculate.HitGoldCount = hitGoldCount;
-            result.PoolStatistics.Calculate.AvgGoldTide = hitGoldCount != 0 ? (double)result.PoolStatistics.Calculate.Tides / hitGoldCount : 0;
+            result.PoolStatistics.Calculate.AvgGoldTide = hitGoldCount != 0 ? (double)(ordered.Count - pity) / hitGoldCount : null;
 
             result.SuccessCount = successCount;
             result.MissCount = missCount;
@@ -161,12 +159,17 @@ namespace WwTool.Services
                     if (pool.Calculate.HitGoldCount > 0)
                     {
                         result.SuccessRate = (double)successCount / pool.Calculate.HitGoldCount * 100;
-                        result.AvgCharaTide = (double)pool.Calculate.Tides / pool.Calculate.HitGoldCount;
+                        result.AvgCharaTide = pool.Calculate.AvgGoldTide;
                     }
 
                     if (featuredCount > 0)
                     {
-                        result.AvgLimitCharaTide = (double)pool.Calculate.Tides / featuredCount;
+                        // 列表为新到旧：忽略最近一次 UP 之后尚未完成的区间。
+                        int completedPulls = pool.HitGoldDatas
+                            .Where(x => x.GachaData.QualityLevel == 5)
+                            .SkipWhile(x => x.IsMiss != false)
+                            .Sum(x => x.Pity);
+                        result.AvgLimitCharaTide = (double)completedPulls / featuredCount;
                     }
 
                     result.LimitedGoldCount = pool.Calculate.HitGoldCount;
@@ -176,17 +179,9 @@ namespace WwTool.Services
             return result;
         }
 
-        public GachaInsights CalculateInsights(
-            IEnumerable<GachaData> data,
-            bool includeIncompleteFeaturedSegment = false)
+        public GachaInsights CalculateInsights(IEnumerable<GachaPull> data)
         {
-            ArgumentNullException.ThrowIfNull(data);
-            List<GachaData> ordered = data
-                .Select((item, index) => new { Item = item, Index = index, Time = ParseTime(item.Time) })
-                .OrderBy(x => x.Time)
-                .ThenBy(x => x.Index)
-                .Select(x => x.Item)
-                .ToList();
+            List<GachaPull> ordered = OrderChronologically(data);
 
             int[] pityBins = new int[8];
             var fiveStars = new List<FiveStarInsight>();
@@ -202,7 +197,7 @@ namespace WwTool.Services
             int validFeaturedPulls = 0;
             int validFeaturedCount = 0;
 
-            foreach (GachaData item in ordered)
+            foreach (GachaPull item in ordered)
             {
                 CardPoolType? pool = ParsePoolType(item.CardPoolType);
                 DateTime occurredAt = ParseTime(item.Time);
@@ -234,27 +229,22 @@ namespace WwTool.Services
                 pityBins[Math.Clamp((fiveStarPity - 1) / 10, 0, pityBins.Length - 1)]++;
                 totalFiveStars++;
                 GameItemInfo? itemInfo = _gameData.GetItemById(item.ResourceId);
-                bool? isFeatured = pool == CardPoolType.CharacterEvent && itemInfo is not null
-                    ? itemInfo.IsUp
+                bool? isFeatured = pool == CardPoolType.CharacterEvent
+                    ? _gameData.GetLimitedStatus(item.ResourceId, item.QualityLevel, true)
                     : null;
                 fiveStars.Add(new FiveStarInsight(occurredAt, item.Name, fiveStarPity, isFeatured));
                 cumulative.Add(new CumulativePullInsight(occurredAt, totalPulls, totalFiveStars));
 
                 if (pool == CardPoolType.CharacterEvent && isFeatured == true)
                 {
-                    bool incomplete = featured.Count == 0;
-                    if (!incomplete || includeIncompleteFeaturedSegment)
-                    {
-                        validFeaturedPulls += pullsSinceFeatured;
-                        validFeaturedCount++;
-                    }
+                    validFeaturedPulls += pullsSinceFeatured;
+                    validFeaturedCount++;
                     featured.Add(new FeaturedPullInsight(
                         featured.Count + 1,
                         item.Name,
                         characterPulls,
                         (featured.Count + 1) * GachaInsights.FeaturedExpectation,
-                        validFeaturedCount == 0 ? 0 : (double)validFeaturedPulls / validFeaturedCount,
-                        incomplete));
+                        (double)validFeaturedPulls / validFeaturedCount));
                     pullsSinceFeatured = 0;
                 }
             }
@@ -272,6 +262,22 @@ namespace WwTool.Services
                 FeaturedPulls = featured,
                 CurrentCharacterPity = pityByPool.GetValueOrDefault(CardPoolType.CharacterEvent)
             };
+        }
+
+        /// <summary>
+        /// 将按 SourceOrder 读取的记录转换为统计用的旧到新顺序。
+        /// 新批次可能追加在旧批次之后，因此按时间归并；同时间内 API 为新到旧，
+        /// 必须反转源序，不能只按时间稳定排序，否则十连中的五星位置会错位。
+        /// 只排序计算副本，不修改持久化记录或同步顺序。
+        /// </summary>
+        private static List<GachaPull> OrderChronologically(IEnumerable<GachaPull> data)
+        {
+            ArgumentNullException.ThrowIfNull(data);
+            return data.Select((item, index) => new { Item = item, Index = index, Time = ParseTime(item.Time) })
+                .OrderBy(x => x.Time)
+                .ThenByDescending(x => x.Index)
+                .Select(x => x.Item)
+                .ToList();
         }
 
         private static DateTime ParseTime(string value) =>

@@ -21,8 +21,12 @@ namespace WwTool.Common.Utils
         /// <summary>
         /// 开启本地服务并唤起浏览器进行验证
         /// </summary>
-        public static async Task<Dictionary<string, string>> SolveGeetestAsync(int port = 5000)
+        public static async Task<Dictionary<string, string>> SolveGeetestAsync(int port = 5000, CancellationToken cancellationToken = default)
         {
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            timeout.CancelAfter(TimeSpan.FromMinutes(3));
+            CancellationToken token = timeout.Token;
+            token.ThrowIfCancellationRequested();
             string url = $"http://localhost:{port}/";
             using var listener = new HttpListener();
             listener.Prefixes.Add(url);
@@ -37,7 +41,7 @@ namespace WwTool.Common.Utils
 
             while (true)
             {
-                var context = await listener.GetContextAsync();
+                var context = await listener.GetContextAsync().WaitAsync(token);
                 var request = context.Request;
                 var response = context.Response;
 
@@ -51,13 +55,13 @@ namespace WwTool.Common.Utils
                         
                         response.ContentType = "text/html; charset=utf-8";
                         response.ContentLength64 = buffer.Length;
-                        await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                        await response.OutputStream.WriteAsync(buffer, token);
                     }
                     // 2. 浏览器验证成功后，将参数 POST 回本地服务器
                     else if (request.Url?.AbsolutePath == "/submit" && request.HttpMethod == "POST")
                     {
                         using var reader = new StreamReader(request.InputStream, request.ContentEncoding);
-                        string body = await reader.ReadToEndAsync();
+                        string body = await reader.ReadToEndAsync(token);
 
                         // 解析极验返回的验证参数
                         var resultParams = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
@@ -66,7 +70,7 @@ namespace WwTool.Common.Utils
                         string okHtml = "<!DOCTYPE html><html lang='zh-CN'><body><h2 style='color:green;text-align:center;margin-top:20%'>验证成功！请关闭该网页并返回客户端。</h2></body></html>";
                         byte[] buffer = Encoding.UTF8.GetBytes(okHtml);
                         response.ContentType = "text/html; charset=utf-8";
-                        await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+                        await response.OutputStream.WriteAsync(buffer, token);
                         
                         return resultParams ?? new Dictionary<string, string>();
                     }
