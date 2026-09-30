@@ -1,6 +1,8 @@
 <div align="center">
 
-# WwTool
+![Icon](WwTool/UI/Resources/Images/Icon.gif)
+
+## WwTool
 
 鸣潮工具箱 · 账号资料、角色详情与抽卡统计
 
