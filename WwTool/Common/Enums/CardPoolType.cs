@@ -25,6 +25,9 @@ namespace WwTool.Common.Enums
         [Description("新手自选唤取")]
         BeginnerChoice = 6,
 
+        [Description("新手自选唤取（感恩定向唤取）")]
+        BeginnerChoiceGiveback = 7,
+
         [Description("角色新旅唤取")]
         CharacterNoviceJourney = 8,
 
@@ -35,6 +38,12 @@ namespace WwTool.Common.Enums
         CharacterCollaboration = 10,
 
         [Description("武器联动唤取")]
-        WeaponCollaboration = 11
+        WeaponCollaboration = 11,
+
+        [Description("角色忆旅唤取")]
+        CharacterMemoryJourney = 12,
+
+        [Description("武器忆旅唤取")]
+        WeaponMemoryJourney = 13
     }
 }

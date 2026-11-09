@@ -21,6 +21,9 @@
 | 6eb2a235b30d05efd77bedb5cf60999e | 欧服 Europe  |
 | 919752ae5ea09c1ced910dd668a63ffb | 港澳台 HMT   |
 | 10cd7254d57e58ae560b15d51e34b4c8 | 东南亚 SEA   |
+| 76402e5b20be2c39f095a152090afddc | 国服 CN      |
+
+> 国际服 UID 的最高位对应服务器：5 美服、6 欧服、7 亚服、8 港澳台、9 东南亚；UID < 200000000 为国服。详见 [抽卡记录](GachaLog.md#按-uid-推断服务器)。
 
 #### 语言
 

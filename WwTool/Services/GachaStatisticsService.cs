@@ -144,8 +144,11 @@ namespace WwTool.Services
             return result;
         }
 
-        public GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount, int featuredCount)
+        public GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount, int missCount, int featuredCount)
         {
+            // 不歪率只统计真正发生过小保底判定的五星：赢 + 歪。
+            // 大保底必出限定，不参与判定，不能计入分母。
+            int fiftyFiftyCount = successCount + missCount;
             var result = new GlobalStatisticsResult();
 
             foreach (var pool in poolStatistics)
@@ -156,9 +159,13 @@ namespace WwTool.Services
 
                 if (pool.PoolType == CardPoolType.CharacterEvent)
                 {
+                    if (fiftyFiftyCount > 0)
+                    {
+                        result.SuccessRate = (double)successCount / fiftyFiftyCount * 100;
+                    }
+
                     if (pool.Calculate.HitGoldCount > 0)
                     {
-                        result.SuccessRate = (double)successCount / pool.Calculate.HitGoldCount * 100;
                         result.AvgCharaTide = pool.Calculate.AvgGoldTide;
                     }
 

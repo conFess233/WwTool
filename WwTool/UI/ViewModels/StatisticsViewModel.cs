@@ -15,6 +15,7 @@ using System.Windows.Media;
 using WwTool.Common.Enums;
 using WwTool.Common.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Common.Models.ApiRequest;
 using WwTool.Common.Models.Entities;
 using WwTool.Common.Models.Domain;
 using WwTool.Common.Models.ApiResponse;
@@ -854,11 +855,12 @@ namespace WwTool.UI.ViewModels
         /// </summary>
         /// <param name="poolType">卡池类型枚举值</param>
         /// <returns>抽卡记录集合</returns>
-        private async Task<IEnumerable<GachaPull>> GetGachaLog(int poolType, GachaServerRegion serverRegion)
+        private async Task<IEnumerable<GachaPull>> GetGachaLog(int poolType, GachaServerRegion serverRegion, string uid)
         {
             if (string.IsNullOrEmpty(_logUrl))
                 return [];
             var param = GachaUrlParser.Parse(_logUrl);
+            EnsureLinkBelongsToAccount(param, uid);
             param.LanguageCode = LanguageTypeExtensions.GetCode(_configService.User.AppLanguage);
             param.CardPoolType = poolType;
 
@@ -867,6 +869,25 @@ namespace WwTool.UI.ViewModels
             return data;
 
         }
+
+        /// <summary>
+        /// 校验抽卡链接属于当前选中的账号。
+        /// Client.log 只保存最后一次在游戏内打开抽卡记录的账号链接，切换账号后直接同步
+        /// 会把另一个账号的记录写进当前 UID，因此 player_id 不一致时必须拒绝。
+        /// </summary>
+        private static void EnsureLinkBelongsToAccount(GachaRequest request, string uid)
+        {
+            if (!string.Equals(request.PlayerId, uid, StringComparison.Ordinal))
+            {
+                throw new WwToolException(string.Format(
+                    LanguageManager.Instance["Msg_GachaLinkAccountMismatch"],
+                    MaskUid(request.PlayerId),
+                    MaskUid(uid)));
+            }
+        }
+
+        private static string MaskUid(string? uid) =>
+            string.IsNullOrEmpty(uid) || uid.Length <= 4 ? "****" : uid[..^4] + "****";
 
         /// <summary>
         /// 从服务器同步所有卡池的抽卡数据，并更新统计结果
@@ -888,11 +909,17 @@ namespace WwTool.UI.ViewModels
 
                 await ExceptionHelper.ExecuteAsync(async () =>
                 {
+                    // 在请求任何卡池之前先校验，避免部分卡池已写入后才发现链接属于别的账号。
+                    if (!string.IsNullOrEmpty(_logUrl))
+                    {
+                        EnsureLinkBelongsToAccount(GachaUrlParser.Parse(_logUrl), uid);
+                    }
+
                     foreach (var type in Enum.GetValues<CardPoolType>())
                     {
                         _uiStateService.ShowLoading(string.Format(LanguageManager.Instance["Msg_SyncingPool"], type.GetLocalizedDescription()));
                         if (SelectedUser?.Uid != uid) throw new OperationCanceledException(token);
-                        var gachaData = await GetGachaLog((int)type, serverRegion);
+                        var gachaData = await GetGachaLog((int)type, serverRegion, uid);
                         await _userDataService.ImportGachaAsync(uid, (int)type, gachaData, "remote", token);
                     }
 
@@ -935,6 +962,7 @@ namespace WwTool.UI.ViewModels
             var globalStats = _gachaStatisticsService.CalculateGlobalStatistics(
                 PoolStatistics,
                 SuccessCount,
+                MissCount,
                 _featuredCharacterCount);
 
             TotalTides = globalStats.TotalTides;
@@ -1183,7 +1211,7 @@ namespace WwTool.UI.ViewModels
                 int fourStarCharacterCount = prepared.FourCharacters;
                 int fourStarWeaponCount = prepared.FourWeapons;
                 int success = prepared.Success;
-                int otherFiveStars = prepared.OtherGolds;
+                int misses = prepared.Misses;
                 var compareXLabels = prepared.PoolLabels.Select(x => Enum.Parse<CardPoolType>(x).GetLocalizedDescription()).ToList();
                 var tidesData = prepared.Tides;
                 var avgTideData = prepared.Averages;
@@ -1273,7 +1301,7 @@ namespace WwTool.UI.ViewModels
                     SuccessRatePieSeries =
                     [
                         new PieSeries<int> { Values = [success], Name = LanguageManager.Instance["Stat_SuccessCount"] ?? "不歪", InnerRadius = 40, Fill = new SolidColorPaint(palette.Success) },
-                        new PieSeries<int> { Values = [otherFiveStars], Name = LanguageManager.Instance["Stat_OtherGoldCount"] ?? "其他五星", InnerRadius = 40, Fill = new SolidColorPaint(palette.Warning) }
+                        new PieSeries<int> { Values = [misses], Name = LanguageManager.Instance["Stat_MissCount"] ?? "歪卡次数", InnerRadius = 40, Fill = new SolidColorPaint(palette.Warning) }
                     ];
 
                     FourStarPieSeries =

@@ -12,7 +12,7 @@ public static class StatisticsChartDataService
     public sealed record Snapshot(List<GachaPull> Records, GachaInsights Insights,
         SortedDictionary<DateTime, (int Pulls, int Golds)> Days, List<string> Labels,
         List<int> Pulls, List<int> Golds, KeyValuePair<DateTime, (int Pulls, int Golds)> Peak,
-        int FourCharacters, int FourWeapons, int Success, int OtherGolds,
+        int FourCharacters, int FourWeapons, int Success, int Misses,
         List<string> PoolLabels, List<int> Tides, List<double?> Averages);
 
     public static Snapshot Build(List<GachaPull> records, HashSet<CardPoolType> pools, int range,
@@ -77,9 +77,8 @@ public static class StatisticsChartDataService
             CardPoolType.CharacterEvent,
             language);
         success = filteredCharacterEventStats.SuccessCount;
-        int otherFiveStars = Math.Max(
-            0,
-            filteredCharacterEventStats.PoolStatistics.Calculate.HitGoldCount - success);
+        // 饼图表达小保底结果：不歪 vs 歪。大保底五星不参与判定，不计入。
+        int misses = filteredCharacterEventStats.MissCount;
 
         // 比较图表
         var compareXLabels = new List<string>();
@@ -105,7 +104,7 @@ public static class StatisticsChartDataService
 
         token.ThrowIfCancellationRequested();
         return new(filteredDatas, insights, dailyBuckets, dailyLabels, dailyPulls, dailyGolds, peakDay,
-            fourStarCharacterCount, fourStarWeaponCount, success, otherFiveStars, compareXLabels, tidesData, avgTideData);
+            fourStarCharacterCount, fourStarWeaponCount, success, misses, compareXLabels, tidesData, avgTideData);
     }
 
     private static int ParsePoolType(string value)

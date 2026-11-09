@@ -498,13 +498,14 @@ public static class GuideCardPools
     public static readonly IReadOnlyList<CardPoolType> Roles =
     [
         CardPoolType.CharacterEvent, CardPoolType.CharacterStandard, CardPoolType.Beginner,
-        CardPoolType.BeginnerChoice, CardPoolType.CharacterNoviceJourney, CardPoolType.CharacterCollaboration
+        CardPoolType.BeginnerChoice, CardPoolType.BeginnerChoiceGiveback, CardPoolType.CharacterNoviceJourney,
+        CardPoolType.CharacterCollaboration, CardPoolType.CharacterMemoryJourney
     ];
 
     public static readonly IReadOnlyList<CardPoolType> Weapons =
     [
         CardPoolType.WeaponEvent, CardPoolType.WeaponStandard,
-        CardPoolType.WeaponNoviceJourney, CardPoolType.WeaponCollaboration
+        CardPoolType.WeaponNoviceJourney, CardPoolType.WeaponCollaboration, CardPoolType.WeaponMemoryJourney
     ];
 }
 

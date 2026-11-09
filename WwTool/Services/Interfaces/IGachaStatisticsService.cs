@@ -20,7 +20,7 @@ namespace WwTool.Services.Interfaces
     public interface IGachaStatisticsService
     {
         GachaStatisticsResult OrganizeData(IEnumerable<GachaPull> data, CardPoolType poolType, string languageCode);
-        GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount, int featuredCount);
+        GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount, int missCount, int featuredCount);
         GachaInsights CalculateInsights(IEnumerable<GachaPull> data);
     }
 
