@@ -1,15 +1,164 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:vm="using:WwTool.UI.ViewModels"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
              xmlns:loc="using:WwTool.UI.Localization"
              x:Class="WwTool.UI.Pages.Pulls.PullsChartsView"
              x:DataType="pulls:PullsChartsViewModel">
-  <!-- 详细图表（图表在下一步接入）。 -->
-  <StackPanel Margin="40,0,40,40" Spacing="18">
-    <Button Classes="pill" HorizontalAlignment="Left" Content="{loc:Tr Pulls_BackToStatistics}" Command="{Binding BackCommand}"
-            AutomationProperties.AutomationId="pulls-charts-back" />
-    <Border Classes="card" Padding="28,24">
-      <TextBlock Classes="caption" Text="{loc:Tr Page_Migrating}" />
-    </Border>
-  </StackPanel>
+  <!-- 详细图表：卡池与时间筛选，六张图表。颜色来自主题，数值同时以文字显示。 -->
+  <UserControl.Styles>
+    <Style Selector="c|RatioBar.danger">
+      <Setter Property="Fill" Value="{DynamicResource DangerBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="40,0,40,120" Spacing="18">
+      <!-- 筛选 -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+        <StackPanel Spacing="8">
+          <ItemsControl ItemsSource="{Binding PoolOptions}">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="pulls:ChartPoolOption">
+                <ToggleButton Classes="chip" Margin="0,0,8,8" IsChecked="{Binding IsSelected, Mode=OneWay}" Content="{Binding Title}"
+                              Command="{Binding $parent[UserControl].((pulls:PullsChartsViewModel)DataContext).SelectPoolCommand}"
+                              CommandParameter="{Binding}" AutomationProperties.AutomationId="{Binding AutomationId}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock Classes="caption" Text="{Binding Basis}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+          <ComboBox Classes="pill" MinWidth="140" ItemsSource="{Binding TimeRanges}" SelectedItem="{Binding SelectedTimeRange}"
+                    ToolTip.Tip="{loc:Tr Stat_Filter_DateRange}" AutomationProperties.Name="{loc:Tr Stat_Filter_DateRange}"
+                    AutomationProperties.AutomationId="charts-time-range">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <Button Classes="pill" Content="{loc:Tr Pulls_BackToStatistics}" Command="{Binding BackCommand}"
+                  AutomationProperties.AutomationId="pulls-charts-back" />
+        </StackPanel>
+      </Grid>
+
+      <Border Classes="card" Padding="28,24" IsVisible="{Binding IsEmpty}">
+        <TextBlock Classes="caption" Text="{loc:Tr Stat_EmptyChart}" />
+      </Border>
+
+      <StackPanel Spacing="18" IsVisible="{Binding !IsEmpty}">
+        <Grid ColumnDefinitions="3*,2*" ColumnSpacing="18">
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="section-title" Text="{loc:Tr Stat_DailyPullChart}" />
+                <TextBlock Classes="caption" Text="{Binding DailyCaption}" />
+              </StackPanel>
+              <lvc:CartesianChart Height="220" Series="{Binding DailySeries}" XAxes="{Binding DailyXAxes}" YAxes="{Binding DailyYAxes}"
+                                  AnimationsSpeed="{Binding AnimationsSpeed}" TooltipPosition="Top" />
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="1" Classes="card">
+            <StackPanel Spacing="8">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="section-title" Text="{loc:Tr Pulls_PityChart}" />
+                <TextBlock Classes="caption" Text="{Binding PityCaption}" />
+              </StackPanel>
+              <lvc:CartesianChart Height="220" Series="{Binding PitySeries}" XAxes="{Binding PityXAxes}" YAxes="{Binding PityYAxes}"
+                                  AnimationsSpeed="{Binding AnimationsSpeed}" TooltipPosition="Hidden" />
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <Grid ColumnDefinitions="2*,3*" ColumnSpacing="18">
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="section-title" Text="{loc:Tr Pulls_PoolShareChart}" />
+                <TextBlock Classes="caption" Text="{Binding ShareCaption}" />
+              </StackPanel>
+              <Grid ColumnDefinitions="200,*" ColumnSpacing="16">
+                <lvc:PieChart Height="200" Series="{Binding ShareSeries}" AnimationsSpeed="{Binding AnimationsSpeed}" TooltipPosition="Hidden" />
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding ShareLegend}" VerticalAlignment="Center">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="10" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:ShareLegendRow">
+                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Border Width="10" Height="10" CornerRadius="3" Background="{Binding Swatch}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Classes="label" Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Grid.Column="2" Classes="label" FontWeight="SemiBold" Text="{Binding Text}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="1" Classes="card">
+            <StackPanel Spacing="8">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="section-title" Text="{loc:Tr Pulls_FiveStarCostChart}" />
+                <TextBlock Classes="caption" Text="{loc:Tr Pulls_FiveStarCostHint}" />
+              </StackPanel>
+              <ScrollViewer MaxHeight="200">
+                <ItemsControl ItemsSource="{Binding CostRows}" Margin="0,0,16,0">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:FiveStarCostRow">
+                      <Grid ColumnDefinitions="120,*,40" ColumnSpacing="12">
+                        <TextBlock Classes="label" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        <c:RatioBar Grid.Column="1" Ratio="{Binding Ratio}" Classes.danger="{Binding IsHardPity}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Classes="label" FontWeight="SemiBold" Text="{Binding Pity}" HorizontalAlignment="Right" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <Grid ColumnDefinitions="3*,2*" ColumnSpacing="18">
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="section-title" Text="{loc:Tr Stat_CumulativePulls}" />
+                <TextBlock Classes="caption" Text="{Binding CumulativeCaption}" />
+              </StackPanel>
+              <lvc:CartesianChart Height="220" Series="{Binding CumulativeSeries}" XAxes="{Binding CumulativeXAxes}"
+                                  YAxes="{Binding CumulativeYAxes}" AnimationsSpeed="{Binding AnimationsSpeed}" TooltipPosition="Top" />
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="1" Classes="card">
+            <StackPanel Spacing="12">
+              <TextBlock Classes="section-title" Text="{loc:Tr Pulls_RarityChart}" />
+              <ItemsControl ItemsSource="{Binding RarityRows}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="10" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="pulls:RarityRow">
+                    <StackPanel Spacing="4">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="label" Text="{Binding Title}" />
+                        <TextBlock Grid.Column="1" Classes="label" FontWeight="SemiBold" Text="{Binding Text}" />
+                      </Grid>
+                      <c:RatioBar Ratio="{Binding Ratio}" Height="8" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <StackPanel Spacing="4" Margin="0,6,0,0">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="label" Text="{loc:Tr Pulls_CharacterWinRate}" />
+                  <TextBlock Grid.Column="1" Classes="label" FontWeight="SemiBold" Text="{Binding WinText}" />
+                </Grid>
+                <c:RatioBar Ratio="{Binding WinRatio}" Height="8" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

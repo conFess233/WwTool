@@ -86,6 +86,7 @@ public partial class App : Application
         TrExtension.Service = services.GetRequiredService<LocalizationService>();
         services.GetRequiredService<AppearanceCoordinator>().Start();
         DataTemplates.Add(services.GetRequiredService<ViewLocator>());
+        ChartPalette.ConfigureFonts();
 
         // 7. Shell 与首屏；4、5 两步（数据库、静态资料）在窗口显示后异步完成，完成前页面区显示加载状态。
         var shell = services.GetRequiredService<ShellViewModel>();

@@ -82,6 +82,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Cursor" Value="Hand" />
   </Style>
