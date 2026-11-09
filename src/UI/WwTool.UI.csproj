@@ -32,4 +32,11 @@
     <None Include="portable" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- SkiaSharp/HarfBuzz 原生包自带约 100 MB 的 .pdb，发布时不需要。 -->
+  <Target Name="ExcludeNativeSymbolsFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(Extension)' == '.pdb' and $([System.String]::Copy('%(Filename)').StartsWith('lib'))" />
+    </ItemGroup>
+  </Target>
+
 </Project>
