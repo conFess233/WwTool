@@ -503,5 +503,15 @@
   "Pulls_ThreeStar": "★3",
   "Pulls_CharacterWinRate": "キャライベント · 50/50 勝ち",
   "Pulls_WinFraction": "{0} / {1} · {2}",
-  "Pulls_WeeklyCaption": "{0} 週 · 最多 {1} 回/週（週合計）"
+  "Pulls_WeeklyCaption": "{0} 週 · 最多 {1} 回/週（週合計）",
+  "Pulls_ImportUrl": "URL を取り込む",
+  "Pulls_ImportTitle": "ガチャ履歴 URL の取り込み",
+  "Pulls_ImportHint": "ゲーム内でガチャ履歴を開いた後、ゲームログから URL を読み取るか、URL またはログの 1 行を貼り付けてください。",
+  "Pulls_ImportField": "ガチャ履歴 URL",
+  "Pulls_ReadFromLog": "ゲームログから読み取る",
+  "Pulls_Import": "取り込む",
+  "Pulls_Server": "サーバー",
+  "Pulls_ServerDetected": "URL から判別済み",
+  "Pulls_ImportInvalid": "有効なガチャ履歴 URL が見つかりません",
+  "Pulls_ImportAccount": "アカウント {0}"
 }

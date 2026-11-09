@@ -503,5 +503,15 @@
   "Pulls_ThreeStar": "三星",
   "Pulls_CharacterWinRate": "角色活动 · 小保底不歪",
   "Pulls_WinFraction": "{0} / {1} · {2}",
-  "Pulls_WeeklyCaption": "共 {0} 周 · 单周最高 {1} 抽（按周合计）"
+  "Pulls_WeeklyCaption": "共 {0} 周 · 单周最高 {1} 抽（按周合计）",
+  "Pulls_ImportUrl": "导入链接",
+  "Pulls_ImportTitle": "导入抽卡链接",
+  "Pulls_ImportHint": "在游戏内打开抽卡历史记录后，可直接从游戏日志读取链接；也可以粘贴链接或整行日志。",
+  "Pulls_ImportField": "抽卡链接",
+  "Pulls_ReadFromLog": "从游戏日志读取",
+  "Pulls_Import": "导入",
+  "Pulls_Server": "服务器",
+  "Pulls_ServerDetected": "已按链接识别",
+  "Pulls_ImportInvalid": "没有识别到有效的抽卡链接",
+  "Pulls_ImportAccount": "账号 {0}"
 }

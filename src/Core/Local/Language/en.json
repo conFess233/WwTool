@@ -503,5 +503,15 @@
   "Pulls_ThreeStar": "3★",
   "Pulls_CharacterWinRate": "Character event · 50/50 won",
   "Pulls_WinFraction": "{0} / {1} · {2}",
-  "Pulls_WeeklyCaption": "{0} weeks · peak {1} pulls/week (weekly totals)"
+  "Pulls_WeeklyCaption": "{0} weeks · peak {1} pulls/week (weekly totals)",
+  "Pulls_ImportUrl": "Import URL",
+  "Pulls_ImportTitle": "Import pull history URL",
+  "Pulls_ImportHint": "After opening the pull history in game, read the URL from the game log, or paste the URL or a whole log line.",
+  "Pulls_ImportField": "Pull history URL",
+  "Pulls_ReadFromLog": "Read from game log",
+  "Pulls_Import": "Import",
+  "Pulls_Server": "Server",
+  "Pulls_ServerDetected": "Detected from the URL",
+  "Pulls_ImportInvalid": "No valid pull history URL found",
+  "Pulls_ImportAccount": "Account {0}"
 }
