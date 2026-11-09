@@ -86,7 +86,7 @@ namespace WwTool.Core.Services
         /// <param name="ex">错误信息</param>
         public void Log(LogLevel level, string message, Exception? ex = null)
         {
-            if (!_configService.App.EnableFileLogging)
+            if (!_configService.App.EnableFileLogging || level < _configService.App.MinimumLogLevel)
                 return;
 
             var entry = new LogEntry
