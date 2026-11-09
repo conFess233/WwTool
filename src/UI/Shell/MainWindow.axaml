@@ -1,60 +1,105 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:core="using:WwTool.Core.Localization"
+        xmlns:shell="using:WwTool.UI.Shell"
         xmlns:loc="using:WwTool.UI.Localization"
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
         x:Class="WwTool.UI.Shell.MainWindow"
         Title="WwTool"
         Width="1440" Height="900"
         MinWidth="1100" MinHeight="720"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="0"
+        WindowDecorations="BorderOnly"
         Icon="avares://WwTool/Assets/WwTool.ico">
-  <!-- 阶段 0 原型：主题令牌预览与运行时切换。正式 Shell 完成后替换。 -->
-  <ScrollViewer>
-    <StackPanel Margin="40,26" Spacing="18">
-      <TextBlock Text="主题原型" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-
-      <!-- 语言原型：A = 编译绑定索引器（x:DataType + Source），B = 标记扩展 {loc:Tr} -->
-      <WrapPanel x:Name="LanguageButtons" ItemSpacing="8" LineSpacing="8" />
-      <StackPanel Orientation="Horizontal" Spacing="24" x:DataType="core:LocalizationService">
-        <TextBlock x:Name="ProbeA" Text="{Binding [Nav_Home], Source={x:Static loc:TrExtension.Service}}" FontSize="16" Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock x:Name="ProbeA2" Text="{Binding [Nav_Statistics], Source={x:Static loc:TrExtension.Service}}" FontSize="16" Foreground="{DynamicResource TextPrimaryBrush}" />
-        <TextBlock x:Name="ProbeB" Text="{loc:Tr Nav_Settings}" FontSize="16" Foreground="{DynamicResource AccentBrush}" />
-        <TextBlock x:Name="ProbeB2" Text="{loc:Tr Index_RefreshAccountList}" FontSize="16" Foreground="{DynamicResource AccentBrush}" />
-        <TextBlock x:Name="ProbeMissing" Text="{loc:Tr Missing_Key_Demo}" FontSize="16" Foreground="{DynamicResource DangerBrush}" />
-      </StackPanel>
-      <WrapPanel x:Name="PresetButtons" ItemSpacing="8" LineSpacing="8" />
-      <WrapPanel x:Name="AccentButtons" ItemSpacing="8" LineSpacing="8" />
-
-      <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-              CornerRadius="{DynamicResource CornerRadiusCard}" Padding="22,18">
-        <StackPanel Spacing="10">
-          <TextBlock Text="卡片标题" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-          <TextBlock Text="正文文字 · Body text · 本文" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" />
-          <TextBlock Text="次要说明文字（需 ≥ 4.5:1）" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
-          <TextBlock Text="532" FontSize="42" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <Border Background="{DynamicResource AccentBrush}" CornerRadius="999" Padding="16,8">
-              <TextBlock Text="主要操作" Foreground="{DynamicResource TextOnAccentBrush}" FontWeight="SemiBold" />
-            </Border>
-            <Border Background="{DynamicResource AccentContainerBrush}" CornerRadius="999" Padding="16,8">
-              <TextBlock Text="选中 Chip" Foreground="{DynamicResource TextPrimaryBrush}" />
-            </Border>
-            <Border Background="{DynamicResource DangerBrush}" CornerRadius="7" Padding="16,8">
-              <TextBlock Text="危险" Foreground="White" />
-            </Border>
-            <Border Background="{DynamicResource NavIslandBrush}" CornerRadius="999" Padding="16,8">
-              <TextBlock Text="悬浮岛" Foreground="{DynamicResource TextOnNavIslandBrush}" FontWeight="SemiBold" />
-            </Border>
-          </StackPanel>
-          <Grid ColumnDefinitions="*" Height="10">
-            <Border Background="{DynamicResource SegmentTrackBrush}" />
-            <Border Background="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Width="260" />
-          </Grid>
+  <!-- Shell：56px 页头（左 Logo 与页名 · 中悬浮岛 · 右账号胶囊）+ 内容区。
+       内容延伸进标题栏，托管标题栏高度设为 0；Windows/Linux 由应用绘制标题按钮，
+       并标记 ElementRole（Win32 映射为 HTMINBUTTON/HTMAXBUTTON/HTCLOSE，保留 Win11 贴靠布局）。
+       macOS 保留系统红绿灯，不显示这组按钮。 -->
+  <Window.Styles>
+    <Style Selector="Button.caption">
+      <Setter Property="Width" Value="46" />
+      <Setter Property="Height" Value="32" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.caption /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.caption:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="Button.caption.close:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#C42B1C" />
+    </Style>
+    <Style Selector="Button.caption.close:pointerover">
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="Button.caption Path">
+      <Setter Property="Stroke" Value="{Binding $parent[Button].Foreground}" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Height" Value="10" />
+      <Setter Property="Stretch" Value="None" />
+    </Style>
+  </Window.Styles>
+  <Grid RowDefinitions="Auto,*">
+    <Grid x:Name="Header" Grid.Row="0" Height="56" Margin="40,26,40,18"
+          ColumnDefinitions="*,Auto,*" Background="Transparent"
+          PointerPressed="OnHeaderPointerPressed">
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center"
+                  IsHitTestVisible="False">
+        <Border Width="44" Height="44" CornerRadius="22" ClipToBounds="True" Background="{DynamicResource SurfaceBrush}">
+          <Image Source="avares://WwTool/Assets/WwTool.ico" Width="44" Height="44" />
+        </Border>
+        <StackPanel VerticalAlignment="Center">
+          <TextBlock Text="鸣潮工具箱" FontSize="12" FontWeight="SemiBold" LetterSpacing="1"
+                     Foreground="{DynamicResource AccentBrush}" />
+          <TextBlock x:Name="PageTitle" FontSize="26" FontWeight="Bold" LineHeight="29"
+                     Foreground="{DynamicResource TextPrimaryBrush}" />
         </StackPanel>
-      </Border>
+      </StackPanel>
 
-      <WrapPanel x:Name="Swatches" ItemSpacing="10" LineSpacing="10" />
+      <shell:FloatingNavIsland x:Name="Island" Grid.Column="1" VerticalAlignment="Center" />
+
+      <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="0">
+        <Button x:Name="AccountCapsule" AutomationProperties.AutomationId="account-capsule"
+                Height="44" Padding="6,0,12,0" CornerRadius="999"
+                Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Ellipse Width="32" Height="32" Fill="{DynamicResource SurfaceMutedBrush}" />
+            <TextBlock Text="漂泊者" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Text="LV.80" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource AccentBrush}" />
+          </StackPanel>
+        </Button>
+        <!-- 系统标题按钮占位：宽度由代码按平台设置（Windows 右侧、macOS 左侧红绿灯不占右侧）。 -->
+        <Border x:Name="CaptionButtonsSpacer" Width="0" />
+      </StackPanel>
+    </Grid>
+
+    <ContentControl x:Name="PageHost" Grid.Row="1" />
+
+    <StackPanel x:Name="CaptionButtons" Grid.Row="0" Orientation="Horizontal"
+                HorizontalAlignment="Right" VerticalAlignment="Top">
+      <Button x:Name="MinimizeButton" Classes="caption" Click="OnMinimizeClick"
+              chrome:WindowDecorationProperties.ElementRole="MinimizeButton"
+              AutomationProperties.AutomationId="caption-minimize">
+        <Path Data="M0,5.5 L10,5.5" />
+      </Button>
+      <Button x:Name="MaximizeButton" Classes="caption" Click="OnMaximizeClick"
+              chrome:WindowDecorationProperties.ElementRole="MaximizeButton"
+              AutomationProperties.AutomationId="caption-maximize">
+        <Path x:Name="MaximizeGlyph" Data="M0.5,0.5 L9.5,0.5 L9.5,9.5 L0.5,9.5 Z" />
+      </Button>
+      <Button Classes="caption close" Click="OnCloseClick"
+              chrome:WindowDecorationProperties.ElementRole="CloseButton"
+              AutomationProperties.AutomationId="caption-close">
+        <Path Data="M0,0 L10,10 M10,0 L0,10" />
+      </Button>
     </StackPanel>
-  </ScrollViewer>
+  </Grid>
 </Window>

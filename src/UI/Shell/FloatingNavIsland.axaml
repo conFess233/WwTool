@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:WwTool.UI.Shell"
+             x:Class="WwTool.UI.Shell.FloatingNavIsland"
+             x:DataType="shell:FloatingNavIsland">
+  <!-- 悬浮岛：深色胶囊，选中项展开为“图标 + 文字”并填充强调色，其余只显示图标。 -->
+  <UserControl.Styles>
+    <Style Selector="RadioButton.nav">
+      <Setter Property="Height" Value="44" />
+      <Setter Property="MinWidth" Value="44" />
+      <Setter Property="Padding" Value="12,0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Pill" CornerRadius="999" Background="Transparent" Padding="{TemplateBinding Padding}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.18" />
+              </Transitions>
+            </Border.Transitions>
+            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="RadioButton.nav:pointerover /template/ Border#PART_Pill">
+      <Setter Property="Background" Value="#22FFFFFF" />
+    </Style>
+    <Style Selector="RadioButton.nav:checked">
+      <Setter Property="Padding" Value="14,0,18,0" />
+    </Style>
+    <Style Selector="RadioButton.nav:checked /template/ Border#PART_Pill">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="RadioButton.nav:focus-visible /template/ Border#PART_Pill">
+      <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+  </UserControl.Styles>
+
+  <Border Background="{DynamicResource NavIslandBrush}" CornerRadius="999" Padding="6"
+          BoxShadow="0 12 28 -10 #99281C0A">
+    <ItemsControl x:Name="ItemsHost">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Orientation="Horizontal" Spacing="4" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="shell:NavItem">
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Border Width="1" Height="22" Margin="6,0" Background="#33FFFFFF" IsVisible="{Binding StartsGroup}" />
+            <RadioButton Classes="nav" GroupName="ShellNav" IsChecked="{Binding IsSelected}"
+                         ToolTip.Tip="{Binding Title}" AutomationProperties.Name="{Binding Title}"
+                         AutomationProperties.AutomationId="{Binding AutomationId}">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <!-- 图标作为遮罩，用主题色填充：任何主题下都是单色且对比清晰。 -->
+                <Rectangle Width="22" Height="22" Fill="{Binding $parent[RadioButton].Foreground}">
+                  <Rectangle.OpacityMask>
+                    <ImageBrush Source="{Binding Icon, Converter={x:Static shell:AssetImageConverter.Instance}}" Stretch="Uniform" />
+                  </Rectangle.OpacityMask>
+                </Rectangle>
+                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"
+                           Foreground="{Binding $parent[RadioButton].Foreground}"
+                           IsVisible="{Binding IsSelected}" />
+              </StackPanel>
+            </RadioButton>
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+      <ItemsControl.Styles>
+        <Style Selector="RadioButton.nav">
+          <Setter Property="Foreground" Value="{DynamicResource TextOnNavIslandBrush}" />
+        </Style>
+        <Style Selector="RadioButton.nav:checked">
+          <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+        </Style>
+      </ItemsControl.Styles>
+    </ItemsControl>
+  </Border>
+</UserControl>
