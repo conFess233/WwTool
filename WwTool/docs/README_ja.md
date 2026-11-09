@@ -48,10 +48,10 @@ WwTool は『鳴潮』のアカウント情報を確認し、集音履歴を整�
 ```powershell
 git clone https://github.com/conFess233/WwTool.git
 cd WwTool
-dotnet build WwTool/WwTool.csproj -c Release
+dotnet build src/UI/WwTool.UI.csproj -c Release
 ```
 
-`WwTool/bin/Release/net10.0-windows/WwTool.exe` を実行します。.NET 10 に対応する開発環境で `WwTool.slnx` を開くこともできます。
+`src/UI/bin/Release/net10.0/WwTool.exe` を実行します。.NET 10 に対応する開発環境で `WwTool.slnx` を開くこともできます。
 
 </details>
 

@@ -48,10 +48,10 @@ Install the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.
 ```powershell
 git clone https://github.com/conFess233/WwTool.git
 cd WwTool
-dotnet build WwTool/WwTool.csproj -c Release
+dotnet build src/UI/WwTool.UI.csproj -c Release
 ```
 
-Run `WwTool/bin/Release/net10.0-windows/WwTool.exe`. You can also open `WwTool.slnx` in a development environment that supports .NET 10.
+Run `src/UI/bin/Release/net10.0/WwTool.exe`. You can also open `WwTool.slnx` in a development environment that supports .NET 10.
 
 </details>
 

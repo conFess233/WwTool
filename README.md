@@ -1,6 +1,6 @@
 <div align="center">
 
-![Icon](WwTool/UI/Resources/Images/Icon.gif)
+![Icon](src/UI/Assets/Images/Icon.gif)
 
 ## WwTool
 
@@ -49,10 +49,10 @@
 ```powershell
 git clone https://github.com/conFess233/WwTool.git
 cd WwTool
-dotnet build WwTool/WwTool.csproj -c Release
+dotnet build src/UI/WwTool.UI.csproj -c Release
 ```
 
-运行 `WwTool/bin/Release/net10.0-windows/WwTool.exe`。也可使用支持 .NET 10 的开发环境打开 `WwTool.slnx`。
+运行 `src/UI/bin/Release/net10.0/WwTool.exe`。也可使用支持 .NET 10 的开发环境打开 `WwTool.slnx`。
 
 </details>
 

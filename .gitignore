@@ -2,14 +2,6 @@
 
 /.vscode
 
-/WwTool/obj
-
-/WwTool/Properties
-
-/WwTool/bin
-
-WwTool/WwTool.csproj.user
-
 /.temp
 
 WwTool.Tests/

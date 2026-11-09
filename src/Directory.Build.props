@@ -1,5 +1,5 @@
 <Project>
-  <!-- src/ 下所有项目的公共设置。旧的 WwTool/ 项目不受影响，迁移完成后移到仓库根。 -->
+  <!-- src/ 下所有项目的公共设置。 -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
