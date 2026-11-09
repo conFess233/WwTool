@@ -9,7 +9,10 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using WwTool.Common;
+using WwTool.Core.Abstractions.Platform;
 using WwTool.Core.Data;
+using WwTool.Core.Infrastructure;
+using WwTool.Core.Platform;
 using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
@@ -232,7 +235,13 @@ namespace WwTool
             var provider = services.BuildServiceProvider();
 
             containerRegistry.RegisterInstance(provider.GetRequiredService<IHttpClientFactory>());
-            DatabaseOptions databaseOptions = DatabaseOptions.CreateDefault();
+            // 迁移期：旧程序也通过 IAppPaths 决定数据位置，与 2.0 规则一致。
+            var appPaths = new AppPaths();
+            containerRegistry.RegisterInstance<IAppPaths>(appPaths);
+            containerRegistry.RegisterInstance<ISecretProtector>(
+                new VersionedSecretProtector(Path.Combine(appPaths.ConfigDirectory, "secret.key")));
+            containerRegistry.RegisterSingleton<IAppLauncher, ShellAppLauncher>();
+            DatabaseOptions databaseOptions = DatabaseOptions.FromPaths(appPaths);
             var contextFactory = new AppDbContextFactory(databaseOptions);
             containerRegistry.RegisterInstance(databaseOptions);
             containerRegistry.RegisterInstance<IDbContextFactory<AppDbContext>>(contextFactory);

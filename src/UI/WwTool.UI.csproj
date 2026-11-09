@@ -27,4 +27,9 @@
     <ProjectReference Include="..\Core\WwTool.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- 便携模式标记：数据写在程序目录，见 AppPaths。 -->
+    <None Include="portable" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

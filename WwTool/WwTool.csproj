@@ -180,4 +180,8 @@
       <LogicalName>WwTool.Catalogs.%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="portable" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

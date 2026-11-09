@@ -15,6 +15,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" />
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
+    <!-- 仅在 Windows 分支调用（OperatingSystem.IsWindows 守卫 + SupportedOSPlatform），CA1416 仍生效。 -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
   </ItemGroup>
 
 </Project>
