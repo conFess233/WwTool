@@ -2,6 +2,8 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
+using WwTool.Core.Enums;
+using WwTool.Core.Localization;
 using WwTool.UI.Services;
 
 namespace WwTool.UI.Shell;
@@ -19,14 +21,22 @@ public partial class MainWindow : Window
 
     private readonly ThemeService _theme;
 
-    public MainWindow() : this(new ThemeService())
+    /// <summary>仅供 Avalonia 设计器使用。</summary>
+    public MainWindow()
     {
+        _theme = new ThemeService();
+        InitializeComponent();
     }
 
-    public MainWindow(ThemeService theme)
+    public MainWindow(ThemeService theme, LocalizationService localization)
     {
         _theme = theme;
         InitializeComponent();
+
+        foreach (LanguageType language in Enum.GetValues<LanguageType>())
+        {
+            LanguageButtons.Children.Add(MakeButton($"lang-{language}", language.ToString(), () => localization.ChangeLanguage(language)));
+        }
 
         foreach (string preset in ThemeService.Presets)
         {

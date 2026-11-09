@@ -26,6 +26,8 @@
       <LogicalName>WwTool.Catalogs.%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
     <None Include="Local/Data/*.json" CopyToOutputDirectory="PreserveNewest" Link="Local/Data/%(Filename)%(Extension)" />
+    <!-- 界面语言资源（中/英/日键集合必须一致），复制到输出目录 Local/Language。 -->
+    <None Include="Local/Language/*.json" CopyToOutputDirectory="PreserveNewest" Link="Local/Language/%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

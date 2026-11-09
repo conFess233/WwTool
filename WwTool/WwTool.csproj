@@ -15,13 +15,7 @@
     <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="Local\Language\*.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
+<ItemGroup>
     <None Remove="UI\Resources\Images\About.png" />
     <None Remove="UI\Resources\Images\Account.png" />
     <None Remove="UI\Resources\Images\Add.png" />

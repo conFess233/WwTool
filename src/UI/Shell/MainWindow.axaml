@@ -1,5 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:core="using:WwTool.Core.Localization"
+        xmlns:loc="using:WwTool.UI.Localization"
         x:Class="WwTool.UI.Shell.MainWindow"
         Title="WwTool"
         Width="1440" Height="900"
@@ -12,6 +14,15 @@
     <StackPanel Margin="40,26" Spacing="18">
       <TextBlock Text="主题原型" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
 
+      <!-- 语言原型：A = 编译绑定索引器（x:DataType + Source），B = 标记扩展 {loc:Tr} -->
+      <WrapPanel x:Name="LanguageButtons" ItemSpacing="8" LineSpacing="8" />
+      <StackPanel Orientation="Horizontal" Spacing="24" x:DataType="core:LocalizationService">
+        <TextBlock x:Name="ProbeA" Text="{Binding [Nav_Home], Source={x:Static loc:TrExtension.Service}}" FontSize="16" Foreground="{DynamicResource TextPrimaryBrush}" />
+        <TextBlock x:Name="ProbeA2" Text="{Binding [Nav_Statistics], Source={x:Static loc:TrExtension.Service}}" FontSize="16" Foreground="{DynamicResource TextPrimaryBrush}" />
+        <TextBlock x:Name="ProbeB" Text="{loc:Tr Nav_Settings}" FontSize="16" Foreground="{DynamicResource AccentBrush}" />
+        <TextBlock x:Name="ProbeB2" Text="{loc:Tr Index_RefreshAccountList}" FontSize="16" Foreground="{DynamicResource AccentBrush}" />
+        <TextBlock x:Name="ProbeMissing" Text="{loc:Tr Missing_Key_Demo}" FontSize="16" Foreground="{DynamicResource DangerBrush}" />
+      </StackPanel>
       <WrapPanel x:Name="PresetButtons" ItemSpacing="8" LineSpacing="8" />
       <WrapPanel x:Name="AccentButtons" ItemSpacing="8" LineSpacing="8" />
 
