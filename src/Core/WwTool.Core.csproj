@@ -30,4 +30,9 @@
     <None Include="Local/Language/*.json" CopyToOutputDirectory="PreserveNewest" Link="Local/Language/%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- 本地测试（/tests，不提交）访问内部计算方法。 -->
+    <InternalsVisibleTo Include="WwTool.Core.Tests" />
+  </ItemGroup>
+
 </Project>

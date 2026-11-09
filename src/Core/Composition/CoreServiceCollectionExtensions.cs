@@ -7,6 +7,7 @@ using WwTool.Core.Abstractions.Platform;
 using WwTool.Core.Data;
 using WwTool.Core.Data.Repositories;
 using WwTool.Core.Services;
+using WwTool.Core.Services.Gacha;
 
 namespace WwTool.Core.Composition;
 
@@ -69,6 +70,7 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IHttpService, HttpService>();
         services.AddSingleton<ILoginService, LoginService>();
         services.AddSingleton<IGetDataService, GetDataService>();
+        services.AddSingleton<IPullsService, PullsService>();
         return services;
     }
 }
