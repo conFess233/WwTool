@@ -90,8 +90,12 @@
           <DataTemplate x:DataType="pulls:FiveStarCard">
             <Border Classes="card inset" AutomationProperties.AutomationId="pulls-five-star">
               <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="10">
-                <Border Grid.RowSpan="2" Classes="avatar" Classes.muted="{Binding IsPermanentTag}">
-                  <TextBlock Text="{Binding Name, Converter={x:Static pulls:InitialConverter.Instance}}" />
+                <Border Grid.RowSpan="2" Classes="avatar" Classes.muted="{Binding IsPermanentTag}" ClipToBounds="True">
+                  <Panel>
+                    <TextBlock Text="{Binding Name, Converter={x:Static pulls:InitialConverter.Instance}}"
+                               IsVisible="{Binding #Portrait.Source, Converter={x:Static ObjectConverters.IsNull}}" />
+                    <c:CatalogImage x:Name="Portrait" Path="{Binding IconPath}" DecodeWidth="104" Stretch="UniformToFill" />
+                  </Panel>
                 </Border>
                 <StackPanel Grid.Column="1" Spacing="4">
                   <StackPanel Orientation="Horizontal" Spacing="8">

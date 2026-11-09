@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:fb="using:WwTool.UI.Feedback"
              x:Class="WwTool.UI.Feedback.ConfirmDialogView"
-             x:DataType="fb:ConfirmDialogViewModel">
+             x:DataType="fb:ConfirmDialogViewModel"
+             MaxWidth="424">
   <StackPanel Spacing="16">
     <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap"
                Foreground="{DynamicResource TextPrimaryBrush}" />

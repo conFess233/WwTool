@@ -14,6 +14,7 @@ using WwTool.Core.Localization;
 using WwTool.Core.Platform;
 using WwTool.Core.Services;
 using WwTool.Core.Enums;
+using WwTool.UI.Controls;
 using WwTool.UI.Feedback;
 using WwTool.UI.Localization;
 using WwTool.UI.Navigation;
@@ -87,6 +88,7 @@ public partial class App : Application
         services.GetRequiredService<AppearanceCoordinator>().Start();
         DataTemplates.Add(services.GetRequiredService<ViewLocator>());
         ChartPalette.ConfigureFonts();
+        CatalogImage.Loader = services.GetRequiredService<AvaloniaCatalogImageService>();
 
         // 7. Shell 与首屏；4、5 两步（数据库、静态资料）在窗口显示后异步完成，完成前页面区显示加载状态。
         var shell = services.GetRequiredService<ShellViewModel>();
@@ -144,6 +146,7 @@ public partial class App : Application
             sp => sp.GetRequiredService<PullsChartsViewModel>(), ParentKey: "pulls"));
         services.AddSingleton(new ViewLocator()
             .Map<ConfirmDialogViewModel, ConfirmDialogView>()
+            .Map<ImportUrlDialogViewModel, ImportUrlDialogView>()
             .Map<PlaceholderPageViewModel, PlaceholderPageView>()
             .Map<SettingsViewModel, SettingsView>()
             .Map<PullsOverviewViewModel, PullsOverviewView>()

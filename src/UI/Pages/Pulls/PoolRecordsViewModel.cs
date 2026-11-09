@@ -44,6 +44,9 @@ public sealed class FiveStarCard
 
     public required IReadOnlyList<FourStarChip> FourStars { get; init; }
 
+    /// <summary>资料图标（随包或从资料仓库下载后缓存）。</summary>
+    public string IconPath => $"Local/Icons/{ResourceId}.png";
+
     public bool IsHardPity => Pity >= PullsSummaryCalculator.HardPity;
     public bool IsLimitedTag => IsLimited == true;
     public bool IsPermanentTag => IsLimited == false;

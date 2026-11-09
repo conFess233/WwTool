@@ -206,49 +206,82 @@ public sealed partial class PullsSession : ObservableObject
     /// <summary>从游戏日志读取最近一次打开抽卡记录时的链接，并切换到链接所属账号。</summary>
     public async Task AutoImportUrlAsync()
     {
+        string? url = await ReadUrlFromGameLogAsync();
+        if (url is not null && ImportUrl(url)) ShowImported();
+    }
+
+    /// <summary>链接导入成功的提示。</summary>
+    public void ShowImported()
+    {
+        _uiState.ShowToast(new NotificationRequest
+        {
+            Title = _localization["Msg_AutoImportSuccessTitle"],
+            Message = _localization["Msg_AutoImportSuccess"],
+            Type = NotificationType.Success,
+            Priority = NotificationPriority.Important,
+            Source = "Pulls",
+            DedupeKey = "auto-import",
+        });
+    }
+
+    /// <summary>从游戏日志读取最近的抽卡链接；失败时提示并返回 null。</summary>
+    public async Task<string?> ReadUrlFromGameLogAsync()
+    {
         try
         {
             if (string.IsNullOrWhiteSpace(_config.User.GamePath))
             {
                 throw new WwToolGamePathException(_localization["Msg_NoGamePath"]);
             }
-            string url = await _logLocator.FindLatestQueryUrlAsync(
+            return await _logLocator.FindLatestQueryUrlAsync(
                 _config.User.GamePath,
                 _config.App.GameLogPath,
                 _config.App.GameLogFile,
                 _config.User.SearchGachaApiUrl ?? string.Empty);
-            if (!ImportUrl(url)) return;
-            _uiState.ShowToast(new NotificationRequest
-            {
-                Title = _localization["Msg_AutoImportSuccessTitle"],
-                Message = _localization["Msg_AutoImportSuccess"],
-                Type = NotificationType.Success,
-                Priority = NotificationPriority.Important,
-                Source = "Pulls",
-                DedupeKey = "auto-import",
-            });
         }
         catch (Exception ex)
         {
             _errors.Report(ex, _localization["Stat_AutoImportUrl"]);
+            return null;
         }
     }
 
-    /// <summary>
-    /// 使用一条抽卡链接（可以是整行日志，自动提取其中的 URL），并切换到链接所属账号。链接无效时提示并返回 false。
-    /// </summary>
-    public bool ImportUrl(string text)
+    /// <summary>从一段文字（链接或整行日志）中取出抽卡链接；不是有效链接时返回 null。</summary>
+    public static string? ExtractUrl(string? text, out string? playerId)
     {
+        playerId = null;
+        if (string.IsNullOrWhiteSpace(text)) return null;
         string url = UrlPattern.Match(text) is { Success: true } m ? m.Value : text.Trim();
-        if (!GachaUrlParser.TryParse(url, out var request, out _) || request is null || string.IsNullOrEmpty(request.PlayerId))
+        if (!GachaUrlParser.TryParse(url, out var request, out _) || request is null || string.IsNullOrEmpty(request.PlayerId)) return null;
+        playerId = request.PlayerId;
+        return url;
+    }
+
+    /// <summary>
+    /// 使用一条抽卡链接（可以是整行日志，自动提取其中的 URL），并切换到链接所属账号。
+    /// 链接不能识别服务器时使用 <paramref name="fallbackRegion"/>（并记为设置中的选择），否则用设置中的服务器。
+    /// 链接无效时提示并返回 false。
+    /// </summary>
+    public bool ImportUrl(string text, GachaServerRegion? fallbackRegion = null)
+    {
+        string? url = ExtractUrl(text, out string? playerId);
+        if (url is null || playerId is null)
         {
             _uiState.ShowToast(_localization["Toast_Warning"], _localization["Msg_ApiUrlNotFound"], NotificationType.Warning);
             return false;
         }
 
         QueryUrl = url;
-        Region = GachaServerDetector.TryDetect(url, out GachaServerRegion detected) ? detected : _config.User.GachaServerRegion;
-        if (Uid != request.PlayerId) _accounts.Select(request.PlayerId);
+        if (GachaServerDetector.TryDetect(url, out GachaServerRegion detected))
+        {
+            Region = detected;
+        }
+        else
+        {
+            if (fallbackRegion is { } chosen) _config.User.GachaServerRegion = chosen;
+            Region = _config.User.GachaServerRegion;
+        }
+        if (Uid != playerId) _accounts.Select(playerId);
         return true;
     }
 

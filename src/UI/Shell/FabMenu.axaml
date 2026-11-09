@@ -75,10 +75,10 @@
       <Setter Property="RenderTransform" Value="rotate(45deg)" />
     </Style>
 
-    <!-- 菜单项：表面色胶囊，首项（主操作）图标底为强调色，危险项文字为 Danger -->
+    <!-- 菜单项：文字在左、图标圆底在右；首项（主操作）整体为强调色，危险项文字为 Danger -->
     <Style Selector="Button.fab-item">
       <Setter Property="Height" Value="44" />
-      <Setter Property="Padding" Value="7,0,18,0" />
+      <Setter Property="Padding" Value="18,0,7,0" />
       <Setter Property="CornerRadius" Value="999" />
       <Setter Property="HorizontalAlignment" Value="Right" />
       <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
@@ -97,11 +97,17 @@
     <Style Selector="Button.fab-item.danger:pointerover /template/ ContentPresenter">
       <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
     </Style>
-    <Style Selector="Button.fab-item.primary Border.icon-disc">
+    <Style Selector="Button.fab-item.primary">
       <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
     </Style>
-    <Style Selector="Button.fab-item.primary Rectangle.item-icon">
-      <Setter Property="Fill" Value="{DynamicResource TextOnAccentBrush}" />
+    <Style Selector="Button.fab-item.primary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+    </Style>
+    <Style Selector="Button.fab-item.primary Border.icon-disc">
+      <Setter Property="Background" Value="#26FFFFFF" />
     </Style>
     <!-- 用圆角焦点环替代 Fluent 的方形焦点装饰 -->
     <Style Selector="Button">
@@ -130,7 +136,8 @@
             <Button Classes="fab-item" Classes.danger="{Binding IsDanger}" Classes.primary="{Binding IsPrimary}"
                     Click="OnActionClick"
                     AutomationProperties.AutomationId="{Binding AutomationId}" AutomationProperties.Name="{Binding Title}">
-              <StackPanel Orientation="Horizontal" Spacing="10">
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
                 <Border Classes="icon-disc" Width="30" Height="30" CornerRadius="999" Background="{DynamicResource SurfaceMutedBrush}">
                   <Rectangle Classes="item-icon" Width="16" Height="16" Fill="{Binding $parent[Button].Foreground}">
                     <Rectangle.OpacityMask>
@@ -138,7 +145,6 @@
                     </Rectangle.OpacityMask>
                   </Rectangle>
                 </Border>
-                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
               </StackPanel>
             </Button>
           </DataTemplate>

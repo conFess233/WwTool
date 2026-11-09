@@ -8,9 +8,11 @@ using WwTool.Core.Localization;
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Services;
 using WwTool.Core.Services.Gacha;
+using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
 using WwTool.UI.Services;
 using WwTool.UI.Shell;
+
 
 namespace WwTool.UI.Pages.Pulls;
 
@@ -75,7 +77,8 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         PoolRecordsViewModel records,
         AccountContext accounts,
         LocalizationService localization,
-        INavigationService navigation)
+        INavigationService navigation,
+        IDialogService dialogs)
     {
         _session = session;
         _localization = localization;
@@ -90,7 +93,11 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         [
             new FabAction("cloud", "Stat_GetCloudData", icons + "Cloud.png", new AsyncRelayCommand(_session.SyncAsync), localization),
             new FabAction("load-local", "Stat_LoadLocalData", icons + "Load.png", new AsyncRelayCommand(() => _session.ReloadAsync(showMessage: true)), localization),
-            new FabAction("import-url", "Stat_AutoImportUrl", icons + "Import.png", new AsyncRelayCommand(_session.AutoImportUrlAsync), localization),
+            new FabAction("import-url", "Pulls_ImportUrl", icons + "Import.png",
+                new AsyncRelayCommand(async () =>
+                {
+                    if (await dialogs.ShowAsync(new ImportUrlDialogViewModel(_session, localization, _session.Region))) _session.ShowImported();
+                }), localization),
             new FabAction("clear", "Stat_ClearData", icons + "Trash.png", new RelayCommand(_session.ClearDisplay), localization,
                 isDanger: true, confirmMessageKey: "Msg_ConfirmClearData"),
         ];
