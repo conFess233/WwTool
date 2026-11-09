@@ -10,6 +10,7 @@ using WwTool.Core.Enums;
 using WwTool.Common.Events;
 using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Core.Models.Statistics;
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Requests;

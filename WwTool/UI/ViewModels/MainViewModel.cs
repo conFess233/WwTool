@@ -7,17 +7,18 @@ using System.Text;
 using System.Windows.Controls.Primitives;
 using WwTool.Common;
 using WwTool.Common.Events;
-using WwTool.Common.Models;
+using WwTool.Common.Models;
+using WwTool.Core.Models.Statistics;
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Models.Config;
 using WwTool.Core.Data.Entities;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
 using WwTool.Core.Infrastructure;
-using WwTool.Extensions;
+using WwTool.Extensions;
 using WwTool.Core.Extensions;
-using WwTool.Services;
+using WwTool.Services;
 using WwTool.Core.Services;
-using WwTool.Services.Interfaces;
+using WwTool.Services.Interfaces;
 using WwTool.Core.Abstractions;
 
 namespace WwTool.UI.ViewModels

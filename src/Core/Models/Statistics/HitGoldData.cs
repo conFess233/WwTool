@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using WwTool.Core.Models.Api.Responses;
 
-namespace WwTool.Common.Models
+namespace WwTool.Core.Models.Statistics
 {
     public class HitGoldData
     {

@@ -1,29 +1,26 @@
-using WwTool.Core.Services;
+using WwTool.Core.Models.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WwTool.Common;
 using WwTool.Core.Enums;
-using WwTool.Common.Models;
 using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Core.Models.Domain;
-using WwTool.Common.Utils;
 using WwTool.Core.Infrastructure;
-using WwTool.Extensions;
 using WwTool.Core.Extensions;
-using WwTool.Services.Interfaces;
 using WwTool.Core.Abstractions;
 
-namespace WwTool.Services
+namespace WwTool.Core.Services
 {
     public class GachaStatisticsService : IGachaStatisticsService
     {
         private readonly GameDataService _gameData;
+        private readonly ILocalizer _localizer;
 
-        public GachaStatisticsService(GameDataService gameData)
+        public GachaStatisticsService(GameDataService gameData, ILocalizer localizer)
         {
             _gameData = gameData;
+            _localizer = localizer;
         }
 
         public GachaStatisticsResult OrganizeData(IEnumerable<GachaPull> data, CardPoolType poolType, string languageCode)
@@ -122,9 +119,9 @@ namespace WwTool.Services
                         CardPoolType = ordered[^1].CardPoolType,
                         ResourceId = 0,
                         Count = 1,
-                        Name = LanguageManager.Instance["Msg_Pity"] ?? "Pity",
+                        Name = _localizer["Msg_Pity"],
                         QualityLevel = 1,
-                        ResourceType = LanguageManager.Instance["Msg_Pity"] ?? "Pity",
+                        ResourceType = _localizer["Msg_Pity"],
                         Time = ordered[^1].Time
                     },
                     Pity = pity,

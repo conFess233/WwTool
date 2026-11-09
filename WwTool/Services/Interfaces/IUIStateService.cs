@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using WwTool.Core.Enums;
-using WwTool.Common.Models;
+using WwTool.Common.Models;
+using WwTool.Core.Models.Statistics;
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Data.Entities;
 

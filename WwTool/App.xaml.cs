@@ -241,6 +241,7 @@ namespace WwTool
             containerRegistry.RegisterInstance<ISecretProtector>(
                 new VersionedSecretProtector(Path.Combine(appPaths.ConfigDirectory, "secret.key")));
             containerRegistry.RegisterSingleton<IAppLauncher, ShellAppLauncher>();
+            containerRegistry.RegisterSingleton<ILocalizer, LanguageManagerLocalizer>();
             DatabaseOptions databaseOptions = DatabaseOptions.FromPaths(appPaths);
             var contextFactory = new AppDbContextFactory(databaseOptions);
             containerRegistry.RegisterInstance(databaseOptions);

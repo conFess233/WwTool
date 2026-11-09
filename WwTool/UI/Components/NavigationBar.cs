@@ -4,10 +4,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using WwTool.Common.Models;
+using WwTool.Common.Models;
+using WwTool.Core.Models.Statistics;
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Data.Entities;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
 using WwTool.Core.Infrastructure;
 
 namespace WwTool.UI.Components

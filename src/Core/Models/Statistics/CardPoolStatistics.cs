@@ -1,15 +1,16 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using WwTool.Core.Enums;
 
-namespace WwTool.Common.Models
+namespace WwTool.Core.Models.Statistics
 {
     /// <summary>
     /// 单个卡池的统计结果，替换汇总对象时通知当前可见的 Tab 刷新绑定。
     /// </summary>
-    public class CardPoolStatistics : BaseModel
+    public class CardPoolStatistics : ObservableObject
     {
         private CalculateData _calculate = new();
 

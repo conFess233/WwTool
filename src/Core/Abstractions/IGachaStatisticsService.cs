@@ -1,11 +1,11 @@
+using WwTool.Core.Models.Statistics;
 using System.Collections.Generic;
 using WwTool.Core.Enums;
-using WwTool.Common.Models;
 using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Core.Models.Domain;
 
-namespace WwTool.Services.Interfaces
+namespace WwTool.Core.Abstractions
 {
     public class GachaStatisticsResult
     {

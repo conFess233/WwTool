@@ -1,6 +1,6 @@
 using System;
 
-namespace WwTool.Common.Models
+namespace WwTool.Core.Models.Statistics
 {
     public class FourStarHistoryItem
     {

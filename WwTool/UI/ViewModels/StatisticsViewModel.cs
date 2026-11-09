@@ -15,6 +15,7 @@ using System.Windows.Media;
 using WwTool.Core.Enums;
 using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
+using WwTool.Core.Models.Statistics;
 using WwTool.Core.Models.Api.Requests;
 using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Domain;

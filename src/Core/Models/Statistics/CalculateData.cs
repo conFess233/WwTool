@@ -1,10 +1,11 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace WwTool.Common.Models
+namespace WwTool.Core.Models.Statistics
 {
-    public class CalculateData : BaseModel
+    public class CalculateData : ObservableObject
     {
         // 总抽数
         private int _Tides;
