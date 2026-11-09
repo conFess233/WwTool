@@ -24,6 +24,9 @@ public sealed class PullsSnapshot
     /// <summary>全部记录，按卡池枚举顺序拼接、卡池内为存储顺序。</summary>
     public required IReadOnlyList<GachaPull> AllRecords { get; init; }
 
+    /// <summary>各卡池的记录（存储顺序）。</summary>
+    public required IReadOnlyDictionary<CardPoolType, IReadOnlyList<GachaPull>> RecordsByPool { get; init; }
+
     public int RecordCount => AllRecords.Count;
 
     public bool IsEmpty => AllRecords.Count == 0;
@@ -120,9 +123,11 @@ public sealed class PullsService(
     {
         var all = new List<GachaPull>();
         var results = new Dictionary<CardPoolType, GachaStatisticsResult>();
+        var byPool = new Dictionary<CardPoolType, IReadOnlyList<GachaPull>>();
         foreach (CardPoolType type in Enum.GetValues<CardPoolType>())
         {
             IReadOnlyList<GachaPull> records = recordsByPool.TryGetValue(type, out var r) ? r : [];
+            byPool[type] = records;
             all.AddRange(records);
             results[type] = statistics.OrganizeData(records, type, languageCode);
         }
@@ -138,6 +143,7 @@ public sealed class PullsService(
             Global = global,
             Insights = statistics.CalculateInsights(all),
             AllRecords = all,
+            RecordsByPool = byPool,
         };
     }
 
