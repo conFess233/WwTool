@@ -15,3 +15,5 @@ WwTool/WwTool.csproj.user
 WwTool.Tests/
 
 publish/
+# 测试项目仅保留在本地，不上传仓库
+/tests/
