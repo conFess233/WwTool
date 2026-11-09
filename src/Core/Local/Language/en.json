@@ -424,5 +424,10 @@
   "Catalog_RepositoryUpdated": "New repository version merged",
   "Catalog_RepositoryOnly": "Repository checked (repository source only)",
   "Catalog_CacheCleared": "Image cache cleared. Images will download as needed.",
-  "Catalog_CacheClearFailed": "Could not clear the image cache. Please try again."
+  "Catalog_CacheClearFailed": "Could not clear the image cache. Please try again.",
+  "Page_Migrating": "This page is being migrated to 2.0. Please use version 1.x for now.",
+  "Startup_Loading": "Loading local data…",
+  "Startup_DataDirNotWritable": "The data folder is not writable, so settings and the database cannot be loaded safely:\n{0}",
+  "Startup_InitFailed": "Local data failed to initialize. The original database and the migration backup were kept. Check the log and try again.",
+  "Startup_ErrorTitle": "WwTool can't start"
 }

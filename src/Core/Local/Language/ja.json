@@ -424,5 +424,10 @@
   "Catalog_RepositoryUpdated": "リポジトリの新バージョンを統合済み",
   "Catalog_RepositoryOnly": "リポジトリ確認済み（リポジトリのみ）",
   "Catalog_CacheCleared": "画像キャッシュを削除しました。画像は必要に応じて再取得します。",
-  "Catalog_CacheClearFailed": "画像キャッシュを削除できませんでした。後でもう一度お試しください。"
+  "Catalog_CacheClearFailed": "画像キャッシュを削除できませんでした。後でもう一度お試しください。",
+  "Page_Migrating": "このページは 2.0 へ移行中です。当面は 1.x 版をご利用ください。",
+  "Startup_Loading": "ローカルデータを読み込んでいます…",
+  "Startup_DataDirNotWritable": "データフォルダーに書き込めないため、設定とデータベースを安全に読み込めません：\n{0}",
+  "Startup_InitFailed": "ローカルデータの初期化に失敗しました。元のデータベースと移行前のバックアップは保持されています。ログを確認してから再試行してください。",
+  "Startup_ErrorTitle": "WwTool を起動できません"
 }

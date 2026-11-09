@@ -424,5 +424,10 @@
   "Catalog_RepositoryUpdated": "已合并仓库新版",
   "Catalog_RepositoryOnly": "仓库检查完成（仅仓库来源）",
   "Catalog_CacheCleared": "图片缓存已清理，显示图片时将按需下载。",
-  "Catalog_CacheClearFailed": "图片缓存清理失败，请稍后重试。"
+  "Catalog_CacheClearFailed": "图片缓存清理失败，请稍后重试。",
+  "Page_Migrating": "该页面正在迁移到 2.0，暂时请使用 1.x 版本。",
+  "Startup_Loading": "正在加载本地数据…",
+  "Startup_DataDirNotWritable": "数据目录不可写，无法安全加载配置或数据库：\n{0}",
+  "Startup_InitFailed": "本地数据初始化失败。原数据库和迁移备份已保留，请查看日志后重试。",
+  "Startup_ErrorTitle": "WwTool 无法启动"
 }
