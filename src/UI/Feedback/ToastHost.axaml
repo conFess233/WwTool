@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fb="using:WwTool.UI.Feedback"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Feedback.ToastHost"
+             x:DataType="fb:IUIStateService">
+  <!-- Toast 栈：内容区右上角，从右侧滑入，关闭时淡出。悬停暂停倒计时。 -->
+  <UserControl.Styles>
+    <Style Selector="Border.toast">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="none" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CubicEaseOut" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.22" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.toast.closing">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translateX(24px)" />
+    </Style>
+    <Style Selector="Border.strip">
+      <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
+    </Style>
+    <Style Selector="Border.strip.success">
+      <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style Selector="Border.strip.warning">
+      <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+    </Style>
+    <Style Selector="Border.strip.error">
+      <Setter Property="Background" Value="{DynamicResource DangerBrush}" />
+    </Style>
+    <Style Selector="Button.toast-close">
+      <Setter Property="Width" Value="28" />
+      <Setter Property="Height" Value="28" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    </Style>
+    <Style Selector="Button.toast-action">
+      <Setter Property="Padding" Value="12,4" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+  </UserControl.Styles>
+
+  <ItemsControl ItemsSource="{Binding Toasts}" Width="360">
+    <ItemsControl.ItemsPanel>
+      <ItemsPanelTemplate>
+        <StackPanel Spacing="10" />
+      </ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+    <ItemsControl.ItemTemplate>
+      <DataTemplate x:DataType="fb:ToastItem">
+        <Border Classes="toast" Classes.closing="{Binding IsClosing}" CornerRadius="16" ClipToBounds="True"
+                Background="{DynamicResource SurfaceElevatedBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                BoxShadow="0 12 28 -12 #55000000"
+                PointerEntered="OnToastPointerEntered" PointerExited="OnToastPointerExited"
+                AutomationProperties.AutomationId="toast">
+          <Grid ColumnDefinitions="4,*" RowDefinitions="*,Auto">
+            <Border Grid.RowSpan="2" Classes="strip"
+                    Classes.success="{Binding IsSuccess}" Classes.warning="{Binding IsWarning}" Classes.error="{Binding IsError}" />
+            <Grid Grid.Column="1" Margin="14,12,8,12" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+                <Border IsVisible="{Binding HasRepeat}" CornerRadius="999" Padding="6,0" VerticalAlignment="Center"
+                        Background="{DynamicResource SurfaceMutedBrush}">
+                  <TextBlock Text="{Binding RepeatCount, StringFormat='×{0}'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                </Border>
+              </StackPanel>
+              <Button Grid.Column="1" Grid.RowSpan="2" Classes="toast-close" VerticalAlignment="Top"
+                      Command="{Binding CloseCommand}" ToolTip.Tip="{loc:Tr Toast_Dismiss}"
+                      AutomationProperties.Name="{loc:Tr Toast_Dismiss}">
+                <Path Data="M0,0 L8,8 M8,0 L0,8" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.4"
+                      Width="8" Height="8" Stretch="None" />
+              </Button>
+              <SelectableTextBlock Grid.Row="1" Margin="0,4,0,0" Text="{Binding Message}" FontSize="13" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+              <Button Grid.Row="2" Margin="0,10,0,0" Classes="toast-action" HorizontalAlignment="Left"
+                      IsVisible="{Binding HasAction}" Content="{Binding ActionText}" Command="{Binding ActionCommand}" />
+            </Grid>
+            <!-- 倒计时（或任务进度） -->
+            <ProgressBar Grid.Row="1" Grid.Column="1" Height="3" MinHeight="3" CornerRadius="0"
+                         Minimum="0" Maximum="1" Value="{Binding RemainingRatio}" IsVisible="{Binding !IsProgress}"
+                         Background="Transparent" Foreground="{DynamicResource BorderStrongBrush}" />
+            <ProgressBar Grid.Row="1" Grid.Column="1" Height="3" MinHeight="3" CornerRadius="0"
+                         Minimum="0" Maximum="1" Value="{Binding Progress}" IsVisible="{Binding IsProgress}"
+                         Background="Transparent" Foreground="{DynamicResource AccentBrush}" />
+          </Grid>
+        </Border>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>

@@ -13,6 +13,8 @@ using WwTool.Core.Infrastructure;
 using WwTool.Core.Localization;
 using WwTool.Core.Platform;
 using WwTool.Core.Services;
+using WwTool.Core.Enums;
+using WwTool.UI.Feedback;
 using WwTool.UI.Localization;
 using WwTool.UI.Navigation;
 using WwTool.UI.Services;
@@ -66,7 +68,17 @@ public partial class App : Application
 
         // 3. 日志与全局异常处理。
         var logger = services.GetRequiredService<ILoggerService>();
-        RegisterGlobalExceptionHandlers(logger);
+        var uiState = services.GetRequiredService<IUIStateService>();
+        var localization = services.GetRequiredService<LocalizationService>();
+        RegisterGlobalExceptionHandlers(logger, uiState, localization);
+        config.UserAutoSaveFailed += (_, _) => uiState.ShowToast(new NotificationRequest
+        {
+            Title = localization["Toast_Error"],
+            Message = localization["Settings_AutoSaveFailed"],
+            Type = NotificationType.Warning,
+            Source = "Config",
+            DedupeKey = "autosave-failed",
+        });
         logger.Info("WwTool 2.0 启动中...");
 
         // 6. 语言、主题（先于窗口创建，首帧即为正确外观）。
@@ -101,17 +113,28 @@ public partial class App : Application
         services.AddSingleton<AppearanceCoordinator>();
         services.AddSingleton<AvaloniaCatalogImageService>();
         services.AddSingleton<ICatalogImageCache>(sp => sp.GetRequiredService<AvaloniaCatalogImageService>());
+        services.AddSingleton<IUIStateService, UIStateService>();
+        services.AddSingleton<DialogService>();
+        services.AddSingleton<IDialogService>(sp => sp.GetRequiredService<DialogService>());
+        services.AddSingleton<FabMenuViewModel>();
 
         // 页面登记（顺序即悬浮岛顺序）与视图映射
         const string icons = "avares://WwTool/Assets/Images/";
-        services.AddSingleton(Placeholder("home", "Nav_Home", icons + "Home.png"));
-        services.AddSingleton(Placeholder("pulls", "Nav_Statistics", icons + "Statistics.png"));
+        services.AddSingleton(Placeholder("home", "Nav_Home", icons + "Home.png",
+            ("refresh", "Index_RefreshAccountList", icons + "Refresh.png", null),
+            ("add-account", "Index_AddAccount", icons + "Add.png", null)));
+        services.AddSingleton(Placeholder("pulls", "Nav_Statistics", icons + "Statistics.png",
+            ("cloud", "Stat_GetCloudData", icons + "Cloud.png", null),
+            ("load-local", "Stat_LoadLocalData", icons + "Load.png", null),
+            ("import-url", "Stat_AutoImportUrl", icons + "Import.png", null),
+            ("clear", "Stat_ClearData", icons + "Trash.png", "Msg_ConfirmClearData")));
         services.AddSingleton(Placeholder("roles", "Nav_RoleData", icons + "Role.png"));
         services.AddSingleton(Placeholder("explore", "Nav_Exploration", icons + "Chest.png"));
         services.AddSingleton(Placeholder("motor", "Nav_Motor", icons + "Motor.png"));
         services.AddSingleton(new PageDescriptor("settings", "Nav_Settings", icons + "Settings.png",
             sp => ActivatorUtilities.CreateInstance<SettingsViewModel>(sp), StartsGroup: true));
         services.AddSingleton(new ViewLocator()
+            .Map<ConfirmDialogViewModel, ConfirmDialogView>()
             .Map<PlaceholderPageViewModel, PlaceholderPageView>()
             .Map<SettingsViewModel, SettingsView>());
         services.AddSingleton<INavigationService, NavigationService>();
@@ -120,8 +143,27 @@ public partial class App : Application
         return builder.Build();
     }
 
-    private static PageDescriptor Placeholder(string key, string titleKey, string icon) =>
-        new(key, titleKey, icon, sp => new PlaceholderPageViewModel(titleKey, sp.GetRequiredService<LocalizationService>()));
+    /// <summary>
+    /// 尚未迁移页面的登记项。悬浮按钮动作先按定稿放好（第四项为危险动作时给出确认文案键），
+    /// 执行时只提示“正在迁移”；页面迁移后换成真实视图模型。
+    /// </summary>
+    private static PageDescriptor Placeholder(string key, string titleKey, string icon,
+        params (string Key, string TitleKey, string Icon, string? DangerConfirmKey)[] actions) =>
+        new(key, titleKey, icon, sp =>
+        {
+            var localization = sp.GetRequiredService<LocalizationService>();
+            var uiState = sp.GetRequiredService<IUIStateService>();
+            FabAction[] fab = actions.Select(a => new FabAction(a.Key, a.TitleKey, a.Icon,
+                new CommunityToolkit.Mvvm.Input.RelayCommand(() => uiState.ShowToast(new NotificationRequest
+                {
+                    Title = localization[a.TitleKey],
+                    Message = localization["Toast_FeatureMigrating"],
+                    Priority = NotificationPriority.Important,
+                    Source = "Placeholder",
+                })),
+                localization, isDanger: a.DangerConfirmKey is not null, confirmMessageKey: a.DangerConfirmKey)).ToArray();
+            return new PlaceholderPageViewModel(titleKey, localization, fab);
+        });
 
     private async Task InitializeDataAsync(IClassicDesktopStyleApplicationLifetime desktop, IServiceProvider services, ShellViewModel shell)
     {
@@ -173,21 +215,40 @@ public partial class App : Application
         _host = null;
     }
 
-    private static void RegisterGlobalExceptionHandlers(ILoggerService logger)
+    /// <summary>
+    /// 最后防线：记录完整异常并附带错误编号；界面只显示简短错误 Toast 与编号，不暴露异常细节。
+    /// UI 线程异常标记为已处理，避免非致命错误导致进程退出。
+    /// </summary>
+    private static void RegisterGlobalExceptionHandlers(ILoggerService logger, IUIStateService uiState, LocalizationService localization)
     {
-        // 最后防线：只记录并阻止进程因非致命异常退出；用户提示在 Toast 服务接入后补上。
+        void Report(string context, Exception ex, bool fatal)
+        {
+            string code = Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
+            string message = $"{context}（错误编号 {code}）";
+            if (fatal) logger.Fatal(message, ex);
+            else logger.Error(message, ex);
+            uiState.ShowToast(new NotificationRequest
+            {
+                Title = localization["Exc_SystemErrorTitle"],
+                Message = string.Format(localization["Exc_UnknownSystemError"], code),
+                Type = NotificationType.Error,
+                Source = "Unhandled",
+                DedupeKey = ex.GetType().FullName,
+            });
+        }
+
         Dispatcher.UIThread.UnhandledException += (_, e) =>
         {
-            logger.Fatal("主 UI 线程捕获到未处理的异常", e.Exception);
+            Report("主 UI 线程捕获到未处理的异常", e.Exception, fatal: true);
             e.Handled = true;
         };
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
-            if (e.ExceptionObject is Exception ex) logger.Fatal("后台线程捕获到未处理的致命异常", ex);
+            if (e.ExceptionObject is Exception ex) Report("后台线程捕获到未处理的致命异常", ex, fatal: true);
         };
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
-            logger.Error("未观察的 Task 异步任务抛出异常", e.Exception);
+            Report("未观察的 Task 异步任务抛出异常", e.Exception, fatal: false);
             e.SetObserved();
         };
     }

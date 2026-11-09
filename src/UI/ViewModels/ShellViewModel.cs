@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using WwTool.Core.Localization;
+using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
 using WwTool.UI.Shell;
 
@@ -15,10 +16,18 @@ public sealed partial class ShellViewModel : ObservableObject
     private readonly INavigationService _navigation;
     private readonly LocalizationService _localization;
 
-    public ShellViewModel(INavigationService navigation, LocalizationService localization)
+    public ShellViewModel(
+        INavigationService navigation,
+        LocalizationService localization,
+        FabMenuViewModel fab,
+        DialogService dialogs,
+        IUIStateService uiState)
     {
         _navigation = navigation;
         _localization = localization;
+        Fab = fab;
+        Dialogs = dialogs;
+        UiState = uiState;
 
         foreach (PageDescriptor page in navigation.Pages)
         {
@@ -30,6 +39,15 @@ public sealed partial class ShellViewModel : ObservableObject
         navigation.Navigated += OnNavigated;
         localization.PropertyChanged += OnLocalizationChanged;
     }
+
+    /// <summary>右下悬浮按钮，动作随当前页面变化。</summary>
+    public FabMenuViewModel Fab { get; }
+
+    /// <summary>窗口内对话框覆盖层。</summary>
+    public DialogService Dialogs { get; }
+
+    /// <summary>Toast 栈。</summary>
+    public IUIStateService UiState { get; }
 
     /// <summary>悬浮岛导航项，顺序同页面登记顺序。</summary>
     public ObservableCollection<NavItem> NavItems { get; } = [];
@@ -62,6 +80,7 @@ public sealed partial class ShellViewModel : ObservableObject
             item.IsSelected = item.Key == e.Page.Key;
         }
         CurrentPage = e.ViewModel;
+        Fab.SetActions((e.ViewModel as IFabProvider)?.FabActions);
         UpdatePageTitle();
     }
 

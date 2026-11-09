@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="using:WwTool.UI.Shell"
         xmlns:vm="using:WwTool.UI.ViewModels"
+        xmlns:fb="using:WwTool.UI.Feedback"
         xmlns:loc="using:WwTool.UI.Localization"
         xmlns:chrome="using:Avalonia.Controls.Chrome"
         x:Class="WwTool.UI.Shell.MainWindow"
@@ -90,6 +91,14 @@
       <ProgressBar IsIndeterminate="True" Width="200" />
       <TextBlock Text="{loc:Tr Startup_Loading}" HorizontalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
     </StackPanel>
+
+    <!-- 悬浮按钮（遮罩只盖内容区）与 Toast 栈 -->
+    <shell:FabMenu Grid.Row="1" DataContext="{Binding Fab}" IsVisible="{Binding $parent[Window].((vm:ShellViewModel)DataContext).IsReady}" />
+    <fb:ToastHost Grid.Row="1" DataContext="{Binding UiState}" Margin="0,0,32,0"
+                  HorizontalAlignment="Right" VerticalAlignment="Top" />
+
+    <!-- 对话框覆盖层盖住整个窗口（含页头），标题按钮仍在其上可用 -->
+    <fb:DialogOverlay Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding Dialogs}" />
 
     <StackPanel x:Name="CaptionButtons" Grid.Row="0" Orientation="Horizontal"
                 HorizontalAlignment="Right" VerticalAlignment="Top">

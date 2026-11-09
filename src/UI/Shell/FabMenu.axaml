@@ -1,0 +1,173 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:WwTool.UI.Shell"
+             x:Class="WwTool.UI.Shell.FabMenu"
+             x:DataType="shell:FabMenuViewModel">
+  <!-- 右下悬浮按钮。根 Grid 无背景，收起时不挡内容区点击；展开时遮罩盖住内容区。 -->
+  <UserControl.Styles>
+    <Style Selector="Border#Scrim">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border#Scrim.shown">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="IsHitTestVisible" Value="True" />
+    </Style>
+
+    <Style Selector="ItemsControl#ActionList">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+      <Setter Property="RenderTransform" Value="translateY(12px)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" Easing="CubicEaseOut" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.22" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="ItemsControl#ActionList.shown">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="IsHitTestVisible" Value="True" />
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+
+    <!-- 圆钮与扩展按钮共用的强调色胶囊 -->
+    <Style Selector="Button.fab">
+      <Setter Property="Height" Value="56" />
+      <Setter Property="MinWidth" Value="56" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.fab:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+    </Style>
+    <Style Selector="Button.fab.expanded">
+      <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextOnNavIslandBrush}" />
+    </Style>
+    <Style Selector="Button.fab.expanded:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextOnNavIslandBrush}" />
+    </Style>
+    <Style Selector="Button.fab.extended">
+      <Setter Property="Padding" Value="20,0,24,0" />
+    </Style>
+    <Style Selector="Path#Glyph">
+      <Setter Property="RenderTransform" Value="rotate(0deg)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="CubicEaseOut" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.fab.expanded Path#Glyph">
+      <Setter Property="RenderTransform" Value="rotate(45deg)" />
+    </Style>
+
+    <!-- 菜单项：表面色胶囊，首项（主操作）图标底为强调色，危险项文字为 Danger -->
+    <Style Selector="Button.fab-item">
+      <Setter Property="Height" Value="44" />
+      <Setter Property="Padding" Value="7,0,18,0" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.fab-item:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.fab-item.danger">
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    </Style>
+    <Style Selector="Button.fab-item.danger:pointerover /template/ ContentPresenter">
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    </Style>
+    <Style Selector="Button.fab-item.primary Border.icon-disc">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Button.fab-item.primary Rectangle.item-icon">
+      <Setter Property="Fill" Value="{DynamicResource TextOnAccentBrush}" />
+    </Style>
+    <!-- 用圆角焦点环替代 Fluent 的方形焦点装饰 -->
+    <Style Selector="Button">
+      <Setter Property="FocusAdorner" Value="{x:Null}" />
+    </Style>
+    <Style Selector="Button:focus-visible /template/ ContentPresenter">
+      <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid IsVisible="{Binding IsVisible}">
+    <Border x:Name="Scrim" Background="#59000000" Classes.shown="{Binding IsExpanded}" PointerPressed="OnScrimPressed" />
+
+    <StackPanel Margin="0,0,32,32" Spacing="14" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+      <!-- 多个动作：展开后的菜单 -->
+      <ItemsControl x:Name="ActionList" ItemsSource="{Binding Actions}" Classes.shown="{Binding IsExpanded}"
+                    IsVisible="{Binding IsMenu}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Spacing="10" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="shell:FabAction">
+            <Button Classes="fab-item" Classes.danger="{Binding IsDanger}" Classes.primary="{Binding IsPrimary}"
+                    Click="OnActionClick"
+                    AutomationProperties.AutomationId="{Binding AutomationId}" AutomationProperties.Name="{Binding Title}">
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Border Classes="icon-disc" Width="30" Height="30" CornerRadius="999" Background="{DynamicResource SurfaceMutedBrush}">
+                  <Rectangle Classes="item-icon" Width="16" Height="16" Fill="{Binding $parent[Button].Foreground}">
+                    <Rectangle.OpacityMask>
+                      <ImageBrush Source="{Binding Icon, Converter={x:Static shell:AssetImageConverter.Instance}}" Stretch="Uniform" />
+                    </Rectangle.OpacityMask>
+                  </Rectangle>
+                </Border>
+                <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- 多个动作：圆钮（展开后变深色 ×） -->
+      <Button x:Name="ToggleButton" Classes="fab" Classes.expanded="{Binding IsExpanded}" Width="56"
+              HorizontalAlignment="Right" IsVisible="{Binding IsMenu}" Command="{Binding ToggleCommand}"
+              ToolTip.Tip="{Binding ToggleName}" AutomationProperties.Name="{Binding ToggleName}"
+              AutomationProperties.AutomationId="fab-toggle">
+        <Path x:Name="Glyph" Data="M9,0 L9,18 M0,9 L18,9" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="2.2"
+              StrokeLineCap="Round" Width="18" Height="18" Stretch="None" />
+      </Button>
+
+      <!-- 单个动作：扩展按钮（图标 + 文字），直接执行 -->
+      <Button x:Name="ExtendedButton" Classes="fab extended" HorizontalAlignment="Right" IsVisible="{Binding IsExtended}"
+              Command="{Binding ExecuteCommand}" CommandParameter="{Binding Primary}"
+              AutomationProperties.AutomationId="fab-primary"
+              AutomationProperties.Name="{Binding PrimaryTitle}">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Rectangle Width="20" Height="20" Fill="{Binding $parent[Button].Foreground}">
+            <Rectangle.OpacityMask>
+              <ImageBrush Source="{Binding PrimaryIcon, Converter={x:Static shell:AssetImageConverter.Instance}}" Stretch="Uniform" />
+            </Rectangle.OpacityMask>
+          </Rectangle>
+          <TextBlock Text="{Binding PrimaryTitle}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+        </StackPanel>
+      </Button>
+    </StackPanel>
+  </Grid>
+</UserControl>
