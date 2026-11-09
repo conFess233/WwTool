@@ -1,19 +1,15 @@
-using WwTool.Core.Services;
+using WwTool.Core.Abstractions.Platform;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using System.Windows.Threading;
 using WwTool.Core.Models.Config;
-using WwTool.Extensions;
 using WwTool.Core.Extensions;
-using WwTool.Common.Utils;
 using WwTool.Core.Infrastructure;
-using WwTool.Services.Interfaces;
 using WwTool.Core.Abstractions;
 
-namespace WwTool.Services
+namespace WwTool.Core.Services
 {
     /// <summary>
     /// 读取并保存应用配置。
@@ -31,15 +27,19 @@ namespace WwTool.Services
             WriteIndented = true,
             PropertyNameCaseInsensitive = true
         };
-        private readonly DispatcherTimer _autoSaveTimer = new() { Interval = TimeSpan.FromSeconds(1) };
+        /// <summary>用户设置变更后延迟保存的时间，连续修改只保存一次。</summary>
+        private static readonly TimeSpan AutoSaveDelay = TimeSpan.FromSeconds(1);
+
+        // 线程池计时器，不依赖 UI 线程。UserAutoSaveFailed 在线程池触发，订阅方自行切回 UI 线程。
+        private readonly Timer _autoSaveTimer;
         private readonly SemaphoreSlim _saveLock = new(1, 1);
 
         public AppConfig App { get; private set; } = new();
         public ApiConfig Api { get; private set; } = new();
         public UserConfig User { get; private set; } = new();
 
-        public ConfigService()
-            : this(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config"))
+        public ConfigService(IAppPaths paths)
+            : this(paths.ConfigDirectory)
         {
         }
 
@@ -49,20 +49,20 @@ namespace WwTool.Services
             _appConfigPath = Path.Combine(_configFolder, "AppConfig.json");
             _apiConfigPath = Path.Combine(_configFolder, "ApiConfig.json");
             _userConfigPath = Path.Combine(_configFolder, "UserConfig.json");
+            _autoSaveTimer = new Timer(_ => _ = AutoSaveUserNowAsync(), null, Timeout.Infinite, Timeout.Infinite);
+        }
 
-            _autoSaveTimer.Tick += async (_, _) =>
+        private async Task AutoSaveUserNowAsync()
+        {
+            try
             {
-                _autoSaveTimer.Stop();
-                try
-                {
-                    await SaveUserAsync();
-                }
-                catch (Exception ex)
-                {
-                    Trace.TraceError($"Failed to auto-save user configuration: {ex}");
-                    UserAutoSaveFailed?.Invoke(this, EventArgs.Empty);
-                }
-            };
+                await SaveUserAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError($"Failed to auto-save user configuration: {ex}");
+                UserAutoSaveFailed?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public void LoadAll()
@@ -156,7 +156,7 @@ namespace WwTool.Services
 
         public async Task FlushAsync()
         {
-            _autoSaveTimer.Stop();
+            _autoSaveTimer.Change(Timeout.Infinite, Timeout.Infinite);
             User.PropertyChanged -= OnUserConfigChanged;
             try { await SaveAllAsync(); }
             catch
@@ -245,10 +245,7 @@ namespace WwTool.Services
             return $"{path}.corrupt.{timestamp}";
         }
 
-        private void AutoSaveUser()
-        {
-            _autoSaveTimer.Stop();
-            _autoSaveTimer.Start();
-        }
+        private void AutoSaveUser() =>
+            _autoSaveTimer.Change(AutoSaveDelay, Timeout.InfiniteTimeSpan);
     }
 }
