@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using WwTool.Common.Models.Config;
+using WwTool.Core.Models.Config;
 
 namespace WwTool.Services.Interfaces
 {

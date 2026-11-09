@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Animation;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 using WwTool.Common.Utils;
 using WwTool.Services.Interfaces;
 

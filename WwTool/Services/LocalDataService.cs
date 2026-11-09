@@ -1,5 +1,5 @@
 using WwTool.Common.Context;
-using WwTool.Common.Exceptions;
+using WwTool.Core.Exceptions;
 using WwTool.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.IO;

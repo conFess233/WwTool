@@ -1,8 +1,8 @@
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using WwTool.Common.Context;
-using WwTool.Common.Exceptions;
+using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Common.Models.Entities;
 using WwTool.Common.Utils;

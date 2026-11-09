@@ -1,6 +1,6 @@
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 
 namespace WwTool.UI.Models
 {

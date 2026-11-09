@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 
 namespace WwTool.UI.ViewModels;
 

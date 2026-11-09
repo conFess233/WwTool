@@ -4,9 +4,9 @@ using System.Net.Http.Json;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using WwTool.Common.Exceptions;
-using WwTool.Common.Models.ApiRequest;
-using WwTool.Common.Models.ApiResponse;
+using WwTool.Core.Exceptions;
+using WwTool.Core.Models.Api.Requests;
+using WwTool.Core.Models.Api.Responses;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services;

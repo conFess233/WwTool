@@ -2,7 +2,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services;

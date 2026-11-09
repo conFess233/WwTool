@@ -1,6 +1,6 @@
-using WwTool.Common.Enums;
-using WwTool.Common.Models.ApiResponse;
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Enums;
+using WwTool.Core.Models.Api.Responses;
+using WwTool.Core.Models.Domain;
 using WwTool.Extensions;
 using WwTool.Services.Interfaces;
 

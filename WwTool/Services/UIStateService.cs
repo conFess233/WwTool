@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Prism.Commands;
 using Prism.Mvvm;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 using WwTool.Common.Models;
 using WwTool.Services.Interfaces;
 

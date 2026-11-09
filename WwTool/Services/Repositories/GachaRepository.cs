@@ -1,15 +1,15 @@
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using WwTool.Common.Context;
-using WwTool.Common.Enums;
-using WwTool.Common.Exceptions;
+using WwTool.Core.Enums;
+using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Common.Models.Entities;
-using WwTool.Common.Models.ApiResponse;
+using WwTool.Core.Models.Api.Responses;
 using WwTool.Extensions;
 using WwTool.Services.Interfaces;
 
@@ -21,7 +21,7 @@ public sealed class GachaRepository(
     ILoggerService logger) : IGachaRepository
 {
     /// <summary>只查询每个物品的最早时间，避免把整份抽卡记录带到 UI。</summary>
-    public Task<WwTool.Common.Models.Domain.AcquisitionTimes> ReadAcquisitionTimesAsync(string uid, int[] pools, CancellationToken cancellationToken = default) => Task.Run(async () =>
+    public Task<WwTool.Core.Models.Domain.AcquisitionTimes> ReadAcquisitionTimesAsync(string uid, int[] pools, CancellationToken cancellationToken = default) => Task.Run(async () =>
     {
         await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
         var rows = await db.GachaRecords.AsNoTracking().Where(x => x.Uid == uid && pools.Contains(x.PoolType))
@@ -29,7 +29,7 @@ public sealed class GachaRepository(
         var times = new Dictionary<int, DateTime>();
         foreach (var row in rows)
             if (DateTime.TryParse(row.Time, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out var time)) times[row.Id] = time;
-        return new WwTool.Common.Models.Domain.AcquisitionTimes(times, rows.Count > 0);
+        return new WwTool.Core.Models.Domain.AcquisitionTimes(times, rows.Count > 0);
     }, cancellationToken);
     public async Task<IReadOnlyList<GachaPull>> GetAllRecordsByUidAsync(
         string uid,

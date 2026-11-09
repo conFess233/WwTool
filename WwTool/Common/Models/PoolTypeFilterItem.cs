@@ -1,5 +1,5 @@
 using Prism.Mvvm;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 
 namespace WwTool.Common.Models
 {

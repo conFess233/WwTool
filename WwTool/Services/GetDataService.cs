@@ -1,11 +1,11 @@
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 using System.Security.Cryptography;
-using WwTool.Common.Enums;
-using WwTool.Common.Exceptions;
+using WwTool.Core.Enums;
+using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Common.Models.Entities;
-using WwTool.Common.Models.ApiRequest;
-using WwTool.Common.Models.ApiResponse;
+using WwTool.Core.Models.Api.Requests;
+using WwTool.Core.Models.Api.Responses;
 using WwTool.Services.Interfaces;
 using WwTool.Services.Repositories;
 using static WwTool.Services.LoginService;
@@ -265,7 +265,7 @@ namespace WwTool.Services
             if (string.IsNullOrWhiteSpace(roleDetailJson))
                 throw new WwToolApiException("未找到玩家角色详情数据");
 
-            var roleDetail = PlayerSnapshotMapper.Map(System.Text.Json.JsonSerializer.Deserialize<WwTool.Common.Models.ApiResponse.RoleDetailInfo>(roleDetailJson));
+            var roleDetail = PlayerSnapshotMapper.Map(System.Text.Json.JsonSerializer.Deserialize<WwTool.Core.Models.Api.Responses.RoleDetailInfo>(roleDetailJson));
             if (roleDetail == null) throw new WwToolApiException("解析玩家角色详细信息失败");
 
             var account = await _userRepository.GetUserAccountAsync(uid, cancellationToken);

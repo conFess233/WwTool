@@ -1,5 +1,5 @@
-using Api = WwTool.Common.Models.ApiResponse;
-using WwTool.Common.Models.Domain;
+using Api = WwTool.Core.Models.Api.Responses;
+using WwTool.Core.Models.Domain;
 
 namespace WwTool.Services;
 

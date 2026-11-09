@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 
 namespace WwTool.Common.Utils
 {

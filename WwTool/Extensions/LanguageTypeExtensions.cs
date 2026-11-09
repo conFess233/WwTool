@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 
 namespace WwTool.Extensions
 {

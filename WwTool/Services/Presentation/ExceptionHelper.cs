@@ -1,8 +1,8 @@
 using WwTool.Common.Utils;
 using System.Diagnostics;
 using System.IO;
-using WwTool.Common.Enums;
-using WwTool.Common.Exceptions;
+using WwTool.Core.Enums;
+using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Services.Interfaces;
 

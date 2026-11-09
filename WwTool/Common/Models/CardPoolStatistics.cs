@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 
 namespace WwTool.Common.Models
 {

@@ -1,12 +1,12 @@
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 using WwTool.Common.Models;
 using WwTool.Common.Models.Entities;
-using WwTool.Common.Models.ApiRequest;
-using WwTool.Common.Models.ApiResponse;
+using WwTool.Core.Models.Api.Requests;
+using WwTool.Core.Models.Api.Responses;
 
 namespace WwTool.Services.Interfaces
 {

@@ -1,8 +1,8 @@
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using WwTool.Common.Models.ApiResponse;
+using WwTool.Core.Models.Api.Responses;
 
 namespace WwTool.Common.Models
 {

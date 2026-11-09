@@ -8,7 +8,7 @@ using System.Windows.Controls.Primitives;
 using WwTool.Common;
 using WwTool.Common.Events;
 using WwTool.Common.Models;
-using WwTool.Common.Models.Config;
+using WwTool.Core.Models.Config;
 using WwTool.Common.Models.Entities;
 using WwTool.Common.Utils;
 using WwTool.Extensions;

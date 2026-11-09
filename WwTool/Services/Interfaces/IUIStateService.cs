@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 using WwTool.Common.Models;
 using WwTool.Common.Models.Entities;
 

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 using WwTool.Extensions;
 
 namespace WwTool.Common.Utils

@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 
 namespace WwTool.Services;
 

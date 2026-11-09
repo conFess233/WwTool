@@ -1,5 +1,5 @@
-using WwTool.Common.Models.ApiResponse;
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Api.Responses;
+using WwTool.Core.Models.Domain;
 
 namespace WwTool.Services.Interfaces;
 

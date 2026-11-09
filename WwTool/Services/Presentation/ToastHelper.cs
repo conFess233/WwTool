@@ -1,5 +1,5 @@
 using WwTool.Common.Utils;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 using WwTool.Common.Models;
 using WwTool.Services.Interfaces;
 

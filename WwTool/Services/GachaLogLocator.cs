@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using System.IO;
-using WwTool.Common.Exceptions;
+using WwTool.Core.Exceptions;
 using WwTool.Common.Utils;
 using WwTool.Services.Interfaces;
 

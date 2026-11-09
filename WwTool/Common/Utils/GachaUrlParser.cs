@@ -1,6 +1,6 @@
 using System.Collections.Specialized;
 using System.Web;
-using WwTool.Common.Models.ApiRequest;
+using WwTool.Core.Models.Api.Requests;
 
 namespace WwTool.Common.Utils
 {

@@ -1,5 +1,5 @@
 using System;
-using WwTool.Common.Enums;
+using WwTool.Core.Enums;
 
 namespace WwTool.Services.Interfaces
 {

@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using WwTool.Common.Models.ApiRequest;
-using WwTool.Common.Models.ApiResponse;
-using WwTool.Common.Models.Config;
+using WwTool.Core.Models.Api.Requests;
+using WwTool.Core.Models.Api.Responses;
+using WwTool.Core.Models.Config;
 using WwTool.Common.Utils;
 using WwTool.Services.Interfaces;
 

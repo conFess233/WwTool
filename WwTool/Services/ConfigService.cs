@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Windows.Threading;
-using WwTool.Common.Models.Config;
+using WwTool.Core.Models.Config;
 using WwTool.Extensions;
 using WwTool.Common.Utils;
 using WwTool.Services.Interfaces;

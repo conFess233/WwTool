@@ -1,5 +1,5 @@
 using WwTool.Common.Models;
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 
 namespace WwTool.Services.Repositories;
 

@@ -1,4 +1,4 @@
-using WwTool.Common.Models.Domain;
+using WwTool.Core.Models.Domain;
 using WwTool.Common.Models.Entities;
 
 namespace WwTool.Services.Repositories;

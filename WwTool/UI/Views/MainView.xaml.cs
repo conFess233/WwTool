@@ -6,7 +6,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
-using WwTool.Common.Models.Config;
+using WwTool.Core.Models.Config;
 using WwTool.Common.Utils;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
