@@ -1,8 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:shell="using:WwTool.UI.Shell"
-             x:Class="WwTool.UI.Shell.FloatingNavIsland"
-             x:DataType="shell:FloatingNavIsland">
+             x:Class="WwTool.UI.Shell.FloatingNavIsland">
   <!-- 悬浮岛：深色胶囊，选中项展开为“图标 + 文字”并填充强调色，其余只显示图标。 -->
   <UserControl.Styles>
     <Style Selector="RadioButton.nav">

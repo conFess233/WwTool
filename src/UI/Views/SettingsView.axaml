@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:WwTool.UI.ViewModels"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+  <UserControl.Styles>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="ComboBox">
+      <Setter Property="MinWidth" Value="200" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="40,0,40,40" Spacing="16">
+      <!-- 界面设置：主题外观、强调色、显示语言。改动即时生效并自动保存。 -->
+      <Border Padding="24" CornerRadius="20"
+              Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+        <StackPanel Spacing="16">
+          <TextBlock Text="{loc:Tr Settings_UI}" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <TextBlock Classes="label" Text="{loc:Tr Settings_BaseTheme}" />
+            <ComboBox Grid.Column="1" AutomationProperties.AutomationId="settings-preset"
+                      ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:LocalizedOption">
+                  <TextBlock Text="{Binding Title}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <TextBlock Classes="label" Text="{loc:Tr Settings_AccentTheme}" />
+            <ComboBox Grid.Column="1" AutomationProperties.AutomationId="settings-accent"
+                      ItemsSource="{Binding Accents}" SelectedItem="{Binding SelectedAccent}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:LocalizedOption">
+                  <TextBlock Text="{Binding Title}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <TextBlock Classes="label" Text="{loc:Tr Settings_Language}" />
+            <ComboBox Grid.Column="1" AutomationProperties.AutomationId="settings-language"
+                      ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:LocalizedOption">
+                  <TextBlock Text="{Binding Title}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

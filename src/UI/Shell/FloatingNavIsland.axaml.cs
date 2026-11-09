@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using Avalonia;
 using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
@@ -12,15 +12,24 @@ namespace WwTool.UI.Shell;
 /// </summary>
 public partial class FloatingNavIsland : UserControl
 {
-    public FloatingNavIsland()
-    {
-        InitializeComponent();
-        // 控件自身不设 DataContext（留给外部），因此直接把集合交给 ItemsControl。
-        ItemsHost.ItemsSource = Items;
-    }
+    public static readonly StyledProperty<IEnumerable<NavItem>?> ItemsSourceProperty =
+        AvaloniaProperty.Register<FloatingNavIsland, IEnumerable<NavItem>?>(nameof(ItemsSource));
+
+    public FloatingNavIsland() => InitializeComponent();
 
     /// <summary>导航项，按显示顺序排列。</summary>
-    public ObservableCollection<NavItem> Items { get; } = [];
+    public IEnumerable<NavItem>? ItemsSource
+    {
+        get => GetValue(ItemsSourceProperty);
+        set => SetValue(ItemsSourceProperty, value);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        // 控件不改自身 DataContext（留给外部），因此在这里把集合交给内部 ItemsControl。
+        if (change.Property == ItemsSourceProperty) ItemsHost.ItemsSource = ItemsSource;
+    }
 }
 
 /// <summary>

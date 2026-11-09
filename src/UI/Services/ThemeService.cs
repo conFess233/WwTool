@@ -22,6 +22,21 @@ public sealed class ThemeService
     public static readonly IReadOnlyList<string> Presets = ["WarmWhite", "DeepBlue", "SoftGreen", "SoftPink", "BlackGold"];
     public static readonly IReadOnlyList<string> Accents = [FollowTheme, "Blue", "Green", "Orange", "Purple", "Red", "Yellow"];
 
+    /// <summary>
+    /// 用户配置里的强调色值（与 1.2.x 共用的格式：<c>BlueAccent</c>、<c>FollowTheme</c>）转换为强调色名。
+    /// 无法识别时返回 <see cref="FollowTheme"/>。
+    /// </summary>
+    public static string AccentFromConfig(string? configValue)
+    {
+        string name = configValue is not null && configValue.EndsWith("Accent", StringComparison.Ordinal)
+            ? configValue[..^"Accent".Length]
+            : configValue ?? FollowTheme;
+        return Accents.Contains(name) ? name : FollowTheme;
+    }
+
+    /// <summary>强调色名转换为用户配置里保存的值，见 <see cref="AccentFromConfig"/>。</summary>
+    public static string AccentToConfig(string accent) => accent == FollowTheme ? FollowTheme : accent + "Accent";
+
     private static readonly HashSet<string> DarkPresets = ["DeepBlue", "BlackGold"];
 
     /// <summary>每套预设都必须提供的键；缺失时视为资源损坏，拒绝应用以免出现回退色。</summary>

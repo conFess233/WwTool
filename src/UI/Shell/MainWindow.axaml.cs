@@ -1,13 +1,15 @@
-using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using WwTool.Core.Localization;
-using WwTool.UI.Services;
+using Avalonia.Interactivity;
+using Avalonia.Media;
+using WwTool.UI.ViewModels;
 
 namespace WwTool.UI.Shell;
 
 /// <summary>
-/// 主窗口 Shell：页头（悬浮岛、账号胶囊）与内容区。页面切换在导航服务接入后由其负责。
+/// 主窗口 Shell。状态全部在 <see cref="ShellViewModel"/>，这里只处理窗口行为：
+/// 页头拖动、双击最大化与应用绘制的标题按钮。
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -17,69 +19,34 @@ public partial class MainWindow : Window
     private const string MaximizeGlyphData = "M0.5,0.5 L9.5,0.5 L9.5,9.5 L0.5,9.5 Z";
     private const string RestoreGlyphData = "M2.5,2.5 L9.5,2.5 L9.5,9.5 L2.5,9.5 Z M2.5,0.5 L0.5,0.5 M0.5,0.5 L0.5,7.5 M2.5,0.5 L9.5,0.5";
 
-    private readonly LocalizationService? _localization;
-
     /// <summary>仅供 Avalonia 设计器使用。</summary>
-    public MainWindow() => InitializeComponent();
-
-    public MainWindow(ThemeService theme, LocalizationService localization)
+    public MainWindow()
     {
-        _localization = localization;
         InitializeComponent();
+        // macOS 保留系统红绿灯，不画这组按钮。
         bool drawCaptionButtons = !OperatingSystem.IsMacOS();
         CaptionButtons.IsVisible = drawCaptionButtons;
         CaptionButtonsSpacer.Width = drawCaptionButtons ? CaptionButtonsWidth : 0;
-
-        Island.Items.Add(new NavItem("home", "Nav_Home", "avares://WwTool/Assets/Images/Home.png", localization));
-        Island.Items.Add(new NavItem("pulls", "Nav_Statistics", "avares://WwTool/Assets/Images/Statistics.png", localization));
-        Island.Items.Add(new NavItem("roles", "Nav_RoleData", "avares://WwTool/Assets/Images/Role.png", localization));
-        Island.Items.Add(new NavItem("explore", "Nav_Exploration", "avares://WwTool/Assets/Images/Chest.png", localization));
-        Island.Items.Add(new NavItem("motor", "Nav_Motor", "avares://WwTool/Assets/Images/Motor.png", localization));
-        Island.Items.Add(new NavItem("settings", "Nav_Settings", "avares://WwTool/Assets/Images/Settings.png", localization, startsGroup: true));
-        foreach (NavItem item in Island.Items)
-        {
-            item.PropertyChanged += OnNavItemChanged;
-        }
-        localization.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == LocalizationService.IndexerName) UpdatePageTitle();
-        };
-        Island.Items[0].IsSelected = true;
-
-        PageHost.Content = new Stage0PreviewView(theme, localization);
     }
 
-    protected override void OnPropertyChanged(Avalonia.AvaloniaPropertyChangedEventArgs change)
+    public MainWindow(ShellViewModel viewModel) : this() => DataContext = viewModel;
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
         if (change.Property == WindowStateProperty && MaximizeGlyph is not null)
         {
-            MaximizeGlyph.Data = Avalonia.Media.Geometry.Parse(
+            MaximizeGlyph.Data = Geometry.Parse(
                 WindowState == WindowState.Maximized ? RestoreGlyphData : MaximizeGlyphData);
         }
     }
 
-    private void OnMinimizeClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
-        WindowState = WindowState.Minimized;
+    private void OnMinimizeClick(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-    private void OnMaximizeClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) =>
+    private void OnMaximizeClick(object? sender, RoutedEventArgs e) =>
         WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
 
-    private void OnCloseClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => Close();
-
-    private void OnNavItemChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(NavItem.IsSelected) && sender is NavItem { IsSelected: true })
-        {
-            UpdatePageTitle();
-        }
-    }
-
-    private void UpdatePageTitle()
-    {
-        NavItem? selected = Island.Items.FirstOrDefault(x => x.IsSelected);
-        PageTitle.Text = selected?.Title ?? string.Empty;
-    }
+    private void OnCloseClick(object? sender, RoutedEventArgs e) => Close();
 
     /// <summary>
     /// 页头空白处：单击拖动窗口（走系统移动循环，保留拖到屏幕边缘的贴靠），双击切换最大化。
