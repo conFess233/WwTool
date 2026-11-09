@@ -36,7 +36,20 @@ public partial class MainWindow : Window
         CaptionButtonsSpacer.Width = drawCaptionButtons ? CaptionButtonsWidth : 0;
     }
 
-    public MainWindow(ShellViewModel viewModel) : this() => DataContext = viewModel;
+    public MainWindow(ShellViewModel viewModel) : this()
+    {
+        DataContext = viewModel;
+        ApplyGlass(viewModel.IsGlassEnabled);
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ShellViewModel.IsGlassEnabled)) ApplyGlass(viewModel.IsGlassEnabled);
+        };
+    }
+
+    // 系统不支持模糊材质时退回不透明，背景层仍按不透明度绘制。
+    private void ApplyGlass(bool enabled) => TransparencyLevelHint = enabled
+        ? [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur, WindowTransparencyLevel.None]
+        : [WindowTransparencyLevel.None];
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {

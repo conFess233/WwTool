@@ -102,6 +102,16 @@ public sealed class ThemeService
             }
         }
 
+        // Fluent 内置控件（开关、滑块、输入框焦点等）用系统强调色；指向当前主题强调色，避免出现系统蓝。
+        if (merged.TryGetValue("AccentColor", out object? accentValue) && accentValue is Color accentColor)
+        {
+            foreach (string key in new[] { "SystemAccentColor", "SystemAccentColorDark1", "SystemAccentColorDark2", "SystemAccentColorDark3",
+                         "SystemAccentColorLight1", "SystemAccentColorLight2", "SystemAccentColorLight3" })
+            {
+                _live[key] = accentColor;
+            }
+        }
+
         if (Application.Current is { } app)
         {
             // 让 Fluent 内置控件（滚动条、输入框等）的明暗与预设一致。
@@ -118,6 +128,20 @@ public sealed class ThemeService
         if (_attached || Application.Current is null) return;
         Application.Current.Resources.MergedDictionaries.Add(_live);
         _attached = true;
+    }
+
+    /// <summary>读取某个预设或强调色文件里的颜色（设置页色板预览用），不影响当前主题。</summary>
+    /// <param name="relative">如 <c>Presets/WarmWhite.axaml</c>、<c>Accents/Blue.axaml</c>。</param>
+    public static Color? PeekColor(string relative, string key)
+    {
+        try
+        {
+            return Load(relative).TryGetValue(key, out object? value) && value is Color color ? color : null;
+        }
+        catch (Exception ex) when (ex is InvalidDataException or IOException or XamlLoadException)
+        {
+            return null;
+        }
     }
 
     private static ResourceDictionary Load(string relative) =>

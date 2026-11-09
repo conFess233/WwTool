@@ -2,7 +2,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WwTool.Core.Abstractions;
 using WwTool.Core.Localization;
+using WwTool.Core.Models.Config;
 using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
 using WwTool.UI.Services;
@@ -17,6 +19,13 @@ public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly INavigationService _navigation;
     private readonly LocalizationService _localization;
+    private readonly IConfigService _config;
+
+    /// <summary>窗口毛玻璃：开启时窗口透明并请求系统模糊材质，背景层按 <see cref="BackdropOpacity"/> 半透明。</summary>
+    public bool IsGlassEnabled => _config.User.IsGlassEffectEnabled;
+
+    /// <summary>背景层不透明度；未开启毛玻璃时为 1。</summary>
+    public double BackdropOpacity => IsGlassEnabled ? _config.User.GlassOpacity / 100.0 : 1;
 
     public ShellViewModel(
         INavigationService navigation,
@@ -24,8 +33,18 @@ public sealed partial class ShellViewModel : ObservableObject
         FabMenuViewModel fab,
         DialogService dialogs,
         IUIStateService uiState,
-        AccountContext accounts)
+        AccountContext accounts,
+        IConfigService config)
     {
+        _config = config;
+        config.User.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(UserConfig.IsGlassEffectEnabled) or nameof(UserConfig.GlassOpacity))
+            {
+                OnPropertyChanged(nameof(IsGlassEnabled));
+                OnPropertyChanged(nameof(BackdropOpacity));
+            }
+        };
         Accounts = accounts;
         _navigation = navigation;
         _localization = localization;
