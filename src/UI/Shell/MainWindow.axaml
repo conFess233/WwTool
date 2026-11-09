@@ -5,6 +5,45 @@
         Width="1440" Height="900"
         MinWidth="1100" MinHeight="720"
         WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource BackgroundBrush}"
         Icon="avares://WwTool/Assets/WwTool.ico">
-  <TextBlock Text="WwTool 2.0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+  <!-- 阶段 0 原型：主题令牌预览与运行时切换。正式 Shell 完成后替换。 -->
+  <ScrollViewer>
+    <StackPanel Margin="40,26" Spacing="18">
+      <TextBlock Text="主题原型" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+
+      <WrapPanel x:Name="PresetButtons" ItemSpacing="8" LineSpacing="8" />
+      <WrapPanel x:Name="AccentButtons" ItemSpacing="8" LineSpacing="8" />
+
+      <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+              CornerRadius="{DynamicResource CornerRadiusCard}" Padding="22,18">
+        <StackPanel Spacing="10">
+          <TextBlock Text="卡片标题" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="正文文字 · Body text · 本文" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" />
+          <TextBlock Text="次要说明文字（需 ≥ 4.5:1）" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+          <TextBlock Text="532" FontSize="42" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Background="{DynamicResource AccentBrush}" CornerRadius="999" Padding="16,8">
+              <TextBlock Text="主要操作" Foreground="{DynamicResource TextOnAccentBrush}" FontWeight="SemiBold" />
+            </Border>
+            <Border Background="{DynamicResource AccentContainerBrush}" CornerRadius="999" Padding="16,8">
+              <TextBlock Text="选中 Chip" Foreground="{DynamicResource TextPrimaryBrush}" />
+            </Border>
+            <Border Background="{DynamicResource DangerBrush}" CornerRadius="7" Padding="16,8">
+              <TextBlock Text="危险" Foreground="White" />
+            </Border>
+            <Border Background="{DynamicResource NavIslandBrush}" CornerRadius="999" Padding="16,8">
+              <TextBlock Text="悬浮岛" Foreground="{DynamicResource TextOnNavIslandBrush}" FontWeight="SemiBold" />
+            </Border>
+          </StackPanel>
+          <Grid ColumnDefinitions="*" Height="10">
+            <Border Background="{DynamicResource SegmentTrackBrush}" />
+            <Border Background="{DynamicResource AccentBrush}" HorizontalAlignment="Left" Width="260" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <WrapPanel x:Name="Swatches" ItemSpacing="10" LineSpacing="10" />
+    </StackPanel>
+  </ScrollViewer>
 </Window>

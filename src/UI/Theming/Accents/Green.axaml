@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+  <Color x:Key="AccentColor">#5B7E63</Color>
+  <Color x:Key="AccentHoverColor">#597E5E</Color>
+  <Color x:Key="AccentPressedColor">#4C6A53</Color>
+  <Color x:Key="AccentContainerColor">#335F8267</Color>
+  <Color x:Key="AccentContainerHoverColor">#4A5F8267</Color>
+  <Color x:Key="FocusRingColor">#719676</Color>
+  <Color x:Key="TextOnAccentColor">#FFFFFF</Color>
+  <Color x:Key="ChartPrimaryColor">#5F8267</Color>
+</ResourceDictionary>

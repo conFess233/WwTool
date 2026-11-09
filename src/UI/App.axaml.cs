@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using WwTool.UI.Services;
 using WwTool.UI.Shell;
 
 namespace WwTool.UI;
@@ -16,7 +17,10 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            // 阶段 0：主题服务先手动创建，正式组合根（Generic Host）在 Shell 模块中接入。
+            var theme = new ThemeService();
+            theme.Apply("WarmWhite", ThemeService.FollowTheme);
+            desktop.MainWindow = new MainWindow(theme);
         }
 
         base.OnFrameworkInitializationCompleted();
