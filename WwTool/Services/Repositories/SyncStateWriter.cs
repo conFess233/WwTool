@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using WwTool.Common.Context;
-using WwTool.Common.Models.Entities;
+using WwTool.Core.Data;
+using WwTool.Core.Data.Entities;
 
 namespace WwTool.Services.Repositories;
 

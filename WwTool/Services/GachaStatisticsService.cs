@@ -4,7 +4,7 @@ using System.Linq;
 using WwTool.Common;
 using WwTool.Core.Enums;
 using WwTool.Common.Models;
-using WwTool.Common.Models.Entities;
+using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Core.Models.Domain;
 using WwTool.Common.Utils;

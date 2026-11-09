@@ -16,7 +16,7 @@ using WwTool.Core.Enums;
 using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Core.Models.Api.Requests;
-using WwTool.Common.Models.Entities;
+using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Common.Utils;

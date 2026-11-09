@@ -1,6 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using WwTool.Common.Context;
+using WwTool.Core.Data;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services;

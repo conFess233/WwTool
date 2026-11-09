@@ -10,7 +10,7 @@ using System.Text;
 using WwTool.Core.Enums;
 using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
-using WwTool.Common.Models.Entities;
+using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Models.Config;
 using WwTool.Common.Utils;

@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using WwTool.Core.Enums;
 using WwTool.Common.Models;
-using WwTool.Common.Models.Entities;
+using WwTool.Core.Data.Entities;
 
 namespace WwTool.Services.Interfaces
 {

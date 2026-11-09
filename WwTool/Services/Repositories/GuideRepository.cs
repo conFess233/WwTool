@@ -1,9 +1,9 @@
 using WwTool.Core.Models.Domain;
 using Microsoft.EntityFrameworkCore;
-using WwTool.Common.Context;
+using WwTool.Core.Data;
 using WwTool.Core.Exceptions;
 using WwTool.Core.Models.Api.Responses;
-using WwTool.Common.Models.Entities;
+using WwTool.Core.Data.Entities;
 using WwTool.Common.Utils;
 using WwTool.Services.Interfaces;
 

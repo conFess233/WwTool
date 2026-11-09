@@ -1,10 +1,10 @@
 using WwTool.Core.Models.Domain;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using WwTool.Common.Context;
+using WwTool.Core.Data;
 using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
-using WwTool.Common.Models.Entities;
+using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Common.Utils;
 using WwTool.Services.Interfaces;

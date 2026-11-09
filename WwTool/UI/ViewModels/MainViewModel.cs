@@ -9,7 +9,7 @@ using WwTool.Common;
 using WwTool.Common.Events;
 using WwTool.Common.Models;
 using WwTool.Core.Models.Config;
-using WwTool.Common.Models.Entities;
+using WwTool.Core.Data.Entities;
 using WwTool.Common.Utils;
 using WwTool.Extensions;
 using WwTool.Services;
