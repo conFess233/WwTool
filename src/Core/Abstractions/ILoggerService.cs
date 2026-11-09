@@ -1,7 +1,7 @@
 using System;
 using WwTool.Core.Enums;
 
-namespace WwTool.Services.Interfaces
+namespace WwTool.Core.Abstractions
 {
 
     public interface ILoggerService

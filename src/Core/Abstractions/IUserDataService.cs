@@ -1,7 +1,7 @@
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Models.Api.Responses;
 
-namespace WwTool.Services.Interfaces;
+namespace WwTool.Core.Abstractions;
 
 public interface IUserDataService
 {

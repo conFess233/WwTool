@@ -1,7 +1,7 @@
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Core.Models.Domain;
 
-namespace WwTool.Services.Interfaces;
+namespace WwTool.Core.Abstractions;
 
 public sealed record GuideCredential(string CUid, string Token, string ServerId);
 

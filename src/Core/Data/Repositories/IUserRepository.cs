@@ -1,7 +1,6 @@
-using WwTool.Common.Models;
 using WwTool.Core.Models.Domain;
 
-namespace WwTool.Services.Repositories;
+namespace WwTool.Core.Data.Repositories;
 
 public interface IUserRepository
 {

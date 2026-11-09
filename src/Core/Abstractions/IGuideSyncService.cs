@@ -1,4 +1,4 @@
-namespace WwTool.Services.Interfaces;
+namespace WwTool.Core.Abstractions;
 
 public interface IGuideSyncService
 {

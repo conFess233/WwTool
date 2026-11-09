@@ -3,12 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using WwTool.Core.Enums;
-using WwTool.Common.Models;
 using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Requests;
 using WwTool.Core.Models.Api.Responses;
 
-namespace WwTool.Services.Interfaces
+namespace WwTool.Core.Abstractions
 {
     public interface IGetDataService
     {

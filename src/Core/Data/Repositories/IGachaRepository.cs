@@ -1,7 +1,7 @@
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Models.Api.Responses;
 
-namespace WwTool.Services.Repositories;
+namespace WwTool.Core.Data.Repositories;
 
 public interface IGachaRepository
 {

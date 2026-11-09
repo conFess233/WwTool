@@ -25,7 +25,8 @@ using WwTool.Extensions;
 using WwTool.Core.Extensions;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
-using WwTool.Services.Repositories;
+using WwTool.Core.Abstractions;
+using WwTool.Core.Data.Repositories;
 using ExceptionHelper = WwTool.Services.Presentation.ExceptionHelper;
 
 namespace WwTool.UI.ViewModels

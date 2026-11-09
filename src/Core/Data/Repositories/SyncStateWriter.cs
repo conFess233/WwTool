@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WwTool.Core.Data;
 using WwTool.Core.Data.Entities;
 
-namespace WwTool.Services.Repositories;
+namespace WwTool.Core.Data.Repositories;
 
 /// <summary>在调用方已有事务中更新同步状态，不创建上下文或自行提交。</summary>
 internal static class SyncStateWriter

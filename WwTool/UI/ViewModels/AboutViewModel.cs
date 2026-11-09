@@ -4,7 +4,8 @@ using WwTool.Common;
 using WwTool.Common.Utils;
 using WwTool.Core.Infrastructure;
 
-using WwTool.Services.Interfaces;
+using WwTool.Services.Interfaces;
+using WwTool.Core.Abstractions;
 
 namespace WwTool.UI.ViewModels
 {

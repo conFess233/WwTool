@@ -2,7 +2,8 @@ using System.Net.Http;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using WwTool.Services.Interfaces;
+using WwTool.Services.Interfaces;
+using WwTool.Core.Abstractions;
 
 namespace WwTool.Services
 {

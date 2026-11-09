@@ -1,7 +1,7 @@
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Data.Entities;
 
-namespace WwTool.Services.Repositories;
+namespace WwTool.Core.Data.Repositories;
 
 internal static class GuideSnapshotMapper
 {

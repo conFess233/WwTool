@@ -5,7 +5,8 @@ using System.Windows.Media.Animation;
 using WwTool.Core.Enums;
 using WwTool.Common.Utils;
 using WwTool.Core.Infrastructure;
-using WwTool.Services.Interfaces;
+using WwTool.Services.Interfaces;
+using WwTool.Core.Abstractions;
 
 namespace WwTool.Services;
 

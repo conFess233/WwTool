@@ -2,7 +2,8 @@ using Prism.Dialogs;
 using Prism.Ioc;
 using System;
 using System.Windows;
-using WwTool.Services.Interfaces;
+using WwTool.Services.Interfaces;
+using WwTool.Core.Abstractions;
 
 namespace WwTool.Services
 {

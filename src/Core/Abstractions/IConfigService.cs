@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using WwTool.Core.Models.Config;
 
-namespace WwTool.Services.Interfaces
+namespace WwTool.Core.Abstractions
 {
     public interface IConfigService
     {

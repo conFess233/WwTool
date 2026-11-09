@@ -6,8 +6,9 @@ using WwTool.Common.Models;
 using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Requests;
 using WwTool.Core.Models.Api.Responses;
-using WwTool.Services.Interfaces;
-using WwTool.Services.Repositories;
+using WwTool.Services.Interfaces;
+using WwTool.Core.Abstractions;
+using WwTool.Core.Data.Repositories;
 using static WwTool.Services.LoginService;
 
 namespace WwTool.Services

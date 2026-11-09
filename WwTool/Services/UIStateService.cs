@@ -5,7 +5,8 @@ using Prism.Commands;
 using Prism.Mvvm;
 using WwTool.Core.Enums;
 using WwTool.Common.Models;
-using WwTool.Services.Interfaces;
+using WwTool.Services.Interfaces;
+using WwTool.Core.Abstractions;
 
 namespace WwTool.Services
 {

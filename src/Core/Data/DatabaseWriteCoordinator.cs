@@ -1,9 +1,9 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using WwTool.Core.Data;
-using WwTool.Services.Interfaces;
+using WwTool.Core.Abstractions;
 
-namespace WwTool.Services;
+namespace WwTool.Core.Data;
 
 public sealed class DatabaseWriteCoordinator(
     IDbContextFactory<AppDbContext> contextFactory,
