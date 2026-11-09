@@ -558,5 +558,15 @@
   "Motor_QualityValue": "品质 {0}",
   "Motor_PartValue": "部位 {0}",
   "Motor_TabEmpty": "这一类还没有解锁的外观。",
-  "Motor_MaxLevel": "已满级"
+  "Motor_MaxLevel": "已满级",
+  "Login_Hint": "使用库街区账号的邮箱和密码登录，获取游戏数据授权。",
+  "Accounts_Summary": "本地已存储 {0} 个账号 · 删除账号会同时清除该账号的本地抽卡数据",
+  "Accounts_Current": "当前账号",
+  "Accounts_CurrentTag": "当前",
+  "Accounts_SwitchTo": "切换到此账号",
+  "Accounts_Delete": "删除账号",
+  "Accounts_Deleted": "已删除账号 {0} 及其本地数据",
+  "Accounts_LastSynced": "最近同步",
+  "Accounts_Today": "今天 {0}",
+  "Accounts_Manage": "管理账号"
 }

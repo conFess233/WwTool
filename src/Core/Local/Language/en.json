@@ -558,5 +558,15 @@
   "Motor_QualityValue": "Quality {0}",
   "Motor_PartValue": "Slot {0}",
   "Motor_TabEmpty": "Nothing unlocked in this category yet.",
-  "Motor_MaxLevel": "Max level"
+  "Motor_MaxLevel": "Max level",
+  "Login_Hint": "Log in with your Kuro account email and password to authorize game data access.",
+  "Accounts_Summary": "{0} accounts stored locally · Deleting an account also removes its local pull data",
+  "Accounts_Current": "Current account",
+  "Accounts_CurrentTag": "Current",
+  "Accounts_SwitchTo": "Switch to this account",
+  "Accounts_Delete": "Delete account",
+  "Accounts_Deleted": "Deleted {0} and its local data",
+  "Accounts_LastSynced": "Last synced",
+  "Accounts_Today": "Today {0}",
+  "Accounts_Manage": "Manage accounts"
 }

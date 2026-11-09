@@ -558,5 +558,15 @@
   "Motor_QualityValue": "品質 {0}",
   "Motor_PartValue": "部位 {0}",
   "Motor_TabEmpty": "このカテゴリはまだ解放されていません。",
-  "Motor_MaxLevel": "最大レベル"
+  "Motor_MaxLevel": "最大レベル",
+  "Login_Hint": "クロアカウントのメールアドレスとパスワードでログインし、ゲームデータへのアクセスを許可します。",
+  "Accounts_Summary": "ローカルに {0} 件のアカウント · 削除するとローカルのガチャ記録も消えます",
+  "Accounts_Current": "現在のアカウント",
+  "Accounts_CurrentTag": "現在",
+  "Accounts_SwitchTo": "このアカウントに切替",
+  "Accounts_Delete": "アカウントを削除",
+  "Accounts_Deleted": "{0} とローカルデータを削除しました",
+  "Accounts_LastSynced": "最終同期",
+  "Accounts_Today": "今日 {0}",
+  "Accounts_Manage": "アカウント管理"
 }

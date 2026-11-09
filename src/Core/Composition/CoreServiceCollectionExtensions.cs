@@ -70,6 +70,7 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IHttpService, HttpService>();
         services.AddSingleton<ILoginService, LoginService>();
         services.AddSingleton<IGetDataService, GetDataService>();
+        services.AddSingleton<IAccountLoginService, AccountLoginService>();
         services.AddSingleton<IPullsService, PullsService>();
         return services;
     }
