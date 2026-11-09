@@ -16,6 +16,13 @@ public partial class MainWindow : Window
     /// <summary>应用绘制的标题按钮（3 × 46）宽度，页头右侧为其留白。</summary>
     private const double CaptionButtonsWidth = 138;
 
+    // 账号胶囊弹出框里的“管理账号”：先收起弹出框再进入账号数据页。
+    private void OnManageAccountsClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        AccountCapsule.Flyout?.Hide();
+        (DataContext as ViewModels.ShellViewModel)?.OpenAccountsCommand.Execute(null);
+    }
+
     private const string MaximizeGlyphData = "M0.5,0.5 L9.5,0.5 L9.5,9.5 L0.5,9.5 Z";
     private const string RestoreGlyphData = "M2.5,2.5 L9.5,2.5 L9.5,9.5 L2.5,9.5 Z M2.5,0.5 L0.5,0.5 M0.5,0.5 L0.5,7.5 M2.5,0.5 L9.5,0.5";
 

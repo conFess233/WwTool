@@ -88,6 +88,7 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware
     private readonly ErrorReporter _errors;
     private readonly ILoggerService _logger;
     private readonly AvaloniaCatalogImageService _images;
+    private readonly AccountActions _actions;
 
     private CancellationTokenSource _cts = new();
     private int _loadVersion;
@@ -113,8 +114,10 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware
         IUIStateService uiState,
         ErrorReporter errors,
         ILoggerService logger,
-        AvaloniaCatalogImageService images)
+        AvaloniaCatalogImageService images,
+        AccountActions actions)
     {
+        _actions = actions;
         Accounts = accounts;
         _guide = guide;
         _guideSync = guideSync;
@@ -207,9 +210,13 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware
             }
             catch (GuideAuthenticationRequiredException)
             {
-                // 攻略站令牌失效：用本次运行中最近一次登录的会话换取新令牌后重试。
-                // 没有可用会话时需要重新登录（登录对话框随账号页迁移）。
-                if (!await TryCaptureSessionAsync(language)) throw;
+                // 攻略站令牌失效：先用本次运行中最近一次登录的会话换取新令牌；
+                // 没有可用会话时请用户重新登录，登录成功后再换取并重试。
+                if (!await TryCaptureSessionAsync(language))
+                {
+                    if (!await _actions.AddAccountAsync()) throw;
+                    if (!await TryCaptureSessionAsync(language)) throw;
+                }
                 await _guideSync.SyncAsync(uid, language);
             }
             if (Accounts.Current?.Uid != uid) return;

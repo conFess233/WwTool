@@ -29,7 +29,8 @@ public abstract class DialogViewModel<TResult> : ObservableObject, IDialogViewMo
     /// <summary>取消时的返回值。</summary>
     protected abstract TResult CancelResult { get; }
 
-    public void Cancel() => Close(CancelResult);
+    /// <summary>按“取消”结束；需要中止进行中工作的对话框可重写（记得调用基类）。</summary>
+    public virtual void Cancel() => Close(CancelResult);
 
     public abstract bool TryAccept();
 

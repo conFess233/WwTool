@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using WwTool.Core.Localization;
 using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
@@ -32,7 +33,7 @@ public sealed partial class ShellViewModel : ObservableObject
         Dialogs = dialogs;
         UiState = uiState;
 
-        foreach (PageDescriptor page in navigation.Pages.Where(p => p.IsTopLevel))
+        foreach (PageDescriptor page in navigation.Pages.Where(p => p.IsTopLevel && p.ShowInIsland))
         {
             var item = new NavItem(page.Key, page.TitleKey, page.Icon, localization, page.StartsGroup);
             item.PropertyChanged += OnNavItemChanged;
@@ -70,6 +71,13 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private bool _isReady;
 
+    /// <summary>账号数据页打开时，页头账号胶囊显示选中态。</summary>
+    [ObservableProperty]
+    private bool _isAccountsPage;
+
+    [RelayCommand]
+    private void OpenAccounts() => _navigation.NavigateTo(Pages.Accounts.AccountsViewModel.PageKey);
+
     private void OnNavItemChanged(object? sender, PropertyChangedEventArgs e)
     {
         // 悬浮岛点击只改 IsSelected，真正的切换交给导航服务；导航服务再回写选中状态。
@@ -89,6 +97,7 @@ public sealed partial class ShellViewModel : ObservableObject
             item.IsSelected = item.Key == islandKey;
         }
         CurrentPage = e.ViewModel;
+        IsAccountsPage = e.Page.Key == Pages.Accounts.AccountsViewModel.PageKey;
         Fab.SetActions((e.ViewModel as IFabProvider)?.FabActions);
         UpdatePageTitle();
     }

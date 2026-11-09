@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:accounts="using:WwTool.UI.Pages.Accounts"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Accounts.LoginDialogView"
+             x:DataType="accounts:LoginDialogViewModel"
+             Width="400">
+  <UserControl.Styles>
+    <Style Selector="TextBlock.error">
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    </Style>
+  </UserControl.Styles>
+  <StackPanel Spacing="14">
+    <StackPanel Spacing="6">
+      <TextBlock Text="{loc:Tr Dialog_AddAccount}" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
+      <TextBlock Classes="caption" Text="{loc:Tr Login_Hint}" TextWrapping="Wrap" />
+    </StackPanel>
+
+    <StackPanel Spacing="6">
+      <TextBlock Classes="caption" Text="{loc:Tr Login_Email}" />
+      <TextBox x:Name="EmailBox" Text="{Binding Email}" IsEnabled="{Binding IsIdle}"
+               AutomationProperties.Name="{loc:Tr Login_Email}" AutomationProperties.AutomationId="login-email" />
+    </StackPanel>
+    <StackPanel Spacing="6">
+      <TextBlock Classes="caption" Text="{loc:Tr Login_Password}" />
+      <TextBox Text="{Binding Password}" PasswordChar="●" RevealPassword="False" IsEnabled="{Binding IsIdle}"
+               AutomationProperties.Name="{loc:Tr Login_Password}" AutomationProperties.AutomationId="login-password" />
+    </StackPanel>
+
+    <TextBlock Classes="caption error" Text="{Binding Error}" TextWrapping="Wrap"
+               IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+               AutomationProperties.AutomationId="login-error" />
+
+    <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsBusy}" VerticalAlignment="Center">
+        <ProgressBar IsIndeterminate="True" Width="60" MinWidth="60" />
+        <TextBlock Classes="caption" Text="{loc:Tr Logging_In}" VerticalAlignment="Center" />
+      </StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+        <Button Classes="dialog-secondary" Content="{loc:Tr Common_Cancel}" Command="{Binding DismissCommand}"
+                AutomationProperties.AutomationId="dialog-cancel" />
+        <Button Classes="dialog-primary" Content="{loc:Tr Common_Login}" Command="{Binding LoginCommand}"
+                AutomationProperties.AutomationId="dialog-confirm" />
+      </StackPanel>
+    </Grid>
+  </StackPanel>
+</UserControl>

@@ -18,6 +18,7 @@ using WwTool.UI.Controls;
 using WwTool.UI.Feedback;
 using WwTool.UI.Localization;
 using WwTool.UI.Navigation;
+using WwTool.UI.Pages.Accounts;
 using WwTool.UI.Pages.Explore;
 using WwTool.UI.Pages.Home;
 using WwTool.UI.Pages.Motor;
@@ -134,6 +135,8 @@ public partial class App : Application
         services.AddSingleton<PullsOverviewViewModel>();
         services.AddSingleton<PullsChartsViewModel>();
         services.AddSingleton<PlayerData>();
+        services.AddSingleton<AccountActions>();
+        services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<ExploreViewModel>();
         services.AddSingleton<MotorViewModel>();
@@ -153,6 +156,9 @@ public partial class App : Application
             sp => sp.GetRequiredService<MotorViewModel>()));
         services.AddSingleton(new PageDescriptor("settings", "Nav_Settings", icons + "Settings.png",
             sp => ActivatorUtilities.CreateInstance<SettingsViewModel>(sp), StartsGroup: true));
+        // 账号数据：不在悬浮岛上，从页头账号胶囊进入。
+        services.AddSingleton(new PageDescriptor(AccountsViewModel.PageKey, "Nav_AccountData", icons + "Account.png",
+            sp => sp.GetRequiredService<AccountsViewModel>(), ShowInIsland: false));
         services.AddSingleton(new PageDescriptor(PullsChartsViewModel.PageKey, "Pulls_DetailedCharts", icons + "Graph.png",
             sp => sp.GetRequiredService<PullsChartsViewModel>(), ParentKey: "pulls"));
         services.AddSingleton(new ViewLocator()
@@ -163,6 +169,8 @@ public partial class App : Application
             .Map<RolesViewModel, RolesView>()
             .Map<ExploreViewModel, ExploreView>()
             .Map<MotorViewModel, MotorView>()
+            .Map<AccountsViewModel, AccountsView>()
+            .Map<LoginDialogViewModel, LoginDialogView>()
             .Map<PullsOverviewViewModel, PullsOverviewView>()
             .Map<PullsChartsViewModel, PullsChartsView>());
         services.AddSingleton<INavigationService, NavigationService>();

@@ -11,7 +11,8 @@ public sealed record PageDescriptor(
     string Icon,
     Func<IServiceProvider, object> CreateViewModel,
     bool StartsGroup = false,
-    string? ParentKey = null)
+    string? ParentKey = null,
+    bool ShowInIsland = true)
 {
     public bool IsTopLevel => ParentKey is null;
 }

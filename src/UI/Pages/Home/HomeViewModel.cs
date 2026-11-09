@@ -62,7 +62,8 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         LocalizationService localization,
         IUIStateService uiState,
         ErrorReporter errors,
-        INavigationService navigation)
+        INavigationService navigation,
+        AccountActions actions)
     {
         Accounts = accounts;
         _player = player;
@@ -77,7 +78,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         FabActions =
         [
             new FabAction("refresh", "Index_RefreshAccountList", Icons + "Refresh.png", new AsyncRelayCommand(RefreshAccountsAsync), localization),
-            new FabAction("add-account", "Index_AddAccount", Icons + "Add.png", new RelayCommand(ShowLoginMigrating), localization),
+            new FabAction("add-account", "Index_AddAccount", Icons + "Add.png", new AsyncRelayCommand(() => actions.AddAccountAsync()), localization),
         ];
 
         // 回满倒计时每秒刷新；只在页面可见时运行。
@@ -178,15 +179,6 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
             _errors.Report(ex, _localization["Index_RefreshAccountList"]);
         }
     }
-
-    // 登录对话框随账号页一起迁移；在此之前提示使用 1.x。
-    private void ShowLoginMigrating() => _uiState.ShowToast(new NotificationRequest
-    {
-        Title = _localization["Index_AddAccount"],
-        Message = _localization["Toast_FeatureMigrating"],
-        Priority = NotificationPriority.Important,
-        Source = "Home",
-    });
 
     private void OnAccountsChanged(object? sender, PropertyChangedEventArgs e)
     {
