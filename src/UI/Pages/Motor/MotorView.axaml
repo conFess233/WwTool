@@ -1,0 +1,159 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:motor="using:WwTool.UI.Pages.Motor"
+             xmlns:roles="using:WwTool.UI.Pages.Roles"
+             xmlns:shell="using:WwTool.UI.Shell"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Motor.MotorView"
+             x:DataType="motor:MotorViewModel">
+  <!-- 摩托：左栏等级与当前装备，右侧解锁统计与外观网格（定稿 FinalMotor）。 -->
+  <UserControl.Styles>
+    <Style Selector="Border.tile">
+      <Setter Property="Padding" Value="10,18,10,14" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Border.tile.equipped">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="Grid.kv">
+      <Setter Property="Margin" Value="0,9" />
+    </Style>
+    <!-- 随包的单色图标按主题文字色着色 -->
+    <Style Selector="Rectangle.glyph">
+      <Setter Property="Fill" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <Grid Margin="40,0,40,60">
+      <Border Classes="card" Padding="28,24" VerticalAlignment="Top" IsVisible="{Binding !HasData}" AutomationProperties.AutomationId="motor-empty">
+        <TextBlock Classes="caption" Text="{loc:Tr Motor_Empty}" TextWrapping="Wrap" />
+      </Border>
+
+      <Grid ColumnDefinitions="400,*" ColumnSpacing="18" IsVisible="{Binding HasData}">
+        <!-- 左栏 -->
+        <Border Classes="card" Padding="22,20" VerticalAlignment="Top">
+          <StackPanel>
+            <Border Height="220" CornerRadius="12" Background="{DynamicResource AccentContainerBrush}">
+              <Rectangle Classes="glyph" Width="200" Height="200" Opacity="0.85">
+                <Rectangle.OpacityMask>
+                  <ImageBrush Source="{Binding Source='avares://WwTool/Assets/Images/Motor.png', Converter={x:Static shell:AssetImageConverter.Instance}}" Stretch="Uniform" />
+                </Rectangle.OpacityMask>
+              </Rectangle>
+            </Border>
+            <StackPanel Orientation="Horizontal" Spacing="14" Margin="0,20,0,0">
+              <Rectangle Classes="glyph" Width="48" Height="48">
+                <Rectangle.OpacityMask>
+                  <ImageBrush Source="{Binding Source='avares://WwTool/Assets/Images/MotorLevel.png', Converter={x:Static shell:AssetImageConverter.Instance}}" Stretch="Uniform" />
+                </Rectangle.OpacityMask>
+              </Rectangle>
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Classes="caption" Text="{loc:Tr Motor_Level}" />
+                <TextBlock Text="{Binding LevelText}" FontSize="32" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"
+                           AutomationProperties.AutomationId="motor-level" />
+              </StackPanel>
+            </StackPanel>
+            <c:SegmentedBar Margin="0,12,0,0" Value="{Binding Exp}" Maximum="{Binding NextExp}" />
+            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+              <TextBlock Classes="caption" Text="{loc:Tr Motor_Exp}" />
+              <TextBlock Grid.Column="1" Classes="caption" Text="{Binding ExpText}" />
+            </Grid>
+            <TextBlock Text="{loc:Tr Motor_CurrentEquip}" FontSize="15" FontWeight="Bold" Margin="0,20,0,4" Foreground="{DynamicResource TextPrimaryBrush}" />
+            <ItemsControl ItemsSource="{Binding Equipment}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="motor:MotorFact">
+                  <StackPanel>
+                    <Border Height="1" Background="{DynamicResource DividerBrush}" />
+                    <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="label" Text="{Binding Name}" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Grid.Column="1" Classes="label" FontWeight="Bold" Text="{Binding Value}" />
+                    </Grid>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+
+        <!-- 右侧 -->
+        <StackPanel Grid.Column="1" Spacing="18">
+          <ItemsControl ItemsSource="{Binding Unlocks}">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4" ColumnSpacing="18" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="motor:UnlockCard">
+                <Border Classes="card" Padding="18,14">
+                  <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                    <Rectangle Classes="glyph" Width="40" Height="40">
+                      <Rectangle.OpacityMask>
+                        <ImageBrush Source="{Binding Icon, Converter={x:Static shell:AssetImageConverter.Instance}}" Stretch="Uniform" />
+                      </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Classes="caption" Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Value}" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <ItemsControl ItemsSource="{Binding Tabs}">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="roles:ChipOption">
+                <ToggleButton Classes="chip" Margin="0,0,8,0" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                              Command="{Binding $parent[UserControl].((motor:MotorViewModel)DataContext).SelectTabCommand}" CommandParameter="{Binding}"
+                              AutomationProperties.AutomationId="{Binding Key, StringFormat='motor-tab-{0}'}" AutomationProperties.Name="{Binding Title}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock Classes="count" Text="{Binding Count}" VerticalAlignment="Center" />
+                  </StackPanel>
+                </ToggleButton>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Border Classes="card" Padding="28,24" IsVisible="{Binding IsTabEmpty}">
+            <TextBlock Classes="caption" Text="{loc:Tr Motor_TabEmpty}" />
+          </Border>
+
+          <ItemsControl ItemsSource="{Binding Tiles}">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4" ColumnSpacing="18" RowSpacing="18" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="motor:MotorTile">
+                <Border Classes="tile" Classes.equipped="{Binding IsEquipped}"
+                        AutomationProperties.AutomationId="{Binding AutomationId}" AutomationProperties.Name="{Binding Name}">
+                  <StackPanel HorizontalAlignment="Stretch">
+                    <Panel Width="96" Height="96" HorizontalAlignment="Center">
+                      <c:CatalogImage Path="{Binding IconPath}" DecodeWidth="192" Stretch="Uniform" />
+                      <Border Width="26" Height="26" CornerRadius="13" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                              Background="{DynamicResource SurfaceElevatedBrush}" IsVisible="{Binding HasPart}">
+                        <Rectangle Classes="glyph" Width="16" Height="16">
+                          <Rectangle.OpacityMask>
+                            <ImageBrush Source="{Binding PartIcon, Converter={x:Static shell:AssetImageConverter.Instance}}" Stretch="Uniform" />
+                          </Rectangle.OpacityMask>
+                        </Rectangle>
+                      </Border>
+                    </Panel>
+                    <TextBlock Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,10,0,0"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                    <Border Classes="tag" Classes.accent="{Binding IsEquipped}" HorizontalAlignment="Center" Margin="0,8,0,0">
+                      <TextBlock Text="{Binding Tag}" />
+                    </Border>
+                    <c:SegmentedBar Classes="thin" Margin="4,10,4,0" Value="{Binding Progress}" Maximum="1" IsVisible="{Binding HasProgress}" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

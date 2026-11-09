@@ -18,7 +18,9 @@ using WwTool.UI.Controls;
 using WwTool.UI.Feedback;
 using WwTool.UI.Localization;
 using WwTool.UI.Navigation;
+using WwTool.UI.Pages.Explore;
 using WwTool.UI.Pages.Home;
+using WwTool.UI.Pages.Motor;
 using WwTool.UI.Pages.Pulls;
 using WwTool.UI.Pages.Roles;
 using WwTool.UI.Services;
@@ -131,7 +133,10 @@ public partial class App : Application
         services.AddSingleton<PoolRecordsViewModel>();
         services.AddSingleton<PullsOverviewViewModel>();
         services.AddSingleton<PullsChartsViewModel>();
+        services.AddSingleton<PlayerData>();
         services.AddSingleton<HomeViewModel>();
+        services.AddSingleton<ExploreViewModel>();
+        services.AddSingleton<MotorViewModel>();
         services.AddSingleton<RolesViewModel>();
 
         // 页面登记（顺序即悬浮岛顺序）与视图映射
@@ -142,8 +147,10 @@ public partial class App : Application
             sp => sp.GetRequiredService<PullsOverviewViewModel>()));
         services.AddSingleton(new PageDescriptor("roles", "Nav_RoleData", icons + "Role.png",
             sp => sp.GetRequiredService<RolesViewModel>()));
-        services.AddSingleton(Placeholder("explore", "Nav_Exploration", icons + "Chest.png"));
-        services.AddSingleton(Placeholder("motor", "Nav_Motor", icons + "Motor.png"));
+        services.AddSingleton(new PageDescriptor("explore", "Nav_Exploration", icons + "Chest.png",
+            sp => sp.GetRequiredService<ExploreViewModel>()));
+        services.AddSingleton(new PageDescriptor("motor", "Nav_Motor", icons + "Motor.png",
+            sp => sp.GetRequiredService<MotorViewModel>()));
         services.AddSingleton(new PageDescriptor("settings", "Nav_Settings", icons + "Settings.png",
             sp => ActivatorUtilities.CreateInstance<SettingsViewModel>(sp), StartsGroup: true));
         services.AddSingleton(new PageDescriptor(PullsChartsViewModel.PageKey, "Pulls_DetailedCharts", icons + "Graph.png",
@@ -151,10 +158,11 @@ public partial class App : Application
         services.AddSingleton(new ViewLocator()
             .Map<ConfirmDialogViewModel, ConfirmDialogView>()
             .Map<ImportUrlDialogViewModel, ImportUrlDialogView>()
-            .Map<PlaceholderPageViewModel, PlaceholderPageView>()
             .Map<SettingsViewModel, SettingsView>()
             .Map<HomeViewModel, HomeView>()
             .Map<RolesViewModel, RolesView>()
+            .Map<ExploreViewModel, ExploreView>()
+            .Map<MotorViewModel, MotorView>()
             .Map<PullsOverviewViewModel, PullsOverviewView>()
             .Map<PullsChartsViewModel, PullsChartsView>());
         services.AddSingleton<INavigationService, NavigationService>();
@@ -162,28 +170,6 @@ public partial class App : Application
 
         return builder.Build();
     }
-
-    /// <summary>
-    /// 尚未迁移页面的登记项。悬浮按钮动作先按定稿放好（第四项为危险动作时给出确认文案键），
-    /// 执行时只提示“正在迁移”；页面迁移后换成真实视图模型。
-    /// </summary>
-    private static PageDescriptor Placeholder(string key, string titleKey, string icon,
-        params (string Key, string TitleKey, string Icon, string? DangerConfirmKey)[] actions) =>
-        new(key, titleKey, icon, sp =>
-        {
-            var localization = sp.GetRequiredService<LocalizationService>();
-            var uiState = sp.GetRequiredService<IUIStateService>();
-            FabAction[] fab = actions.Select(a => new FabAction(a.Key, a.TitleKey, a.Icon,
-                new CommunityToolkit.Mvvm.Input.RelayCommand(() => uiState.ShowToast(new NotificationRequest
-                {
-                    Title = localization[a.TitleKey],
-                    Message = localization["Toast_FeatureMigrating"],
-                    Priority = NotificationPriority.Important,
-                    Source = "Placeholder",
-                })),
-                localization, isDanger: a.DangerConfirmKey is not null, confirmMessageKey: a.DangerConfirmKey)).ToArray();
-            return new PlaceholderPageViewModel(titleKey, localization, fab);
-        });
 
     private async Task InitializeDataAsync(IClassicDesktopStyleApplicationLifetime desktop, IServiceProvider services, ShellViewModel shell)
     {

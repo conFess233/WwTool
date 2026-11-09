@@ -42,24 +42,22 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
 {
     private const string Icons = "avares://WwTool/Assets/Images/";
 
-    private readonly IUserDataService _userData;
+    private readonly PlayerData _player;
     private readonly IGuideRepository _guide;
     private readonly GameDataService _catalog;
-    private readonly IGetDataService _getData;
     private readonly PullsSession _pulls;
     private readonly LocalizationService _localization;
     private readonly IUIStateService _uiState;
     private readonly ErrorReporter _errors;
     private readonly INavigationService _navigation;
     private readonly DispatcherTimer _clock;
-    private CancellationTokenSource? _loadCts;
+    private CancellationTokenSource? _iconsCts;
 
     public HomeViewModel(
         AccountContext accounts,
-        IUserDataService userData,
+        PlayerData player,
         IGuideRepository guide,
         GameDataService catalog,
-        IGetDataService getData,
         PullsSession pulls,
         LocalizationService localization,
         IUIStateService uiState,
@@ -67,10 +65,9 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         INavigationService navigation)
     {
         Accounts = accounts;
-        _userData = userData;
+        _player = player;
         _guide = guide;
         _catalog = catalog;
-        _getData = getData;
         _pulls = pulls;
         _localization = localization;
         _uiState = uiState;
@@ -88,12 +85,26 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         _clock.Tick += (_, _) => UpdateCountdowns();
 
         accounts.PropertyChanged += OnAccountsChanged;
+        _player.SnapshotChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(Snapshot));
+            OnPropertyChanged(nameof(HasSnapshot));
+            OnPropertyChanged(nameof(ShowNoSnapshot));
+            Refresh();
+            _ = LoadRoleIconsAsync();
+        };
+        _player.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(PlayerData.IsLoading)) OnPropertyChanged(nameof(ShowNoSnapshot));
+            if (e.PropertyName == nameof(PlayerData.IsSyncing)) SyncCommand.NotifyCanExecuteChanged();
+        };
         _pulls.SnapshotReplaced += (_, _) => UpdatePulls();
         _localization.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == LocalizationService.IndexerName) Refresh();
         };
         Refresh();
+        if (_player.Snapshot is not null) _ = LoadRoleIconsAsync();
     }
 
     public AccountContext Accounts { get; }
@@ -105,20 +116,9 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     public GaugeCard Radio { get; } = new("Index_Radio", Icons + "BattlePass.png");
     public GaugeCard WeeklyBoss { get; } = new("Index_WeeklyBoss", Icons + "WeeklyInst.png");
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasSnapshot), nameof(ShowNoSnapshot))]
-    private PlayerSnapshot? _snapshot;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowNoSnapshot))]
-    private bool _isLoading;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(SyncCommand))]
-    private bool _isSyncing;
-
-    public bool HasSnapshot => Snapshot?.Base is not null;
-    public bool ShowNoSnapshot => Accounts.HasAccount && !HasSnapshot && !IsLoading;
+    public PlayerSnapshot? Snapshot => _player.Snapshot;
+    public bool HasSnapshot => _player.HasSnapshot;
+    public bool ShowNoSnapshot => Accounts.HasAccount && !HasSnapshot && !_player.IsLoading;
 
     [ObservableProperty] private string _uidLine = string.Empty;
     [ObservableProperty] private string _activeDays = "--";
@@ -139,58 +139,17 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     public void OnNavigatedTo(object? parameter)
     {
         _clock.Start();
-        if (Snapshot is null && Accounts.Current is not null) _ = LoadAsync();
+        _ = _player.EnsureLoadedAsync();
         _ = _pulls.EnsureLoadedAsync();
     }
 
     public void OnNavigatedFrom() => _clock.Stop();
 
-    /// <summary>从服务器同步当前账号的游戏数据（需要登录凭据），再读回本地快照。</summary>
+    /// <summary>从服务器同步当前账号的游戏数据。</summary>
     [RelayCommand(CanExecute = nameof(CanSync))]
-    private async Task SyncAsync()
-    {
-        string? uid = Accounts.Current?.Uid;
-        if (uid is null)
-        {
-            _uiState.ShowToast(_localization["Toast_Error"], _localization["Msg_NoAccountSelected"], NotificationType.Error);
-            return;
-        }
-        IsSyncing = true;
-        try
-        {
-            string? credential = await _userData.GetCredentialAsync(uid);
-            await _getData.SyncAllUserDataAsync(uid, credential);
-            await Accounts.RefreshAsync();
-            if (Accounts.Current?.Uid != uid) return;
-            await LoadAsync();
-            if (HasSnapshot)
-            {
-                _uiState.ShowToast(new NotificationRequest
-                {
-                    Title = _localization["Toast_Success"],
-                    Message = _localization["Msg_FetchRoleSuccess"],
-                    Type = NotificationType.Success,
-                    Priority = NotificationPriority.Important,
-                    Source = "Home",
-                    DedupeKey = "home-sync",
-                });
-            }
-            else
-            {
-                _uiState.ShowToast(_localization["Toast_Warning"], _localization["Msg_FetchRoleEmpty"], NotificationType.Warning);
-            }
-        }
-        catch (Exception ex)
-        {
-            _errors.Report(ex, _localization["Home_Sync"]);
-        }
-        finally
-        {
-            IsSyncing = false;
-        }
-    }
+    private Task SyncAsync() => _player.SyncAsync();
 
-    private bool CanSync() => !IsSyncing;
+    private bool CanSync() => !_player.IsSyncing;
 
     [RelayCommand]
     private void OpenPulls() => _navigation.NavigateTo("pulls");
@@ -233,49 +192,35 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     {
         if (e.PropertyName != nameof(AccountContext.Current)) return;
         OnPropertyChanged(nameof(ShowNoSnapshot));
-        // 刷新账号列表会换成新的同 UID 对象；UID 没变时只更新页头文字，快照不必重读。
-        if (Snapshot is not null && Accounts.Current?.Uid == _snapshotUid)
-        {
-            Refresh();
-            return;
-        }
-        Snapshot = null;
         Refresh();
-        if (Accounts.Current is not null) _ = LoadAsync();
     }
 
-    private string? _snapshotUid;
-
-    private async Task LoadAsync()
+    // 角色卡头像来自攻略站快照，随游戏数据快照一起重读。
+    private async Task LoadRoleIconsAsync()
     {
         string? uid = Accounts.Current?.Uid;
-        if (uid is null) return;
-        _loadCts?.Cancel();
+        _iconsCts?.Cancel();
+        if (uid is null)
+        {
+            RoleIcons = [];
+            return;
+        }
         var cts = new CancellationTokenSource();
-        _loadCts = cts;
-        IsLoading = true;
+        _iconsCts = cts;
         try
         {
-            PlayerSnapshot? snapshot = await _userData.LoadRoleSnapshotAsync(uid, cts.Token);
             GuideSnapshot guide = await _guide.LoadSnapshotAsync(uid, cts.Token);
             if (cts.IsCancellationRequested || Accounts.Current?.Uid != uid) return;
             RoleIcons = GuideCardSorter.Sort(guide.Roles.Select(ToPreview), GuideSort.Star, x => x.Id)
                 .Take(4).Select(x => $"Local/Icons/{x.Id}.png").ToArray();
-            _snapshotUid = uid;
-            Snapshot = snapshot;
-            Refresh();
         }
         catch (OperationCanceledException) when (cts.IsCancellationRequested)
         {
-            // 切换账号时取消旧的读取。
+            // 切换账号。
         }
         catch (Exception ex)
         {
-            _errors.Report(ex, _localization["Msg_ReadingLocalRole"]);
-        }
-        finally
-        {
-            if (_loadCts == cts) IsLoading = false;
+            _errors.Report(ex, _localization["Nav_RoleData"], notifyUser: false);
         }
     }
 
