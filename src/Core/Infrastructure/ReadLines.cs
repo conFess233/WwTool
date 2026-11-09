@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace WwTool.Common.Utils
+namespace WwTool.Core.Infrastructure
 {
     /// <summary>
     /// 文件读取工具类

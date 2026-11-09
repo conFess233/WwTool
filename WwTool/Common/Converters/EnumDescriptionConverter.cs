@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Data;
 using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 
 namespace WwTool.Common.Converters
 {
@@ -13,7 +14,7 @@ namespace WwTool.Common.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is Enum item ? WwTool.Extensions.EnumExtensions.GetLocalizedDescription(item) : value?.ToString() ?? string.Empty;
+            return value is Enum item ? WwTool.Extensions.LocalizedEnumExtensions.GetLocalizedDescription(item) : value?.ToString() ?? string.Empty;
         }
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

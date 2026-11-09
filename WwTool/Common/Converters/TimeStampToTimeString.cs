@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Windows.Data;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 
 namespace WwTool.Common.Converters
 {

@@ -5,7 +5,8 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using WwTool.Core.Enums;
-using WwTool.Extensions;
+using WwTool.Extensions;
+using WwTool.Core.Extensions;
 
 namespace WwTool.Common.Utils
 {

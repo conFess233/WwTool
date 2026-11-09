@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace WwTool.Common.Utils
+namespace WwTool.Core.Infrastructure
 {
     public class CheckPathExists
     {

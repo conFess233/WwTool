@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using WwTool.Core.Enums;
 
-namespace WwTool.Common.Utils
+namespace WwTool.Core.Infrastructure
 {
     public static class GachaServerDetector
     {

@@ -1,21 +1,24 @@
+using WwTool.Core.Abstractions.Platform;
 using WwTool.Core.Models.Domain;
 using Microsoft.EntityFrameworkCore;
 using WwTool.Core.Data;
 using WwTool.Core.Exceptions;
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Core.Data.Entities;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services.Repositories;
 
 public sealed class GuideRepository(
     IDbContextFactory<AppDbContext> contextFactory,
-    IDatabaseWriteCoordinator writeCoordinator) : IGuideRepository
+    IDatabaseWriteCoordinator writeCoordinator,
+    ISecretProtector secretProtector) : IGuideRepository
 {
     public async Task SaveCredentialAndPlayersAsync(string cUid, string token, IReadOnlyList<GuidePlayerIdentity> players, CancellationToken cancellationToken = default)
     {
-        string encrypted = Crypto.Encrypt(token);
+        string encrypted = secretProtector.Protect(token);
         if (string.IsNullOrWhiteSpace(encrypted))
             throw new WwToolDatabaseException("Guide 令牌加密失败。");
 
@@ -56,8 +59,10 @@ public sealed class GuideRepository(
             .FirstOrDefaultAsync(cancellationToken);
         if (data is null)
             return null;
-        string token = Crypto.Decrypt(data.EncryptedGuideToken);
-        return string.IsNullOrWhiteSpace(token) ? null : new GuideCredential(data.CUid, token, data.ServerId);
+        // 解密失败视为需要重新登录攻略账号。
+        return secretProtector.TryUnprotect(data.EncryptedGuideToken, out string token) && !string.IsNullOrWhiteSpace(token)
+            ? new GuideCredential(data.CUid, token, data.ServerId)
+            : null;
     }
 
     public Task DeleteCredentialAsync(string cUid, CancellationToken cancellationToken = default) =>

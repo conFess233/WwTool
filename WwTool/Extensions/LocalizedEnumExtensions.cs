@@ -3,27 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Text;
+using WwTool.Core.Extensions;
 
 namespace WwTool.Extensions
 {
     /// <summary>
-    /// 枚举扩展方法
+    /// 旧 WPF 界面使用的多语言枚举描述；无语言依赖的 GetDescription 已移到 WwTool.Core.Extensions。
     /// </summary>
-    public static class EnumExtensions
+    public static class LocalizedEnumExtensions
     {
-        /// <summary>
-        /// 获取枚举的描述信息
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string GetDescription(this Enum value)
-        {
-            FieldInfo? field = value.GetType().GetField(value.ToString());
-            DescriptionAttribute? attribute = field?.GetCustomAttribute<DescriptionAttribute>();
-
-            return attribute?.Description ?? value.ToString();
-        }
-
         /// <summary>
         /// 获取枚举的多语言描述信息
         /// </summary>
@@ -55,7 +43,7 @@ namespace WwTool.Extensions
                 return localized;
             }
 
-            return GetDescription(value);
+            return value.GetDescription();
         }
     }
 }

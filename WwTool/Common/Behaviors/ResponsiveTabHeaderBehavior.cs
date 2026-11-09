@@ -4,7 +4,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 
 namespace WwTool.Common.Behaviors
 {

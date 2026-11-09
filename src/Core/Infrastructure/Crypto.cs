@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace WwTool.Common.Utils
+namespace WwTool.Core.Infrastructure
 {
     /// <summary>
     /// 加密工具类
@@ -96,36 +96,6 @@ namespace WwTool.Common.Utils
             return new string(chars);
         }
 
-        /// <summary>
-        /// 使用 Windows DPAPI 加密数据，保证本地存储安全
-        /// </summary>
-        /// <param name="plainText">要加密的字符串</param>
-        /// <returns>Base64字符串</returns>
-        public static string Encrypt(string plainText)
-        {
-            ArgumentException.ThrowIfNullOrEmpty(plainText);
-            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-            try { return Convert.ToBase64String(ProtectedData.Protect(plainBytes, null, DataProtectionScope.CurrentUser)); }
-            finally { CryptographicOperations.ZeroMemory(plainBytes); }
-        }
-        /// <summary>
-        /// 使用 Windows DPAPI 解密数据
-        /// </summary>
-        /// <param name="cipherText">密文</param>
-        /// <returns>明文</returns>
-        public static string Decrypt(string cipherText)
-        {
-            if (string.IsNullOrEmpty(cipherText)) return string.Empty;
-            try
-            {
-                byte[] cipherBytes = Convert.FromBase64String(cipherText);
-                byte[] decryptedBytes = ProtectedData.Unprotect(cipherBytes, null, DataProtectionScope.CurrentUser);
-                return Encoding.UTF8.GetString(decryptedBytes);
-            }
-            catch
-            {
-                return string.Empty;
-            }
-        }
+        // 本地凭据加解密已移到 ISecretProtector（VersionedSecretProtector），此类只保留库洛协议所需的签名与混淆。
     }
 }

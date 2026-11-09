@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 
-namespace WwTool.Common.Utils;
+namespace WwTool.Core.Infrastructure;
 
 /// <summary>在同一目录写入并落盘后原子替换，失败时保留原文件。</summary>
 public static class AtomicFile

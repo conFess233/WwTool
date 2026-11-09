@@ -4,7 +4,7 @@ using System.Text;
 using System.Globalization;
 using WwTool.Core.Enums;
 
-namespace WwTool.Extensions
+namespace WwTool.Core.Extensions
 {
     /// <summary>
     /// 语言类型扩展方法

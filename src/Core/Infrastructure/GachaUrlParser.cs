@@ -2,7 +2,7 @@ using System.Collections.Specialized;
 using System.Web;
 using WwTool.Core.Models.Api.Requests;
 
-namespace WwTool.Common.Utils
+namespace WwTool.Core.Infrastructure
 {
     /// <summary>
     /// 解析并校验抽卡记录链接。

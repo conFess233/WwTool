@@ -1,3 +1,4 @@
+using WwTool.Core.Abstractions.Platform;
 using WwTool.Core.Models.Domain;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,8 @@ using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Responses;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services.Repositories;
@@ -14,6 +16,7 @@ namespace WwTool.Services.Repositories;
 public sealed class PlayerInfoRepository(
     IDbContextFactory<AppDbContext> contextFactory,
     IDatabaseWriteCoordinator writeCoordinator,
+    ISecretProtector secretProtector,
     ILoggerService logger) : IPlayerInfoRepository
 {
     public async Task SavePlayerRegionInfoAsync(
@@ -31,7 +34,7 @@ public sealed class PlayerInfoRepository(
                 UserAccount? account = await db.UserAccounts.FirstOrDefaultAsync(x => x.Uid == uid, token);
                 account ??= AddAccount(db, uid);
                 ApplyAccount(account, playerRegionInfo, region);
-                account.EncryptedOauthCode = Crypto.Encrypt(oauthCode);
+                account.EncryptedOauthCode = secretProtector.Protect(oauthCode);
 
                 PlayerBaseInfo? baseInfo = await db.PlayerBaseInfos.FirstOrDefaultAsync(x => x.Uid == uid, token);
                 if (baseInfo is null)

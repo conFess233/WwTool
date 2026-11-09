@@ -20,7 +20,7 @@ namespace WwTool.Core.Models.Config
         public long LogMaxSizeBytes { get; set; } = 10 * 1024 * 1024; // 默认限制为 10 MB。
         public int LogMaxFileCount { get; set; } = 5;
 
-        // 极验本地验证服务配置
-        public int GeetestPort { get; set; } = 5000;
+        // 极验本地验证服务配置。旧配置里保存的 5000 仍可用：被占用时 GeetestServer 会顺延端口。
+        public int GeetestPort { get; set; } = AppConfigDefaults.GeetestPort;
     }
 }

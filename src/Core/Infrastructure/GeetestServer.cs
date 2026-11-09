@@ -7,37 +7,69 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using WwTool.Core.Abstractions.Platform;
+using WwTool.Core.Models.Config;
 
-namespace WwTool.Common.Utils
+namespace WwTool.Core.Infrastructure
 {
     /// <summary>
     /// 极验行为验证本地服务
     /// </summary>
     public static class GeetestServer
     {
+        /// <summary>
+        /// 从首选端口开始绑定本地监听；全部被占用时抛出最后一次的异常。
+        /// </summary>
+        private static HttpListener StartListener(int preferredPort, out string url)
+        {
+            HttpListenerException? last = null;
+            int start = preferredPort is > 0 and < 65536 - PortFallbackCount ? preferredPort : AppConfigDefaults.GeetestPort;
+            for (int port = start; port < start + PortFallbackCount; port++)
+            {
+                string candidate = $"http://localhost:{port}/";
+                var listener = new HttpListener();
+                listener.Prefixes.Add(candidate);
+                try
+                {
+                    listener.Start();
+                    url = candidate;
+                    return listener;
+                }
+                catch (HttpListenerException ex)
+                {
+                    // 端口被占用或无权监听：释放后尝试下一个端口。
+                    listener.Close();
+                    last = ex;
+                }
+            }
+
+            throw last ?? new HttpListenerException();
+        }
+
         // 库洛游戏端的极验 Captcha ID
         private const string CAPTCHA_ID = "1f4565ff7acc97b1a2fc97b921743aa4";
 
+        /// <summary>首选端口被占用时，向后尝试的端口数量。</summary>
+        public const int PortFallbackCount = 10;
+
         /// <summary>
-        /// 开启本地服务并唤起浏览器进行验证
+        /// 开启本地服务并唤起浏览器进行验证。
+        /// <paramref name="preferredPort"/> 被占用时依次尝试后续端口（macOS 12 起 5000 被 AirPlay 接收器占用）。
         /// </summary>
-        public static async Task<Dictionary<string, string>> SolveGeetestAsync(int port = 5000, CancellationToken cancellationToken = default)
+        public static async Task<Dictionary<string, string>> SolveGeetestAsync(
+            IAppLauncher launcher,
+            int preferredPort,
+            CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(launcher);
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeout.CancelAfter(TimeSpan.FromMinutes(3));
             CancellationToken token = timeout.Token;
             token.ThrowIfCancellationRequested();
-            string url = $"http://localhost:{port}/";
-            using var listener = new HttpListener();
-            listener.Prefixes.Add(url);
-            listener.Start();
+            using HttpListener listener = StartListener(preferredPort, out string url);
 
             // 自动唤起系统浏览器
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = url,
-                UseShellExecute = true
-            });
+            launcher.OpenUrl(new Uri(url));
 
             while (true)
             {

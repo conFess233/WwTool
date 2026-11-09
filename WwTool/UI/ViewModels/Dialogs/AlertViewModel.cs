@@ -4,7 +4,8 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media.Effects;
 using WwTool.Common.Events;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 
 namespace WwTool.UI.ViewModels.Dialogs
 {

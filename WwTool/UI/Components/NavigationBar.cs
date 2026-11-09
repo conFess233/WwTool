@@ -6,7 +6,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WwTool.Common.Models;
 using WwTool.Core.Data.Entities;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 
 namespace WwTool.UI.Components
 {

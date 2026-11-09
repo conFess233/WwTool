@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using WwTool.Core.Models.Api.Requests;
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Core.Models.Config;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services

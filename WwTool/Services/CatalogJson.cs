@@ -78,6 +78,6 @@ public static class CatalogJson
     }
 
     public static Task WriteAsync(string path, JsonObject document, CancellationToken token = default) =>
-        WwTool.Common.Utils.AtomicFile.WriteAsync(path,
+        WwTool.Core.Infrastructure.AtomicFile.WriteAsync(path,
             (stream, cancellation) => JsonSerializer.SerializeAsync(stream, document, Options, cancellation), token);
 }

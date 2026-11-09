@@ -1,3 +1,4 @@
+using WwTool.Core.Abstractions.Platform;
 using WwTool.Core.Models.Domain;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
@@ -5,7 +6,8 @@ using WwTool.Core.Data;
 using WwTool.Core.Exceptions;
 using WwTool.Common.Models;
 using WwTool.Core.Data.Entities;
-using WwTool.Common.Utils;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 using WwTool.Services.Interfaces;
 
 namespace WwTool.Services.Repositories;
@@ -13,6 +15,7 @@ namespace WwTool.Services.Repositories;
 public sealed class UserRepository(
     IDbContextFactory<AppDbContext> contextFactory,
     IDatabaseWriteCoordinator writeCoordinator,
+    ISecretProtector secretProtector,
     ILoggerService logger) : IUserRepository
 {
     private static readonly Expression<Func<UserAccount, AccountSummary>> AccountProjection = account => new()
@@ -84,7 +87,7 @@ public sealed class UserRepository(
                     db.UserAccounts.Add(account);
                 }
 
-                account.EncryptedOauthCode = Crypto.Encrypt(oauthCode);
+                account.EncryptedOauthCode = secretProtector.Protect(oauthCode);
             }, cancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -102,7 +105,8 @@ public sealed class UserRepository(
                 .Where(x => x.Uid == uid)
                 .Select(x => x.EncryptedOauthCode)
                 .FirstOrDefaultAsync(cancellationToken);
-            return string.IsNullOrWhiteSpace(encrypted) ? null : Crypto.Decrypt(encrypted);
+            // 解密失败（换了电脑或系统用户、密文损坏）按未登录处理，由调用方提示重新登录。
+            return !string.IsNullOrWhiteSpace(encrypted) && secretProtector.TryUnprotect(encrypted, out string oauthCode) ? oauthCode : null;
         }
         catch (OperationCanceledException)
         {

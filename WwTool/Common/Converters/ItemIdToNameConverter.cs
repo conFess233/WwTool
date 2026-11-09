@@ -2,8 +2,10 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 using WwTool.Services;
-using WwTool.Common.Utils;
-using WwTool.Extensions;
+using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
+using WwTool.Extensions;
+using WwTool.Core.Extensions;
 
 namespace WwTool.Common.Converters
 {

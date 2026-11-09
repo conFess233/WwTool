@@ -14,8 +14,10 @@ using WwTool.Core.Data.Entities;
 using WwTool.Core.Models.Api.Requests;
 using WwTool.Core.Models.Api.Responses;
 using WwTool.Common.Utils;
+using WwTool.Core.Infrastructure;
 using WwTool.Services;
 using WwTool.Services.Interfaces;
+using WwTool.Core.Abstractions.Platform;
 using ExceptionHelper = WwTool.Services.Presentation.ExceptionHelper;
 
 namespace WwTool.UI.ViewModels.Dialogs
@@ -49,6 +51,10 @@ namespace WwTool.UI.ViewModels.Dialogs
         /// 事件聚合器，控制背景模糊
         /// </summary>
         private readonly IEventAggregator _eventAggregator;
+        /// <summary>
+        /// 打开极验验证页所用的系统浏览器启动器
+        /// </summary>
+        private readonly IAppLauncher _appLauncher;
 
         /// <summary>
         /// 弹窗标题
@@ -126,8 +132,10 @@ namespace WwTool.UI.ViewModels.Dialogs
             ILoginService loginService,
             IUIStateService uiStateService,
             IGetDataService getDataService,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IAppLauncher appLauncher)
         {
+            _appLauncher = appLauncher;
             _configService = configService;
             _loginService = loginService;
             _uiStateService = uiStateService;
@@ -182,7 +190,7 @@ namespace WwTool.UI.ViewModels.Dialogs
                         _uiStateService.ShowToast(LanguageManager.Instance["Login_RiskTitle"],
                             LanguageManager.Instance["Login_RiskMsg"], NotificationType.Warning);
 
-                        var geetestData = await GeetestServer.SolveGeetestAsync(_configService.App.GeetestPort, _lifetime.Token);
+                        var geetestData = await GeetestServer.SolveGeetestAsync(_appLauncher, _configService.App.GeetestPort, _lifetime.Token);
 
                         if (geetestData == null || geetestData.Count == 0)
                         {

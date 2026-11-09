@@ -1,6 +1,6 @@
 using System;
 
-namespace WwTool.Extensions
+namespace WwTool.Core.Extensions
 {
     public static class ObjectExtensions
     {
