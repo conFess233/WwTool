@@ -7,7 +7,9 @@ using WwTool.Core.Abstractions;
 using WwTool.Core.Enums;
 using WwTool.Core.Localization;
 using WwTool.Core.Models.Domain;
+using WwTool.Core.Services;
 using WwTool.Core.Services.Gacha;
+using WwTool.Core.Services.Guide;
 using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
 using WwTool.UI.Pages.Pulls;
@@ -41,6 +43,8 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     private const string Icons = "avares://WwTool/Assets/Images/";
 
     private readonly IUserDataService _userData;
+    private readonly IGuideRepository _guide;
+    private readonly GameDataService _catalog;
     private readonly IGetDataService _getData;
     private readonly PullsSession _pulls;
     private readonly LocalizationService _localization;
@@ -53,6 +57,8 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     public HomeViewModel(
         AccountContext accounts,
         IUserDataService userData,
+        IGuideRepository guide,
+        GameDataService catalog,
         IGetDataService getData,
         PullsSession pulls,
         LocalizationService localization,
@@ -62,6 +68,8 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     {
         Accounts = accounts;
         _userData = userData;
+        _guide = guide;
+        _catalog = catalog;
         _getData = getData;
         _pulls = pulls;
         _localization = localization;
@@ -118,6 +126,9 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     [ObservableProperty] private string _worldLevel = "--";
     [ObservableProperty] private string _server = "--";
     [ObservableProperty] private string _roleCount = "--";
+
+    /// <summary>角色卡里展示的几位角色头像（来自攻略站快照，限定五星优先）。</summary>
+    [ObservableProperty] private IReadOnlyList<string> _roleIcons = [];
 
     [ObservableProperty] private bool _hasPulls;
     [ObservableProperty] private string _totalPulls = "--";
@@ -246,7 +257,10 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         try
         {
             PlayerSnapshot? snapshot = await _userData.LoadRoleSnapshotAsync(uid, cts.Token);
+            GuideSnapshot guide = await _guide.LoadSnapshotAsync(uid, cts.Token);
             if (cts.IsCancellationRequested || Accounts.Current?.Uid != uid) return;
+            RoleIcons = GuideCardSorter.Sort(guide.Roles.Select(ToPreview), GuideSort.Star, x => x.Id)
+                .Take(4).Select(x => $"Local/Icons/{x.Id}.png").ToArray();
             _snapshotUid = uid;
             Snapshot = snapshot;
             Refresh();
@@ -419,6 +433,17 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         return local.Date == DateTime.Today
             ? local.ToString("HH:mm", CultureInfo.InvariantCulture)
             : local.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+    }
+
+    private RolePreview ToPreview(GuideRoleData role) => new(
+        role.RoleGbId,
+        role.Star,
+        role.Star == 5 && int.TryParse(role.RoleGbId, out int id) && _catalog.GetLimitedStatus(id, role.Star, true) == true,
+        role.SourceOrder);
+
+    private sealed record RolePreview(string Id, int Star, bool IsLimitedFiveStar, int SourceOrder) : IGuideCard
+    {
+        public DateTime? FirstAcquiredAt => null;
     }
 
     private static string MaskUid(string uid) => uid.Length <= 4 ? uid : uid[..4] + new string('●', uid.Length - 4);

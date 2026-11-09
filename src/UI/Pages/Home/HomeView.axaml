@@ -136,14 +136,28 @@
           <UniformGrid Columns="3" ColumnSpacing="18">
             <ContentControl Content="{Binding Radio}" />
             <ContentControl Content="{Binding WeeklyBoss}" />
-            <Border Classes="card gauge" Padding="22,18">
-              <Grid RowDefinitions="Auto,*,Auto">
-                <TextBlock Classes="label" Text="{loc:Tr Index_OwnedRoles}" />
-                <TextBlock Grid.Row="1" Classes="gauge-value" Text="{Binding RoleCount}" VerticalAlignment="Bottom" />
-                <Button Grid.Row="2" Classes="pill" Margin="0,12,0,0" Content="{loc:Tr Home_ViewRoles}" Command="{Binding OpenRolesCommand}"
-                        AutomationProperties.AutomationId="home-open-roles" />
-              </Grid>
-            </Border>
+            <!-- 角色：数量与几位角色头像，点击进入角色页 -->
+            <Button Classes="card-button" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" Command="{Binding OpenRolesCommand}"
+                    AutomationProperties.AutomationId="home-open-roles" AutomationProperties.Name="{loc:Tr Home_ViewRoles}">
+              <Border Classes="card gauge" Padding="22,18">
+                <Grid RowDefinitions="Auto,*">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Classes="label" Text="{loc:Tr Index_OwnedRoles}" />
+                    <TextBlock Classes="label" Text="{Binding RoleCount}" FontWeight="SemiBold" />
+                  </StackPanel>
+                  <ItemsControl Grid.Row="1" ItemsSource="{Binding RoleIcons}" VerticalAlignment="Bottom" Margin="0,12,0,0">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="10" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="x:String">
+                        <Border Classes="portrait" Width="60" Height="60" CornerRadius="10">
+                          <c:CatalogImage Path="{Binding}" DecodeWidth="120" Stretch="UniformToFill" />
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Grid>
+              </Border>
+            </Button>
           </UniformGrid>
         </StackPanel>
 
