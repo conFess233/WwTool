@@ -57,7 +57,7 @@ namespace WwTool.Core.Services
                         {
                             ResourceId = item.ResourceId,
                             IconPath = item.IconPath,
-                            Name = item.Name,
+                            Name = DisplayName(item, itemInfo, languageCode),
                             Count = 1
                         };
                     }
@@ -94,15 +94,14 @@ namespace WwTool.Core.Services
                     tempDatas.Add(new HitGoldData
                     {
                         GachaData = item,
+                        DisplayName = DisplayName(item, itemInfo, languageCode),
                         Pity = pity,
                         FourStarHistories = new System.Collections.ObjectModel.ObservableCollection<FourStarHistoryItem>(tempFourStars.Values),
                         IsMiss = isMiss
                     });
 
                     result.GoldValues.Add(pity);
-                    string name = itemInfo?.GetName(languageCode) ?? string.Empty;
-                    if (string.IsNullOrWhiteSpace(name)) name = item.Name;
-                    result.GoldLabels.Add(name);
+                    result.GoldLabels.Add(tempDatas[^1].DisplayName);
 
                     hitGoldCount++;
                     pity = 0;
@@ -124,6 +123,7 @@ namespace WwTool.Core.Services
                         ResourceType = _localizer["Msg_Pity"],
                         Time = ordered[^1].Time
                     },
+                    DisplayName = _localizer["Msg_Pity"],
                     Pity = pity,
                     FourStarHistories = new System.Collections.ObjectModel.ObservableCollection<FourStarHistoryItem>(tempFourStars.Values)
                 });
@@ -187,7 +187,14 @@ namespace WwTool.Core.Services
             return result;
         }
 
-        public GachaInsights CalculateInsights(IEnumerable<GachaPull> data)
+        /// <summary>界面显示名：按当前语言取资料表名称，资料表没有时用接口返回的原名。</summary>
+        private static string DisplayName(GachaPull item, GameItemInfo? itemInfo, string languageCode)
+        {
+            string name = itemInfo?.GetName(languageCode) ?? string.Empty;
+            return string.IsNullOrWhiteSpace(name) ? item.Name : name;
+        }
+
+        public GachaInsights CalculateInsights(IEnumerable<GachaPull> data, string languageCode)
         {
             List<GachaPull> ordered = OrderChronologically(data);
 
@@ -240,7 +247,8 @@ namespace WwTool.Core.Services
                 bool? isFeatured = pool == CardPoolType.CharacterEvent
                     ? _gameData.GetLimitedStatus(item.ResourceId, item.QualityLevel, true)
                     : null;
-                fiveStars.Add(new FiveStarInsight(occurredAt, item.Name, fiveStarPity, isFeatured));
+                string name = DisplayName(item, itemInfo, languageCode);
+                fiveStars.Add(new FiveStarInsight(occurredAt, name, fiveStarPity, isFeatured));
                 cumulative.Add(new CumulativePullInsight(occurredAt, totalPulls, totalFiveStars));
 
                 if (pool == CardPoolType.CharacterEvent && isFeatured == true)
@@ -249,7 +257,7 @@ namespace WwTool.Core.Services
                     validFeaturedCount++;
                     featured.Add(new FeaturedPullInsight(
                         featured.Count + 1,
-                        item.Name,
+                        name,
                         characterPulls,
                         (featured.Count + 1) * GachaInsights.FeaturedExpectation,
                         (double)validFeaturedPulls / validFeaturedCount));

@@ -141,7 +141,7 @@ public sealed class PullsService(
             Uid = uid,
             Pools = results,
             Global = global,
-            Insights = statistics.CalculateInsights(all),
+            Insights = statistics.CalculateInsights(all, languageCode),
             AllRecords = all,
             RecordsByPool = byPool,
         };

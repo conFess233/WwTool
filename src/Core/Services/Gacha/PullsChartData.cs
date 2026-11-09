@@ -101,7 +101,7 @@ public static class PullsChartBuilder
                     guaranteed = miss;
                 }
                 if (!inRange) continue;
-                fiveStars.Add(new FiveStarCost(pool, hit.GachaData.ResourceId, hit.GachaData.Name, time, hit.Pity,
+                fiveStars.Add(new FiveStarCost(pool, hit.GachaData.ResourceId, hit.DisplayName, time, hit.Pity,
                     hit.IsMiss is null ? null : !hit.IsMiss.Value));
             }
         }

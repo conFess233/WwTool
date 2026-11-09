@@ -198,7 +198,7 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
             cards.Add(new FiveStarCard
             {
                 ResourceId = hit.GachaData.ResourceId,
-                Name = hit.GachaData.Name,
+                Name = hit.DisplayName,
                 Time = time,
                 TimeText = Format(time),
                 Pity = hit.Pity,

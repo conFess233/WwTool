@@ -305,7 +305,7 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
                 null => string.Empty,
             };
             PoolRows.Add(new PoolOverviewRow(pool, _localization[PoolNames.TitleKey(pool)], progress,
-                latest?.GachaData.Name, meta, latest?.Pity ?? 0, latest?.IsMiss is null ? null : !latest.IsMiss.Value, next));
+                latest?.DisplayName, meta, latest?.Pity ?? 0, latest?.IsMiss is null ? null : !latest.IsMiss.Value, next));
         }
 
         // 近 30 天每日抽数。

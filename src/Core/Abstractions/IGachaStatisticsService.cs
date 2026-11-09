@@ -21,7 +21,7 @@ namespace WwTool.Core.Abstractions
     {
         GachaStatisticsResult OrganizeData(IEnumerable<GachaPull> data, CardPoolType poolType, string languageCode);
         GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount, int missCount, int featuredCount);
-        GachaInsights CalculateInsights(IEnumerable<GachaPull> data);
+        GachaInsights CalculateInsights(IEnumerable<GachaPull> data, string languageCode);
     }
 
     public class GlobalStatisticsResult
