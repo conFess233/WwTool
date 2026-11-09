@@ -250,6 +250,8 @@ namespace WwTool
             containerRegistry.RegisterSingleton<GameDataService>();
             containerRegistry.RegisterSingleton<CatalogRepositorySource>();
             containerRegistry.RegisterSingleton<CatalogImageService>();
+            // 资料同步只依赖与界面无关的缓存接口，指向同一个图片服务实例。
+            containerRegistry.RegisterSingleton<ICatalogImageCache>(c => c.Resolve<CatalogImageService>());
             containerRegistry.RegisterSingleton<CatalogSyncService>();
             containerRegistry.RegisterSingleton<CatalogSettingsViewModel>();
 

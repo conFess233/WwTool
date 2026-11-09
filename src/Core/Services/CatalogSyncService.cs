@@ -1,17 +1,15 @@
-using WwTool.Core.Services;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using WwTool.Core.Models.Domain;
-using WwTool.Services.Interfaces;
 using WwTool.Core.Abstractions;
 
-namespace WwTool.Services;
+namespace WwTool.Core.Services;
 
 /// <summary>仅从仓库主分支按类别独立同步，失败保留旧数据。</summary>
 public sealed class CatalogSyncService(GameDataService data,
-    IHttpClientFactory factory, CatalogImageService images, ILoggerService logger, CatalogRepositorySource repository)
+    IHttpClientFactory factory, ICatalogImageCache images, ILoggerService logger, CatalogRepositorySource repository)
 {
     private readonly SemaphoreSlim gate = new(1, 1);
     private IReadOnlyList<CatalogSyncStatus> statuses = [];
