@@ -49,11 +49,22 @@ public sealed class RoleTile : GuideTile
     /// <summary>三至五链用浅强调色，六链用强调色实底。</summary>
     public bool IsMidSequence => Sequence is >= 3 and <= 5;
     public bool IsFullSequence => Sequence >= 6;
+
+    /// <summary>悬停卡内容：只是数据，控件树由模板在悬停卡打开时才创建。</summary>
+    public RoleHover Hover => new(this);
 }
+
+/// <summary>角色悬停卡的数据。</summary>
+public sealed record RoleHover(RoleTile Tile);
+
+/// <summary>武器悬停提示的数据。</summary>
+public sealed record WeaponHover(string Text);
 
 public sealed class WeaponTile : GuideTile
 {
     public required string OwnerText { get; init; }
+
+    public WeaponHover Hover => new(AcquiredText);
 }
 
 /// <summary>按星级分组的一段：标题、数量与卡片。</summary>
