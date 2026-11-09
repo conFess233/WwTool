@@ -144,7 +144,18 @@ public sealed partial class PullsChartsViewModel : ObservableObject, INavigation
         if (_dirty) Rebuild();
     }
 
-    public void OnNavigatedFrom() => _isActive = false;
+    /// <remarks>
+    /// 每次进入页面都会新建视图；LiveCharts 的系列和坐标轴会为画过它们的每个图表控件保留状态，
+    /// 跨视图复用同一批对象会让旧视图无法回收（每进入一次多留一份，托管堆约 2.5 MB）。
+    /// 所以离开时先清空、让旧图表释放它们，回来时用新对象重建。
+    /// </remarks>
+    public void OnNavigatedFrom()
+    {
+        _isActive = false;
+        _dirty = true;
+        DailySeries = PitySeries = ShareSeries = CumulativeSeries = [];
+        DailyXAxes = DailyYAxes = PityXAxes = PityYAxes = CumulativeXAxes = CumulativeYAxes = [];
+    }
 
     [RelayCommand]
     private void Back() => _navigation.NavigateTo("pulls");

@@ -29,8 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- 便携模式标记：数据写在程序目录，见 AppPaths。 -->
-    <None Include="portable" CopyToOutputDirectory="PreserveNewest" />
+    <!-- 便携模式标记：数据写在程序目录，见 AppPaths。只随 Windows 包发布（及不指定平台的本地构建）；
+         Linux/macOS 包不带，数据写到系统用户数据目录（macOS 的 .app 内不可写）。 -->
+    <None Include="portable" CopyToOutputDirectory="PreserveNewest"
+          Condition="'$(RuntimeIdentifier)' == '' or $(RuntimeIdentifier.StartsWith('win'))" />
   </ItemGroup>
 
   <!-- SkiaSharp/HarfBuzz 原生包自带约 100 MB 的 .pdb，发布时不需要。 -->

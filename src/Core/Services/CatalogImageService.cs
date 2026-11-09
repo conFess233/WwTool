@@ -54,14 +54,51 @@ public class CatalogImageService<TImage> : ICatalogImageCache where TImage : cla
     }
 
     /// <summary>页面载入时预备立绘缓存；浮层显示时只读缓存。</summary>
+    /// <remarks>
+    /// 网址图片只确保已下载到磁盘缓存，不解码：一页几十张立绘全部解码会常驻约 90 MB。
+    /// 只有新下载的图片才发 <see cref="ImageReady"/>，让已打开的浮层从缓存重读。
+    /// </remarks>
     public async Task PrepareHoverImagesAsync(IEnumerable<string> paths, CancellationToken token)
     {
         await Task.WhenAll(paths.Distinct().Select(async path =>
         {
-            await LoadAsync(path, 360, token);
+            if (CatalogJson.IsImageUrl(path))
+            {
+                if (!await EnsureDownloadedAsync(path, token)) return;
+            }
+            else
+            {
+                await LoadAsync(path, 360, token);
+            }
             token.ThrowIfCancellationRequested();
             ImageReady?.Invoke(this, path);
         }));
+    }
+
+    /// <summary>网址图片没有磁盘缓存时下载一份；返回是否新写入了缓存。</summary>
+    private async Task<bool> EnsureDownloadedAsync(string url, CancellationToken token)
+    {
+        string key = Key(url);
+        string cachePath = Path.Combine(_root, key + ".image");
+        if (File.Exists(cachePath)) return false;
+        var gate = _locks[Convert.ToByte(key[..2], 16) % _locks.Length];
+        await gate.WaitAsync(token);
+        try
+        {
+            if (File.Exists(cachePath) || IsSuppressed(key)) return false;
+            int startedGeneration = _generation;
+            try
+            {
+                return await FetchAsync(url, url, key, null, token) is not null;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException || !token.IsCancellationRequested)
+            {
+                if (_generation == startedGeneration) _failed[key] = DateTimeOffset.UtcNow;
+                _logger.Debug($"立绘预下载失败：{ex.GetType().Name}");
+                return false;
+            }
+        }
+        finally { gate.Release(); }
     }
 
     /// <summary>浮层只读已有缓存与本地图，缺少立绘时回退到头像，不触发下载。</summary>

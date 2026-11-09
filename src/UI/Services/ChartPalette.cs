@@ -38,6 +38,6 @@ public sealed record ChartPalette(SKColor Primary, SKColor Secondary, SKColor Te
     public static void ConfigureFonts()
     {
         SKTypeface typeface = SKFontManager.Default.MatchCharacter('统') ?? SKTypeface.Default;
-        LiveCharts.Configure(settings => settings.HasGlobalSKTypeface(typeface));
+        LiveCharts.Configure(settings => settings.HasTextSettings(new TextSettings { DefaultTypeface = typeface }));
     }
 }
