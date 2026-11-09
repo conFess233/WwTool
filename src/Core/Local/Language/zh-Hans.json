@@ -532,5 +532,13 @@
   "Home_NoAccountHint": "用右下角的按钮登录库街区账号，或在抽卡统计里导入抽卡链接。",
   "Home_NoSnapshotTitle": "还没有游戏数据",
   "Home_NoSnapshotHint": "这个账号还没有同步过游戏数据。登录过的账号可以直接同步。",
-  "Home_ViewRoles": "查看角色"
+  "Home_ViewRoles": "查看角色",
+  "Roles_FiveStar": "五星",
+  "Roles_FourStar": "四星",
+  "Roles_ThreeStar": "三星",
+  "Roles_RoleCountUnit": "{0} 位",
+  "Roles_WeaponCountUnit": "{0} 把",
+  "Roles_SyncInfo": "最后同步 {0} · 数据来自官方攻略站",
+  "Roles_TwoStar": "二星",
+  "Roles_OneStar": "一星"
 }

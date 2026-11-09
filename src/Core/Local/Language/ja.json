@@ -532,5 +532,13 @@
   "Home_NoAccountHint": "右下のボタンでログインするか、ガチャ統計で履歴 URL を取り込んでください。",
   "Home_NoSnapshotTitle": "ゲームデータがありません",
   "Home_NoSnapshotHint": "このアカウントは未同期です。ログイン済みなら同期できます。",
-  "Home_ViewRoles": "キャラを見る"
+  "Home_ViewRoles": "キャラを見る",
+  "Roles_FiveStar": "★5",
+  "Roles_FourStar": "★4",
+  "Roles_ThreeStar": "★3",
+  "Roles_RoleCountUnit": "{0} 人",
+  "Roles_WeaponCountUnit": "{0} 本",
+  "Roles_SyncInfo": "最終同期 {0} · 公式攻略サイトより",
+  "Roles_TwoStar": "★2",
+  "Roles_OneStar": "★1"
 }

@@ -532,5 +532,13 @@
   "Home_NoAccountHint": "Log in with the button at the bottom right, or import a pull history URL in Convene Statistics.",
   "Home_NoSnapshotTitle": "No game data yet",
   "Home_NoSnapshotHint": "This account has no synced game data. Logged-in accounts can sync now.",
-  "Home_ViewRoles": "View characters"
+  "Home_ViewRoles": "View characters",
+  "Roles_FiveStar": "5★",
+  "Roles_FourStar": "4★",
+  "Roles_ThreeStar": "3★",
+  "Roles_RoleCountUnit": "{0}",
+  "Roles_WeaponCountUnit": "{0}",
+  "Roles_SyncInfo": "Last synced {0} · From the official guide site",
+  "Roles_TwoStar": "2★",
+  "Roles_OneStar": "1★"
 }
