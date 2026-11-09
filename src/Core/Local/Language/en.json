@@ -429,5 +429,9 @@
   "Startup_Loading": "Loading local data…",
   "Startup_DataDirNotWritable": "The data folder is not writable, so settings and the database cannot be loaded safely:\n{0}",
   "Startup_InitFailed": "Local data failed to initialize. The original database and the migration backup were kept. Check the log and try again.",
-  "Startup_ErrorTitle": "WwTool can't start"
+  "Startup_ErrorTitle": "WwTool can't start",
+  "Fab_Open": "More actions",
+  "Fab_Close": "Close actions",
+  "Toast_FeatureMigrating": "This feature is being migrated to 2.0. Please use version 1.x for now.",
+  "Toast_Dismiss": "Dismiss notification"
 }

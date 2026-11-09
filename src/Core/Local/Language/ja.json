@@ -429,5 +429,9 @@
   "Startup_Loading": "ローカルデータを読み込んでいます…",
   "Startup_DataDirNotWritable": "データフォルダーに書き込めないため、設定とデータベースを安全に読み込めません：\n{0}",
   "Startup_InitFailed": "ローカルデータの初期化に失敗しました。元のデータベースと移行前のバックアップは保持されています。ログを確認してから再試行してください。",
-  "Startup_ErrorTitle": "WwTool を起動できません"
+  "Startup_ErrorTitle": "WwTool を起動できません",
+  "Fab_Open": "その他の操作",
+  "Fab_Close": "操作を閉じる",
+  "Toast_FeatureMigrating": "この機能は 2.0 へ移行中です。当面は 1.x 版をご利用ください。",
+  "Toast_Dismiss": "通知を閉じる"
 }

@@ -429,5 +429,9 @@
   "Startup_Loading": "正在加载本地数据…",
   "Startup_DataDirNotWritable": "数据目录不可写，无法安全加载配置或数据库：\n{0}",
   "Startup_InitFailed": "本地数据初始化失败。原数据库和迁移备份已保留，请查看日志后重试。",
-  "Startup_ErrorTitle": "WwTool 无法启动"
+  "Startup_ErrorTitle": "WwTool 无法启动",
+  "Fab_Open": "更多操作",
+  "Fab_Close": "收起操作",
+  "Toast_FeatureMigrating": "该功能正在迁移到 2.0，暂时请使用 1.x 版本。",
+  "Toast_Dismiss": "关闭通知"
 }
