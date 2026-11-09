@@ -1,9 +1,12 @@
+using WwTool.Core.Extensions;
+using WwTool.Core.Infrastructure;
+using WwTool.Core.Abstractions;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using WwTool.Core.Models.Domain;
 
-namespace WwTool.Services;
+namespace WwTool.Core.Services;
 
 /// <summary>四类资料的校验、无损合并与原子文件写入。</summary>
 public static class CatalogJson

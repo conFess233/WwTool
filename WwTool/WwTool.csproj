@@ -165,21 +165,11 @@
     <Resource Include="UI\Resources\Images\WeeklyInst.png"></Resource>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Local\Data\Characters.json;Local\Data\Weapons.json;Local\Data\Albums.json;Local\Data\Motors.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Local\Images\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Local/Data/Characters.json;Local/Data/Weapons.json;Local/Data/Albums.json;Local/Data/Motors.json">
-      <LogicalName>WwTool.Catalogs.%(Filename)%(Extension)</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
   <ItemGroup>
     <None Include="portable" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

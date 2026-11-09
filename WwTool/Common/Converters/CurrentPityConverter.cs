@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows.Data;
-using WwTool.Common.Models;
+using WwTool.Common.Models;
+using WwTool.Core.Models.Domain;
 
 namespace WwTool.Common.Converters;
 

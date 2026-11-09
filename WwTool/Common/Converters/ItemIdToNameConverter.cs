@@ -1,7 +1,8 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using WwTool.Services;
+using WwTool.Services;
+using WwTool.Core.Services;
 using WwTool.Common.Utils;
 using WwTool.Core.Infrastructure;
 using WwTool.Extensions;

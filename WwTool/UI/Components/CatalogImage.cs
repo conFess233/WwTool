@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
-using WwTool.Services;
+using WwTool.Services;
+using WwTool.Core.Services;
 
 namespace WwTool.UI.Components;
 

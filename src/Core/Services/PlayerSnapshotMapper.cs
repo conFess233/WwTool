@@ -1,7 +1,10 @@
+using WwTool.Core.Extensions;
+using WwTool.Core.Infrastructure;
+using WwTool.Core.Abstractions;
 using Api = WwTool.Core.Models.Api.Responses;
 using WwTool.Core.Models.Domain;
 
-namespace WwTool.Services;
+namespace WwTool.Core.Services;
 
 internal static class PlayerSnapshotMapper
 {

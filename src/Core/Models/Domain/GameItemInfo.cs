@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace WwTool.Common.Models
+namespace WwTool.Core.Models.Domain
 {
     /// <summary>
     /// 游戏物品资源信息模型

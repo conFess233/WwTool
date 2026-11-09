@@ -15,7 +15,8 @@ using WwTool.Core.Infrastructure;
 using WwTool.Core.Platform;
 using WwTool.Common.Utils;
 using WwTool.Services;
-using WwTool.Services.Interfaces;
+using WwTool.Core.Services;
+using WwTool.Services.Interfaces;
 using WwTool.Core.Abstractions;
 using WwTool.Core.Data.Repositories;
 using WwTool.UI.ViewModels;
@@ -40,17 +41,15 @@ namespace WwTool
 
         protected override Window CreateShell()
         {
-            DatabaseOptions databaseOptions = Container.Resolve<DatabaseOptions>();
+            IAppPaths appPaths = Container.Resolve<IAppPaths>();
             try
             {
-                LocalDataService.EnsureWritableDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Local"));
-                LocalDataService.EnsureWritableDirectory(Path.GetDirectoryName(databaseOptions.DatabasePath)!);
-                LocalDataService.EnsureWritableDirectory(databaseOptions.BackupDirectory);
+                appPaths.EnsureWritable();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"程序目录不可写，无法安全加载配置或数据库。\n\n{ex.Message}",
+                    $"数据目录不可写，无法安全加载配置或数据库：{appPaths.DataRoot}\n\n{ex.Message}",
                     "WwTool",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

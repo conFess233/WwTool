@@ -19,4 +19,13 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- 内置游戏资料：嵌入程序集作为损坏时的回退，同时复制到输出目录 Local/Data。
+         引用本项目的程序（新旧界面）会一并复制这些文件。 -->
+    <EmbeddedResource Include="Local/Data/*.json">
+      <LogicalName>WwTool.Catalogs.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <None Include="Local/Data/*.json" CopyToOutputDirectory="PreserveNewest" Link="Local/Data/%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

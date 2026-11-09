@@ -3,7 +3,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.ComponentModel;
-using WwTool.Common.Models;
+using WwTool.Common.Models;
+using WwTool.Core.Models.Domain;
 
 namespace WwTool.UI.Components
 {
