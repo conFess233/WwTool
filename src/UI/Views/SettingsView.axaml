@@ -187,6 +187,9 @@
                   <StackPanel>
                     <TextBlock Classes="name" Text="{loc:Tr Settings_EnableGlass}" />
                     <TextBlock Classes="hint" Text="{loc:Tr Settings_EnableGlassHint}" />
+                    <TextBlock Classes="hint" Text="{loc:Tr Settings_GlassRestartToShow}" IsVisible="{Binding GlassNeedsRestartToShow}"
+                               Foreground="{DynamicResource WarningBrush}" />
+                    <TextBlock Classes="hint" Text="{loc:Tr Settings_GlassRestartToSave}" IsVisible="{Binding GlassNeedsRestartToSave}" />
                   </StackPanel>
                   <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsGlassEnabled}" VerticalAlignment="Center"
                                 AutomationProperties.AutomationId="settings-glass" />

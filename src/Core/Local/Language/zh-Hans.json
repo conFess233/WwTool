@@ -50,7 +50,7 @@
   "Settings_ThemeGlass": "玻璃质感",
   "Settings_GlassHint": "提示：选择玻璃主题时，建议同时开启下方的“窗口毛玻璃效果”。",
   "Settings_EnableGlass": "启用窗口毛玻璃效果",
-  "Settings_EnableGlassHint": "开启后主窗口将拥有亚克力半透明模糊背景。若感觉卡顿可关闭。",
+  "Settings_EnableGlassHint": "开启后主窗口使用半透明模糊背景。需要显卡渲染，会多占用内存；关闭则改用软件渲染。",
   "Settings_GlassOpacity": "毛玻璃背景透明度",
   "Settings_GlassOpacityHint": "调节背景透明度，拉到最右侧时背景将变为纯色",
   "Settings_AppLanguage": "软件语言",
@@ -588,5 +588,7 @@
   "Settings_DataDirectory": "数据目录",
   "Settings_DataDirectoryPortable": "便携模式：数据库、配置和日志保存在程序目录",
   "Settings_DataDirectorySystem": "数据库、配置和日志保存在系统的用户数据目录",
-  "Settings_OpenDataFolder": "打开"
+  "Settings_OpenDataFolder": "打开",
+  "Settings_GlassRestartToShow": "重启程序后显示毛玻璃效果",
+  "Settings_GlassRestartToSave": "重启程序后改用软件渲染，减少内存占用"
 }

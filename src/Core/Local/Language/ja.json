@@ -50,7 +50,7 @@
   "Settings_ThemeGlass": "ガラスエフェクト",
   "Settings_GlassHint": "ヒント：ガラステーマを選択した場合、下の「ウィンドウのすりガラス効果」も有効にすることをお勧めします。",
   "Settings_EnableGlass": "ウィンドウのすりガラス効果を有効にする",
-  "Settings_EnableGlassHint": "有効にすると、メインウィンドウの背景がアクリル半透明のぼかし効果になります。動作が重い場合は無効にしてください。",
+  "Settings_EnableGlassHint": "メインウィンドウの背景を半透明のぼかしにします。GPU 描画が必要でメモリ使用量が増えます。オフの場合はソフトウェア描画になります。",
   "Settings_GlassOpacity": "すりガラス背景の不透明度",
   "Settings_GlassOpacityHint": "背景の不透明度を調整します。右端まで引くと単色になります。",
   "Settings_AppLanguage": "ソフトウェア言語",
@@ -588,5 +588,7 @@
   "Settings_DataDirectory": "データフォルダー",
   "Settings_DataDirectoryPortable": "ポータブルモード：データベース・設定・ログはプログラムのフォルダーに保存されます",
   "Settings_DataDirectorySystem": "データベース・設定・ログはユーザーデータフォルダーに保存されます",
-  "Settings_OpenDataFolder": "開く"
+  "Settings_OpenDataFolder": "開く",
+  "Settings_GlassRestartToShow": "すりガラス効果はアプリの再起動後に表示されます",
+  "Settings_GlassRestartToSave": "再起動するとソフトウェア描画に切り替わり、メモリ使用量が減ります"
 }

@@ -1,4 +1,5 @@
 using Avalonia;
+using WwTool.UI.Services;
 
 namespace WwTool.UI;
 
@@ -9,7 +10,7 @@ internal static class Program
 {
     [STAThread]
     public static void Main(string[] args) =>
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp().UseGlassAwareRendering().StartWithClassicDesktopLifetime(args);
 
     /// <summary>
     /// Avalonia 设计器也会调用此方法，不得在这里做 I/O 或服务初始化。

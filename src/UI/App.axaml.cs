@@ -91,6 +91,7 @@ public partial class App : Application
         // 6. 语言、主题（先于窗口创建，首帧即为正确外观）。
         TrExtension.Service = services.GetRequiredService<LocalizationService>();
         services.GetRequiredService<AppearanceCoordinator>().Start();
+        services.GetRequiredService<MemoryTrimmer>();
         DataTemplates.Add(services.GetRequiredService<ViewLocator>());
         ChartPalette.ConfigureFonts();
         CatalogImage.Loader = services.GetRequiredService<AvaloniaCatalogImageService>();
@@ -120,6 +121,7 @@ public partial class App : Application
         services.AddSingleton<ILocalizer>(sp => sp.GetRequiredService<LocalizationService>());
         services.AddSingleton<ThemeService>();
         services.AddSingleton<AppearanceCoordinator>();
+        services.AddSingleton<MemoryTrimmer>();
         services.AddSingleton<AvaloniaCatalogImageService>();
         services.AddSingleton<ICatalogImageCache>(sp => sp.GetRequiredService<AvaloniaCatalogImageService>());
         services.AddSingleton<IUIStateService, UIStateService>();

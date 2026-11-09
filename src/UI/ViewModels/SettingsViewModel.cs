@@ -116,7 +116,12 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         config.User.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(Core.Models.Config.UserConfig.GamePath)) OnPropertyChanged(nameof(GamePath));
-            if (e.PropertyName == nameof(Core.Models.Config.UserConfig.IsGlassEffectEnabled)) OnPropertyChanged(nameof(IsGlassEnabled));
+            if (e.PropertyName == nameof(Core.Models.Config.UserConfig.IsGlassEffectEnabled))
+            {
+                OnPropertyChanged(nameof(IsGlassEnabled));
+                OnPropertyChanged(nameof(GlassNeedsRestartToShow));
+                OnPropertyChanged(nameof(GlassNeedsRestartToSave));
+            }
         };
         _catalogSync.Changed += (_, _) => Dispatcher.UIThread.Post(RefreshCatalog);
         _localization.PropertyChanged += (_, e) =>
@@ -207,6 +212,12 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
             OnPropertyChanged();
         }
     }
+
+    /// <summary>本次启动用的是软件渲染，打开毛玻璃要重启才显示（见 <see cref="RenderingProfile"/>）。</summary>
+    public bool GlassNeedsRestartToShow => IsGlassEnabled && !RenderingProfile.GlassCapable;
+
+    /// <summary>本次启动用的是 GPU 渲染，关掉毛玻璃后重启才改用软件渲染、释放显卡驱动内存。</summary>
+    public bool GlassNeedsRestartToSave => !IsGlassEnabled && RenderingProfile.GlassCapable && OperatingSystem.IsWindows();
 
     public double GlassOpacity
     {

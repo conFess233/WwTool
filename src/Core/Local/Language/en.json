@@ -50,7 +50,7 @@
   "Settings_ThemeGlass": "Glass Effect",
   "Settings_GlassHint": "Hint: When selecting the glass theme, it is recommended to enable 'Window Frosted Glass Effect' below.",
   "Settings_EnableGlass": "Enable Window Frosted Glass Effect",
-  "Settings_EnableGlassHint": "When enabled, the main window will have an acrylic translucent blur background. Turn off if it causes lag.",
+  "Settings_EnableGlassHint": "Gives the main window a translucent blurred background. Requires GPU rendering and uses more memory; when off, software rendering is used.",
   "Settings_GlassOpacity": "Frosted Glass Opacity",
   "Settings_GlassOpacityHint": "Adjust background opacity. It will become a solid color when pulled to the rightmost.",
   "Settings_AppLanguage": "Software Language",
@@ -588,5 +588,7 @@
   "Settings_DataDirectory": "Data folder",
   "Settings_DataDirectoryPortable": "Portable mode: database, settings and logs are stored next to the program",
   "Settings_DataDirectorySystem": "Database, settings and logs are stored in your user data folder",
-  "Settings_OpenDataFolder": "Open"
+  "Settings_OpenDataFolder": "Open",
+  "Settings_GlassRestartToShow": "Restart the app to show the frosted glass effect",
+  "Settings_GlassRestartToSave": "Restart the app to switch to software rendering and use less memory"
 }

@@ -22,7 +22,8 @@ public sealed partial class ShellViewModel : ObservableObject
     private readonly IConfigService _config;
 
     /// <summary>窗口毛玻璃：开启时窗口透明并请求系统模糊材质，背景层按 <see cref="BackdropOpacity"/> 半透明。</summary>
-    public bool IsGlassEnabled => _config.User.IsGlassEffectEnabled;
+    /// <remarks>本次启动用了软件渲染（启动时毛玻璃为关）时系统材质不可用，运行中打开开关也按不透明处理，重启后生效，见 <see cref="RenderingProfile"/>。</remarks>
+    public bool IsGlassEnabled => _config.User.IsGlassEffectEnabled && RenderingProfile.GlassCapable;
 
     /// <summary>背景层不透明度；未开启毛玻璃时为 1。</summary>
     public double BackdropOpacity => IsGlassEnabled ? _config.User.GlassOpacity / 100.0 : 1;
