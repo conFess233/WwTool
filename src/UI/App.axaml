@@ -4,5 +4,6 @@
              RequestedThemeVariant="Light">
   <Application.Styles>
     <FluentTheme />
+    <StyleInclude Source="avares://WwTool/Theming/Controls.axaml" />
   </Application.Styles>
 </Application>

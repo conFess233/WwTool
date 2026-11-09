@@ -1,0 +1,134 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Pulls.PoolRecordsView"
+             x:DataType="pulls:PoolRecordsViewModel">
+  <!-- 单个卡池的抽卡记录：未出金进度在前，五星记录由新到旧，滚动到底由页面加载下一页。 -->
+  <UserControl.Styles>
+    <Style Selector="Border.avatar">
+      <Setter Property="Width" Value="52" />
+      <Setter Property="Height" Value="52" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+    </Style>
+    <Style Selector="Border.avatar > TextBlock">
+      <Setter Property="FontSize" Value="20" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Border.avatar.muted">
+      <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="Border.four-star">
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Padding" Value="8,2" />
+      <Setter Property="Margin" Value="0,0,6,6" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="Border.four-star > TextBlock">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <Border Classes="card">
+    <StackPanel Spacing="14">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <TextBlock Classes="section-title" Text="{loc:Tr Pulls_Records}" VerticalAlignment="Center" />
+        <TextBlock Classes="caption" Text="{Binding LoadedText}" VerticalAlignment="Center" />
+      </StackPanel>
+
+      <!-- 未出金进度 -->
+      <Border Classes="card inset" IsVisible="{Binding NotYet, Converter={x:Static ObjectConverters.IsNotNull}}"
+              AutomationProperties.AutomationId="pulls-not-yet">
+        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="10">
+          <Border Grid.RowSpan="2" Classes="avatar muted"><TextBlock Text="?" /></Border>
+          <StackPanel Grid.Column="1" Spacing="4">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Classes="section-title" Text="{loc:Tr Pulls_NoFiveStarYet}" />
+              <Border Classes="tag outline" IsVisible="{Binding NotYet.ShowsNextKind, FallbackValue=False}">
+                <Panel>
+                  <TextBlock Text="{loc:Tr Pulls_NextGuaranteed}" IsVisible="{Binding NotYet.IsNextGuaranteed, FallbackValue=False}" />
+                  <TextBlock Text="{loc:Tr Pulls_NextSoftPity}" IsVisible="{Binding NotYet.IsNextSoftPity, FallbackValue=False}" />
+                </Panel>
+              </Border>
+            </StackPanel>
+            <TextBlock Classes="caption">
+              <Run Text="{Binding NotYet.LastPullText, FallbackValue=''}" />
+              <Run Text=" · " />
+              <Run Text="{loc:Tr Pulls_LatestRecord}" />
+            </TextBlock>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+            <TextBlock Classes="big-number" Text="{Binding NotYet.Pity, FallbackValue=0}" />
+            <TextBlock Classes="label" Text="{loc:Tr Pulls_PullUnit}" VerticalAlignment="Bottom" Margin="0,0,0,6" />
+          </StackPanel>
+          <c:SegmentedBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Value="{Binding NotYet.Pity, FallbackValue=0}" Maximum="80" />
+          <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto">
+            <ItemsControl ItemsSource="{Binding NotYet.FourStars, FallbackValue={x:Null}}">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="pulls:FourStarChip">
+                  <Border Classes="four-star"><TextBlock Text="{Binding Text}" /></Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Grid.Column="1" Classes="caption"
+                       Text="{Binding NotYet.ToHardPityText, FallbackValue=''}" />
+          </Grid>
+        </Grid>
+      </Border>
+
+      <!-- 五星记录 -->
+      <ItemsControl ItemsSource="{Binding Items}">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="10" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="pulls:FiveStarCard">
+            <Border Classes="card inset" AutomationProperties.AutomationId="pulls-five-star">
+              <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="10">
+                <Border Grid.RowSpan="2" Classes="avatar" Classes.muted="{Binding IsPermanentTag}">
+                  <TextBlock Text="{Binding Name, Converter={x:Static pulls:InitialConverter.Instance}}" />
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="4">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Classes="section-title" Text="{Binding Name}" />
+                    <Border Classes="tag accent" IsVisible="{Binding IsLimitedTag}"><TextBlock Text="{loc:Tr Pulls_Limited}" /></Border>
+                    <Border Classes="tag" IsVisible="{Binding IsPermanentTag}"><TextBlock Text="{loc:Tr Pulls_Permanent}" /></Border>
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Classes="caption" Text="{Binding TimeText}" VerticalAlignment="Center" />
+                    <Border Classes="tag outline" IsVisible="{Binding IsGuaranteed}"><TextBlock Text="{loc:Tr Pulls_Guaranteed}" /></Border>
+                    <Border Classes="tag outline" IsVisible="{Binding IsSoftPity}"><TextBlock Text="{loc:Tr Pulls_SoftPity}" /></Border>
+                    <Border Classes="tag outline" IsVisible="{Binding IsStandardPool}"><TextBlock Text="{loc:Tr Pulls_StandardPool}" /></Border>
+                    <Border Classes="tag danger" IsVisible="{Binding IsLost}"><TextBlock Text="{loc:Tr Pulls_Lost}" /></Border>
+                    <Border Classes="tag danger" IsVisible="{Binding IsHardPity}"><TextBlock Text="{loc:Tr Pulls_HardPityHit}" /></Border>
+                  </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                  <TextBlock Classes="big-number" Text="{Binding Pity}" />
+                  <TextBlock Classes="label" Text="{loc:Tr Pulls_PullUnit}" VerticalAlignment="Bottom" Margin="0,0,0,6" />
+                </StackPanel>
+                <c:SegmentedBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Value="{Binding Pity}" Maximum="80"
+                                Classes.danger="{Binding IsHardPity}" />
+                <ItemsControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" ItemsSource="{Binding FourStars}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:FourStarChip">
+                      <Border Classes="four-star"><TextBlock Text="{Binding Text}" /></Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <TextBlock Classes="caption" HorizontalAlignment="Center" Text="{loc:Tr Pulls_LoadingMore}" IsVisible="{Binding HasMore}" />
+    </StackPanel>
+  </Border>
+</UserControl>

@@ -1,15 +1,20 @@
 namespace WwTool.UI.Navigation;
 
 /// <summary>
-/// 一级页面的登记信息。视图模型由 <see cref="CreateViewModel"/> 创建，首次进入时创建一次并缓存，
-/// 切换页面时保留状态。
+/// 页面的登记信息。视图模型由 <see cref="CreateViewModel"/> 创建，首次进入时创建一次并缓存，
+/// 切换页面时保留状态。<see cref="ParentKey"/> 不为空的是子页面（如详细图表）：不出现在悬浮岛上，
+/// 悬浮岛保持选中其父页面，页头小字显示父页面标题。
 /// </summary>
 public sealed record PageDescriptor(
     string Key,
     string TitleKey,
     string Icon,
     Func<IServiceProvider, object> CreateViewModel,
-    bool StartsGroup = false);
+    bool StartsGroup = false,
+    string? ParentKey = null)
+{
+    public bool IsTopLevel => ParentKey is null;
+}
 
 /// <summary>
 /// 页面视图模型可选实现：进入时收到导航参数，离开时停止本页发起的后台工作。

@@ -17,6 +17,7 @@ using WwTool.Core.Enums;
 using WwTool.UI.Feedback;
 using WwTool.UI.Localization;
 using WwTool.UI.Navigation;
+using WwTool.UI.Pages.Pulls;
 using WwTool.UI.Services;
 using WwTool.UI.Shell;
 using WwTool.UI.ViewModels;
@@ -117,26 +118,35 @@ public partial class App : Application
         services.AddSingleton<DialogService>();
         services.AddSingleton<IDialogService>(sp => sp.GetRequiredService<DialogService>());
         services.AddSingleton<FabMenuViewModel>();
+        services.AddSingleton<ErrorReporter>();
+        services.AddSingleton<AccountContext>();
+
+        // 抽卡统计：三个视图模型共享 PullsSession，彼此不直接依赖。
+        services.AddSingleton<PullsSession>();
+        services.AddSingleton<PoolRecordsViewModel>();
+        services.AddSingleton<PullsOverviewViewModel>();
+        services.AddSingleton<PullsChartsViewModel>();
 
         // 页面登记（顺序即悬浮岛顺序）与视图映射
         const string icons = "avares://WwTool/Assets/Images/";
         services.AddSingleton(Placeholder("home", "Nav_Home", icons + "Home.png",
             ("refresh", "Index_RefreshAccountList", icons + "Refresh.png", null),
             ("add-account", "Index_AddAccount", icons + "Add.png", null)));
-        services.AddSingleton(Placeholder("pulls", "Nav_Statistics", icons + "Statistics.png",
-            ("cloud", "Stat_GetCloudData", icons + "Cloud.png", null),
-            ("load-local", "Stat_LoadLocalData", icons + "Load.png", null),
-            ("import-url", "Stat_AutoImportUrl", icons + "Import.png", null),
-            ("clear", "Stat_ClearData", icons + "Trash.png", "Msg_ConfirmClearData")));
+        services.AddSingleton(new PageDescriptor("pulls", "Nav_Statistics", icons + "Statistics.png",
+            sp => sp.GetRequiredService<PullsOverviewViewModel>()));
         services.AddSingleton(Placeholder("roles", "Nav_RoleData", icons + "Role.png"));
         services.AddSingleton(Placeholder("explore", "Nav_Exploration", icons + "Chest.png"));
         services.AddSingleton(Placeholder("motor", "Nav_Motor", icons + "Motor.png"));
         services.AddSingleton(new PageDescriptor("settings", "Nav_Settings", icons + "Settings.png",
             sp => ActivatorUtilities.CreateInstance<SettingsViewModel>(sp), StartsGroup: true));
+        services.AddSingleton(new PageDescriptor(PullsChartsViewModel.PageKey, "Pulls_DetailedCharts", icons + "Graph.png",
+            sp => sp.GetRequiredService<PullsChartsViewModel>(), ParentKey: "pulls"));
         services.AddSingleton(new ViewLocator()
             .Map<ConfirmDialogViewModel, ConfirmDialogView>()
             .Map<PlaceholderPageViewModel, PlaceholderPageView>()
-            .Map<SettingsViewModel, SettingsView>());
+            .Map<SettingsViewModel, SettingsView>()
+            .Map<PullsOverviewViewModel, PullsOverviewView>()
+            .Map<PullsChartsViewModel, PullsChartsView>());
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<ShellViewModel>();
 
@@ -183,6 +193,16 @@ public partial class App : Application
             ShowStartupError(desktop, localization, localization["Startup_InitFailed"]);
             main?.Close();
             return;
+        }
+
+        try
+        {
+            await services.GetRequiredService<AccountContext>().RefreshAsync();
+        }
+        catch (Exception ex)
+        {
+            // 账号列表读不出来不阻止启动：页面会显示“未选择账号”，并可从胶囊重试。
+            services.GetRequiredService<ErrorReporter>().Report(ex, services.GetRequiredService<LocalizationService>()["Msg_LoadingLocalAccount"]);
         }
 
         services.GetRequiredService<INavigationService>().NavigateTo("home");

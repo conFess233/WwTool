@@ -1,0 +1,153 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:WwTool.UI.Controls">
+  <!-- 页面共用样式：卡片、标签、页签 Chip、统计数字。颜色全部来自主题资源。 -->
+
+  <!-- 卡片 -->
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="22,18" />
+  </Style>
+  <Style Selector="Border.card.inset">
+    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="Padding" Value="16,14" />
+  </Style>
+
+  <!-- 文字层级 -->
+  <Style Selector="TextBlock.section-title">
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="TextBlock.label">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+  <Style Selector="TextBlock.caption">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="TextBlock.stat-value">
+    <Setter Property="FontSize" Value="30" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="TextBlock.big-number">
+    <Setter Property="FontSize" Value="32" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+  </Style>
+
+  <!-- 标签：限定 / 常驻 / 大保底 / 小保底 / 歪 -->
+  <Style Selector="Border.tag">
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Padding" Value="8,1" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.tag > TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+  <Style Selector="Border.tag.accent">
+    <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+  </Style>
+  <Style Selector="Border.tag.accent > TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="Border.tag.danger">
+    <Setter Property="Background" Value="{DynamicResource DangerContainerBrush}" />
+  </Style>
+  <Style Selector="Border.tag.danger > TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+  </Style>
+  <Style Selector="Border.tag.outline">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!-- 页签 Chip（卡池选择） -->
+  <Style Selector="ToggleButton.chip">
+    <Setter Property="Height" Value="38" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="ToggleButton.chip:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="ToggleButton.chip:checked /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource NavIslandBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextOnNavIslandBrush}" />
+  </Style>
+  <Style Selector="ToggleButton.chip:focus-visible /template/ ContentPresenter">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+  <Style Selector="ToggleButton.chip TextBlock.count">
+    <Setter Property="Opacity" Value="0.7" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+
+  <!-- 次要按钮（胶囊、表面色） -->
+  <Style Selector="Button.pill">
+    <Setter Property="Height" Value="38" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+  </Style>
+  <Style Selector="Button.pill:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="Button.pill:focus-visible /template/ ContentPresenter">
+    <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+
+  <!-- 下拉框：表面色胶囊 -->
+  <Style Selector="ComboBox.pill">
+    <Setter Property="Height" Value="38" />
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Padding" Value="14,0,8,0" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+
+  <!-- 刻度条：常规强调色，触底 / 警示用 Danger -->
+  <Style Selector="c|SegmentedBar">
+    <Setter Property="Fill" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Track" Value="{DynamicResource SegmentTrackBrush}" />
+  </Style>
+  <Style Selector="c|SegmentedBar.danger">
+    <Setter Property="Fill" Value="{DynamicResource DangerBrush}" />
+  </Style>
+  <Style Selector="c|SegmentedBar.thin">
+    <Setter Property="Height" Value="8" />
+  </Style>
+  <Style Selector="c|RatioBar">
+    <Setter Property="Fill" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Track" Value="{DynamicResource SegmentTrackBrush}" />
+  </Style>
+</Styles>

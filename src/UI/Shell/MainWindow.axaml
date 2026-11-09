@@ -3,6 +3,8 @@
         xmlns:shell="using:WwTool.UI.Shell"
         xmlns:vm="using:WwTool.UI.ViewModels"
         xmlns:fb="using:WwTool.UI.Feedback"
+        xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+        xmlns:domain="using:WwTool.Core.Models.Domain"
         xmlns:loc="using:WwTool.UI.Localization"
         xmlns:chrome="using:Avalonia.Controls.Chrome"
         x:Class="WwTool.UI.Shell.MainWindow"
@@ -60,7 +62,7 @@
           <Image Source="avares://WwTool/Assets/WwTool.ico" Width="44" Height="44" />
         </Border>
         <StackPanel VerticalAlignment="Center">
-          <TextBlock Text="鸣潮工具箱" FontSize="12" FontWeight="SemiBold" LetterSpacing="1"
+          <TextBlock Text="{Binding PageEyebrow}" FontSize="12" FontWeight="SemiBold" LetterSpacing="1"
                      Foreground="{DynamicResource AccentBrush}" />
           <TextBlock x:Name="PageTitle" Text="{Binding PageTitle}" FontSize="26" FontWeight="Bold" LineHeight="29"
                      Foreground="{DynamicResource TextPrimaryBrush}" />
@@ -72,13 +74,40 @@
 
       <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="0">
         <Button x:Name="AccountCapsule" AutomationProperties.AutomationId="account-capsule"
-                Height="44" Padding="6,0,12,0" CornerRadius="999"
+                AutomationProperties.Name="{loc:Tr Account_Switch}" ToolTip.Tip="{loc:Tr Account_Switch}"
+                Height="44" Padding="6,0,14,0" CornerRadius="999" FocusAdorner="{x:Null}"
                 Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
           <StackPanel Orientation="Horizontal" Spacing="10">
-            <Ellipse Width="32" Height="32" Fill="{DynamicResource SurfaceMutedBrush}" />
-            <TextBlock Text="漂泊者" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
-            <TextBlock Text="LV.80" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource AccentBrush}" />
+            <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource AccentContainerBrush}">
+              <TextBlock Text="{Binding Accounts.DisplayName, Converter={x:Static pulls:InitialConverter.Instance}}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"
+                         Foreground="{DynamicResource TextPrimaryBrush}" />
+            </Border>
+            <TextBlock Text="{Binding Accounts.DisplayName}" IsVisible="{Binding Accounts.HasAccount}" MaxWidth="160"
+                       TextTrimming="CharacterEllipsis" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Text="{loc:Tr Account_None}" IsVisible="{Binding !Accounts.HasAccount}"
+                       FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+            <TextBlock Text="{Binding Accounts.Current.Level, StringFormat='LV.{0}', FallbackValue=''}" IsVisible="{Binding Accounts.HasLevel}"
+                       FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource AccentBrush}" />
           </StackPanel>
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedRight">
+              <StackPanel Spacing="8" MinWidth="260">
+                <TextBlock Text="{loc:Tr Account_Switch}" FontWeight="SemiBold" Margin="4,0" />
+                <ListBox ItemsSource="{Binding Accounts.Accounts}" SelectedItem="{Binding Accounts.Current}" MaxHeight="360"
+                         AutomationProperties.AutomationId="account-list">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="domain:AccountSummary">
+                      <StackPanel Spacing="2">
+                        <TextBlock Text="{Binding Name, TargetNullValue=—}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Uid}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+              </StackPanel>
+            </Flyout>
+          </Button.Flyout>
         </Button>
         <!-- 系统标题按钮占位：宽度由代码按平台设置（Windows 右侧、macOS 左侧红绿灯不占右侧）。 -->
         <Border x:Name="CaptionButtonsSpacer" Width="0" />

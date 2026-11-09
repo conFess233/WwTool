@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Pulls.PullsChartsView"
+             x:DataType="pulls:PullsChartsViewModel">
+  <!-- 详细图表（图表在下一步接入）。 -->
+  <StackPanel Margin="40,0,40,40" Spacing="18">
+    <Button Classes="pill" HorizontalAlignment="Left" Content="{loc:Tr Pulls_BackToStatistics}" Command="{Binding BackCommand}"
+            AutomationProperties.AutomationId="pulls-charts-back" />
+    <Border Classes="card" Padding="28,24">
+      <TextBlock Classes="caption" Text="{loc:Tr Page_Migrating}" />
+    </Border>
+  </StackPanel>
+</UserControl>
