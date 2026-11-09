@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Avalonia 桌面程序。输出程序集名仍为 WwTool，Windows 上产物仍是 WwTool.exe。 -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>WwTool.UI</RootNamespace>
+    <AssemblyName>WwTool</AssemblyName>
+    <ApplicationIcon>Assets\WwTool.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\WwTool.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,3 +1,8 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Core/WwTool.Core.csproj" />
+    <Project Path="src/UI/WwTool.UI.csproj" />
+  </Folder>
+  <!-- 旧版 WPF 项目：迁移期间保留并引用 Core，全部页面迁完后删除。 -->
   <Project Path="WwTool/WwTool.csproj" />
 </Solution>

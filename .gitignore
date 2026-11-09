@@ -17,3 +17,7 @@ WwTool.Tests/
 publish/
 # 测试项目仅保留在本地，不上传仓库
 /tests/
+
+# 所有项目的编译产物
+[Bb]in/
+[Oo]bj/

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- 不含界面、不调用平台专有 API 的核心库。
+       CA1416 设为错误：误用只能在某个系统上运行的 API 会直接编译失败。 -->
+  <PropertyGroup>
+    <RootNamespace>WwTool.Core</RootNamespace>
+    <AssemblyName>WwTool.Core</AssemblyName>
+    <WarningsAsErrors>$(WarningsAsErrors);CA1416</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
+  </ItemGroup>
+
+</Project>
