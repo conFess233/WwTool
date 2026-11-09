@@ -488,5 +488,20 @@
   "Pulls_DailyCaption": "Last {0} days · peak {1} pulls/day",
   "Pulls_ShareHint": "Bar length is the banner's share of all 5★",
   "Pulls_FiveStarCount": "{0} × 5★",
-  "Shell_Eyebrow": "Wuthering Waves Toolbox"
+  "Shell_Eyebrow": "Wuthering Waves Toolbox",
+  "Pulls_ChartsBasis": "Based on {0} local records · {1}",
+  "Pulls_PityChart": "5★ pity distribution",
+  "Pulls_AveragePityCaption": "Avg. {0} pulls per 5★",
+  "Pulls_PoolShareChart": "Pulls by banner",
+  "Pulls_TotalPullsCaption": "{0} pulls",
+  "Pulls_FiveStarCostChart": "Pulls spent per 5★",
+  "Pulls_FiveStarCostHint": "By time · newest first",
+  "Pulls_CumulativeCaption": "{0} Astrite equivalent",
+  "Pulls_RarityChart": "Rarity mix and 50/50",
+  "Pulls_FiveStar": "5★",
+  "Pulls_FourStar": "4★",
+  "Pulls_ThreeStar": "3★",
+  "Pulls_CharacterWinRate": "Character event · 50/50 won",
+  "Pulls_WinFraction": "{0} / {1} · {2}",
+  "Pulls_WeeklyCaption": "{0} weeks · peak {1} pulls/week (weekly totals)"
 }

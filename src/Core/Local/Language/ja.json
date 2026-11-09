@@ -488,5 +488,20 @@
   "Pulls_DailyCaption": "直近 {0} 日 · 最多 {1} 回/日",
   "Pulls_ShareHint": "バーの長さは全★5に占める割合",
   "Pulls_FiveStarCount": "★5 × {0}",
-  "Shell_Eyebrow": "鳴潮ツールボックス"
+  "Shell_Eyebrow": "鳴潮ツールボックス",
+  "Pulls_ChartsBasis": "ローカル {0} 件に基づく · {1}",
+  "Pulls_PityChart": "★5 獲得回数の分布",
+  "Pulls_AveragePityCaption": "★5 平均 {0} 回",
+  "Pulls_PoolShareChart": "ガチャ別の回数",
+  "Pulls_TotalPullsCaption": "計 {0} 回",
+  "Pulls_FiveStarCostChart": "★5 ごとの回数",
+  "Pulls_FiveStarCostHint": "獲得順 · 新しい順",
+  "Pulls_CumulativeCaption": "星声換算 {0}",
+  "Pulls_RarityChart": "レア度構成と 50/50",
+  "Pulls_FiveStar": "★5",
+  "Pulls_FourStar": "★4",
+  "Pulls_ThreeStar": "★3",
+  "Pulls_CharacterWinRate": "キャライベント · 50/50 勝ち",
+  "Pulls_WinFraction": "{0} / {1} · {2}",
+  "Pulls_WeeklyCaption": "{0} 週 · 最多 {1} 回/週（週合計）"
 }
