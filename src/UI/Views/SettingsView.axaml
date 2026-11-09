@@ -240,8 +240,21 @@
         <!-- 运行日志 -->
         <Border Classes="card" Padding="22,18">
           <StackPanel>
-            <TextBlock Classes="section" Text="{loc:Tr Settings_Log}" />
+            <TextBlock Classes="section" Text="{loc:Tr Settings_DataAndLog}" />
             <Border Classes="row first">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel>
+                  <TextBlock Classes="name" Text="{loc:Tr Settings_DataDirectory}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_DataDirectoryPortable}" IsVisible="{Binding IsPortable}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_DataDirectorySystem}" IsVisible="{Binding !IsPortable}" />
+                  <SelectableTextBlock Classes="hint" Text="{Binding DataRoot}" TextWrapping="Wrap"
+                                       AutomationProperties.AutomationId="settings-data-root" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="pill" Content="{loc:Tr Settings_OpenDataFolder}" Command="{Binding OpenDataFolderCommand}"
+                        VerticalAlignment="Center" AutomationProperties.AutomationId="settings-open-data" />
+              </Grid>
+            </Border>
+            <Border Classes="row">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
                 <StackPanel>
                   <TextBlock Classes="name" Text="{loc:Tr Settings_EnableLog}" />

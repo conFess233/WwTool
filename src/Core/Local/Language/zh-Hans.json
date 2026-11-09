@@ -583,5 +583,10 @@
   "LogLevel_Debug": "Debug（全部）",
   "LogLevel_Info": "Info",
   "LogLevel_Warn": "Warning",
-  "LogLevel_Error": "Error"
+  "LogLevel_Error": "Error",
+  "Settings_DataAndLog": "数据与日志",
+  "Settings_DataDirectory": "数据目录",
+  "Settings_DataDirectoryPortable": "便携模式：数据库、配置和日志保存在程序目录",
+  "Settings_DataDirectorySystem": "数据库、配置和日志保存在系统的用户数据目录",
+  "Settings_OpenDataFolder": "打开"
 }

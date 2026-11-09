@@ -270,6 +270,14 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         ScheduleSave();
     }
 
+    /// <summary>当前数据根目录（启动时确定，便携模式为程序目录）。</summary>
+    public string DataRoot => _paths.DataRoot;
+
+    public bool IsPortable => _paths.IsPortable;
+
+    [RelayCommand]
+    private void OpenDataFolder() => _launcher.OpenFolder(_paths.DataRoot);
+
     [RelayCommand]
     private void OpenLogFolder()
     {

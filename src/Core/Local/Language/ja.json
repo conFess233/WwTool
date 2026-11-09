@@ -583,5 +583,10 @@
   "LogLevel_Debug": "Debug（すべて）",
   "LogLevel_Info": "Info",
   "LogLevel_Warn": "Warning",
-  "LogLevel_Error": "Error"
+  "LogLevel_Error": "Error",
+  "Settings_DataAndLog": "データとログ",
+  "Settings_DataDirectory": "データフォルダー",
+  "Settings_DataDirectoryPortable": "ポータブルモード：データベース・設定・ログはプログラムのフォルダーに保存されます",
+  "Settings_DataDirectorySystem": "データベース・設定・ログはユーザーデータフォルダーに保存されます",
+  "Settings_OpenDataFolder": "開く"
 }

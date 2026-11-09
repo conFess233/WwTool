@@ -583,5 +583,10 @@
   "LogLevel_Debug": "Debug (all)",
   "LogLevel_Info": "Info",
   "LogLevel_Warn": "Warning",
-  "LogLevel_Error": "Error"
+  "LogLevel_Error": "Error",
+  "Settings_DataAndLog": "Data & logs",
+  "Settings_DataDirectory": "Data folder",
+  "Settings_DataDirectoryPortable": "Portable mode: database, settings and logs are stored next to the program",
+  "Settings_DataDirectorySystem": "Database, settings and logs are stored in your user data folder",
+  "Settings_OpenDataFolder": "Open"
 }
