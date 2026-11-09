@@ -18,6 +18,7 @@ using WwTool.UI.Controls;
 using WwTool.UI.Feedback;
 using WwTool.UI.Localization;
 using WwTool.UI.Navigation;
+using WwTool.UI.Pages.Home;
 using WwTool.UI.Pages.Pulls;
 using WwTool.UI.Services;
 using WwTool.UI.Shell;
@@ -129,12 +130,12 @@ public partial class App : Application
         services.AddSingleton<PoolRecordsViewModel>();
         services.AddSingleton<PullsOverviewViewModel>();
         services.AddSingleton<PullsChartsViewModel>();
+        services.AddSingleton<HomeViewModel>();
 
         // 页面登记（顺序即悬浮岛顺序）与视图映射
         const string icons = "avares://WwTool/Assets/Images/";
-        services.AddSingleton(Placeholder("home", "Nav_Home", icons + "Home.png",
-            ("refresh", "Index_RefreshAccountList", icons + "Refresh.png", null),
-            ("add-account", "Index_AddAccount", icons + "Add.png", null)));
+        services.AddSingleton(new PageDescriptor("home", "Nav_Home", icons + "Home.png",
+            sp => sp.GetRequiredService<HomeViewModel>()));
         services.AddSingleton(new PageDescriptor("pulls", "Nav_Statistics", icons + "Statistics.png",
             sp => sp.GetRequiredService<PullsOverviewViewModel>()));
         services.AddSingleton(Placeholder("roles", "Nav_RoleData", icons + "Role.png"));
@@ -149,6 +150,7 @@ public partial class App : Application
             .Map<ImportUrlDialogViewModel, ImportUrlDialogView>()
             .Map<PlaceholderPageViewModel, PlaceholderPageView>()
             .Map<SettingsViewModel, SettingsView>()
+            .Map<HomeViewModel, HomeView>()
             .Map<PullsOverviewViewModel, PullsOverviewView>()
             .Map<PullsChartsViewModel, PullsChartsView>());
         services.AddSingleton<INavigationService, NavigationService>();

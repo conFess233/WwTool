@@ -3,6 +3,7 @@
         xmlns:shell="using:WwTool.UI.Shell"
         xmlns:vm="using:WwTool.UI.ViewModels"
         xmlns:fb="using:WwTool.UI.Feedback"
+        xmlns:c="using:WwTool.UI.Controls"
         xmlns:pulls="using:WwTool.UI.Pages.Pulls"
         xmlns:domain="using:WwTool.Core.Models.Domain"
         xmlns:loc="using:WwTool.UI.Localization"
@@ -78,10 +79,15 @@
                 Height="44" Padding="6,0,14,0" CornerRadius="999" FocusAdorner="{x:Null}"
                 Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
           <StackPanel Orientation="Horizontal" Spacing="10">
-            <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource AccentContainerBrush}">
-              <TextBlock Text="{Binding Accounts.DisplayName, Converter={x:Static pulls:InitialConverter.Instance}}"
-                         HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"
-                         Foreground="{DynamicResource TextPrimaryBrush}" />
+            <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource AccentContainerBrush}" ClipToBounds="True">
+              <Panel>
+                <TextBlock Text="{Binding Accounts.DisplayName, Converter={x:Static pulls:InitialConverter.Instance}}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           IsVisible="{Binding #CapsuleAvatar.Source, Converter={x:Static ObjectConverters.IsNull}}" />
+                <c:CatalogImage x:Name="CapsuleAvatar" Path="{Binding Accounts.Current.IconPath}" DecodeWidth="64"
+                                Stretch="UniformToFill" IsVisible="{Binding Accounts.HasAccount}" />
+              </Panel>
             </Border>
             <TextBlock Text="{Binding Accounts.DisplayName}" IsVisible="{Binding Accounts.HasAccount}" MaxWidth="160"
                        TextTrimming="CharacterEllipsis" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
