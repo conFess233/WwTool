@@ -590,5 +590,10 @@
   "Settings_DataDirectorySystem": "Database, settings and logs are stored in your user data folder",
   "Settings_OpenDataFolder": "Open",
   "Settings_GlassRestartToShow": "Restart the app to show the frosted glass effect",
-  "Settings_GlassRestartToSave": "Restart the app to switch to software rendering and use less memory"
+  "Settings_GlassRestartToSave": "Restart the app to switch to software rendering and use less memory",
+  "Splash_Loading": "Reading local data",
+  "Fab_GetRecords": "Get records",
+  "Fab_RefreshData": "Refresh data",
+  "Fab_Back": "Go back",
+  "Fab_SaveSettings": "Save settings"
 }

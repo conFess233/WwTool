@@ -11,14 +11,16 @@ public sealed partial class NavItem : ObservableObject
 {
     private readonly LocalizationService _localization;
 
-    public NavItem(string key, string titleKey, string icon, LocalizationService localization, bool startsGroup = false)
+    public NavItem(string key, string titleKey, string icon, LocalizationService localization, bool startsGroup = false,
+        string? shortcut = null)
     {
         Key = key;
         TitleKey = titleKey;
         Icon = icon;
         StartsGroup = startsGroup;
+        Shortcut = shortcut;
         _localization = localization;
-        // 弱事件不必要：导航项与本地化服务同为应用生命周期。
+        // 导航项与本地化服务同为应用生命周期，不需要弱事件。
         _localization.PropertyChanged += OnLocalizationChanged;
     }
 
@@ -37,11 +39,20 @@ public sealed partial class NavItem : ObservableObject
     /// <summary>是否在此项之前画分隔线（设置与主导航之间）。</summary>
     public bool StartsGroup { get; }
 
+    /// <summary>悬停提示第二行的快捷键文字（Windows「Ctrl + 1」，macOS「⌘ + 1」）。</summary>
+    public string? Shortcut { get; }
+
+    public bool HasShortcut => Shortcut is not null;
+
     /// <summary>当前语言的标题。</summary>
     public string Title => _localization[TitleKey];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowTip))]
     private bool _isSelected;
+
+    /// <summary>当前选中项不显示悬停提示。</summary>
+    public bool ShowTip => !IsSelected;
 
     private void OnLocalizationChanged(object? sender, PropertyChangedEventArgs e)
     {

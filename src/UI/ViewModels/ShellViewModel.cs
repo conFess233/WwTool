@@ -53,9 +53,13 @@ public sealed partial class ShellViewModel : ObservableObject
         Dialogs = dialogs;
         UiState = uiState;
 
+        string modifier = OperatingSystem.IsMacOS() ? "⌘" : "Ctrl";
+        int number = 0;
         foreach (PageDescriptor page in navigation.Pages.Where(p => p.IsTopLevel && p.ShowInIsland))
         {
-            var item = new NavItem(page.Key, page.TitleKey, page.Icon, localization, page.StartsGroup);
+            // 主导航依次为 1…5，设置（分隔线后）为「,」。
+            string keyText = page.StartsGroup ? "," : (++number).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var item = new NavItem(page.Key, page.TitleKey, page.Icon, localization, page.StartsGroup, $"{modifier} + {keyText}");
             item.PropertyChanged += OnNavItemChanged;
             NavItems.Add(item);
         }
@@ -98,6 +102,28 @@ public sealed partial class ShellViewModel : ObservableObject
     [RelayCommand]
     private void OpenAccounts() => _navigation.NavigateTo(Pages.Accounts.AccountsViewModel.PageKey);
 
+    /// <summary>快捷键导航（参数为页面键）。</summary>
+    [RelayCommand]
+    private void Navigate(string? key)
+    {
+        if (key is not null) _navigation.NavigateTo(key);
+    }
+
+    /// <summary>导航快捷键的按键：主导航 1…5，设置为「,」。</summary>
+    public IEnumerable<(NavItem Item, Avalonia.Input.Key Key)> ShortcutTargets()
+    {
+        int number = 0;
+        foreach (NavItem item in NavItems)
+        {
+            if (item.StartsGroup) yield return (item, Avalonia.Input.Key.OemComma);
+            else if (++number <= 9) yield return (item, Avalonia.Input.Key.D0 + number);
+        }
+    }
+
+    /// <summary>启动画面进度条（0–1），由组合根在初始化各步之间推进。</summary>
+    [ObservableProperty]
+    private double _startupProgress;
+
     private void OnNavItemChanged(object? sender, PropertyChangedEventArgs e)
     {
         // 悬浮岛点击只改 IsSelected，真正的切换交给导航服务；导航服务再回写选中状态。
@@ -118,7 +144,7 @@ public sealed partial class ShellViewModel : ObservableObject
         }
         CurrentPage = e.ViewModel;
         IsAccountsPage = e.Page.Key == Pages.Accounts.AccountsViewModel.PageKey;
-        Fab.SetActions((e.ViewModel as IFabProvider)?.FabActions);
+        Fab.SetProvider(e.ViewModel as IFabProvider);
         UpdatePageTitle();
     }
 
@@ -127,15 +153,18 @@ public sealed partial class ShellViewModel : ObservableObject
         if (e.PropertyName == LocalizationService.IndexerName) UpdatePageTitle();
     }
 
-    /// <summary>页头页名上方的小字：一级页面为应用名，子页面为父页面标题。</summary>
+    /// <summary>子页面在页名上方显示父级名（详细图表 → 抽卡统计）；一级页面不显示。</summary>
     [ObservableProperty]
-    private string _pageEyebrow = string.Empty;
+    [NotifyPropertyChangedFor(nameof(HasParent))]
+    private string? _parentTitle;
+
+    public bool HasParent => !string.IsNullOrEmpty(ParentTitle);
 
     private void UpdatePageTitle()
     {
         PageDescriptor? page = _navigation.Current;
         PageTitle = page is null ? string.Empty : _localization[page.TitleKey];
         PageDescriptor? parent = page?.ParentKey is { } key ? _navigation.Pages.FirstOrDefault(p => p.Key == key) : null;
-        PageEyebrow = parent is null ? _localization["Shell_Eyebrow"] : _localization[parent.TitleKey];
+        ParentTitle = parent is null ? null : _localization[parent.TitleKey];
     }
 }

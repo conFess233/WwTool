@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- 线性图标（24 × 24，描边 2、圆角端点），由设计稿 SVG 转换；用 c:StrokeIcon 绘制。 -->
+  <StreamGeometry x:Key="Icon.ChevronDown">M 6 9 l 6 6 6 -6</StreamGeometry>
+  <StreamGeometry x:Key="Icon.ChevronLeft">M 15 18 l -6 -6 6 -6</StreamGeometry>
+  <StreamGeometry x:Key="Icon.ArrowLeft">M 19 12 H 5 M 11 6 l -6 6 6 6</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Trash">M 4 7 h 16 M 9 7 V 4 h 6 v 3 M 6 7 l 1 13 h 10 l 1 -13</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Plus">M 12 5 v 14 M 5 12 h 14</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Close">M 6 6 l 12 12 M 18 6 L 6 18</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Cloud">M 7 18 a 4 4 0 0 1 0 -8 5.5 5.5 0 0 1 10.6 1.5 A 3.3 3.3 0 0 1 17 18 z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.FolderOff">M 3 6 h 6 l 2 2 h 10 v 11 H 3 z M 10 13 h 4</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Document">M 6 3 H 18 A 2 2 0 0 1 20 5 V 19 A 2 2 0 0 1 18 21 H 6 A 2 2 0 0 1 4 19 V 5 A 2 2 0 0 1 6 3 Z M 8 8 h 8 M 8 12 h 8 M 8 16 h 5</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Warning">M 12 9 v 4 M 12 17 h .01 M 10.3 3.9 L 2 18 a 2 2 0 0 0 1.7 3 h 16.6 A 2 2 0 0 0 22 18 L 13.7 3.9 a 2 2 0 0 0 -3.4 0 z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Lock">M 6 10 H 18 A 2 2 0 0 1 20 12 V 19 A 2 2 0 0 1 18 21 H 6 A 2 2 0 0 1 4 19 V 12 A 2 2 0 0 1 6 10 Z M 8 10 V 7 a 4 4 0 0 1 8 0 v 3</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Play">M 7 4 l 13 8 -13 8 z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Camera">M 4 8 h 3 l 2 -3 h 6 l 2 3 h 3 v 11 H 4 z M 8.5 13 A 3.5 3.5 0 1 0 15.5 13 A 3.5 3.5 0 1 0 8.5 13 Z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Folder">M 3 6 h 6 l 2 2 h 10 v 11 H 3 z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Log">M 6 3 h 9 l 4 4 v 14 H 6 z M 14 3 v 5 h 5 M 9 12 h 7 M 9 16 h 7</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Link">M 10 14 a 4 4 0 0 0 6 0 l 3 -3 a 4 4 0 0 0 -6 -6 l -1 1 M 14 10 a 4 4 0 0 0 -6 0 l -3 3 a 4 4 0 0 0 6 6 l 1 -1</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Sync">M 20 11 a 8 8 0 1 0 -2.3 5.7 M 20 4 v 7 h -7</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Database">M 5 6 A 7 3 0 1 0 19 6 A 7 3 0 1 0 5 6 Z M 5 6 v 12 c 0 1.7 3 3 7 3 s 7 -1.3 7 -3 V 6 M 5 12 c 0 1.7 3 3 7 3 s 7 -1.3 7 -3</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Globe">M 3 12 A 9 9 0 1 0 21 12 A 9 9 0 1 0 3 12 Z M 3 12 h 18 M 12 3 c 3 3 3 15 0 18 M 12 3 c -3 3 -3 15 0 18</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Sun">M 8 12 A 4 4 0 1 0 16 12 A 4 4 0 1 0 8 12 Z M 12 2 v 2 M 12 20 v 2 M 2 12 h 2 M 20 12 h 2 M 5 5 l 1.5 1.5 M 17.5 17.5 L 19 19 M 5 19 l 1.5 -1.5 M 17.5 6.5 L 19 5</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Check">M 5 12 l 5 5 9 -10</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Upload">M 12 15 V 3 M 7 8 l 5 -5 5 5 M 4 15 v 4 a 2 2 0 0 0 2 2 h 12 a 2 2 0 0 0 2 -2 v -4</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Copy">M 11 9 H 18 A 2 2 0 0 1 20 11 V 18 A 2 2 0 0 1 18 20 H 11 A 2 2 0 0 1 9 18 V 11 A 2 2 0 0 1 11 9 Z M 5 15 V 5 a 1 1 0 0 1 1 -1 h 10</StreamGeometry>
+  <StreamGeometry x:Key="Icon.User">M 8 8 A 4 4 0 1 0 16 8 A 4 4 0 1 0 8 8 Z M 4 21 a 8 8 0 0 1 16 0</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Chart">M 4 20 V 10 M 10 20 V 4 M 16 20 v -7 M 22 20 H 2</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Image">M 5 5 H 19 A 2 2 0 0 1 21 7 V 17 A 2 2 0 0 1 19 19 H 5 A 2 2 0 0 1 3 17 V 7 A 2 2 0 0 1 5 5 Z M 7 11 A 2 2 0 1 0 11 11 A 2 2 0 1 0 7 11 Z M 21 17 l -5 -5 -9 7</StreamGeometry>
+  <StreamGeometry x:Key="Icon.FolderOpen">M 3 7 a 2 2 0 0 1 2 -2 h 4 l 2 2 h 8 a 2 2 0 0 1 2 2 v 8 a 2 2 0 0 1 -2 2 H 5 a 2 2 0 0 1 -2 -2 z</StreamGeometry>
+  <StreamGeometry x:Key="Icon.LinkAlt">M 10 14 a 4 4 0 0 0 5.7 0 l 3 -3 a 4 4 0 0 0 -5.7 -5.7 l -1 1 M 14 10 a 4 4 0 0 0 -5.7 0 l -3 3 a 4 4 0 0 0 5.7 5.7 l 1 -1</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Back">M 15 6 l -6 6 6 6</StreamGeometry>
+  <StreamGeometry x:Key="Icon.Save">M 5 4 h 11 l 3 3 v 13 H 5 z M 8 4 v 5 h 7 M 8 20 v -6 h 8 v 6</StreamGeometry>
+</ResourceDictionary>

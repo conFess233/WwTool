@@ -590,5 +590,10 @@
   "Settings_DataDirectorySystem": "数据库、配置和日志保存在系统的用户数据目录",
   "Settings_OpenDataFolder": "打开",
   "Settings_GlassRestartToShow": "重启程序后显示毛玻璃效果",
-  "Settings_GlassRestartToSave": "重启程序后改用软件渲染，减少内存占用"
+  "Settings_GlassRestartToSave": "重启程序后改用软件渲染，减少内存占用",
+  "Splash_Loading": "正在读取本地数据",
+  "Fab_GetRecords": "获取记录",
+  "Fab_RefreshData": "刷新数据",
+  "Fab_Back": "返回上一页",
+  "Fab_SaveSettings": "保存设置"
 }

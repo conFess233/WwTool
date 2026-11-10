@@ -78,7 +78,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         FabActions =
         [
             new FabAction("refresh", "Index_RefreshAccountList", Icons + "Refresh.png", new AsyncRelayCommand(RefreshAccountsAsync), localization),
-            new FabAction("add-account", "Index_AddAccount", Icons + "Add.png", new AsyncRelayCommand(() => actions.AddAccountAsync()), localization),
+            new FabAction("add-account", "Index_AddAccount", "Icon.Plus", new AsyncRelayCommand(() => actions.AddAccountAsync()), localization),
         ];
 
         // 回满倒计时每秒刷新；只在页面可见时运行。

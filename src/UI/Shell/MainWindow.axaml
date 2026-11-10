@@ -4,31 +4,57 @@
         xmlns:vm="using:WwTool.UI.ViewModels"
         xmlns:fb="using:WwTool.UI.Feedback"
         xmlns:c="using:WwTool.UI.Controls"
-        xmlns:pulls="using:WwTool.UI.Pages.Pulls"
-        xmlns:domain="using:WwTool.Core.Models.Domain"
         xmlns:loc="using:WwTool.UI.Localization"
         xmlns:chrome="using:Avalonia.Controls.Chrome"
         x:Class="WwTool.UI.Shell.MainWindow"
         x:DataType="vm:ShellViewModel"
         Title="WwTool"
         Width="1440" Height="900"
-        MinWidth="1100" MinHeight="720"
+        MinWidth="1200" MinHeight="760"
         WindowStartupLocation="CenterScreen"
         Background="Transparent"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="0"
         WindowDecorations="BorderOnly"
         Icon="avares://WwTool/Assets/WwTool.ico">
-  <!-- Shell：56px 页头（左 Logo 与页名 · 中悬浮岛 · 右账号胶囊）+ 内容区。
-       内容延伸进标题栏，托管标题栏高度设为 0；Windows/Linux 由应用绘制标题按钮，
-       并标记 ElementRole（Win32 映射为 HTMINBUTTON/HTMAXBUTTON/HTCLOSE，保留 Win11 贴靠布局）。
-       macOS 保留系统红绿灯，不显示这组按钮。 -->
+  <!--
+    全局框架（开发文档「全局框架」「窗口外框」）：页头即标题栏，没有侧边栏。
+    页头高 56、三列（左右等宽、中列按内容），左 Logo 与页名、中悬浮岛、右账号胶囊；页边距左右 40、上下 26，卡片间距 18。
+    Windows：窗口按钮 46 × 32 贴右上角，页头整体下移 12；macOS：系统红绿灯在左，Logo 与页名右移到 112（由代码按平台设置）。
+  -->
   <Window.Styles>
-    <!-- 账号数据页打开时账号胶囊显示选中态 -->
-    <Style Selector="Button#AccountCapsule.on /template/ ContentPresenter">
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-      <Setter Property="BoxShadow" Value="0 0 0 3 #33888888" />
+    <!-- 账号胶囊：高 44、左 6 右 12、Surface 底、Border 描边 -->
+    <Style Selector="Button#AccountCapsule">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel>
+            <Border Name="Ring" Margin="-3" CornerRadius="999" BorderThickness="3" BorderBrush="{DynamicResource AccentContainerBrush}"
+                    IsVisible="False" />
+            <Border Name="Body" Height="44" Padding="6,0,12,0" CornerRadius="999" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+                </Transitions>
+              </Border.Transitions>
+              <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+            </Border>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
     </Style>
+    <Style Selector="Button#AccountCapsule:pointerover /template/ Border#Body">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
+    </Style>
+    <Style Selector="Button#AccountCapsule.on /template/ Border#Body">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="Button#AccountCapsule.on /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Windows 窗口按钮：46 × 32；关闭悬停 #C42B1C 底、白色图标 -->
     <Style Selector="Button.caption">
       <Setter Property="Width" Value="46" />
       <Setter Property="Height" Value="32" />
@@ -42,10 +68,10 @@
       <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="Button.caption:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
     </Style>
     <Style Selector="Button.caption.close:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#C42B1C" />
+      <Setter Property="Background" Value="{DynamicResource CloseHoverBrush}" />
     </Style>
     <Style Selector="Button.caption.close:pointerover">
       <Setter Property="Foreground" Value="#FFFFFF" />
@@ -53,114 +79,108 @@
     <Style Selector="Button.caption Path">
       <Setter Property="Stroke" Value="{Binding $parent[Button].Foreground}" />
       <Setter Property="StrokeThickness" Value="1" />
-      <Setter Property="Width" Value="10" />
-      <Setter Property="Height" Value="10" />
+      <Setter Property="Width" Value="12" />
+      <Setter Property="Height" Value="12" />
       <Setter Property="Stretch" Value="None" />
     </Style>
   </Window.Styles>
-  <Grid RowDefinitions="Auto,*">
-    <!-- 背景层：主题背景色；开启毛玻璃时半透明，透出系统模糊材质 -->
-    <Border Grid.RowSpan="2" Background="{DynamicResource BackgroundBrush}" Opacity="{Binding BackdropOpacity}" IsHitTestVisible="False" />
-    <Grid x:Name="Header" Grid.Row="0" Height="56" Margin="40,26,40,18"
-          ColumnDefinitions="*,Auto,*" Background="Transparent"
-          PointerPressed="OnHeaderPointerPressed">
-      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center"
-                  IsHitTestVisible="False">
-        <Border Width="44" Height="44" CornerRadius="22" ClipToBounds="True" Background="{DynamicResource SurfaceBrush}">
-          <Image Source="avares://WwTool/Assets/WwTool.ico" Width="44" Height="44" />
-        </Border>
-        <StackPanel VerticalAlignment="Center">
-          <TextBlock Text="{Binding PageEyebrow}" FontSize="12" FontWeight="SemiBold" LetterSpacing="1"
-                     Foreground="{DynamicResource AccentBrush}" />
-          <TextBlock x:Name="PageTitle" Text="{Binding PageTitle}" FontSize="26" FontWeight="Bold" LineHeight="29"
-                     Foreground="{DynamicResource TextPrimaryBrush}" />
+
+  <Panel>
+    <!-- 背景：主题背景色（开启毛玻璃时半透明）+ 默认底纹 -->
+    <Border Background="{DynamicResource BackgroundBrush}" Opacity="{Binding BackdropOpacity}" IsHitTestVisible="False" />
+    <c:BackdropTexture GridColor="{DynamicResource GridLineColor}" GridOpacity="{DynamicResource GridLineOpacity}"
+                       GlowColor="{DynamicResource GlowColor}" GlowOpacity="{DynamicResource GlowOpacity}" />
+
+    <Grid x:Name="Frame" RowDefinitions="Auto,*" Margin="40,38,40,0">
+      <!-- 页头：空白处拖动窗口，双击最大化 / 还原；Logo、悬浮岛、账号胶囊不参与拖动 -->
+      <Grid x:Name="Header" Grid.Row="0" Height="56" ColumnDefinitions="*,Auto,*" Background="Transparent"
+            PointerPressed="OnHeaderPointerPressed">
+        <StackPanel x:Name="Brand" Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center"
+                    HorizontalAlignment="Left" Background="Transparent" PointerPressed="OnBrandPointerPressed">
+          <Border Width="44" Height="44" CornerRadius="22" ClipToBounds="True" Background="#EFE7D8"
+                  BoxShadow="{DynamicResource ShadowSoft}">
+            <Image Source="avares://WwTool/Assets/WwTool.ico" Width="44" Height="44" />
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Classes="parent-title" Text="{Binding ParentTitle}" IsVisible="{Binding HasParent}" Margin="0,0,0,2" />
+            <TransitioningContentControl x:Name="TitleHost" Content="{Binding PageTitle}" ClipToBounds="False">
+              <TransitioningContentControl.PageTransition>
+                <shell:TitleSwapTransition />
+              </TransitioningContentControl.PageTransition>
+              <TransitioningContentControl.ContentTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <TextBlock Classes="page-title" Text="{Binding}" AutomationProperties.AutomationId="PageTitle" />
+                </DataTemplate>
+              </TransitioningContentControl.ContentTemplate>
+            </TransitioningContentControl>
+          </StackPanel>
         </StackPanel>
-      </StackPanel>
 
-      <shell:FloatingNavIsland x:Name="Island" Grid.Column="1" VerticalAlignment="Center"
-                               ItemsSource="{Binding NavItems}" />
+        <shell:FloatingNavIsland x:Name="Island" Grid.Column="1" VerticalAlignment="Center" ItemsSource="{Binding NavItems}" />
 
-      <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="0">
-        <Button x:Name="AccountCapsule" Classes.on="{Binding IsAccountsPage}" AutomationProperties.AutomationId="account-capsule"
-                AutomationProperties.Name="{loc:Tr Account_Switch}" ToolTip.Tip="{loc:Tr Account_Switch}"
-                Height="44" Padding="6,0,14,0" CornerRadius="999" FocusAdorner="{x:Null}"
-                Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+        <Button x:Name="AccountCapsule" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                Classes.on="{Binding IsAccountsPage}" Command="{Binding OpenAccountsCommand}"
+                AutomationProperties.AutomationId="account-capsule" AutomationProperties.Name="{loc:Tr Nav_AccountData}">
           <StackPanel Orientation="Horizontal" Spacing="10">
-            <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource AccentContainerBrush}" ClipToBounds="True">
-              <Panel>
-                <TextBlock Text="{Binding Accounts.DisplayName, Converter={x:Static pulls:InitialConverter.Instance}}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"
-                           Foreground="{DynamicResource TextPrimaryBrush}"
-                           IsVisible="{Binding #CapsuleAvatar.Source, Converter={x:Static ObjectConverters.IsNull}}" />
-                <c:CatalogImage x:Name="CapsuleAvatar" Path="{Binding Accounts.Current.IconPath}" DecodeWidth="64"
-                                Stretch="UniformToFill" IsVisible="{Binding Accounts.HasAccount}" />
-              </Panel>
+            <Border Width="32" Height="32" CornerRadius="16" Background="#EFE7D8" ClipToBounds="True">
+              <c:CatalogImage Path="{Binding Accounts.Current.IconPath}" DecodeWidth="64" Stretch="UniformToFill"
+                              FallbackPath="avares://WwTool/Assets/Images/Account.png" />
             </Border>
             <TextBlock Text="{Binding Accounts.DisplayName}" IsVisible="{Binding Accounts.HasAccount}" MaxWidth="160"
-                       TextTrimming="CharacterEllipsis" FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
-            <TextBlock Text="{loc:Tr Account_None}" IsVisible="{Binding !Accounts.HasAccount}"
-                       FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+                       TextTrimming="CharacterEllipsis" FontSize="13" VerticalAlignment="Center" />
+            <TextBlock Text="{loc:Tr Account_None}" IsVisible="{Binding !Accounts.HasAccount}" FontSize="13"
+                       VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
             <TextBlock Text="{Binding Accounts.Current.Level, StringFormat='LV.{0}', FallbackValue=''}" IsVisible="{Binding Accounts.HasLevel}"
-                       FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource AccentBrush}" />
+                       FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource AccentTextBrush}" />
+            <c:StrokeIcon Data="{StaticResource Icon.ChevronDown}" Width="14" Height="14" StrokeThickness="2.4"
+                          VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
           </StackPanel>
-          <Button.Flyout>
-            <Flyout Placement="BottomEdgeAlignedRight">
-              <StackPanel Spacing="8" MinWidth="260">
-                <TextBlock Text="{loc:Tr Account_Switch}" FontWeight="SemiBold" Margin="4,0" />
-                <ListBox ItemsSource="{Binding Accounts.Accounts}" SelectedItem="{Binding Accounts.Current}" MaxHeight="360"
-                         AutomationProperties.AutomationId="account-list">
-                  <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="domain:AccountSummary">
-                      <StackPanel Spacing="2">
-                        <TextBlock Text="{Binding Name, TargetNullValue=—}" FontWeight="SemiBold" />
-                        <TextBlock Text="{Binding Uid}" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
-                      </StackPanel>
-                    </DataTemplate>
-                  </ListBox.ItemTemplate>
-                </ListBox>
-                <Button Content="{loc:Tr Accounts_Manage}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                        Click="OnManageAccountsClick" AutomationProperties.AutomationId="account-manage" />
-              </StackPanel>
-            </Flyout>
-          </Button.Flyout>
         </Button>
-        <!-- 系统标题按钮占位：宽度由代码按平台设置（Windows 右侧、macOS 左侧红绿灯不占右侧）。 -->
-        <Border x:Name="CaptionButtonsSpacer" Width="0" />
-      </StackPanel>
+      </Grid>
+
+      <!-- 内容区：页面切换（旧页左移淡出、新页从右淡入）；页面自己负责底部 26 与悬浮按钮避让 -->
+      <TransitioningContentControl x:Name="PageHost" Grid.Row="1" Margin="0,18,0,0" Content="{Binding CurrentPage}"
+                                   ClipToBounds="False">
+        <TransitioningContentControl.PageTransition>
+          <shell:PageSlideTransition />
+        </TransitioningContentControl.PageTransition>
+      </TransitioningContentControl>
     </Grid>
 
-    <ContentControl x:Name="PageHost" Grid.Row="1" Content="{Binding CurrentPage}" IsVisible="{Binding IsReady}" />
-    <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12"
-                IsVisible="{Binding !IsReady}">
-      <ProgressBar IsIndeterminate="True" Width="200" />
-      <TextBlock Text="{loc:Tr Startup_Loading}" HorizontalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
-    </StackPanel>
+    <!-- 悬浮按钮（含遮罩）与提示栈 -->
+    <shell:FabMenu x:Name="Fab" DataContext="{Binding Fab}" />
+    <fb:ToastHost DataContext="{Binding UiState}" Margin="0,44,24,0" HorizontalAlignment="Right" VerticalAlignment="Top" />
 
-    <!-- 悬浮按钮（遮罩只盖内容区）与 Toast 栈 -->
-    <shell:FabMenu Grid.Row="1" DataContext="{Binding Fab}" IsVisible="{Binding $parent[Window].((vm:ShellViewModel)DataContext).IsReady}" />
-    <fb:ToastHost Grid.Row="1" DataContext="{Binding UiState}" Margin="0,0,32,0"
-                  HorizontalAlignment="Right" VerticalAlignment="Top" />
+    <!-- 对话框覆盖层盖住整个窗口（含页头） -->
+    <fb:DialogOverlay DataContext="{Binding Dialogs}" />
 
-    <!-- 对话框覆盖层盖住整个窗口（含页头），标题按钮仍在其上可用 -->
-    <fb:DialogOverlay Grid.Row="0" Grid.RowSpan="2" DataContext="{Binding Dialogs}" />
+    <!-- 启动画面：加载形象 + WwTool + 细进度条 + 正在读取本地数据；完成后放大 4% 淡出 -->
+    <Panel x:Name="Splash" Background="{DynamicResource BackgroundBrush}" RenderTransformOrigin="50%,50%">
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+        <c:PixelGif Width="96" Height="96" HorizontalAlignment="Center" />
+        <TextBlock Text="WwTool" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" />
+        <c:SegmentedBar Classes="thin" Width="220" Maximum="1" Value="{Binding StartupProgress}" />
+        <TextBlock Classes="caption" Text="{loc:Tr Splash_Loading}" HorizontalAlignment="Center" />
+      </StackPanel>
+    </Panel>
 
-    <StackPanel x:Name="CaptionButtons" Grid.Row="0" Orientation="Horizontal"
-                HorizontalAlignment="Right" VerticalAlignment="Top">
+    <!-- Windows 窗口按钮：贴窗口右上角，在所有层之上 -->
+    <StackPanel x:Name="CaptionButtons" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
       <Button x:Name="MinimizeButton" Classes="caption" Click="OnMinimizeClick"
               chrome:WindowDecorationProperties.ElementRole="MinimizeButton"
               AutomationProperties.AutomationId="caption-minimize">
-        <Path Data="M0,5.5 L10,5.5" />
+        <Path Data="M1,6 L11,6" />
       </Button>
       <Button x:Name="MaximizeButton" Classes="caption" Click="OnMaximizeClick"
               chrome:WindowDecorationProperties.ElementRole="MaximizeButton"
               AutomationProperties.AutomationId="caption-maximize">
-        <Path x:Name="MaximizeGlyph" Data="M0.5,0.5 L9.5,0.5 L9.5,9.5 L0.5,9.5 Z" />
+        <Path x:Name="MaximizeGlyph" Data="M1.5,1.5 L10.5,1.5 L10.5,10.5 L1.5,10.5 Z" />
       </Button>
       <Button Classes="caption close" Click="OnCloseClick"
               chrome:WindowDecorationProperties.ElementRole="CloseButton"
               AutomationProperties.AutomationId="caption-close">
-        <Path Data="M0,0 L10,10 M10,0 L0,10" />
+        <Path Data="M1.5,1.5 L10.5,10.5 M10.5,1.5 L1.5,10.5" />
       </Button>
     </StackPanel>
-  </Grid>
+  </Panel>
 </Window>

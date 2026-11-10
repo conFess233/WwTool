@@ -88,18 +88,16 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         Accounts = accounts;
         Session = session;
 
-        const string icons = "avares://WwTool/Assets/Images/";
+        // 悬浮按钮：扩展态「获取记录」，展开为获取云端数据（主）、加载本地数据、导入链接；清空数据已移到设置页。
         FabActions =
         [
-            new FabAction("cloud", "Stat_GetCloudData", icons + "Cloud.png", new AsyncRelayCommand(_session.SyncAsync), localization),
-            new FabAction("load-local", "Stat_LoadLocalData", icons + "Load.png", new AsyncRelayCommand(() => _session.ReloadAsync(showMessage: true)), localization),
-            new FabAction("import-url", "Pulls_ImportUrl", icons + "Import.png",
+            new FabAction("cloud", "Stat_GetCloudData", "Icon.Cloud", new AsyncRelayCommand(_session.SyncAsync), localization),
+            new FabAction("load-local", "Stat_LoadLocalData", "Icon.FolderOpen", new AsyncRelayCommand(() => _session.ReloadAsync(showMessage: true)), localization),
+            new FabAction("import-url", "Pulls_ImportUrl", "Icon.LinkAlt",
                 new AsyncRelayCommand(async () =>
                 {
                     if (await dialogs.ShowAsync(new ImportUrlDialogViewModel(_session, localization, _session.Region))) _session.ShowImported();
                 }), localization),
-            new FabAction("clear", "Stat_ClearData", icons + "Trash.png", new RelayCommand(_session.ClearDisplay), localization,
-                isDanger: true, confirmMessageKey: "Msg_ConfirmClearData"),
         ];
 
         Tabs.Add(new PoolTab(null, false, string.Empty));
@@ -125,6 +123,11 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     public PoolRecordsViewModel Records { get; }
 
     public IReadOnlyList<FabAction> FabActions { get; }
+
+    public FabTrigger? FabTrigger { get; } = new("Fab_GetRecords", "Icon.Cloud", ExecutesPrimary: false);
+
+    /// <summary>获取中，悬浮按钮内显示加载形象。</summary>
+    public bool IsFabBusy => _session.IsSyncing;
 
     /// <summary>总览 + 4 个主卡池 + （有记录时）其他卡池。</summary>
     public ObservableCollection<PoolTab> Tabs { get; } = [];
@@ -208,6 +211,7 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     private void OnSessionChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(PullsSession.Region) or nameof(PullsSession.Uid) or nameof(PullsSession.IsLoading)) Refresh();
+        if (e.PropertyName == nameof(PullsSession.IsSyncing)) OnPropertyChanged(nameof(IsFabBusy));
     }
 
     /// <summary>当前页签对应的卡池；总览为 null。</summary>

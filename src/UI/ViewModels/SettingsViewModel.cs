@@ -79,7 +79,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         Accounts = accounts;
         FabActions =
         [
-            new FabAction("save", "Action_SaveSettings", "avares://WwTool/Assets/Images/Save.png", SaveCommand, localization),
+            new FabAction("save", "Fab_SaveSettings", "Icon.Save", SaveCommand, localization),
         ];
 
         Presets = ThemeService.Presets.Select(p =>
@@ -132,6 +132,9 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
     }
 
     public IReadOnlyList<FabAction> FabActions { get; }
+
+    /// <summary>扩展态「保存设置」，点击直接保存。</summary>
+    public FabTrigger? FabTrigger { get; } = new("Fab_SaveSettings", "Icon.Save", ExecutesPrimary: true);
     public AccountContext Accounts { get; }
 
     /// <summary>有语言资源文件的界面语言。</summary>

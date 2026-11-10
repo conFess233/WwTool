@@ -187,9 +187,13 @@ public partial class App : Application
         try
         {
             // 4. 数据库（识别旧库、备份、迁移）；5. 静态游戏资料。
+            shell.StartupProgress = 0.15;
             await services.GetRequiredService<GameDataService>().InitializeAsync();
+            shell.StartupProgress = 0.4;
             await services.GetRequiredService<LocalDataService>().InitializeAsync();
+            shell.StartupProgress = 0.7;
             await services.GetRequiredService<CatalogSyncService>().InitializeAsync();
+            shell.StartupProgress = 0.85;
         }
         catch (Exception ex)
         {
@@ -211,6 +215,7 @@ public partial class App : Application
             services.GetRequiredService<ErrorReporter>().Report(ex, services.GetRequiredService<LocalizationService>()["Msg_LoadingLocalAccount"]);
         }
 
+        shell.StartupProgress = 1;
         services.GetRequiredService<INavigationService>().NavigateTo("home");
         shell.IsReady = true;
         logger.Info("WwTool 2.0 初始化完成");

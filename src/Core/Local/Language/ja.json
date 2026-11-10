@@ -590,5 +590,10 @@
   "Settings_DataDirectorySystem": "データベース・設定・ログはユーザーデータフォルダーに保存されます",
   "Settings_OpenDataFolder": "開く",
   "Settings_GlassRestartToShow": "すりガラス効果はアプリの再起動後に表示されます",
-  "Settings_GlassRestartToSave": "再起動するとソフトウェア描画に切り替わり、メモリ使用量が減ります"
+  "Settings_GlassRestartToSave": "再起動するとソフトウェア描画に切り替わり、メモリ使用量が減ります",
+  "Splash_Loading": "ローカルデータを読み込み中",
+  "Fab_GetRecords": "記録を取得",
+  "Fab_RefreshData": "データを更新",
+  "Fab_Back": "前のページに戻る",
+  "Fab_SaveSettings": "設定を保存"
 }

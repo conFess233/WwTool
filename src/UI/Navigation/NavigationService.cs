@@ -47,6 +47,12 @@ public interface INavigationService
 
     /// <summary>导航到 <paramref name="key"/>。键未登记时抛出；已在该页且没有参数时不做任何事并返回 false。</summary>
     bool NavigateTo(string key, object? parameter = null);
+
+    /// <summary>有可返回的上一页。</summary>
+    bool CanGoBack { get; }
+
+    /// <summary>回到上一页（悬浮菜单「返回上一页」）；没有上一页时回首页。</summary>
+    void GoBack();
 }
 
 /// <summary>
@@ -60,6 +66,8 @@ public sealed class NavigationService : INavigationService
     private readonly Dictionary<string, PageDescriptor> _byKey;
     private readonly Dictionary<string, object> _viewModels = new(StringComparer.Ordinal);
     private object? _currentViewModel;
+    private readonly Stack<string> _history = new();
+    private bool _goingBack;
 
     public NavigationService(IEnumerable<PageDescriptor> pages, IServiceProvider services)
     {
@@ -96,10 +104,37 @@ public sealed class NavigationService : INavigationService
             _viewModels[key] = viewModel;
         }
 
+        if (Current is { } previous && !_goingBack)
+        {
+            _history.Push(previous.Key);
+            if (_history.Count > 32) TrimHistory();
+        }
         Current = page;
         _currentViewModel = viewModel;
         (viewModel as INavigationAware)?.OnNavigatedTo(parameter);
         Navigated?.Invoke(this, new NavigatedEventArgs(page, viewModel));
         return true;
+    }
+
+    public bool CanGoBack => _history.Count > 0;
+
+    public void GoBack()
+    {
+        while (_history.TryPop(out string? key))
+        {
+            if (ReferenceEquals(_byKey[key], Current)) continue;
+            _goingBack = true;
+            try { NavigateTo(key); }
+            finally { _goingBack = false; }
+            return;
+        }
+        if (Current?.Key != "home") NavigateTo("home");
+    }
+
+    private void TrimHistory()
+    {
+        string[] keep = _history.Take(16).Reverse().ToArray();
+        _history.Clear();
+        foreach (string key in keep) _history.Push(key);
     }
 }
