@@ -560,7 +560,7 @@
   "Motor_TabEmpty": "このカテゴリはまだ解放されていません。",
   "Motor_MaxLevel": "最大レベル",
   "Login_Hint": "クロアカウントのメールアドレスとパスワードでログインし、ゲームデータへのアクセスを許可します。",
-  "Accounts_Summary": "ローカルに {0} 件のアカウント · 削除するとローカルのガチャ記録も消えます",
+  "Accounts_Summary": "ローカルに {0} 件のアカウントを保存済み",
   "Accounts_Current": "現在のアカウント",
   "Accounts_CurrentTag": "現在",
   "Accounts_SwitchTo": "このアカウントに切替",

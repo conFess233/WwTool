@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
@@ -11,6 +11,7 @@ using WwTool.Core.Models.Domain;
 using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
 using WwTool.UI.Services;
+using WwTool.UI.Shell;
 
 namespace WwTool.UI.Pages.Accounts;
 
@@ -41,7 +42,7 @@ public sealed class AccountCard
 /// 账号数据页（从页头账号胶囊进入）：本地账号卡片、切换、删除、添加。
 /// 创建日期与活跃天数来自各账号的本地游戏数据快照。
 /// </summary>
-public sealed partial class AccountsViewModel : ObservableObject, INavigationAware
+public sealed partial class AccountsViewModel : ObservableObject, INavigationAware, IFabProvider
 {
     public const string PageKey = "accounts";
 
@@ -61,8 +62,15 @@ public sealed partial class AccountsViewModel : ObservableObject, INavigationAwa
         IUserDataService userData,
         LocalizationService localization,
         IUIStateService uiState,
-        ErrorReporter errors)
+        ErrorReporter errors,
+        INavigationService navigation)
     {
+        // 悬浮按钮：收起态加号，展开为「刷新数据」（主，重读账号列表）与「返回上一页」。
+        FabActions =
+        [
+            new FabAction("refresh", "Fab_RefreshData", "avares://WwTool/Assets/Images/Refresh.png", RefreshCommand, localization),
+            new FabAction("back", "Fab_Back", "Icon.Back", new RelayCommand(() => navigation.GoBack()), localization),
+        ];
         _accounts = accounts;
         _actions = actions;
         _userData = userData;
@@ -79,6 +87,8 @@ public sealed partial class AccountsViewModel : ObservableObject, INavigationAwa
 
     /// <summary>账号卡（<see cref="AccountCard"/>）加末尾一格 <see cref="AddAccountTile"/>。</summary>
     public ObservableCollection<object> Cards { get; } = [];
+
+    public IReadOnlyList<FabAction> FabActions { get; }
 
     [ObservableProperty] private string _summary = string.Empty;
     [ObservableProperty] private bool _isBusy;

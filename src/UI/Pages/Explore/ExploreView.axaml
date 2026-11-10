@@ -6,133 +6,121 @@
              xmlns:loc="using:WwTool.UI.Localization"
              x:Class="WwTool.UI.Pages.Explore.ExploreView"
              x:DataType="explore:ExploreViewModel">
-  <!-- 探索：声匣、奇藏箱、潮汐之遗（定稿 FinalExplore）。 -->
+  <!--
+    探索（定稿 FinalExplore）：总览行三张卡（1.3 : 1 : 1，高 190，56 图标 + 标签，贴底 56 Bold 大数字）；
+    「奇藏」四张卡（64 图标 + 名称，贴底 48 Bold 数字 +「个」，刻度条为占比）；
+    「潮汐之遗」三张横向卡（64 图标在左，名称与 40 Bold 数字在右，右侧留 84 给悬浮按钮）。数字首次显示时从 0 计数。
+  -->
   <UserControl.Styles>
-    <Style Selector="TextBlock.huge">
-      <Setter Property="FontSize" Value="52" />
+    <Style Selector="c|RollingText.huge">
+      <Setter Property="FontSize" Value="56" />
       <Setter Property="FontWeight" Value="Bold" />
       <Setter Property="LetterSpacing" Value="-1" />
-      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-    </Style>
-    <Style Selector="TextBlock.big">
-      <Setter Property="FontSize" Value="42" />
-      <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="LetterSpacing" Value="-1" />
-      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+      <Setter Property="CountUp" Value="True" />
+      <Setter Property="FlashOnChange" Value="True" />
+      <Setter Property="FlashBrush" Value="{DynamicResource GoldLightBrush}" />
     </Style>
     <Style Selector="TextBlock.unit">
       <Setter Property="FontSize" Value="16" />
-      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="Margin" Value="6,0,0,9" />
       <Setter Property="VerticalAlignment" Value="Bottom" />
-      <Setter Property="Margin" Value="8,0,0,8" />
     </Style>
   </UserControl.Styles>
 
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="40,0,40,60" Spacing="18">
-      <Border Classes="card" Padding="28,24" IsVisible="{Binding !HasData}" AutomationProperties.AutomationId="explore-empty">
+  <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Disabled">
+    <Panel>
+      <Border Classes="card" Padding="28,24" VerticalAlignment="Top" IsVisible="{Binding !HasData}" AutomationProperties.AutomationId="explore-empty">
         <TextBlock Classes="caption" Text="{loc:Tr Explore_Empty}" TextWrapping="Wrap" />
       </Border>
 
-      <StackPanel Spacing="18" IsVisible="{Binding HasData}">
+      <Grid x:Name="Root" RowDefinitions="190,Auto,*,Auto,*" RowSpacing="18" Margin="0,0,0,26" MinHeight="600" IsVisible="{Binding HasData}">
         <!-- 总览：声匣、奇藏箱总数、潮汐之遗总数 -->
         <Grid ColumnDefinitions="1.3*,*,*" ColumnSpacing="18">
-          <Border Classes="card" Padding="22,18" MinHeight="180">
-            <Grid RowDefinitions="Auto,*">
-              <StackPanel Orientation="Horizontal" Spacing="12">
-                <Image Width="48" Height="48" Source="{Binding Source='avares://WwTool/Assets/Images/SoundBox.png', Converter={x:Static shell:AssetImageConverter.Instance}}" />
+          <Border Classes="card">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12">
+                <Image Width="56" Height="56" Source="{Binding Source='avares://WwTool/Assets/Images/SoundBox.png', Converter={x:Static shell:AssetImageConverter.Instance}}" />
                 <TextBlock Classes="label" Text="{loc:Tr Exploration_SonanceCasketProgress}" VerticalAlignment="Center" />
               </StackPanel>
-              <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom">
-                <TextBlock Classes="huge" Text="{Binding SoundBoxes}" AutomationProperties.AutomationId="explore-soundbox" />
-                <TextBlock Classes="unit" Text="{loc:Tr Exploration_Collected}" />
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                <c:RollingText Classes="huge" Text="{Binding SoundBoxes}" AutomationProperties.AutomationId="explore-soundbox" />
+                <TextBlock Classes="unit muted" Text="{loc:Tr Exploration_Collected}" />
               </StackPanel>
-            </Grid>
+            </DockPanel>
           </Border>
-          <Border Grid.Column="1" Classes="card" Padding="22,18">
-            <Grid RowDefinitions="Auto,*">
-              <StackPanel Orientation="Horizontal" Spacing="12">
-                <Rectangle Width="40" Height="40" Margin="4" Fill="{DynamicResource TextPrimaryBrush}">
-                  <Rectangle.OpacityMask>
-                    <ImageBrush Source="{Binding Source='avares://WwTool/Assets/Images/Chest.png', Converter={x:Static shell:AssetImageConverter.Instance}}" Stretch="Uniform" />
-                  </Rectangle.OpacityMask>
-                </Rectangle>
+          <Border Grid.Column="1" Classes="card">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12">
+                <Border Width="56" Height="56" CornerRadius="12" Background="{DynamicResource NavIslandBrush}">
+                  <Image Width="44" Height="44" Source="{Binding Source='avares://WwTool/Assets/Images/Chest.png', Converter={x:Static shell:AssetImageConverter.Instance}}" />
+                </Border>
                 <TextBlock Classes="label" Text="{loc:Tr Role_BoxesTotal}" VerticalAlignment="Center" />
               </StackPanel>
-              <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom">
-                <TextBlock Classes="huge" Text="{Binding BoxesTotal}" />
-                <TextBlock Classes="unit" Text="{Binding BasicSuffix}" />
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                <c:RollingText Classes="huge" Text="{Binding BoxesTotal}" />
+                <TextBlock Classes="unit muted" Text="{Binding BasicSuffix}" />
               </StackPanel>
-            </Grid>
+            </DockPanel>
           </Border>
-          <Border Grid.Column="2" Classes="card" Padding="22,18">
-            <Grid RowDefinitions="Auto,*">
-              <StackPanel Orientation="Horizontal" Spacing="12">
-                <Image Width="48" Height="48" Source="{Binding Source='avares://WwTool/Assets/Images/Phantom1.png', Converter={x:Static shell:AssetImageConverter.Instance}}" />
+          <Border Grid.Column="2" Classes="card">
+            <DockPanel>
+              <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12">
+                <Image Width="56" Height="56" Source="{Binding Source='avares://WwTool/Assets/Images/Phantom1.png', Converter={x:Static shell:AssetImageConverter.Instance}}" />
                 <TextBlock Classes="label" Text="{loc:Tr Role_PhantomBoxesTotal}" VerticalAlignment="Center" />
               </StackPanel>
-              <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom">
-                <TextBlock Classes="huge" Text="{Binding PhantomTotal}" />
-                <TextBlock Classes="unit" Text="{loc:Tr Explore_Unit}" />
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                <c:RollingText Classes="huge" Text="{Binding PhantomTotal}" />
+                <TextBlock Classes="unit muted" Text="{loc:Tr Explore_Unit}" />
               </StackPanel>
-            </Grid>
+            </DockPanel>
           </Border>
         </Grid>
 
         <!-- 奇藏 -->
-        <StackPanel Orientation="Horizontal" Spacing="10">
-          <TextBlock Text="{loc:Tr Explore_BoxesSection}" FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-          <TextBlock Classes="caption" Text="{Binding BasicCaption}" VerticalAlignment="Center" />
-        </StackPanel>
-        <ItemsControl ItemsSource="{Binding Boxes}">
+        <TextBlock Grid.Row="1" Classes="section-title" Text="{loc:Tr Explore_BoxesSection}" />
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Boxes}">
           <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4" ColumnSpacing="18" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="explore:CountCard">
-              <Border Classes="card" Padding="22,18" MinHeight="190">
-                <Grid RowDefinitions="Auto,*,Auto">
-                  <StackPanel Orientation="Horizontal" Spacing="12">
-                    <!-- 宝箱图是浅色插画，垫一块底色才看得清 -->
-                    <Border Width="60" Height="60" CornerRadius="12" Background="{DynamicResource NavIslandBrush}">
-                      <Image Width="48" Height="48" Source="{Binding Icon, Converter={x:Static shell:AssetImageConverter.Instance}}" />
+              <Border Classes="card">
+                <DockPanel>
+                  <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12">
+                    <!-- 宝箱图是浅色插画，垫一块深色底才看得清 -->
+                    <Border Width="64" Height="64" CornerRadius="14" Background="{DynamicResource NavIslandBrush}">
+                      <Image Width="52" Height="52" Source="{Binding Icon, Converter={x:Static shell:AssetImageConverter.Instance}}" />
                     </Border>
-                    <StackPanel VerticalAlignment="Center" Spacing="2">
-                      <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                      <TextBlock Classes="caption" Text="{Binding Caption}" />
-                    </StackPanel>
+                    <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold" VerticalAlignment="Center" />
                   </StackPanel>
-                  <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,12,0,0">
-                    <TextBlock Classes="big" Text="{Binding Value}" />
-                    <TextBlock Classes="unit" Text="{loc:Tr Explore_Unit}" />
+                  <c:SegmentedBar DockPanel.Dock="Bottom" Margin="0,14,0,0" Value="{Binding Ratio}" Maximum="1" ToolTip.Tip="{Binding Caption}" />
+                  <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                    <c:RollingText Classes="huge" FontSize="48" Text="{Binding Value}" />
+                    <TextBlock Classes="unit muted" Margin="6,0,0,7" Text="{loc:Tr Explore_Unit}" />
                   </StackPanel>
-                  <c:SegmentedBar Grid.Row="2" Margin="0,14,0,0" Value="{Binding Ratio}" Maximum="1" />
-                </Grid>
+                </DockPanel>
               </Border>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
 
         <!-- 潮汐之遗 -->
-        <StackPanel Orientation="Horizontal" Spacing="10">
-          <TextBlock Text="{loc:Tr Explore_PhantomSection}" FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-          <TextBlock Classes="caption" Text="{Binding PhantomCaption}" VerticalAlignment="Center" />
-        </StackPanel>
-        <ItemsControl ItemsSource="{Binding Phantoms}">
+        <TextBlock Grid.Row="3" Classes="section-title" Text="{loc:Tr Explore_PhantomSection}" />
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding Phantoms}" Margin="0,0,84,0">
           <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="3" ColumnSpacing="18" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="explore:CountCard">
-              <Border Classes="card" Padding="22,18">
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="18">
+              <Border Classes="card">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="18" VerticalAlignment="Center">
                   <Image Width="64" Height="64" Source="{Binding Icon, Converter={x:Static shell:AssetImageConverter.Instance}}" />
                   <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
                     <TextBlock Classes="label" Text="{Binding Title}" />
-                    <TextBlock Classes="big" FontSize="38" Text="{Binding Value}" />
+                    <c:RollingText Classes="huge" FontSize="40" Text="{Binding Value}" />
                   </StackPanel>
                 </Grid>
               </Border>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
-      </StackPanel>
-    </StackPanel>
+      </Grid>
+    </Panel>
   </ScrollViewer>
 </UserControl>

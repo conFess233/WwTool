@@ -49,6 +49,10 @@ public partial class MainWindow : Window
         ApplyGlass(viewModel.IsGlassEnabled);
         viewModel.PropertyChanged += OnViewModelChanged;
         RegisterShortcuts(viewModel);
+        viewModel.Accounts.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(Services.AccountContext.Current)) _ = FlipAvatarAsync();
+        };
         if (viewModel.IsReady) Splash.IsVisible = false;
 #if DEBUG
         // 本地截图验证：窗口放到屏幕外、不抢焦点、不进任务栏，不打扰正在用电脑的人。
@@ -121,6 +125,23 @@ public partial class MainWindow : Window
         await Task.WhenAll(splashOut.RunAsync(Splash), frameIn.RunAsync(Frame));
         Splash.IsVisible = false;
         Frame.RenderTransform = null;
+    }
+
+    /// <summary>账号切换：页头头像绕竖轴从侧面翻到正面（480ms）。</summary>
+    private async Task FlipAvatarAsync()
+    {
+        if (Motion.Reduced || !IsVisible) return;
+        var rotate = new Rotate3DTransform { Depth = 300 };
+        CapsuleAvatar.RenderTransform = rotate;
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        const double duration = 480;
+        while (clock.Elapsed.TotalMilliseconds < duration)
+        {
+            double t = clock.Elapsed.TotalMilliseconds / duration;
+            rotate.AngleY = -90 * (1 - Motion.StandardEasing.Ease(t));
+            await Task.Delay(16);
+        }
+        CapsuleAvatar.RenderTransform = null;
     }
 
     /// <summary>导航快捷键：Windows Ctrl + 1…5、Ctrl + ,；macOS 用 ⌘。</summary>

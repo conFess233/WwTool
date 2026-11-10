@@ -141,12 +141,14 @@
                 Classes.on="{Binding IsAccountsPage}" Command="{Binding OpenAccountsCommand}"
                 AutomationProperties.AutomationId="account-capsule" AutomationProperties.Name="{loc:Tr Nav_AccountData}">
           <StackPanel Orientation="Horizontal" Spacing="10">
-            <Border Width="32" Height="32" CornerRadius="16" Background="#EFE7D8" ClipToBounds="True">
+            <!-- 切换账号：头像三维翻转，昵称上滚换新（动效「账号切换」） -->
+            <Border x:Name="CapsuleAvatar" Width="32" Height="32" CornerRadius="16" Background="#EFE7D8" ClipToBounds="True"
+                    RenderTransformOrigin="50%,50%">
               <c:CatalogImage Path="{Binding Accounts.Current.IconPath}" DecodeWidth="64" Stretch="UniformToFill"
                               FallbackPath="avares://WwTool/Assets/Images/Account.png" />
             </Border>
-            <TextBlock Text="{Binding Accounts.DisplayName}" IsVisible="{Binding Accounts.HasAccount}" MaxWidth="160"
-                       TextTrimming="CharacterEllipsis" FontSize="13" VerticalAlignment="Center" />
+            <c:RollingText Text="{Binding Accounts.DisplayName}" IsVisible="{Binding Accounts.HasAccount}" MaxWidth="160" ClipToBounds="True"
+                           FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" RollDuration="0:0:0.48" />
             <TextBlock Text="{loc:Tr Account_None}" IsVisible="{Binding !Accounts.HasAccount}" FontSize="13"
                        VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
             <TextBlock Text="{Binding Accounts.Current.Level, StringFormat='LV.{0}', FallbackValue=''}" IsVisible="{Binding Accounts.HasLevel}"

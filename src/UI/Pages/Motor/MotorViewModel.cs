@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -10,6 +10,7 @@ using WwTool.Core.Services;
 using WwTool.UI.Navigation;
 using WwTool.UI.Pages.Roles;
 using WwTool.UI.Services;
+using WwTool.UI.Shell;
 
 namespace WwTool.UI.Pages.Motor;
 
@@ -43,7 +44,7 @@ public sealed record UnlockCard(string Icon, string Title, string Value);
 /// 摩托页：载具等级与经验、当前装备、各类外观与车载音乐专辑（来自 <see cref="PlayerData"/> 快照）。
 /// 快照只含已解锁的外观，所以网格只列已解锁项。
 /// </summary>
-public sealed partial class MotorViewModel : ObservableObject, INavigationAware
+public sealed partial class MotorViewModel : ObservableObject, INavigationAware, IFabProvider
 {
     private const string Icons = "avares://WwTool/Assets/Images/";
 
@@ -52,8 +53,14 @@ public sealed partial class MotorViewModel : ObservableObject, INavigationAware
     private readonly IConfigService _config;
     private readonly LocalizationService _localization;
 
-    public MotorViewModel(PlayerData player, GameDataService catalog, IConfigService config, LocalizationService localization)
+    public MotorViewModel(PlayerData player, GameDataService catalog, IConfigService config, LocalizationService localization, INavigationService navigation)
     {
+        // 悬浮按钮：收起态加号，展开为「刷新数据」（主，同步游戏数据）与「返回上一页」。
+        FabActions =
+        [
+            new FabAction("refresh", "Fab_RefreshData", Icons + "Refresh.png", new AsyncRelayCommand(player.SyncAsync), localization),
+            new FabAction("back", "Fab_Back", "Icon.Back", new RelayCommand(() => navigation.GoBack()), localization),
+        ];
         _player = player;
         _catalog = catalog;
         _config = config;
@@ -76,6 +83,7 @@ public sealed partial class MotorViewModel : ObservableObject, INavigationAware
     }
 
     public ObservableCollection<ChipOption> Tabs { get; }
+    public IReadOnlyList<FabAction> FabActions { get; }
 
     [ObservableProperty] private bool _hasData;
     [ObservableProperty] private string _levelText = "--";

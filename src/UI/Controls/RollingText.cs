@@ -42,7 +42,14 @@ public sealed class RollingText : Control
     public static readonly StyledProperty<TimeSpan> RollDurationProperty =
         AvaloniaProperty.Register<RollingText, TimeSpan>(nameof(RollDuration), TimeSpan.FromMilliseconds(420));
 
+    /// <summary>首次显示时数字从 0 计数到目标值（动效「数字滚动」，900ms，先快后慢）。</summary>
+    public static readonly StyledProperty<bool> CountUpProperty =
+        AvaloniaProperty.Register<RollingText, bool>(nameof(CountUp));
+
     private static readonly TimeSpan FlashDuration = TimeSpan.FromMilliseconds(1700);
+    private static readonly TimeSpan CountDuration = TimeSpan.FromMilliseconds(900);
+    private static readonly System.Text.RegularExpressions.Regex NumberPattern =
+        new(@"^(\D*?)(\d[\d,]*(?:\.\d+)?)(\D*)$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
     static RollingText()
     {
@@ -59,6 +66,12 @@ public sealed class RollingText : Control
     public bool FlashOnChange { get => GetValue(FlashOnChangeProperty); set => SetValue(FlashOnChangeProperty, value); }
     public IBrush? FlashBrush { get => GetValue(FlashBrushProperty); set => SetValue(FlashBrushProperty, value); }
     public TimeSpan RollDuration { get => GetValue(RollDurationProperty); set => SetValue(RollDurationProperty, value); }
+    public bool CountUp { get => GetValue(CountUpProperty); set => SetValue(CountUpProperty, value); }
+
+    // 计数动画：前后缀、目标值、小数位与是否带千分位。
+    private (string Prefix, double Target, int Decimals, bool Grouped, string Suffix)? _count;
+    private TimeSpan? _countStart;
+    private bool _countPending;
 
     private sealed class Slot
     {
@@ -95,6 +108,17 @@ public sealed class RollingText : Control
 
     private void UpdateSlots(string? oldText, string? newText)
     {
+        if (_count is not null)
+        {
+            // 计数中数据变了：直接停在新值。
+            _count = null;
+            _countStart = null;
+            _slots.Clear();
+            foreach (string c in Split(newText)) _slots.Add(new Slot { Current = c });
+            InvalidateMeasure();
+            InvalidateVisual();
+            return;
+        }
         string[] next = Split(newText);
         bool animate = _shown && !Motion.Reduced && TopLevel.GetTopLevel(this) is not null && oldText != newText;
         if (!animate)
@@ -152,7 +176,30 @@ public sealed class RollingText : Control
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        if (!_shown && CountUp && !Motion.Reduced && Text is { } text
+            && NumberPattern.Match(text) is { Success: true } m
+            && double.TryParse(m.Groups[2].Value.Replace(",", "", StringComparison.Ordinal), NumberStyles.Float, CultureInfo.InvariantCulture, out double target)
+            && target > 0)
+        {
+            string digits = m.Groups[2].Value;
+            int dot = digits.IndexOf('.', StringComparison.Ordinal);
+            _count = (m.Groups[1].Value, target, dot < 0 ? 0 : digits.Length - dot - 1, digits.Contains(',', StringComparison.Ordinal), m.Groups[3].Value);
+            _countPending = true;
+            SetCountText(0);
+            RequestFrame();
+        }
         _shown = true;
+    }
+
+    private void SetCountText(double value)
+    {
+        if (_count is not { } c) return;
+        string format = (c.Grouped ? "#,0" : "0") + (c.Decimals > 0 ? "." + new string('0', c.Decimals) : string.Empty);
+        string text = c.Prefix + value.ToString(format, CultureInfo.InvariantCulture) + c.Suffix;
+        _slots.Clear();
+        foreach (string part in Split(text)) _slots.Add(new Slot { Current = part });
+        InvalidateMeasure();
+        InvalidateVisual();
     }
 
     private void RequestFrame()
@@ -185,6 +232,29 @@ public sealed class RollingText : Control
             }
             else
             {
+                more = true;
+            }
+        }
+
+        if (_count is { } count)
+        {
+            if (_countPending)
+            {
+                _countStart = time;
+                _countPending = false;
+            }
+            double t = _countStart is { } cs ? Math.Clamp((time - cs).TotalMilliseconds / CountDuration.TotalMilliseconds, 0, 1) : 0;
+            if (t >= 1)
+            {
+                _count = null;
+                _countStart = null;
+                _slots.Clear();
+                foreach (string part in Split(Text)) _slots.Add(new Slot { Current = part });
+                InvalidateMeasure();
+            }
+            else
+            {
+                SetCountText(count.Target * Motion.CountEasing.Ease(t));
                 more = true;
             }
         }

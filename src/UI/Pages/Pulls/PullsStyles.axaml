@@ -12,6 +12,7 @@
     <Setter Property="FontWeight" Value="Bold" />
     <Setter Property="LetterSpacing" Value="-1" />
     <Setter Property="FlashOnChange" Value="True" />
+    <Setter Property="CountUp" Value="True" />
     <Setter Property="FlashBrush" Value="{DynamicResource GoldLightBrush}" />
   </Style>
 

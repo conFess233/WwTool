@@ -560,7 +560,7 @@
   "Motor_TabEmpty": "这一类还没有解锁的外观。",
   "Motor_MaxLevel": "已满级",
   "Login_Hint": "使用库街区账号的邮箱和密码登录，获取游戏数据授权。",
-  "Accounts_Summary": "本地已存储 {0} 个账号 · 删除账号会同时清除该账号的本地抽卡数据",
+  "Accounts_Summary": "本地已存储 {0} 个账号",
   "Accounts_Current": "当前账号",
   "Accounts_CurrentTag": "当前",
   "Accounts_SwitchTo": "切换到此账号",

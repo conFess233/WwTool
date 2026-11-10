@@ -1,9 +1,10 @@
-using System.Globalization;
+﻿using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using WwTool.Core.Localization;
 using WwTool.Core.Models.Domain;
 using WwTool.UI.Navigation;
 using WwTool.UI.Services;
+using WwTool.UI.Shell;
 
 namespace WwTool.UI.Pages.Explore;
 
@@ -13,7 +14,7 @@ public sealed record CountCard(string Icon, string Title, string Value, string? 
 /// <summary>
 /// 探索页：声匣、奇藏箱、潮汐之遗的收集数量（来自 <see cref="PlayerData"/> 快照）。
 /// </summary>
-public sealed partial class ExploreViewModel : ObservableObject, INavigationAware
+public sealed partial class ExploreViewModel : ObservableObject, INavigationAware, IFabProvider
 {
     private const string Icons = "avares://WwTool/Assets/Images/";
 
@@ -36,8 +37,14 @@ public sealed partial class ExploreViewModel : ObservableObject, INavigationAwar
     private readonly PlayerData _player;
     private readonly LocalizationService _localization;
 
-    public ExploreViewModel(PlayerData player, AccountContext accounts, LocalizationService localization)
+    public ExploreViewModel(PlayerData player, AccountContext accounts, LocalizationService localization, INavigationService navigation)
     {
+        // 悬浮按钮：收起态加号，展开为「刷新数据」（主，同步游戏数据）与「返回上一页」。
+        FabActions =
+        [
+            new FabAction("refresh", "Fab_RefreshData", Icons + "Refresh.png", new CommunityToolkit.Mvvm.Input.AsyncRelayCommand(player.SyncAsync), localization),
+            new FabAction("back", "Fab_Back", "Icon.Back", new CommunityToolkit.Mvvm.Input.RelayCommand(() => navigation.GoBack()), localization),
+        ];
         _player = player;
         _localization = localization;
         Accounts = accounts;
@@ -50,6 +57,7 @@ public sealed partial class ExploreViewModel : ObservableObject, INavigationAwar
     }
 
     public AccountContext Accounts { get; }
+    public IReadOnlyList<FabAction> FabActions { get; }
 
     [ObservableProperty] private bool _hasData;
     [ObservableProperty] private string _soundBoxes = "--";
