@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using WwTool.Core.Abstractions;
 using WwTool.Core.Localization;
 using WwTool.Core.Models.Config;
+using WwTool.UI.Theming;
 
 namespace WwTool.UI.Services;
 
@@ -33,6 +34,7 @@ public sealed class AppearanceCoordinator
     {
         _localization.ChangeLanguage(_config.User.AppLanguage);
         ApplyTheme();
+        Motion.Reduced = _config.User.IsReducedMotionEnabled;
         _config.User.PropertyChanged += OnUserConfigChanged;
     }
 
@@ -43,6 +45,9 @@ public sealed class AppearanceCoordinator
             case nameof(UserConfig.BaseTheme):
             case nameof(UserConfig.AccentTheme):
                 Dispatcher.UIThread.Post(ApplyTheme);
+                break;
+            case nameof(UserConfig.IsReducedMotionEnabled):
+                Dispatcher.UIThread.Post(() => Motion.Reduced = _config.User.IsReducedMotionEnabled);
                 break;
             case nameof(UserConfig.AppLanguage):
                 Dispatcher.UIThread.Post(() => _localization.ChangeLanguage(_config.User.AppLanguage));

@@ -42,13 +42,14 @@ public sealed class ThemeService
     /// <summary>每套预设都必须提供的键；缺失时视为资源损坏，拒绝应用以免出现回退色。</summary>
     private static readonly string[] RequiredPresetKeys =
     [
-        "BackgroundColor", "SurfaceColor", "SurfaceElevatedColor", "SurfaceMutedColor", "SurfaceHoverColor",
-        "BorderColor", "BorderStrongColor", "DividerColor", "TextPrimaryColor", "TextSecondaryColor", "TextMutedColor",
-        "TextOnAccentColor", "AccentColor", "AccentHoverColor", "AccentPressedColor", "AccentContainerColor",
-        "AccentContainerHoverColor", "DangerColor", "WarningColor", "SuccessColor", "InfoColor", "FocusRingColor",
-        "ChartPrimaryColor", "ChartSecondaryColor", "ChartTertiaryColor", "ChartFourStarColor", "ChartGridColor",
-        "CornerRadiusSmall", "CornerRadiusControl", "CornerRadiusCard", "CornerRadiusDialog",
-        "SegmentTrackColor", "NavIslandColor", "TextOnNavIslandColor"
+        "BackgroundColor", "SurfaceColor", "SurfaceRaisedColor", "SurfaceSunkenColor", "BorderColor", "DividerColor",
+        "BorderStrongColor", "InputBorderColor", "InputBackgroundColor", "TrackColor", "TextPrimaryColor", "TextSecondaryColor",
+        "LabelColor", "TextMutedColor", "NavIslandColor", "NavIslandBorderColor", "AccentColor", "TextOnAccentColor",
+        "AccentTextColor", "AccentContainerColor", "AccentLineColor", "HighlightColor", "HighlightStrongColor",
+        "DangerColor", "DangerContainerColor", "DangerLineColor", "SuccessColor", "SuccessContainerColor",
+        "FourStarColor", "FourStarContainerColor", "InfoColor", "InfoContainerColor", "ScrimColor", "GridLineColor",
+        "ShadowIsland", "ShadowFab", "ShadowMenu", "ShadowDialog", "ShadowHover",
+        "CornerRadiusControl", "CornerRadiusCard", "CornerRadiusInner", "CornerRadiusDialog"
     ];
 
     private readonly ResourceDictionary _live = new();
@@ -79,7 +80,7 @@ public sealed class ThemeService
         }
         if (accentName != FollowTheme)
         {
-            Merge(merged, Load($"Accents/{accentName}.axaml"));
+            ApplyAccent(merged, Load($"Accents/{accentName}.axaml"), DarkPresets.Contains(presetName));
         }
 
         AttachOnce();
@@ -143,6 +144,37 @@ public sealed class ThemeService
             return null;
         }
     }
+
+    /// <summary>
+    /// 强调色联动（开发文档「强调色联动」）：填充与填充上文字固定，文字与淡底按主题深浅取值；
+    /// 描边、悬停、高亮底、底纹光晕等由填充与淡底派生，危险、成功、四星紫不变。
+    /// </summary>
+    private static void ApplyAccent(Dictionary<object, object?> merged, ResourceDictionary accent, bool dark)
+    {
+        Color Get(string key) => accent.TryGetValue(key, out object? v) && v is Color c
+            ? c : throw new InvalidDataException($"强调色资源缺少 {key}");
+        Color fill = Get("AccentColor");
+        Color soft = Get(dark ? "AccentContainerDarkColor" : "AccentContainerLightColor");
+        Color surface = merged.TryGetValue("SurfaceColor", out object? s) && s is Color sc ? sc : Colors.White;
+        merged["AccentColor"] = fill;
+        merged["TextOnAccentColor"] = Get("TextOnAccentColor");
+        merged["AccentTextColor"] = Get(dark ? "AccentTextDarkColor" : "AccentTextLightColor");
+        merged["AccentContainerColor"] = soft;
+        merged["AccentLineColor"] = Mix(soft, fill, 0.45);
+        merged["AccentHoverColor"] = Mix(fill, Colors.White, 0.1);
+        merged["AccentPressedColor"] = Mix(fill, Colors.Black, 0.1);
+        merged["AccentContainerHoverColor"] = Mix(soft, fill, 0.2);
+        merged["FocusRingColor"] = fill;
+        merged["ChartPrimaryColor"] = fill;
+        merged["GlowColor"] = fill;
+        merged["HighlightColor"] = Mix(surface, soft, 0.5);
+        merged["HighlightStrongColor"] = Mix(surface, soft, 0.35);
+    }
+
+    /// <summary>按比例混合两种颜色（0 为 a，1 为 b）。</summary>
+    public static Color Mix(Color a, Color b, double t) => Color.FromArgb(
+        (byte)Math.Round(a.A + (b.A - a.A) * t), (byte)Math.Round(a.R + (b.R - a.R) * t),
+        (byte)Math.Round(a.G + (b.G - a.G) * t), (byte)Math.Round(a.B + (b.B - a.B) * t));
 
     private static ResourceDictionary Load(string relative) =>
         AvaloniaXamlLoader.Load(new Uri($"avares://WwTool/Theming/{relative}")) as ResourceDictionary
