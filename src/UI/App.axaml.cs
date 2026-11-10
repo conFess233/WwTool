@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -139,6 +139,9 @@ public partial class App : Application
         services.AddSingleton<PlayerData>();
         services.AddSingleton<AccountActions>();
         services.AddSingleton<AccountsViewModel>();
+        services.AddSingleton<GameLauncherService>();
+        services.AddSingleton<ClipboardService>();
+        services.AddSingleton<IAnnouncementSource, EmptyAnnouncementSource>();
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<ExploreViewModel>();
         services.AddSingleton<MotorViewModel>();

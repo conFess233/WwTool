@@ -37,6 +37,7 @@ public partial class MainWindow : Window
         {
             // Windows：窗口按钮贴右上角（高 32），页头整体下移 12。
             Frame.Margin = new Thickness(40, 26 + 12, 40, 0);
+            HomeDecor.TopOffset = 12;
         }
         Classes.Set("reduced", Motion.Reduced);
         Motion.ReducedChanged += (_, _) => Classes.Set("reduced", Motion.Reduced);
@@ -49,6 +50,16 @@ public partial class MainWindow : Window
         viewModel.PropertyChanged += OnViewModelChanged;
         RegisterShortcuts(viewModel);
         if (viewModel.IsReady) Splash.IsVisible = false;
+#if DEBUG
+        // 本地截图验证：窗口放到屏幕外、不抢焦点、不进任务栏，不打扰正在用电脑的人。
+        if (Environment.GetEnvironmentVariable("WWTOOL_QUIET_VERIFY") == "1")
+        {
+            ShowActivated = false;
+            ShowInTaskbar = false;
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Position = new PixelPoint(-6000, 100);
+        }
+#endif
     }
 
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)

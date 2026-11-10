@@ -13,32 +13,40 @@
   <UserControl.Styles>
     <!-- 主按钮 -->
     <Style Selector="Button.fab">
+      <Setter Property="ClipToBounds" Value="False" />
       <Setter Property="Height" Value="56" />
       <Setter Property="MinWidth" Value="56" />
       <Setter Property="Padding" Value="0" />
       <Setter Property="Cursor" Value="Hand" />
       <Setter Property="Template">
         <ControlTemplate>
-          <Border Name="PART_Body" Height="56" MinWidth="56" CornerRadius="28" Background="{DynamicResource AccentBrush}"
-                  BorderBrush="{DynamicResource AccentPressedBrush}" BorderThickness="1" BoxShadow="{DynamicResource ShadowFab}"
-                  Padding="{TemplateBinding Padding}" RenderTransform="scale(1)">
-            <Border.Transitions>
+          <!-- Fluent 主题的按钮默认裁剪到自身范围，阴影会被切掉，所以 Button.fab 关闭 ClipToBounds -->
+          <Panel Name="PART_Scale" RenderTransform="scale(1)">
+            <Panel.Transitions>
               <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.42" />
-                <BrushTransition Property="BorderBrush" Duration="0:0:0.42" />
                 <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
               </Transitions>
-            </Border.Transitions>
-            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                              Foreground="{DynamicResource TextOnAccentBrush}" />
-          </Border>
+            </Panel.Transitions>
+            <Border Name="PART_Body" Height="56" MinWidth="56" CornerRadius="28" Background="{DynamicResource AccentBrush}"
+                    BorderBrush="{DynamicResource AccentPressedBrush}" BorderThickness="1" BoxShadow="{DynamicResource ShadowFab}"
+                    Padding="{TemplateBinding Padding}">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="Background" Duration="0:0:0.42" />
+                  <BrushTransition Property="BorderBrush" Duration="0:0:0.42" />
+                </Transitions>
+              </Border.Transitions>
+              <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Foreground="{DynamicResource TextOnAccentBrush}" />
+            </Border>
+          </Panel>
         </ControlTemplate>
       </Setter>
     </Style>
     <Style Selector="Button.fab:pointerover /template/ Border#PART_Body">
       <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
     </Style>
-    <Style Selector="Button.fab:pressed /template/ Border#PART_Body">
+    <Style Selector="Button.fab:pressed /template/ Panel#PART_Scale">
       <Setter Property="RenderTransform" Value="scale(0.96)" />
     </Style>
     <Style Selector="Button.fab.expanded /template/ Border#PART_Body">
@@ -82,6 +90,7 @@
 
     <!-- 操作胶囊：文字在左、右侧 38 圆形图标底，左内边距 18 -->
     <Style Selector="Button.fab-action">
+      <Setter Property="ClipToBounds" Value="False" />
       <Setter Property="Cursor" Value="Hand" />
       <Setter Property="HorizontalAlignment" Value="Right" />
       <Setter Property="Template">

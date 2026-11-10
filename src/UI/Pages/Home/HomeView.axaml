@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:home="using:WwTool.UI.Pages.Home"
              xmlns:pulls="using:WwTool.UI.Pages.Pulls"
@@ -7,209 +7,509 @@
              xmlns:loc="using:WwTool.UI.Localization"
              x:Class="WwTool.UI.Pages.Home.HomeView"
              x:DataType="home:HomeViewModel">
-  <!-- 首页：账号概况、体力与周常、抽卡摘要（定稿 FinalHome）。 -->
+  <!--
+    首页（定稿 FinalHome，底纹版）：左栏自适应，上「账号总览」、下「便捷操作」，高度比 1.35 : 1；
+    右栏固定 430 宽为「游戏公告」，底部留 76 给悬浮按钮。窗口过矮时整页滚动。
+  -->
   <UserControl.Styles>
-    <Style Selector="Border.gauge">
-      <Setter Property="MinHeight" Value="168" />
+    <!-- 首页卡片：左上、右下金色角标 -->
+    <Style Selector="c|CornerMarks">
+      <Setter Property="Brush" Value="{DynamicResource AccentLineBrush}" />
     </Style>
-    <Style Selector="TextBlock.gauge-value">
-      <Setter Property="FontSize" Value="40" />
-      <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="LetterSpacing" Value="-1" />
-      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-    </Style>
-    <Style Selector="TextBlock.gauge-suffix">
-      <Setter Property="FontSize" Value="16" />
-      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
-      <Setter Property="VerticalAlignment" Value="Bottom" />
-      <Setter Property="Margin" Value="6,0,0,6" />
-    </Style>
-    <Style Selector="c|SegmentedBar.hot">
-      <Setter Property="Fill" Value="{DynamicResource DangerBrush}" />
-    </Style>
-    <!-- 页头卡片右侧的数据列：竖线分隔 -->
-    <Style Selector="Border.fact">
-      <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+
+    <!-- 统计行：上下分隔线，五列等宽，列间竖线 -->
+    <Style Selector="Border.stat">
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
       <Setter Property="BorderThickness" Value="1,0,0,0" />
-      <Setter Property="Padding" Value="20,0,8,0" />
+      <Setter Property="Padding" Value="18,0,4,0" />
     </Style>
-    <Style Selector="Border.fact TextBlock.fact-value">
-      <Setter Property="FontSize" Value="20" />
-      <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="Margin" Value="0,4,0,0" />
-      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Style Selector="Border.stat.first">
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0,0,4,0" />
     </Style>
-    <Style Selector="Border.portrait">
-      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+
+    <!-- 资源小卡 -->
+    <Style Selector="Border.res">
+      <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="14,14,14,12" />
       <Setter Property="ClipToBounds" Value="True" />
     </Style>
-    <Style Selector="Border.portrait > Panel > TextBlock">
-      <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="HorizontalAlignment" Value="Center" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Style Selector="TextBlock.kv-key">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
     </Style>
-    <Style Selector="Button.card-button">
-      <Setter Property="Padding" Value="0" />
+    <Style Selector="c|RollingText.kv-value">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+      <Setter Property="FlashBrush" Value="{DynamicResource GoldLightBrush}" />
+    </Style>
+    <Style Selector="c|RollingText.flash">
+      <Setter Property="FlashOnChange" Value="True" />
+      <Setter Property="FlashBrush" Value="{DynamicResource GoldLightBrush}" />
+    </Style>
+    <Style Selector="Border.cell">
+      <Setter Property="Height" Value="8" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="Background" Value="{DynamicResource SegmentTrackBrush}" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.42" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.cell.on">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    </Style>
+
+    <!-- 「已满」：闪烁（减少动画时常亮） -->
+    <Style Selector="Border.full-tag">
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Padding" Value="7,1" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.full-tag > TextBlock">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="Window:not(.reduced) Border.full-tag">
+      <Style.Animations>
+        <Animation Duration="0:0:1.2" IterationCount="Infinite" Easing="0.45,0,0.55,1">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="1" /></KeyFrame>
+          <KeyFrame Cue="50%"><Setter Property="Opacity" Value="0.35" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!-- 便捷操作按钮：左上 38 图标底，左下 14 SemiBold 文字；悬停上浮 4、阴影、描边转 Accent Line；按下 96% -->
+    <Style Selector="Button.quick">
+      <Setter Property="ClipToBounds" Value="False" />
+      <Setter Property="Padding" Value="14" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FocusAdorner" Value="{x:Null}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Body" CornerRadius="10" BorderThickness="1" ClipToBounds="True"
+                  Background="{DynamicResource SurfaceRaisedBrush}" BorderBrush="{DynamicResource DividerBrush}"
+                  RenderTransform="translateY(0px) scale(1)">
+            <Border.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="0.2,0.8,0.2,1" />
+                <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.15" />
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+                <BrushTransition Property="Background" Duration="0:0:0.24" />
+              </Transitions>
+            </Border.Transitions>
+            <Panel>
+              <!-- 右下淡圆环 -->
+              <Ellipse Name="PART_Ring" Width="64" Height="64" StrokeThickness="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                       Margin="0,0,-18,-18" Stroke="{DynamicResource AccentBrush}" Opacity="0.07" />
+              <!-- 启动中的微光 -->
+              <Border Name="PART_Shimmer" Width="90" HorizontalAlignment="Left" IsVisible="False" Opacity="0.35">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                    <GradientStop Color="#00FFFFFF" Offset="0" />
+                    <GradientStop Color="#99FFFFFF" Offset="0.5" />
+                    <GradientStop Color="#00FFFFFF" Offset="1" />
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+              <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" Padding="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+            </Panel>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.quick:pointerover /template/ Border#PART_Body">
+      <Setter Property="RenderTransform" Value="translateY(-4px) scale(1)" />
+      <Setter Property="BoxShadow" Value="{DynamicResource ShadowHover}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
+    </Style>
+    <Style Selector="Button.quick:pressed /template/ Border#PART_Body">
+      <Setter Property="RenderTransform" Value="translateY(-2px) scale(0.96)" />
+    </Style>
+    <Style Selector="Window.reduced Button.quick:pointerover /template/ Border#PART_Body">
+      <Setter Property="RenderTransform" Value="translateY(0px) scale(1)" />
+    </Style>
+    <Style Selector="Button.quick:focus-visible /template/ Border#PART_Body">
+      <Setter Property="BorderBrush" Value="{DynamicResource FocusRingBrush}" />
+    </Style>
+    <Style Selector="Button.quick Border.disc">
+      <Setter Property="Width" Value="38" />
+      <Setter Property="Height" Value="38" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentTextBrush}" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.24" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.quick TextBlock.title">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+
+    <!-- 主按钮「启动游戏」：Accent 底白字，图标底白色 20% -->
+    <Style Selector="Button.quick.primary">
+      <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+    </Style>
+    <Style Selector="Button.quick.primary /template/ Border#PART_Body">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentPressedBrush}" />
+    </Style>
+    <Style Selector="Button.quick.primary:pointerover /template/ Border#PART_Body">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Button.quick.primary /template/ Ellipse#PART_Ring">
+      <Setter Property="Stroke" Value="White" />
+      <Setter Property="Opacity" Value="0.14" />
+    </Style>
+    <Style Selector="Button.quick.primary Border.disc">
+      <Setter Property="Background" Value="#33FFFFFF" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+    </Style>
+    <!-- 正在启动：按钮加深、微光扫过 -->
+    <Style Selector="Button.quick.busy.primary /template/ Border#PART_Body">
+      <Setter Property="Background" Value="{DynamicResource AccentPressedBrush}" />
+    </Style>
+    <Style Selector="Button.quick.busy.primary /template/ Border#PART_Shimmer">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="Window:not(.reduced) Button.quick.busy.primary /template/ Border#PART_Shimmer">
+      <Style.Animations>
+        <Animation Duration="0:0:1.6" IterationCount="Infinite" Easing="0.45,0,0.55,1">
+          <KeyFrame Cue="0%"><Setter Property="TranslateTransform.X" Value="-100" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="TranslateTransform.X" Value="320" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <!-- 已复制：底色转绿，图标底为绿色 -->
+    <Style Selector="Button.quick.success">
+      <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style Selector="Button.quick.success /template/ Border#PART_Body">
+      <Setter Property="Background" Value="{DynamicResource SuccessContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource SuccessLineBrush}" />
+    </Style>
+    <Style Selector="Button.quick.success Border.disc">
+      <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+      <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+    <!-- 游戏运行中：绿点闪烁 -->
+    <Style Selector="Ellipse.live">
+      <Setter Property="Width" Value="8" />
+      <Setter Property="Height" Value="8" />
+      <Setter Property="Fill" Value="#6FD08C" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Window:not(.reduced) Ellipse.live">
+      <Style.Animations>
+        <Animation Duration="0:0:1.2" IterationCount="Infinite" Easing="0.45,0,0.55,1">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="1" /></KeyFrame>
+          <KeyFrame Cue="50%"><Setter Property="Opacity" Value="0.25" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!-- 公告筛选胶囊：高 28、12 号；选中 Ink 底白字，未选 Surface Muted 底 -->
+    <Style Selector="RadioButton.ann-chip">
+      <Setter Property="Height" Value="28" />
+      <Setter Property="Padding" Value="12,0" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Foreground" Value="{DynamicResource LabelBrush}" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Body" CornerRadius="999" Padding="{TemplateBinding Padding}" Background="{DynamicResource SurfaceMutedBrush}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+              </Transitions>
+            </Border.Transitions>
+            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="RadioButton.ann-chip:pointerover /template/ Border#PART_Body">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+    </Style>
+    <Style Selector="RadioButton.ann-chip:checked">
+      <Setter Property="Foreground" Value="{DynamicResource TextOnNavIslandBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="RadioButton.ann-chip:checked /template/ Border#PART_Body">
+      <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
+    </Style>
+
+    <!-- 公告行：上下内边距 11，行间分隔线 -->
+    <Style Selector="Button.ann-row">
+      <Setter Property="Padding" Value="0,11" />
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderThickness" Value="0" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
       <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="Transparent" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
     </Style>
-    <Style Selector="Button.card-button:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="Transparent" />
+    <Style Selector="ItemsControl.ann-list > ContentPresenter:nth-child(1) Button.ann-row /template/ Border">
+      <Setter Property="BorderThickness" Value="0" />
     </Style>
-    <Style Selector="Button.card-button:pointerover > Border.card">
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Style Selector="Button.ann-row:pointerover TextBlock.ann-title">
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
     </Style>
   </UserControl.Styles>
 
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Margin="40,0,40,120" Spacing="18">
+  <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <Grid x:Name="Root" ColumnDefinitions="*,430" ColumnSpacing="18" Margin="0,0,0,26" MinHeight="620">
 
-      <!-- 没有账号 -->
-      <Border Classes="card" Padding="28,24" IsVisible="{Binding !Accounts.HasAccount}"
-              AutomationProperties.AutomationId="home-no-account">
-        <StackPanel Spacing="6">
-          <TextBlock Classes="section-title" Text="{loc:Tr Home_NoAccountTitle}" />
-          <TextBlock Classes="caption" Text="{loc:Tr Home_NoAccountHint}" TextWrapping="Wrap" />
-        </StackPanel>
-      </Border>
+      <!-- ── 左栏 ── -->
+      <Grid RowDefinitions="1.35*,*" RowSpacing="18">
 
-      <StackPanel Spacing="18" IsVisible="{Binding Accounts.HasAccount}">
-        <!-- 账号概况 -->
-        <Border Classes="card" Padding="22,20" AutomationProperties.AutomationId="home-profile">
-          <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="18">
-            <Border Classes="portrait" Width="68" Height="68" CornerRadius="34" VerticalAlignment="Center">
-              <Panel>
-                <TextBlock FontSize="24" Text="{Binding Accounts.DisplayName, Converter={x:Static pulls:InitialConverter.Instance}}"
-                           IsVisible="{Binding #Avatar.Source, Converter={x:Static ObjectConverters.IsNull}}" />
-                <c:CatalogImage x:Name="Avatar" Path="{Binding Accounts.Current.IconPath}" DecodeWidth="136" Stretch="UniformToFill" />
-              </Panel>
-            </Border>
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4" MinWidth="160">
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBlock Text="{Binding Accounts.DisplayName}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
-                <TextBlock Text="{Binding Accounts.Current.Level, StringFormat='LV.{0}'}" IsVisible="{Binding Accounts.HasLevel}"
-                           FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
-              </StackPanel>
-              <TextBlock Classes="caption" Text="{Binding UidLine}" />
+        <!-- 账号总览 -->
+        <Border Classes="card" Padding="22,20,22,22" ClipToBounds="True" AutomationProperties.AutomationId="home-profile">
+          <Panel>
+            <!-- 右上点阵与 Logo 水印 -->
+            <c:DotField Width="420" Height="200" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-60,-52,0"
+                        Brush="{DynamicResource AccentBrush}" Opacity="0.28" />
+            <Image Source="avares://WwTool/Assets/WwTool.ico" Width="120" Height="120" HorizontalAlignment="Right" VerticalAlignment="Top"
+                   Margin="0,2,4,0" Opacity="0.08" IsHitTestVisible="False" />
+
+            <!-- 没有账号 -->
+            <StackPanel IsVisible="{Binding !Accounts.HasAccount}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10"
+                        AutomationProperties.AutomationId="home-no-account">
+              <c:PixelGif Width="64" Height="64" HorizontalAlignment="Center" />
+              <TextBlock Classes="section-title" Text="{loc:Tr Home_NoAccountTitle}" HorizontalAlignment="Center" />
+              <TextBlock Classes="caption" Text="{loc:Tr Home_NoAccountHint}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="420" />
             </StackPanel>
-            <UniformGrid Grid.Column="2" Rows="1" Margin="12,0,0,0" VerticalAlignment="Center">
-              <Border Classes="fact">
-                <StackPanel><TextBlock Classes="caption" Text="{loc:Tr Index_ActiveDays}" /><TextBlock Classes="fact-value" Text="{Binding ActiveDays}" /></StackPanel>
-              </Border>
-              <Border Classes="fact">
-                <StackPanel><TextBlock Classes="caption" Text="{loc:Tr Index_CreateDate}" /><TextBlock Classes="fact-value" Text="{Binding CreateDate}" /></StackPanel>
-              </Border>
-              <Border Classes="fact">
-                <StackPanel><TextBlock Classes="caption" Text="{loc:Tr Index_SolaLevel}" /><TextBlock Classes="fact-value" Text="{Binding WorldLevel}" /></StackPanel>
-              </Border>
-              <Border Classes="fact">
-                <StackPanel><TextBlock Classes="caption" Text="{loc:Tr Index_Server}" /><TextBlock Classes="fact-value" Text="{Binding Server}" TextTrimming="CharacterEllipsis" /></StackPanel>
-              </Border>
-              <Border Classes="fact">
-                <StackPanel><TextBlock Classes="caption" Text="{loc:Tr Index_OwnedRoles}" /><TextBlock Classes="fact-value" Text="{Binding RoleCount}" /></StackPanel>
-              </Border>
-            </UniformGrid>
-            <Button Grid.Column="3" Classes="pill" Content="{loc:Tr Home_Sync}" Command="{Binding SyncCommand}" VerticalAlignment="Center"
-                    AutomationProperties.AutomationId="home-sync" />
-          </Grid>
-        </Border>
 
-        <!-- 尚未同步 -->
-        <Border Classes="card" Padding="28,24" IsVisible="{Binding ShowNoSnapshot}" AutomationProperties.AutomationId="home-no-snapshot">
-          <StackPanel Spacing="6">
-            <TextBlock Classes="section-title" Text="{loc:Tr Home_NoSnapshotTitle}" />
-            <TextBlock Classes="caption" Text="{loc:Tr Home_NoSnapshotHint}" TextWrapping="Wrap" />
-          </StackPanel>
-        </Border>
-
-        <!-- 体力、储备体力、活跃度 / 电台、周本、角色 -->
-        <StackPanel Spacing="18" IsVisible="{Binding HasSnapshot}">
-          <UniformGrid Columns="3" ColumnSpacing="18">
-            <ContentControl Content="{Binding Energy}" />
-            <ContentControl Content="{Binding StoreEnergy}" />
-            <ContentControl Content="{Binding Liveness}" />
-          </UniformGrid>
-          <UniformGrid Columns="3" ColumnSpacing="18">
-            <ContentControl Content="{Binding Radio}" />
-            <ContentControl Content="{Binding WeeklyBoss}" />
-            <!-- 角色：数量与几位角色头像，点击进入角色页 -->
-            <Button Classes="card-button" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" Command="{Binding OpenRolesCommand}"
-                    AutomationProperties.AutomationId="home-open-roles" AutomationProperties.Name="{loc:Tr Home_ViewRoles}">
-              <Border Classes="card gauge" Padding="22,18">
-                <Grid RowDefinitions="Auto,*">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Classes="label" Text="{loc:Tr Index_OwnedRoles}" />
-                    <TextBlock Classes="label" Text="{Binding RoleCount}" FontWeight="SemiBold" />
+            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18" IsVisible="{Binding Accounts.HasAccount}">
+              <!-- 身份行 -->
+              <StackPanel Orientation="Horizontal" Spacing="16">
+                <Border Width="64" Height="64" CornerRadius="32" ClipToBounds="True" Background="{DynamicResource AccentContainerBrush}">
+                  <Panel>
+                    <TextBlock FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Text="{Binding Accounts.DisplayName, Converter={x:Static pulls:InitialConverter.Instance}}"
+                               IsVisible="{Binding #Avatar.Source, Converter={x:Static ObjectConverters.IsNull}}" />
+                    <c:CatalogImage x:Name="Avatar" Path="{Binding Accounts.Current.IconPath}" DecodeWidth="128" Stretch="UniformToFill" />
+                  </Panel>
+                </Border>
+                <StackPanel VerticalAlignment="Center" Spacing="4">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Accounts.DisplayName}" FontSize="22" FontWeight="Bold" />
+                    <TextBlock Text="{Binding Accounts.Current.Level, StringFormat='LV.{0}'}" IsVisible="{Binding Accounts.HasLevel}"
+                               FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource AccentTextBrush}" VerticalAlignment="Center" Margin="0,3,0,0" />
                   </StackPanel>
-                  <ItemsControl Grid.Row="1" ItemsSource="{Binding RoleIcons}" VerticalAlignment="Bottom" Margin="0,12,0,0">
-                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="10" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="x:String">
-                        <Border Classes="portrait" Width="60" Height="60" CornerRadius="10">
-                          <c:CatalogImage Path="{Binding}" DecodeWidth="120" Stretch="UniformToFill" />
-                        </Border>
-                      </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
-                </Grid>
-              </Border>
-            </Button>
-          </UniformGrid>
-        </StackPanel>
-
-        <!-- 唤取记录摘要：点击进入抽卡统计。右侧留出悬浮按钮的位置。 -->
-        <Button Classes="card-button" Margin="0,0,84,0" Command="{Binding OpenPullsCommand}"
-                AutomationProperties.AutomationId="home-open-pulls" AutomationProperties.Name="{loc:Tr Home_PullRecords}">
-          <Border Classes="card" Padding="22,16">
-            <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="22">
-              <Image Width="52" Height="52" Source="{Binding Source='avares://WwTool/Assets/Images/UpRolePull.png', Converter={x:Static shell:AssetImageConverter.Instance}}" />
-              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                <TextBlock Classes="section-title" Text="{loc:Tr Home_PullRecords}" />
-                <TextBlock Classes="caption" Text="{loc:Tr Home_PullsLocal}" />
+                  <TextBlock Classes="aux muted" Text="{Binding UidLine}" />
+                </StackPanel>
               </StackPanel>
-              <TextBlock Grid.Column="2" Classes="caption" VerticalAlignment="Center" Text="{loc:Tr Home_PullsEmpty}" IsVisible="{Binding !HasPulls}" />
-              <Grid Grid.Column="2" ColumnDefinitions="*,*,2*" IsVisible="{Binding HasPulls}" VerticalAlignment="Center">
-                <Border Classes="fact">
-                  <StackPanel><TextBlock Classes="caption" Text="{loc:Tr Home_TotalPulls}" /><TextBlock Classes="fact-value" Text="{Binding TotalPulls}" /></StackPanel>
-                </Border>
-                <Border Grid.Column="1" Classes="fact">
-                  <StackPanel><TextBlock Classes="caption" Text="{loc:Tr Home_FiveStars}" /><TextBlock Classes="fact-value" Text="{Binding FiveStars}" /></StackPanel>
-                </Border>
-                <Border Grid.Column="2" Classes="fact">
-                  <StackPanel Spacing="8">
-                    <TextBlock Classes="caption" Text="{Binding PityText}" />
-                    <c:SegmentedBar Classes="thin" Value="{Binding CurrentPity}" Maximum="80" />
-                  </StackPanel>
-                </Border>
-              </Grid>
-            </Grid>
-          </Border>
-        </Button>
-      </StackPanel>
-    </StackPanel>
-  </ScrollViewer>
 
-  <UserControl.DataTemplates>
-    <DataTemplate DataType="home:GaugeCard">
-      <Border Classes="card gauge" Padding="22,18">
-        <Grid RowDefinitions="Auto,*,Auto,Auto">
-          <StackPanel Orientation="Horizontal" Spacing="12">
-            <Image Width="36" Height="36" Source="{Binding Icon, Converter={x:Static shell:AssetImageConverter.Instance}}" />
-            <TextBlock Classes="label" Text="{Binding Title}" VerticalAlignment="Center" />
-          </StackPanel>
-          <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,12,0,0">
-            <TextBlock Classes="gauge-value" Text="{Binding Value}" />
-            <TextBlock Classes="gauge-suffix" Text="{Binding Suffix}" IsVisible="{Binding Suffix, Converter={x:Static ObjectConverters.IsNotNull}}" />
-          </StackPanel>
-          <c:SegmentedBar Grid.Row="2" Margin="0,14,0,0" Value="{Binding Current}" Maximum="{Binding Maximum}"
-                          Classes.hot="{Binding IsHot}" IsVisible="{Binding HasBar}" />
-          <TextBlock Grid.Row="3" Classes="caption" Margin="0,8,0,0" Text="{Binding Caption}" />
-        </Grid>
+              <!-- 统计行 -->
+              <Border Grid.Row="1" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1" Padding="0,14">
+                <UniformGrid Columns="5">
+                  <Border Classes="stat first">
+                    <StackPanel Spacing="4"><TextBlock Classes="caption" Text="{loc:Tr Index_ActiveDays}" /><c:RollingText Classes="flash" FontSize="22" FontWeight="Bold" Text="{Binding ActiveDays}" /></StackPanel>
+                  </Border>
+                  <Border Classes="stat">
+                    <StackPanel Spacing="4"><TextBlock Classes="caption" Text="{loc:Tr Index_CreateDate}" /><c:RollingText Classes="flash" FontSize="22" FontWeight="Bold" Text="{Binding CreateDate}" /></StackPanel>
+                  </Border>
+                  <Border Classes="stat">
+                    <StackPanel Spacing="4"><TextBlock Classes="caption" Text="{loc:Tr Index_SolaLevel}" /><c:RollingText Classes="flash" FontSize="22" FontWeight="Bold" Text="{Binding WorldLevel}" /></StackPanel>
+                  </Border>
+                  <Border Classes="stat">
+                    <StackPanel Spacing="4"><TextBlock Classes="caption" Text="{loc:Tr Index_Server}" /><TextBlock FontSize="22" FontWeight="Bold" Text="{Binding Server}" TextTrimming="CharacterEllipsis" /></StackPanel>
+                  </Border>
+                  <Border Classes="stat">
+                    <StackPanel Spacing="4"><TextBlock Classes="caption" Text="{loc:Tr Index_OwnedRoles}" /><c:RollingText Classes="flash" FontSize="22" FontWeight="Bold" Text="{Binding RoleCount}" /></StackPanel>
+                  </Border>
+                </UniformGrid>
+              </Border>
+
+              <!-- 资源卡 -->
+              <ItemsControl Grid.Row="2" ItemsSource="{Binding Resources}" AutomationProperties.AutomationId="home-resources">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><UniformGrid Rows="1" ColumnSpacing="12" /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="home:ResourceCard">
+                    <Panel>
+                      <c:OrbitGlow IsHalo="True" IsActive="{Binding IsFull}" Radius="10"
+                                   Color="{DynamicResource AccentColor}" LightColor="{DynamicResource GoldLightColor}" />
+                      <Border Classes="res">
+                        <Panel>
+                          <c:HatchStrip Height="46" VerticalAlignment="Top" Margin="-14,-14,-14,0"
+                                        Brush="{DynamicResource AccentBrush}" Opacity="0.06" />
+                          <Grid RowDefinitions="Auto,Auto,Auto,*">
+                            <DockPanel>
+                              <Image DockPanel.Dock="Left" Width="30" Height="30" Margin="0,0,8,0" Source="{Binding Icon, Converter={x:Static shell:AssetImageConverter.Instance}}" />
+                              <Border DockPanel.Dock="Right" Classes="full-tag" Margin="6,0,0,0" IsVisible="{Binding IsFull}">
+                                <TextBlock Text="{loc:Tr Home_Full}" />
+                              </Border>
+                              <TextBlock Classes="label" Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,16,0,0">
+                              <c:RollingText Classes="flash" Text="{Binding Value}" FontSize="34" FontWeight="Bold" LetterSpacing="-0.5" />
+                              <TextBlock Classes="unit" Margin="4,0,0,4" VerticalAlignment="Bottom" Text="{Binding Suffix}"
+                                         IsVisible="{Binding Suffix, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                            </StackPanel>
+                            <c:SegmentedBar Grid.Row="2" Classes="thin" Margin="0,10,0,0" IsVisible="{Binding HasBar}"
+                                            Value="{Binding Current}" Maximum="{Binding Maximum}" />
+                            <ItemsControl Grid.Row="2" Margin="0,10,0,0" ItemsSource="{Binding Cells}" IsVisible="{Binding IsWeekly}">
+                              <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><UniformGrid Rows="1" ColumnSpacing="6" /></ItemsPanelTemplate>
+                              </ItemsControl.ItemsPanel>
+                              <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="x:Boolean">
+                                  <Border Classes="cell" Classes.on="{Binding}" />
+                                </DataTemplate>
+                              </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl Grid.Row="3" ItemsSource="{Binding Rows}" VerticalAlignment="Bottom" Margin="0,12,0,0">
+                              <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><StackPanel Spacing="7" /></ItemsPanelTemplate>
+                              </ItemsControl.ItemsPanel>
+                              <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="home:KeyValueRow">
+                                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                    <TextBlock Classes="kv-key" Text="{Binding Key}" TextTrimming="CharacterEllipsis" />
+                                    <c:RollingText Grid.Column="1" Classes="kv-value" HorizontalAlignment="Right" Text="{Binding Value}"
+                                                   FlashOnChange="{Binding !IsLive}" />
+                                  </Grid>
+                                </DataTemplate>
+                              </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                          </Grid>
+                        </Panel>
+                      </Border>
+                      <c:OrbitGlow IsActive="{Binding IsFull}" Radius="10"
+                                   Color="{DynamicResource AccentColor}" LightColor="{DynamicResource GoldLightColor}" />
+                    </Panel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+            <c:CornerMarks Margin="-22,-20,-22,-22" />
+          </Panel>
+        </Border>
+
+        <!-- 便捷操作 -->
+        <Border Grid.Row="1" Classes="card" Padding="22,18,22,20" AutomationProperties.AutomationId="home-quick">
+          <Panel>
+            <Grid RowDefinitions="Auto,*" RowSpacing="12">
+              <TextBlock Classes="card-title" Text="{loc:Tr Home_QuickActions}" />
+              <ItemsControl Grid.Row="1" ItemsSource="{Binding QuickActions}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><UniformGrid Columns="4" Rows="2" ColumnSpacing="12" RowSpacing="12" /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="home:QuickAction">
+                    <Button Classes="quick" Classes.primary="{Binding IsPrimary}" Classes.busy="{Binding IsBusy}" Classes.success="{Binding IsSuccess}"
+                            Command="{Binding Command}" AutomationProperties.AutomationId="{Binding AutomationId}"
+                            AutomationProperties.Name="{Binding Title}">
+                      <Grid RowDefinitions="*,Auto" RowSpacing="8">
+                        <Border Classes="disc">
+                          <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <c:StrokeIcon Width="20" Height="20" Data="{Binding Icon, Converter={x:Static home:IconKeyConverter.Instance}}">
+                              <c:StrokeIcon.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                  <Binding Path="!IsBusy" />
+                                  <Binding Path="!IsSuccess" />
+                                </MultiBinding>
+                              </c:StrokeIcon.IsVisible>
+                            </c:StrokeIcon>
+                            <c:StrokeIcon Width="20" Height="20" Data="{StaticResource Icon.Check}" IsVisible="{Binding IsSuccess}" />
+                            <c:PixelGif Width="30" Height="30" Margin="-5" IsVisible="{Binding IsBusy}" />
+                          </Panel>
+                        </Border>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="7">
+                          <Ellipse Classes="live" IsVisible="{Binding IsRunning}" />
+                          <TextBlock Classes="title" Text="{Binding Title}" />
+                        </StackPanel>
+                      </Grid>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+            <c:CornerMarks Margin="-22,-18,-22,-20" />
+          </Panel>
+        </Border>
+      </Grid>
+
+      <!-- ── 右栏：游戏公告 ── -->
+      <Border Grid.Column="1" Classes="card" Padding="20,18,20,16" Margin="0,0,0,76" AutomationProperties.AutomationId="home-announcements">
+        <Panel>
+          <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="card-title" Text="{loc:Tr Home_Announcements}" VerticalAlignment="Center" />
+              <ItemsControl Grid.Column="1" ItemsSource="{Binding Filters}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="home:AnnouncementFilter">
+                    <RadioButton Classes="ann-chip" GroupName="home-ann" Content="{Binding Title}" IsChecked="{Binding IsSelected}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+
+            <home:BannerCarousel Grid.Row="1" Banners="{Binding Banners}" IsVisible="{Binding HasBanners}" />
+
+            <ItemsControl Grid.Row="2" Classes="ann-list" ItemsSource="{Binding AnnouncementRows}" ClipToBounds="True">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="home:AnnouncementRow">
+                  <Button Classes="ann-row" Command="{Binding $parent[ItemsControl].((home:HomeViewModel)DataContext).OpenAnnouncementCommand}"
+                          CommandParameter="{Binding}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                      <Border Classes="ntag" Classes.version="{Binding IsVersion}" Classes.maintenance="{Binding IsMaintenance}" Classes.notice="{Binding IsNotice}">
+                        <TextBlock Text="{Binding KindText}" />
+                      </Border>
+                      <TextBlock Grid.Column="1" Classes="aux ann-title" Text="{Binding Title}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="2" Classes="caption" Text="{Binding DateText}" VerticalAlignment="Center" />
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- 暂无公告 -->
+            <StackPanel Grid.Row="1" Grid.RowSpan="2" IsVisible="{Binding ShowAnnouncementsEmpty}" VerticalAlignment="Center"
+                        HorizontalAlignment="Center" Spacing="8" AutomationProperties.AutomationId="home-ann-empty">
+              <c:PixelGif Width="56" Height="56" HorizontalAlignment="Center" />
+              <TextBlock Classes="card-title" Text="{loc:Tr Home_AnnEmptyTitle}" HorizontalAlignment="Center" />
+              <TextBlock Classes="caption" Text="{loc:Tr Home_AnnEmptyHint}" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <Button Grid.Row="3" Classes="link" HorizontalAlignment="Center" Content="{loc:Tr Home_AnnViewAll}"
+                    Command="{Binding OpenAllAnnouncementsCommand}" AutomationProperties.AutomationId="home-ann-all" />
+          </Grid>
+          <c:CornerMarks Margin="-20,-18,-20,-16" />
+        </Panel>
       </Border>
-    </DataTemplate>
-  </UserControl.DataTemplates>
+    </Grid>
+  </ScrollViewer>
 </UserControl>

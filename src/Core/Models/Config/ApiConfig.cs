@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -81,5 +81,9 @@ namespace WwTool.Core.Models.Config
         public string H5LoginUrl { get; set; } = "https://api.kurobbs.com/user/loginForH5";
         public string GuideBaseUrl { get; set; } = "https://guide-server.aki-game.net";
         public string GuideFallbackBaseUrl { get; set; } = "https://guide-server-1.aki-game.net";
+        /// <summary>首页「官方攻略站」打开的网页。</summary>
+        public string GuideSiteUrl { get; set; } = "https://wiki.kurobbs.com/mc/home";
+        /// <summary>首页公告卡「前往官网查看全部公告」的默认网页。</summary>
+        public string OfficialSiteUrl { get; set; } = "https://mc.kurogame.com/";
     }
 }

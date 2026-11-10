@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -99,6 +99,10 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private bool _isAccountsPage;
 
+    /// <summary>首页打开时显示首页专属底纹装饰。</summary>
+    [ObservableProperty]
+    private bool _isHomePage;
+
     [RelayCommand]
     private void OpenAccounts() => _navigation.NavigateTo(Pages.Accounts.AccountsViewModel.PageKey);
 
@@ -144,6 +148,7 @@ public sealed partial class ShellViewModel : ObservableObject
         }
         CurrentPage = e.ViewModel;
         IsAccountsPage = e.Page.Key == Pages.Accounts.AccountsViewModel.PageKey;
+        IsHomePage = e.Page.Key == "home";
         Fab.SetProvider(e.ViewModel as IFabProvider);
         UpdatePageTitle();
     }
