@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,12 +14,17 @@ using WwTool.Core.Services.Guide;
 using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
 using WwTool.UI.Services;
+using WwTool.UI.Shell;
 
 namespace WwTool.UI.Pages.Roles;
 
 /// <summary>角色 / 武器网格里的一格。</summary>
-public abstract class GuideTile : IGuideCard
+public abstract partial class GuideTile : ObservableObject, IGuideCard
 {
+    /// <summary>详情浮层打开时，对应卡片显示选中态。</summary>
+    [ObservableProperty]
+    private bool _isSelected;
+
     public required string Id { get; init; }
     public required string Name { get; init; }
     public required string IconPath { get; init; }
@@ -86,8 +91,10 @@ public sealed partial class ChipOption(string key) : ObservableObject
 /// 角色页：当前账号在官方攻略站的已有角色与已装备武器（本地快照），按星级分组。
 /// “同步”从攻略站拉取；需要登录时先尝试用当前登录会话换取攻略站令牌。
 /// </summary>
-public sealed partial class RolesViewModel : ObservableObject, INavigationAware
+public sealed partial class RolesViewModel : ObservableObject, INavigationAware, IFabProvider
 {
+    private const string Icons = "avares://WwTool/Assets/Images/";
+
     private readonly IGuideRepository _guide;
     private readonly IGuideSyncService _guideSync;
     private readonly ILoginService _login;
@@ -126,9 +133,16 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware
         ErrorReporter errors,
         ILoggerService logger,
         AvaloniaCatalogImageService images,
-        AccountActions actions)
+        AccountActions actions,
+        INavigationService navigation)
     {
         _actions = actions;
+        // 悬浮按钮：收起态加号，展开为「刷新数据」（主，从攻略站同步）与「返回上一页」。
+        FabActions =
+        [
+            new FabAction("refresh", "Fab_RefreshData", Icons + "Refresh.png", SyncCommand, localization),
+            new FabAction("back", "Fab_Back", "Icon.Back", new RelayCommand(() => navigation.GoBack()), localization),
+        ];
         Accounts = accounts;
         _guide = guide;
         _guideSync = guideSync;
@@ -155,6 +169,7 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware
     }
 
     public AccountContext Accounts { get; }
+    public IReadOnlyList<FabAction> FabActions { get; }
     public ObservableCollection<ChipOption> Tabs { get; }
     public ObservableCollection<ChipOption> Sorts { get; }
     public ObservableCollection<TileGroup> Groups { get; } = [];

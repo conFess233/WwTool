@@ -54,10 +54,21 @@ public partial class MainWindow : Window
         // 本地截图验证：窗口放到屏幕外、不抢焦点、不进任务栏，不打扰正在用电脑的人。
         if (Environment.GetEnvironmentVariable("WWTOOL_QUIET_VERIFY") == "1")
         {
+            // 显示时系统会把窗口拉回屏幕内，所以先全透明显示，打开后再移到屏幕外、恢复不透明。
             ShowActivated = false;
             ShowInTaskbar = false;
             WindowStartupLocation = WindowStartupLocation.Manual;
             Position = new PixelPoint(-6000, 100);
+            Opacity = 0;
+            Opened += (_, _) =>
+            {
+                Position = new PixelPoint(-6000, 100);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    Position = new PixelPoint(-6000, 100);
+                    Opacity = 1;
+                }, DispatcherPriority.Background);
+            };
         }
 #endif
     }
