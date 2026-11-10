@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,19 +19,35 @@ public enum PityKind
     Guaranteed,
 }
 
-/// <summary>卡片下方的四星记录：名称 × 次数。</summary>
+/// <summary>期间获得的四星：名称 × 次数。</summary>
 public sealed record FourStarChip(int ResourceId, string Name, int Count)
 {
-    public string Text => $"{Name} ×{Count}";
+    public string Text => $"{Name} x{Count}";
+    public string CountText => $"x{Count}";
+    public string IconPath => $"Local/Icons/{ResourceId}.png";
 }
 
-/// <summary>一次五星记录。</summary>
-public sealed class FiveStarCard
+/// <summary>一次五星记录。点击行展开期间获得的四星明细。</summary>
+public sealed partial class FiveStarCard : ObservableObject
 {
+    [ObservableProperty]
+    private bool _isExpanded;
+
+    [ObservableProperty]
+    private bool _isHighlighted;
+
+    public CardPoolType Pool { get; init; }
+
     public required int ResourceId { get; init; }
     public required string Name { get; init; }
     public required DateTime? Time { get; init; }
     public required string TimeText { get; init; }
+
+    /// <summary>名称下方的说明：记录列表为获取时间，总览为「卡池，日期」。</summary>
+    public string Subtitle => SubtitleOverride ?? TimeText;
+
+    public string? SubtitleOverride { get; set; }
+
     public required int Pity { get; init; }
 
     /// <summary>true 限定 / false 常驻 / null 无法判断（资料缺失的武器）。</summary>
@@ -53,6 +69,11 @@ public sealed class FiveStarCard
     public bool IsGuaranteed => Kind == PityKind.Guaranteed;
     public bool IsSoftPity => Kind == PityKind.SoftPity;
     public bool IsStandardPool => Kind == PityKind.Standard;
+    public bool HasFourStars => FourStars.Count > 0;
+    public bool NoFourStars => FourStars.Count == 0;
+
+    /// <summary>抽数刻度条的比例（满格 80 抽）。</summary>
+    public double PityRatio => Math.Min(1, Pity / (double)PullsSummaryCalculator.HardPity);
 }
 
 /// <summary>列表首项：自上一个五星起的进度。</summary>
@@ -65,6 +86,7 @@ public sealed class NotYetCard
     public required IReadOnlyList<FourStarChip> FourStars { get; init; }
     public required string ToHardPityText { get; init; }
     public bool ShowsNextKind => NextIsGuaranteed is not null;
+    public bool HasFourStars => FourStars.Count > 0;
     public bool IsNextGuaranteed => NextIsGuaranteed == true;
     public bool IsNextSoftPity => NextIsGuaranteed == false;
 }
@@ -184,7 +206,15 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
             ToHardPityText = string.Format(_localization["Pulls_ToHardPity"], progress.PullsToHardPity),
         };
 
-        // 保底类型按时间顺序推算：歪了之后的下一个五星为大保底。
+        var cards = BuildCards(stats, Pool);
+        _all = cards;
+        ApplyFilter();
+    }
+
+
+    /// <summary>卡池的五星记录（新→旧）。保底类型按时间顺序推算：歪了之后的下一个五星为大保底。</summary>
+    internal static List<FiveStarCard> BuildCards(CardPoolStatistics stats, CardPoolType Pool)
+    {
         var chronological = stats.HitGoldDatas.Where(x => x.GachaData.QualityLevel == 5).Reverse().ToList();
         var cards = new List<FiveStarCard>(chronological.Count);
         bool guaranteed = false;
@@ -197,6 +227,7 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
             PityKind kind = !hasPityRule ? PityKind.Standard : guaranteed ? PityKind.Guaranteed : PityKind.SoftPity;
             cards.Add(new FiveStarCard
             {
+                Pool = Pool,
                 ResourceId = hit.GachaData.ResourceId,
                 Name = hit.DisplayName,
                 Time = time,
@@ -210,8 +241,7 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
             if (Pool == CardPoolType.CharacterEvent) guaranteed = hit.IsMiss == true;
         }
         cards.Reverse(); // 新→旧
-        _all = cards;
-        ApplyFilter();
+        return cards;
     }
 
     private void ApplyFilter()

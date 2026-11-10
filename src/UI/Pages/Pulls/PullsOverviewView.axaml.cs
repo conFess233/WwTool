@@ -1,25 +1,120 @@
+using System.Windows.Input;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
+using Avalonia.VisualTree;
+using WwTool.UI.Controls;
 
 namespace WwTool.UI.Pages.Pulls;
 
+/// <summary>
+/// 抽卡统计视图行为：总览滚动时筛选栏下方阴影渐显；记录行点击展开、右键菜单（行同时高亮）与导出分享图片。
+/// </summary>
 public partial class PullsOverviewView : UserControl
 {
-    /// <summary>距底部多少像素时加载下一页。</summary>
-    private const double LoadMoreThreshold = 320;
-
     public PullsOverviewView()
     {
         InitializeComponent();
-        Scroller.ScrollChanged += OnScrollChanged;
+        OverviewScroller.ScrollChanged += (_, _) => BarShadow.Opacity = Math.Clamp(OverviewScroller.Offset.Y / 24, 0, 1);
+        AddHandler(TappedEvent, OnTapped);
+        AddHandler(ContextRequestedEvent, OnContextRequested);
     }
 
-    // 纯视图行为：滚动到接近底部时触发视图模型的分页加载。
-    private void OnScrollChanged(object? sender, ScrollChangedEventArgs e)
+    private PullsOverviewViewModel? ViewModel => DataContext as PullsOverviewViewModel;
+
+    /// <summary>从事件源向上找到记录行。</summary>
+    private static (Control Row, FiveStarCard Card)? FindRow(object? source)
     {
-        if (DataContext is not PullsOverviewViewModel { IsPoolView: true, Records.HasMore: true } vm) return;
-        if (Scroller.Offset.Y + Scroller.Viewport.Height >= Scroller.Extent.Height - LoadMoreThreshold)
+        for (Visual? v = source as Visual; v is not null; v = v.GetVisualParent())
         {
-            vm.Records.LoadMore();
+            if (v is Border { DataContext: FiveStarCard card } row && row.Classes.Contains("rec-row")) return (row, card);
+        }
+        return null;
+    }
+
+    private void OnTapped(object? sender, TappedEventArgs e)
+    {
+        if (FindRow(e.Source) is { Card: var card })
+        {
+            card.IsExpanded = !card.IsExpanded;
+            e.Handled = true;
+        }
+    }
+
+    private void OnContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (FindRow(e.Source) is not { } hit || ViewModel is not { } vm) return;
+        (Control row, FiveStarCard card) = hit;
+
+        var export = MenuItem(vm.Text("Pulls_CtxExport"), "Icon.Image", null, null, null);
+        export.Click += async (_, _) => await ExportAsync(row, card, vm);
+        var menu = new ContextMenu
+        {
+            ItemsSource = new Control[]
+            {
+                MenuItem(vm.Text("Pulls_CtxCopy"), "Icon.Copy", vm.CopyRecordCommand, card, new KeyGesture(Key.C, KeyModifiers.Control)),
+                MenuItem(vm.Text("Pulls_CtxViewRole"), "Icon.User", vm.ViewRoleCommand, card, null),
+                MenuItem(vm.Text("Pulls_CtxLocate"), "Icon.Chart", vm.LocateInChartsCommand, card, null),
+                new Separator(),
+                export,
+            },
+        };
+        card.IsHighlighted = true;
+        menu.Closed += (_, _) => card.IsHighlighted = false;
+        menu.Open(row);
+        e.Handled = true;
+    }
+
+    private static MenuItem MenuItem(string header, string icon, ICommand? command, object? parameter, KeyGesture? gesture)
+    {
+        var item = new MenuItem
+        {
+            Header = header,
+            Command = command,
+            CommandParameter = parameter,
+            InputGesture = gesture,
+        };
+        if (Application.Current?.TryGetResource(icon, null, out object? geometry) == true && geometry is Avalonia.Media.Geometry g)
+        {
+            item.Icon = new StrokeIcon { Data = g };
+        }
+        return item;
+    }
+
+    /// <summary>把记录行渲染成 2 倍图并另存为 PNG。</summary>
+    private async Task ExportAsync(Control row, FiveStarCard card, PullsOverviewViewModel vm)
+    {
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        IStorageFile? file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = vm.Text("Pulls_ExportTitle"),
+            SuggestedFileName = $"{card.Name}-{card.Pity}.png",
+            DefaultExtension = "png",
+            FileTypeChoices = [FilePickerFileTypes.ImagePng],
+        });
+        if (file is null) return;
+
+        card.IsHighlighted = true;
+        try
+        {
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => { }, Avalonia.Threading.DispatcherPriority.Render);
+            var size = new PixelSize((int)Math.Ceiling(row.Bounds.Width * 2), (int)Math.Ceiling(row.Bounds.Height * 2));
+            using var bitmap = new RenderTargetBitmap(size, new Vector(192, 192));
+            bitmap.Render(row);
+            await using Stream stream = await file.OpenWriteAsync();
+            bitmap.Save(stream);
+            vm.ReportExported(file.Name);
+        }
+        catch (Exception ex)
+        {
+            vm.ReportExportFailed(ex);
+        }
+        finally
+        {
+            card.IsHighlighted = false;
         }
     }
 }

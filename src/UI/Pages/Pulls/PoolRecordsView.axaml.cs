@@ -6,10 +6,24 @@ namespace WwTool.UI.Pages.Pulls;
 
 public partial class PoolRecordsView : UserControl
 {
-    public PoolRecordsView() => InitializeComponent();
+    /// <summary>距底部多少像素时加载下一页。</summary>
+    private const double LoadMoreThreshold = 240;
+
+    public PoolRecordsView()
+    {
+        InitializeComponent();
+        ListScroller.ScrollChanged += OnScrollChanged;
+    }
+
+    // 列表内部滚动：接近底部时加载更早的记录。
+    private void OnScrollChanged(object? sender, ScrollChangedEventArgs e)
+    {
+        if (DataContext is not PoolRecordsViewModel { HasMore: true } vm) return;
+        if (ListScroller.Offset.Y + ListScroller.Viewport.Height >= ListScroller.Extent.Height - LoadMoreThreshold) vm.LoadMore();
+    }
 }
 
-/// <summary>取名称首字作为头像占位（立绘接入前使用）。</summary>
+/// <summary>取名称首字作为头像占位（图标缺失时使用）。</summary>
 public sealed class InitialConverter : IValueConverter
 {
     public static readonly InitialConverter Instance = new();

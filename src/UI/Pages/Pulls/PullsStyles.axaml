@@ -1,0 +1,250 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:WwTool.UI.Controls">
+  <!-- 抽卡统计各视图共用的样式（开发文档「抽卡统计」「通用组件 → 胶囊与标签 / 刻度条」）。 -->
+
+  <!-- 指标卡：高 112，标签在上、数字贴底，可带一行说明 -->
+  <Style Selector="Border.metric">
+    <Setter Property="Height" Value="112" />
+  </Style>
+  <Style Selector="Border.metric c|RollingText.metric-value">
+    <Setter Property="FontSize" Value="34" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="LetterSpacing" Value="-1" />
+    <Setter Property="FlashOnChange" Value="True" />
+    <Setter Property="FlashBrush" Value="{DynamicResource GoldLightBrush}" />
+  </Style>
+
+  <!-- 小号状态标签（记录行）：11 号、内边距 8 / 3 -->
+  <Style Selector="Border.tag.sm">
+    <Setter Property="Padding" Value="8,3" />
+  </Style>
+  <Style Selector="Border.tag.sm > TextBlock">
+    <Setter Property="FontSize" Value="11" />
+  </Style>
+  <!-- 「即将触底」外扩光圈 -->
+  <Style Selector="Border.near-ring">
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Opacity" Value="0" />
+  </Style>
+  <Style Selector="Window:not(.reduced) Border.near-ring">
+    <Style.Animations>
+      <Animation Duration="0:0:1.2" IterationCount="Infinite" Easing="0.2,0.8,0.2,1">
+        <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.7" /><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
+        <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0" /><Setter Property="ScaleTransform.ScaleX" Value="1.25" /><Setter Property="ScaleTransform.ScaleY" Value="1.6" /></KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+  <!-- 保底预警：数字心跳（放大 8% 再 4%） -->
+  <Style Selector="Window:not(.reduced) TextBlock.heartbeat">
+    <Setter Property="RenderTransformOrigin" Value="0%,100%" />
+    <Style.Animations>
+      <Animation Duration="0:0:1.2" IterationCount="Infinite">
+        <KeyFrame Cue="0%"><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
+        <KeyFrame Cue="14%"><Setter Property="ScaleTransform.ScaleX" Value="1.08" /><Setter Property="ScaleTransform.ScaleY" Value="1.08" /></KeyFrame>
+        <KeyFrame Cue="28%"><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
+        <KeyFrame Cue="42%"><Setter Property="ScaleTransform.ScaleX" Value="1.04" /><Setter Property="ScaleTransform.ScaleY" Value="1.04" /></KeyFrame>
+        <KeyFrame Cue="70%"><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
+        <KeyFrame Cue="100%"><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+  <!-- 保底预警：红色刻度条发光呼吸 -->
+  <Style Selector="Border.bar-glow">
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="BoxShadow" Value="0 0 12 1 #80A8302A" />
+    <Setter Property="Opacity" Value="0.6" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+  </Style>
+  <Style Selector="Window:not(.reduced) Border.bar-glow">
+    <Style.Animations>
+      <Animation Duration="0:0:1.2" IterationCount="Infinite" Easing="0.45,0,0.55,1">
+        <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.25" /></KeyFrame>
+        <KeyFrame Cue="50%"><Setter Property="Opacity" Value="1" /></KeyFrame>
+        <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.25" /></KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+
+  <!-- 记录行：高 92，行间分隔线；悬停淡底；右键时高亮（Highlight 底 + Accent Line 描边） -->
+  <Style Selector="Border.rec-row">
+    <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="ItemsControl.rec-list > ContentPresenter:nth-child(1) Border.rec-row">
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="Border.rec-row > Border.rec-body">
+    <Setter Property="Padding" Value="4,0" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Background" Duration="0:0:0.15" />
+        <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Border.rec-row:pointerover > Border.rec-body">
+    <Setter Property="Background" Value="{DynamicResource SurfaceSunkenBrush}" />
+  </Style>
+  <Style Selector="Border.rec-row.highlighted > Border.rec-body">
+    <Setter Property="Background" Value="{DynamicResource HighlightStrongBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
+  </Style>
+  <Style Selector="ItemsControl.rec-list Grid.rec-main">
+    <Setter Property="Height" Value="92" />
+  </Style>
+  <Style Selector="ItemsControl.compact Border.rec-body > StackPanel">
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="ItemsControl.compact Border.rec-body">
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+  </Style>
+  <Style Selector="StackPanel.c1">
+    <Setter Property="Width" Value="196" />
+  </Style>
+  <Style Selector="StackPanel.c2">
+    <Setter Property="Width" Value="480" />
+  </Style>
+  <Style Selector="ItemsControl.compact StackPanel.c1">
+    <Setter Property="Width" Value="224" />
+  </Style>
+  <Style Selector="ItemsControl.compact StackPanel.c2">
+    <Setter Property="Width" Value="320" />
+  </Style>
+  <Style Selector="ItemsControl.compact c|SegmentedBar.row-bar">
+    <Setter Property="SegmentWidth" Value="3" />
+  </Style>
+  <Style Selector="TextBlock.rec-name">
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+  </Style>
+  <Style Selector="TextBlock.pity-big">
+    <Setter Property="FontSize" Value="28" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="LetterSpacing" Value="-0.5" />
+  </Style>
+  <!-- 行内热力密版刻度条：高 10、刻 5、隙 1，满格 80 抽 -->
+  <Style Selector="c|SegmentedBar.row-bar">
+    <Setter Property="Height" Value="10" />
+    <Setter Property="SegmentWidth" Value="5" />
+    <Setter Property="SegmentGap" Value="1" />
+    <Setter Property="IsHeat" Value="True" />
+    <Setter Property="Maximum" Value="80" />
+    <Setter Property="Margin" Value="0,10,0,0" />
+  </Style>
+  <!-- 展开箭头 -->
+  <Style Selector="c|StrokeIcon.chevron">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    <Setter Property="RenderTransform" Value="rotate(0deg)" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="0.2,0.8,0.2,1" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="c|StrokeIcon.chevron.open">
+    <Setter Property="RenderTransform" Value="rotate(180deg)" />
+  </Style>
+  <!-- 展开明细：300ms 高度展开 -->
+  <Style Selector="Border.rec-detail">
+    <Setter Property="MaxHeight" Value="0" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="MaxHeight" Duration="0:0:0.3" Easing="0.2,0.8,0.2,1" />
+        <DoubleTransition Property="Opacity" Duration="0:0:0.3" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Border.rec-detail.open">
+    <Setter Property="MaxHeight" Value="320" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <!-- 四星小胶囊：高 30，四星配色；头像 24 圆形 + 「x2」 -->
+  <Style Selector="Border.chip4">
+    <Setter Property="Height" Value="30" />
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Padding" Value="3,0,10,0" />
+    <Setter Property="Margin" Value="0,0,5,5" />
+    <Setter Property="Background" Value="{DynamicResource FourStarContainerBrush}" />
+  </Style>
+  <Style Selector="Border.chip4 TextBlock">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource FourStarBrush}" />
+  </Style>
+  <Style Selector="Border.chip4 TextBlock.chip-name">
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+  <Style Selector="Border.chip4 Border.chip-face">
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+  </Style>
+
+  <!-- 头像：56 圆角 14；未出金为虚线框「?」 -->
+  <Style Selector="Border.face">
+    <Setter Property="Width" Value="56" />
+    <Setter Property="Height" Value="56" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Panel.unknown-face">
+    <Setter Property="Width" Value="56" />
+    <Setter Property="Height" Value="56" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Panel.unknown-face > Rectangle">
+    <Setter Property="RadiusX" Value="14" />
+    <Setter Property="RadiusY" Value="14" />
+    <Setter Property="StrokeThickness" Value="1.5" />
+    <Setter Property="StrokeDashArray" Value="3,2" />
+    <Setter Property="Stroke" Value="{DynamicResource AccentLineBrush}" />
+    <Setter Property="Fill" Value="{DynamicResource HighlightBrush}" />
+  </Style>
+  <Style Selector="Panel.unknown-face > TextBlock">
+    <Setter Property="FontSize" Value="30" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+  </Style>
+
+  <!-- 未出金进度刻度数字 -->
+  <Style Selector="UniformGrid.scale > TextBlock">
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+  </Style>
+
+  <!-- 图例色块 -->
+  <Style Selector="Border.legend">
+    <Setter Property="Width" Value="10" />
+    <Setter Property="Height" Value="10" />
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="c|Skeleton">
+    <Setter Property="BaseColor" Value="{DynamicResource SurfaceMutedColor}" />
+    <Setter Property="ShineColor" Value="{DynamicResource HighlightStrongColor}" />
+  </Style>
+</Styles>

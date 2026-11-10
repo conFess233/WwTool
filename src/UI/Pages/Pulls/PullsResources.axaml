@@ -1,0 +1,96 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+                    xmlns:c="using:WwTool.UI.Controls"
+                    xmlns:loc="using:WwTool.UI.Localization">
+  <!-- 抽卡记录行与四星胶囊模板，单卡池记录与总览「各卡池最近五星」共用。点击展开与右键菜单由页面代码处理。 -->
+
+  <!-- 四星小胶囊（行内）：头像 + x数量，悬停显示名称 -->
+  <DataTemplate x:Key="ChipCompact" x:DataType="pulls:FourStarChip">
+    <Border Classes="chip4" ToolTip.Tip="{Binding Name}">
+      <StackPanel Orientation="Horizontal" Spacing="5">
+        <Border Classes="chip-face">
+          <c:CatalogImage Path="{Binding IconPath}" DecodeWidth="48" Stretch="UniformToFill" />
+        </Border>
+        <TextBlock Text="{Binding CountText}" />
+      </StackPanel>
+    </Border>
+  </DataTemplate>
+
+  <!-- 四星胶囊（展开明细）：头像 + 名称 + x数量 -->
+  <DataTemplate x:Key="ChipNamed" x:DataType="pulls:FourStarChip">
+    <Border Classes="chip4">
+      <StackPanel Orientation="Horizontal" Spacing="6">
+        <Border Classes="chip-face">
+          <c:CatalogImage Path="{Binding IconPath}" DecodeWidth="48" Stretch="UniformToFill" />
+        </Border>
+        <TextBlock Classes="chip-name" Text="{Binding Name}" />
+        <TextBlock Text="{Binding CountText}" />
+      </StackPanel>
+    </Border>
+  </DataTemplate>
+
+  <!-- 五星记录行：头像、名称与标签、抽数与热力条、期间四星；点击展开四星明细 -->
+  <DataTemplate x:Key="FiveStarRow" x:DataType="pulls:FiveStarCard">
+    <Border Classes="rec-row" Classes.highlighted="{Binding IsHighlighted}" AutomationProperties.AutomationId="pulls-five-star"
+            AutomationProperties.Name="{Binding Name}">
+      <Border Classes="rec-body">
+        <StackPanel>
+          <Grid Classes="rec-main" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="16">
+            <Border Classes="face">
+              <Panel>
+                <TextBlock FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Text="{Binding Name, Converter={x:Static pulls:InitialConverter.Instance}}"
+                           IsVisible="{Binding #Portrait.Source, Converter={x:Static ObjectConverters.IsNull}}" />
+                <c:CatalogImage x:Name="Portrait" Path="{Binding IconPath}" DecodeWidth="112" Stretch="UniformToFill" />
+              </Panel>
+            </Border>
+
+            <StackPanel Grid.Column="1" Classes="c1" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Classes="rec-name" Text="{Binding Name}" />
+                <Border Classes="tag sm" IsVisible="{Binding IsLimitedTag}"><TextBlock Text="{loc:Tr Pulls_Limited}" /></Border>
+                <Border Classes="tag sm gray" IsVisible="{Binding IsPermanentTag}"><TextBlock Text="{loc:Tr Pulls_Permanent}" /></Border>
+              </StackPanel>
+              <TextBlock Classes="caption" Margin="0,3,0,0" Text="{Binding Subtitle}" />
+              <WrapPanel Margin="0,8,0,0" ItemSpacing="5" LineSpacing="5">
+                <Border Classes="tag sm ink" IsVisible="{Binding IsGuaranteed}"><TextBlock Text="{loc:Tr Pulls_Guaranteed}" /></Border>
+                <Border Classes="tag sm" IsVisible="{Binding IsSoftPity}"><TextBlock Text="{loc:Tr Pulls_SoftPity}" /></Border>
+                <Border Classes="tag sm gray" IsVisible="{Binding IsStandardPool}"><TextBlock Text="{loc:Tr Pulls_StandardPool}" /></Border>
+                <Border Classes="tag sm red" IsVisible="{Binding IsLost}"><TextBlock Text="{loc:Tr Pulls_Lost}" /></Border>
+                <Border Classes="tag sm red-line" IsVisible="{Binding IsHardPity}"><TextBlock Text="{loc:Tr Pulls_HardPityHit}" /></Border>
+              </WrapPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Classes="c2" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Classes="pity-big" Text="{Binding Pity}" />
+                <TextBlock Classes="caption" Text="{loc:Tr Pulls_PullUnit}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+              </StackPanel>
+              <c:SegmentedBar Classes="row-bar" Value="{Binding Pity}" />
+            </StackPanel>
+
+            <Grid Grid.Column="3" ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+              <ItemsControl ItemsSource="{Binding FourStars}" ItemTemplate="{StaticResource ChipCompact}"
+                            MaxHeight="70" ClipToBounds="True" VerticalAlignment="Center">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              </ItemsControl>
+              <c:StrokeIcon Grid.Column="1" Classes="chevron" Classes.open="{Binding IsExpanded}" Data="{StaticResource Icon.ChevronDown}"
+                            Margin="8,0,4,0" VerticalAlignment="Center" />
+            </Grid>
+          </Grid>
+
+          <Border Classes="rec-detail" Classes.open="{Binding IsExpanded}">
+            <StackPanel Margin="72,0,0,14" Spacing="8">
+              <TextBlock Classes="caption" Text="{loc:Tr Pulls_FourStarsDuring}" IsVisible="{Binding HasFourStars}" />
+              <TextBlock Classes="caption" Text="{loc:Tr Pulls_NoFourStars}" IsVisible="{Binding NoFourStars}" />
+              <ItemsControl ItemsSource="{Binding FourStars}" ItemTemplate="{StaticResource ChipNamed}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Border>
+    </Border>
+  </DataTemplate>
+</ResourceDictionary>

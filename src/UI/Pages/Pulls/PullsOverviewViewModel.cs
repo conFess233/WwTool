@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -33,26 +33,21 @@ public sealed partial class PoolTab(CardPoolType? pool, bool isOther, string tit
     private bool _isSelected;
 }
 
-/// <summary>总览页“各卡池最近五星”与“未出金进度”的一行。</summary>
-public sealed record PoolOverviewRow(
-    CardPoolType Pool,
-    string PoolTitle,
-    PoolProgress Progress,
-    string? LatestName,
-    string LatestMeta,
-    int LatestPity,
-    bool? LatestIsLimited,
-    string NextKindText)
+/// <summary>总览「各卡池最近五星」的一行；卡池没有五星时 <see cref="Card"/> 为 null。</summary>
+public sealed record LatestFiveStarRow(string PoolTitle, string Meta, FiveStarCard? Card)
 {
-    public bool HasLatest => LatestName is not null;
-    public bool LatestLimitedTag => LatestIsLimited == true;
-    public bool LatestPermanentTag => LatestIsLimited == false;
-    public string PityText => Progress.CurrentPity.ToString(CultureInfo.InvariantCulture);
-    public bool HasNextKind => NextKindText.Length > 0;
+    public bool HasCard => Card is not null;
+    public bool NoCard => Card is null;
 }
 
-/// <summary>每日活跃柱（近 30 天）。</summary>
-public sealed record DailyBar(DateTime Date, int Pulls, double Height, string Tip);
+/// <summary>总览「未出金进度」的一组。</summary>
+public sealed record PityProgressRow(string PoolTitle, int Pity, string ToHardPityText, string NextKindText)
+{
+    public bool HasNextKind => NextKindText.Length > 0;
+
+    /// <summary>已垫 ≥ 70 抽：卡池名旁显示「即将触底」。</summary>
+    public bool IsNearHardPity => Pity >= 70;
+}
 
 /// <summary>各卡池五星分布条。</summary>
 public sealed record PoolShareBar(string PoolTitle, int FiveStars, double Ratio, string Text);
@@ -64,12 +59,14 @@ public sealed record PoolShareBar(string PoolTitle, int FiveStars, double Ratio,
 public sealed partial class PullsOverviewViewModel : ObservableObject, INavigationAware, IFabProvider
 {
     private const int DailyWindowDays = 30;
-    private const double DailyBarMaxHeight = 64;
 
     private readonly PullsSession _session;
     private readonly LocalizationService _localization;
     private readonly INavigationService _navigation;
     private readonly GameDataService _gameData;
+    private readonly ClipboardService _clipboard;
+    private readonly IUIStateService _uiState;
+    private readonly ErrorReporter _errors;
 
     public PullsOverviewViewModel(
         PullsSession session,
@@ -78,8 +75,14 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         AccountContext accounts,
         LocalizationService localization,
         INavigationService navigation,
-        IDialogService dialogs)
+        IDialogService dialogs,
+        ClipboardService clipboard,
+        IUIStateService uiState,
+        ErrorReporter errors)
     {
+        _clipboard = clipboard;
+        _uiState = uiState;
+        _errors = errors;
         _session = session;
         _localization = localization;
         _navigation = navigation;
@@ -164,14 +167,21 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     [ObservableProperty] private string _astritesCaption = string.Empty;
 
     // —— 总览内容 ——
-    public ObservableCollection<PoolOverviewRow> PoolRows { get; } = [];
-    public ObservableCollection<DailyBar> DailyBars { get; } = [];
+    public ObservableCollection<LatestFiveStarRow> LatestRows { get; } = [];
+    public ObservableCollection<PityProgressRow> PityRows { get; } = [];
     public ObservableCollection<PoolShareBar> ShareBars { get; } = [];
+    [ObservableProperty] private IReadOnlyList<double> _dailyValues = [];
+    [ObservableProperty] private IReadOnlyList<string> _dailyTips = [];
+    [ObservableProperty] private IReadOnlyList<string> _dailyAxis = [];
     [ObservableProperty] private string _dailyCaption = string.Empty;
-    [ObservableProperty] private string _winLossText = string.Empty;
-    [ObservableProperty] private double _winRatio;
-    [ObservableProperty] private string _fourStarSplitText = string.Empty;
-    [ObservableProperty] private double _fourStarCharacterRatio;
+    [ObservableProperty] private IReadOnlyList<double> _winValues = [];
+    [ObservableProperty] private double _winPercent;
+    [ObservableProperty] private string _winLegend = string.Empty;
+    [ObservableProperty] private string _lossLegend = string.Empty;
+    [ObservableProperty] private IReadOnlyList<double> _fourStarValues = [];
+    [ObservableProperty] private double _fourStarPercent;
+    [ObservableProperty] private string _fourCharacterLegend = string.Empty;
+    [ObservableProperty] private string _fourWeaponLegend = string.Empty;
 
     public void OnNavigatedTo(object? parameter) => _ = _session.EnsureLoadedAsync();
 
@@ -226,8 +236,7 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         ShowContent = !ShowNoAccount && s is { IsEmpty: false };
 
         UpdateTabs(s);
-        string region = _localization[_session.Region == GachaServerRegion.China ? "Stat_GachaServerCN" : "Stat_GachaServerInternational"];
-        StoredSummary = string.Format(_localization["Pulls_StoredSummary"], s?.RecordCount ?? 0, region);
+        StoredSummary = string.Format(_localization["Pulls_StoredCount"], s?.RecordCount ?? 0);
         if (s is null) return;
 
         CardPoolType? pool = CurrentPool;
@@ -278,7 +287,7 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     private void UpdateCards(PullsSummary summary, CardPoolType? pool)
     {
         TotalPulls = N(summary.TotalPulls);
-        TotalPullsCaption = pool is { } p ? _localization[PoolNames.TitleKey(p)] : _localization["Pulls_AllPools"];
+        TotalPullsCaption = string.Empty;
         FiveStars = N(summary.FiveStars);
         FiveStarsCaption = string.Format(_localization["Pulls_LimitedPermanent"], summary.Limited, summary.Permanent);
         AveragePerFiveStar = summary.AveragePerFiveStar is { } avg ? avg.ToString("0.0", CultureInfo.InvariantCulture) : "—";
@@ -290,62 +299,69 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
             ? _localization["Pulls_WinRateCharacterOnly"]
             : string.Format(_localization["Pulls_WinMiss"], summary.Wins, summary.Misses);
         Astrites = N(summary.Astrites);
-        AstritesCaption = string.Format(_localization["Pulls_AstritesFormula"], N(summary.TotalPulls));
+        AstritesCaption = string.Empty;
     }
 
     private void UpdateOverview(PullsSnapshot s)
     {
-        PoolRows.Clear();
+        LatestRows.Clear();
+        PityRows.Clear();
         foreach (CardPoolType pool in PoolNames.MainPools)
         {
+            string title = _localization[PoolNames.TitleKey(pool)];
+            FiveStarCard? latest = PoolRecordsViewModel.BuildCards(s.Pools[pool].PoolStatistics, pool).FirstOrDefault();
+            string meta = latest is null ? title
+                : string.Format(_localization["Pulls_PoolDate"], ShortTitle(pool), latest.Time?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? "—");
+            if (latest is not null) latest.SubtitleOverride = meta;
+            LatestRows.Add(new LatestFiveStarRow(title, meta, latest));
+
             PoolProgress progress = PullsSummaryCalculator.Progress(s, pool);
-            var latest = progress.LatestFiveStar;
-            string meta = latest is null ? string.Empty
-                : $"{(DateTime.TryParse(latest.GachaData.Time, CultureInfo.InvariantCulture, DateTimeStyles.None, out var t) ? t.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) : latest.GachaData.Time)} · {ShortTitle(pool)}";
             string next = progress.NextIsGuaranteed switch
             {
                 true => _localization["Pulls_NextGuaranteed"],
                 false => _localization["Pulls_NextSoftPity"],
                 null => string.Empty,
             };
-            PoolRows.Add(new PoolOverviewRow(pool, _localization[PoolNames.TitleKey(pool)], progress,
-                latest?.DisplayName, meta, latest?.Pity ?? 0, latest?.IsMiss is null ? null : !latest.IsMiss.Value, next));
+            PityRows.Add(new PityProgressRow(title, progress.CurrentPity,
+                string.Format(_localization["Pulls_ToHardPityShort"], progress.PullsToHardPity), next));
         }
 
-        // 近 30 天每日抽数。
+        // 近 30 天每日抽数；横轴标首、末与中间两个日期。
         DateTime today = DateTime.Today;
         var byDay = s.Insights.DailyPulls.ToDictionary(x => x.Date.Date, x => x.Pulls);
-        int max = Enumerable.Range(0, DailyWindowDays).Select(i => byDay.GetValueOrDefault(today.AddDays(i - DailyWindowDays + 1))).DefaultIfEmpty().Max();
-        DailyBars.Clear();
-        for (int i = 0; i < DailyWindowDays; i++)
-        {
-            DateTime day = today.AddDays(i - DailyWindowDays + 1);
-            int pulls = byDay.GetValueOrDefault(day);
-            double height = max == 0 ? 2 : Math.Max(2, pulls / (double)max * DailyBarMaxHeight);
-            DailyBars.Add(new DailyBar(day, pulls, height, $"{day:MM/dd} · {pulls}"));
-        }
-        DailyCaption = string.Format(_localization["Pulls_DailyCaption"], DailyWindowDays, max);
+        var days = Enumerable.Range(0, DailyWindowDays).Select(i => today.AddDays(i - DailyWindowDays + 1)).ToArray();
+        DailyValues = days.Select(d => (double)byDay.GetValueOrDefault(d)).ToArray();
+        DailyTips = days.Select(d => string.Format(_localization["Pulls_PoolDate"], d.ToString("MM/dd", CultureInfo.InvariantCulture),
+            byDay.GetValueOrDefault(d) + " " + _localization["Pulls_PullUnit"])).ToArray();
+        DailyAxis = new[] { 0, 9, 19, DailyWindowDays - 1 }.Select(i => days[i].ToString("MM/dd", CultureInfo.InvariantCulture)).ToArray();
+        DailyCaption = string.Format(_localization["Pulls_LastDays"], DailyWindowDays);
 
         int totalFive = PoolNames.MainPools.Sum(p => s.Pools[p].PoolStatistics.Calculate.HitGoldCount);
         ShareBars.Clear();
         foreach (CardPoolType pool in PoolNames.MainPools)
         {
             int five = s.Pools[pool].PoolStatistics.Calculate.HitGoldCount;
-            ShareBars.Add(new PoolShareBar(ShortTitle(pool), five, totalFive == 0 ? 0 : five / (double)totalFive, five.ToString(CultureInfo.InvariantCulture)));
+            ShareBars.Add(new PoolShareBar(ShortTitle(pool), five, totalFive == 0 ? 0 : five / (double)totalFive,
+                string.Format(_localization["Pulls_FiveStarCount"], five)));
         }
 
         PullsSummary character = PullsSummaryCalculator.ForPool(s, CardPoolType.CharacterEvent);
-        WinRatio = character.Wins + character.Misses == 0 ? 0 : character.Wins / (double)(character.Wins + character.Misses);
-        WinLossText = string.Format(_localization["Pulls_WinMiss"], character.Wins, character.Misses);
+        int decided = character.Wins + character.Misses;
+        WinValues = [character.Wins, character.Misses];
+        WinPercent = decided == 0 ? 0 : character.Wins * 100.0 / decided;
+        WinLegend = string.Format(_localization["Pulls_WinCount"], character.Wins);
+        LossLegend = string.Format(_localization["Pulls_LossCount"], character.Misses);
 
         var fourStars = s.AllRecords.Where(x => x.QualityLevel == 4).ToList();
         // 以资料中的类型为准；资料缺失时退回记录里的资源类型文字。
         int fourCharacters = fourStars.Count(x => _gameData.GetItemById(x.ResourceId)?.Type is { } type
             ? type == "Character"
             : x.ResourceType is "角色" or "Character" or "Resonators");
-        FourStarCharacterRatio = fourStars.Count == 0 ? 0 : fourCharacters / (double)fourStars.Count;
-        FourStarSplitText = fourStars.Count == 0 ? "—"
-            : $"{_localization["Pulls_FourStarCharacter"]} {FourStarCharacterRatio:P0} · {_localization["Pulls_FourStarWeapon"]} {1 - FourStarCharacterRatio:P0}";
+        double characterRatio = fourStars.Count == 0 ? 0 : fourCharacters / (double)fourStars.Count;
+        FourStarValues = [fourCharacters, fourStars.Count - fourCharacters];
+        FourStarPercent = characterRatio * 100;
+        FourCharacterLegend = string.Format(_localization["Pulls_CharacterShare"], Percent(characterRatio));
+        FourWeaponLegend = string.Format(_localization["Pulls_WeaponShare"], Percent(1 - characterRatio));
     }
 
     /// <summary>页签用短名：去掉卡池名末尾的“唤取”（英文为 “Convene”）。</summary>
@@ -358,6 +374,47 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         }
         return title;
     }
+
+    private static string Percent(double ratio) => Math.Round(ratio * 100).ToString("0", CultureInfo.InvariantCulture) + "%";
+
+    // —— 记录行：展开与右键菜单 ——
+
+    /// <summary>视图里拼菜单文字用。</summary>
+    public string Text(string key) => _localization[key];
+
+    public void ReportExported(string name) =>
+        _uiState.ShowToast(_localization["Toast_Success"], string.Format(_localization["Pulls_ExportSaved"], name), NotificationType.Success);
+
+    public void ReportExportFailed(Exception ex) => _errors.Report(ex, _localization["Pulls_CtxExport"]);
+
+    [RelayCommand]
+    private static void ToggleExpand(FiveStarCard? card)
+    {
+        if (card is not null) card.IsExpanded = !card.IsExpanded;
+    }
+
+    [RelayCommand]
+    private async Task CopyRecordAsync(FiveStarCard? card)
+    {
+        if (card is null) return;
+        string kind = _localization[card.IsLimited == true ? "Pulls_Limited" : card.IsLimited == false ? "Pulls_Permanent" : "Pulls_FiveStar"];
+        string text = string.Format(_localization["Pulls_RecordText"], card.Name, kind, card.TimeText, card.Pity);
+        try
+        {
+            await _clipboard.SetTextAsync(text);
+            _uiState.ShowToast(_localization["Toast_Success"], _localization["Pulls_CopiedRecord"], NotificationType.Success);
+        }
+        catch (Exception ex)
+        {
+            _errors.Report(ex, _localization["Pulls_CtxCopy"]);
+        }
+    }
+
+    [RelayCommand]
+    private void ViewRole(FiveStarCard? card) => _navigation.NavigateTo("roles", card?.ResourceId);
+
+    [RelayCommand]
+    private void LocateInCharts(FiveStarCard? card) => _navigation.NavigateTo(PullsChartsViewModel.PageKey, card?.Pool);
 
     private static string N(int value) => value.ToString("N0", CultureInfo.InvariantCulture);
 }

@@ -6,73 +6,77 @@
              xmlns:loc="using:WwTool.UI.Localization"
              x:Class="WwTool.UI.Pages.Pulls.PullsOverviewView"
              x:DataType="pulls:PullsOverviewViewModel">
-  <!-- 抽卡统计：卡池页签 + 工具栏、五张统计卡、总览或单卡池记录。 -->
+  <!--
+    抽卡统计（定稿 FinalPulls / FinalPullsAll）：顶部筛选栏（五个视图共用，滚动时吸顶、下方阴影渐显）、五张指标卡；
+    「总览」为长页面：各卡池最近五星 + 未出金进度、每日活跃 / 五星分布 / 两个环形图；
+    单卡池视图为「抽卡记录」卡，列表内部滚动。底部留 96 给悬浮按钮。
+  -->
   <UserControl.Styles>
-    <Style Selector="Border.stat">
-      <Setter Property="Padding" Value="20,16" />
-    </Style>
-    <Style Selector="Border.bar-track">
-      <Setter Property="Height" Value="10" />
-      <Setter Property="CornerRadius" Value="999" />
-      <Setter Property="Background" Value="{DynamicResource SegmentTrackBrush}" />
-    </Style>
+    <StyleInclude Source="avares://WwTool/Pages/Pulls/PullsStyles.axaml" />
   </UserControl.Styles>
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://WwTool/Pages/Pulls/PullsResources.axaml" />
+      </ResourceDictionary.MergedDictionaries>
 
-  <Grid>
-    <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Disabled">
-      <StackPanel Margin="40,0,40,120" Spacing="18">
-        <!-- 页签与工具栏 -->
-        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-          <StackPanel Spacing="8">
-            <ItemsControl ItemsSource="{Binding Tabs}">
-              <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="pulls:PoolTab">
-                  <ToggleButton Classes="chip" Margin="0,0,8,8" IsChecked="{Binding IsSelected, Mode=OneWay}"
-                                Command="{Binding $parent[UserControl].((pulls:PullsOverviewViewModel)DataContext).SelectTabCommand}"
-                                CommandParameter="{Binding}"
-                                AutomationProperties.AutomationId="{Binding AutomationId}"
-                                AutomationProperties.Name="{Binding Title}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                      <TextBlock Classes="count" Text="{Binding Count}" VerticalAlignment="Center" />
-                    </StackPanel>
-                  </ToggleButton>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <TextBlock Classes="caption" Text="{Binding StoredSummary}" />
-          </StackPanel>
-          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
-            <ComboBox Classes="pill" IsVisible="{Binding IsPoolView}" MinWidth="140"
-                      ItemsSource="{Binding Records.TimeRanges}" SelectedItem="{Binding Records.SelectedTimeRange}"
-                      ToolTip.Tip="{loc:Tr Stat_Filter_DateRange}" AutomationProperties.Name="{loc:Tr Stat_Filter_DateRange}"
-                      AutomationProperties.AutomationId="pulls-time-range">
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-            <ComboBox Classes="pill" IsVisible="{Binding IsPoolView}" MinWidth="110"
-                      ItemsSource="{Binding Records.FiveStarFilters}" SelectedItem="{Binding Records.SelectedFiveStarFilter}"
-                      ToolTip.Tip="{loc:Tr Pulls_FilterFiveStar}" AutomationProperties.Name="{loc:Tr Pulls_FilterFiveStar}"
-                      AutomationProperties.AutomationId="pulls-five-star-filter">
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Button Classes="pill" Command="{Binding OpenChartsCommand}" Content="{loc:Tr Pulls_DetailedCharts}"
-                    AutomationProperties.AutomationId="pulls-open-charts" />
-          </StackPanel>
-        </Grid>
+    <!-- 五张指标卡 -->
+    <DataTemplate x:Key="Metrics" x:DataType="pulls:PullsOverviewViewModel">
+      <UniformGrid Columns="5" ColumnSpacing="18">
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-total">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Stat_TotalTides}" />
+            <c:RollingText Classes="metric-value" Text="{Binding TotalPulls}" VerticalAlignment="Bottom" />
+          </DockPanel>
+        </Border>
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-five">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Pulls_FiveStars}" />
+            <TextBlock DockPanel.Dock="Bottom" Classes="caption" Text="{Binding FiveStarsCaption}" />
+            <c:RollingText Classes="metric-value" Text="{Binding FiveStars}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+          </DockPanel>
+        </Border>
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-average">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Pulls_AvgPerFiveStar}" />
+            <TextBlock DockPanel.Dock="Bottom" Classes="caption" Text="{Binding AveragePerLimitedCaption}" />
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,0,0,2">
+              <c:RollingText Classes="metric-value" Text="{Binding AveragePerFiveStar}" />
+              <TextBlock Classes="unit" FontSize="16" Margin="6,0,0,3" VerticalAlignment="Bottom" Text="{loc:Tr Pulls_PullUnit}" />
+            </StackPanel>
+          </DockPanel>
+        </Border>
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-winrate">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Pulls_WinRate}" />
+            <TextBlock DockPanel.Dock="Bottom" Classes="caption" Text="{Binding WinRateCaption}" />
+            <c:RollingText Classes="metric-value" Text="{Binding WinRate}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+          </DockPanel>
+        </Border>
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-astrites">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Pulls_Astrites}" />
+            <c:RollingText Classes="metric-value" Text="{Binding Astrites}" VerticalAlignment="Bottom" />
+          </DockPanel>
+        </Border>
+      </UniformGrid>
+    </DataTemplate>
+    </ResourceDictionary>
+  </UserControl.Resources>
 
-        <!-- 其他卡池：子选择 -->
-        <ItemsControl ItemsSource="{Binding OtherPools}" IsVisible="{Binding IsOtherSelected}">
-          <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+  <Grid RowDefinitions="Auto,*">
+    <!-- ── 筛选栏 ── -->
+    <Grid x:Name="FilterBar" Height="40" ColumnDefinitions="*,Auto" ZIndex="2">
+      <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <ItemsControl ItemsSource="{Binding Tabs}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="pulls:PoolTab">
-              <ToggleButton Classes="chip" Margin="0,0,8,8" Height="32" IsChecked="{Binding IsSelected, Mode=OneWay}"
-                            Command="{Binding $parent[UserControl].((pulls:PullsOverviewViewModel)DataContext).SelectOtherPoolCommand}"
-                            CommandParameter="{Binding}">
+              <ToggleButton Classes="chip" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                            Command="{Binding $parent[UserControl].((pulls:PullsOverviewViewModel)DataContext).SelectTabCommand}"
+                            CommandParameter="{Binding}"
+                            AutomationProperties.AutomationId="{Binding AutomationId}"
+                            AutomationProperties.Name="{Binding Title}">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                   <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
                   <TextBlock Classes="count" Text="{Binding Count}" VerticalAlignment="Center" />
@@ -81,8 +85,77 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <!-- 其他卡池：子选择 -->
+        <ItemsControl ItemsSource="{Binding OtherPools}" IsVisible="{Binding IsOtherSelected}" VerticalAlignment="Center">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="pulls:PoolTab">
+              <ToggleButton Classes="chip small" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                            Command="{Binding $parent[UserControl].((pulls:PullsOverviewViewModel)DataContext).SelectOtherPoolCommand}"
+                            CommandParameter="{Binding}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                  <TextBlock Classes="count" Text="{Binding Count}" VerticalAlignment="Center" />
+                </StackPanel>
+              </ToggleButton>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
 
-        <!-- 状态：未选账号 / 无记录 / 加载失败 -->
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <TextBlock Classes="caption" Text="{Binding StoredSummary}" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <ComboBox Classes="filter" Tag="{loc:Tr Stat_Filter_DateRange}"
+                  ItemsSource="{Binding Records.TimeRanges}" SelectedItem="{Binding Records.SelectedTimeRange}"
+                  AutomationProperties.Name="{loc:Tr Stat_Filter_DateRange}" AutomationProperties.AutomationId="pulls-time-range">
+          <ComboBox.SelectionBoxItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock FontWeight="Normal" Foreground="{DynamicResource TextMutedBrush}" Text="{Binding $parent[ComboBox].Tag}" />
+                <TextBlock Text="{Binding Title}" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.SelectionBoxItemTemplate>
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <ComboBox Classes="filter" Tag="{loc:Tr Pulls_FilterFiveStar}"
+                  ItemsSource="{Binding Records.FiveStarFilters}" SelectedItem="{Binding Records.SelectedFiveStarFilter}"
+                  AutomationProperties.Name="{loc:Tr Pulls_FilterFiveStar}" AutomationProperties.AutomationId="pulls-five-star-filter">
+          <ComboBox.SelectionBoxItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock FontWeight="Normal" Foreground="{DynamicResource TextMutedBrush}" Text="{Binding $parent[ComboBox].Tag}" />
+                <TextBlock Text="{Binding Title}" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.SelectionBoxItemTemplate>
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Classes="btn" Command="{Binding OpenChartsCommand}" AutomationProperties.AutomationId="pulls-open-charts">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.Chart}" />
+            <TextBlock Text="{loc:Tr Pulls_DetailedCharts}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </Grid>
+    <!-- 吸顶阴影：随滚动渐显 -->
+    <Border x:Name="BarShadow" Grid.Row="1" Height="14" VerticalAlignment="Top" Margin="-40,0" Opacity="0" ZIndex="2" IsHitTestVisible="False">
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Color="#33281C0A" Offset="0" />
+          <GradientStop Color="#00281C0A" Offset="1" />
+        </LinearGradientBrush>
+      </Border.Background>
+    </Border>
+
+    <Panel Grid.Row="1">
+      <!-- 状态：未选账号 / 无记录 / 加载失败 -->
+      <StackPanel Margin="0,18,0,0" Spacing="18">
         <Border Classes="card" Padding="28,24" IsVisible="{Binding ShowNoAccount}" AutomationProperties.AutomationId="pulls-no-account">
           <StackPanel Spacing="6">
             <TextBlock Classes="section-title" Text="{loc:Tr Pulls_NoAccountTitle}" />
@@ -92,7 +165,7 @@
         <Border Classes="card" Padding="28,24" IsVisible="{Binding ShowEmpty}" AutomationProperties.AutomationId="pulls-empty">
           <StackPanel Spacing="6">
             <TextBlock Classes="section-title" Text="{loc:Tr Pulls_EmptyTitle}" />
-            <TextBlock Classes="caption" Text="{loc:Tr Pulls_EmptyHint}" />
+            <TextBlock Classes="caption" Text="{loc:Tr Pulls_EmptyHint}" TextWrapping="Wrap" />
           </StackPanel>
         </Border>
         <Border Classes="card" Padding="28,24" IsVisible="{Binding Session.LoadError, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -101,120 +174,130 @@
               <TextBlock Classes="section-title" Text="{loc:Tr Pulls_LoadFailed}" />
               <TextBlock Classes="caption" Text="{Binding Session.LoadError}" />
             </StackPanel>
-            <Button Grid.Column="1" Classes="pill" VerticalAlignment="Center" Content="{loc:Tr Pulls_Retry}" Command="{Binding RetryCommand}" />
+            <Button Grid.Column="1" Classes="btn" VerticalAlignment="Center" Content="{loc:Tr Pulls_Retry}" Command="{Binding RetryCommand}" />
           </Grid>
         </Border>
+      </StackPanel>
 
-        <!-- 统计卡 -->
-        <UniformGrid Columns="5" ColumnSpacing="14" IsVisible="{Binding ShowContent}">
-          <Border Classes="card stat" AutomationProperties.AutomationId="pulls-card-total">
-            <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="{loc:Tr Stat_TotalTides}" />
-              <TextBlock Classes="stat-value" Text="{Binding TotalPulls}" />
-              <TextBlock Classes="caption" Text="{Binding TotalPullsCaption}" />
-            </StackPanel>
-          </Border>
-          <Border Classes="card stat" AutomationProperties.AutomationId="pulls-card-five">
-            <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="{loc:Tr Pulls_FiveStars}" />
-              <TextBlock Classes="stat-value" Text="{Binding FiveStars}" />
-              <TextBlock Classes="caption" Text="{Binding FiveStarsCaption}" />
-            </StackPanel>
-          </Border>
-          <Border Classes="card stat" AutomationProperties.AutomationId="pulls-card-average">
-            <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="{loc:Tr Pulls_AvgPerFiveStar}" />
-              <StackPanel Orientation="Horizontal" Spacing="4">
-                <TextBlock Classes="stat-value" Text="{Binding AveragePerFiveStar}" />
-                <TextBlock Classes="label" Text="{loc:Tr Pulls_PullUnit}" VerticalAlignment="Bottom" Margin="0,0,0,6" />
-              </StackPanel>
-              <TextBlock Classes="caption" Text="{Binding AveragePerLimitedCaption}" />
-            </StackPanel>
-          </Border>
-          <Border Classes="card stat" AutomationProperties.AutomationId="pulls-card-winrate">
-            <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="{loc:Tr Pulls_WinRate}" />
-              <TextBlock Classes="stat-value" Text="{Binding WinRate}" />
-              <TextBlock Classes="caption" Text="{Binding WinRateCaption}" />
-            </StackPanel>
-          </Border>
-          <Border Classes="card stat" AutomationProperties.AutomationId="pulls-card-astrites">
-            <StackPanel Spacing="4">
-              <TextBlock Classes="label" Text="{loc:Tr Pulls_Astrites}" />
-              <TextBlock Classes="stat-value" Text="{Binding Astrites}" />
-              <TextBlock Classes="caption" Text="{Binding AstritesCaption}" />
-            </StackPanel>
-          </Border>
-        </UniformGrid>
+      <!-- ── 总览：长页面 ── -->
+      <ScrollViewer x:Name="OverviewScroller" HorizontalScrollBarVisibility="Disabled" Margin="-40,0" Padding="40,0">
+        <ScrollViewer.IsVisible>
+          <MultiBinding Converter="{x:Static BoolConverters.And}">
+            <Binding Path="ShowContent" />
+            <Binding Path="IsOverview" />
+          </MultiBinding>
+        </ScrollViewer.IsVisible>
+        <StackPanel Spacing="18" Margin="0,18,0,96">
+          <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Metrics}" />
 
-        <!-- 总览内容 -->
-        <StackPanel Spacing="18">
-          <StackPanel.IsVisible>
-            <MultiBinding Converter="{x:Static BoolConverters.And}">
-              <Binding Path="ShowContent" />
-              <Binding Path="IsOverview" />
-            </MultiBinding>
-          </StackPanel.IsVisible>
-
-          <Border Classes="card">
-            <StackPanel Spacing="12">
-              <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock Classes="section-title" Text="{loc:Tr Pulls_LatestPerPool}" VerticalAlignment="Center" />
-                <TextBlock Classes="caption" Text="{loc:Tr Pulls_LatestPerPoolHint}" VerticalAlignment="Center" />
-              </StackPanel>
-              <ItemsControl ItemsSource="{Binding PoolRows}">
-                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4" ColumnSpacing="12" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="pulls:PoolOverviewRow">
-                    <Border Classes="card inset">
-                      <Panel>
-                        <StackPanel Spacing="6" IsVisible="{Binding HasLatest}">
-                          <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Classes="section-title" Text="{Binding LatestName}" TextTrimming="CharacterEllipsis" />
-                            <Border Classes="tag accent" IsVisible="{Binding LatestLimitedTag}"><TextBlock Text="{loc:Tr Pulls_Limited}" /></Border>
-                            <Border Classes="tag" IsVisible="{Binding LatestPermanentTag}"><TextBlock Text="{loc:Tr Pulls_Permanent}" /></Border>
-                          </StackPanel>
-                          <TextBlock Classes="caption" Text="{Binding LatestMeta}" />
-                          <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock Classes="big-number" FontSize="26" Text="{Binding LatestPity}" />
-                            <TextBlock Classes="label" Text="{loc:Tr Pulls_PullUnit}" VerticalAlignment="Bottom" Margin="0,0,0,4" />
-                          </StackPanel>
-                        </StackPanel>
-                        <StackPanel Spacing="6" IsVisible="{Binding !HasLatest}">
-                          <TextBlock Classes="section-title" Text="{loc:Tr Pulls_NoFiveStarRecord}" />
-                          <TextBlock Classes="caption" Text="{Binding PoolTitle}" />
-                        </StackPanel>
-                      </Panel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </Border>
-
-          <Grid ColumnDefinitions="*,*" ColumnSpacing="18">
-            <Border Classes="card">
-              <StackPanel Spacing="12">
-                <StackPanel Spacing="2">
-                  <TextBlock Classes="section-title" Text="{loc:Tr Pulls_PityPerPool}" />
-                  <TextBlock Classes="caption" Text="{loc:Tr Pulls_PityPerPoolHint}" />
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding PoolRows}">
-                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="14" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <Grid ColumnDefinitions="*,444" ColumnSpacing="18" Height="640">
+            <!-- 各卡池最近五星 -->
+            <Border Classes="card" Padding="22,20">
+              <Grid RowDefinitions="Auto,*">
+                <TextBlock Classes="section-title" Text="{loc:Tr Pulls_LatestPerPool}" />
+                <ItemsControl Grid.Row="1" Classes="rec-list compact" Margin="0,10,0,0" ItemsSource="{Binding LatestRows}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="pulls:PoolOverviewRow">
+                    <DataTemplate x:DataType="pulls:LatestFiveStarRow">
+                      <Panel>
+                        <ContentControl Content="{Binding Card}" ContentTemplate="{StaticResource FiveStarRow}" IsVisible="{Binding HasCard}"
+                                        VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" />
+                        <Border Classes="rec-row" IsVisible="{Binding NoCard}" Cursor="Arrow">
+                          <Border Classes="rec-body">
+                            <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                              <Panel Classes="unknown-face"><Rectangle /><TextBlock Text="?" /></Panel>
+                              <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="rec-name" Foreground="{DynamicResource TextMutedBrush}" Text="{loc:Tr Pulls_NoFiveStarRecord}" />
+                                <TextBlock Classes="caption" Margin="0,3,0,0" Text="{Binding PoolTitle}" />
+                              </StackPanel>
+                            </StackPanel>
+                          </Border>
+                        </Border>
+                      </Panel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </Border>
+
+            <!-- 未出金进度 -->
+            <Border Grid.Column="1" Classes="card" Padding="22,20">
+              <Grid RowDefinitions="Auto,*">
+                <TextBlock Classes="section-title" Text="{loc:Tr Pulls_PityPerPool}" />
+                <ItemsControl Grid.Row="1" Margin="0,4,0,0" ItemsSource="{Binding PityRows}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:PityProgressRow">
+                      <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8" Height="22">
+                          <TextBlock FontSize="14" FontWeight="Bold" Text="{Binding PoolTitle}" VerticalAlignment="Center" />
+                          <Border Classes="tag sm" IsVisible="{Binding HasNextKind}"><TextBlock Text="{Binding NextKindText}" /></Border>
+                          <Panel IsVisible="{Binding IsNearHardPity}" VerticalAlignment="Center">
+                            <Border Classes="near-ring" />
+                            <Border Classes="tag sm red"><TextBlock Text="{loc:Tr Pulls_NearHardPity}" /></Border>
+                          </Panel>
+                        </StackPanel>
+                        <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="8" Margin="0,6,0,8">
+                          <TextBlock FontSize="14" Text="{loc:Tr Pulls_HavePrefix}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+                          <TextBlock Grid.Column="1" FontSize="30" FontWeight="Bold" LetterSpacing="-1" Text="{Binding Pity}"
+                                     Classes.heartbeat="{Binding IsNearHardPity}" Classes.danger-text="{Binding IsNearHardPity}" />
+                          <TextBlock Grid.Column="2" FontSize="14" Text="{loc:Tr Pulls_HaveSuffix}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+                          <TextBlock Grid.Column="3" Classes="caption" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,3"
+                                     Text="{Binding ToHardPityText}" />
+                        </Grid>
+                        <Panel>
+                          <Border Classes="bar-glow" IsVisible="{Binding IsNearHardPity}" />
+                          <c:SegmentedBar Classes="pity" Shimmer="True" Maximum="80" Value="{Binding Pity}" />
+                        </Panel>
+                        <Grid ColumnDefinitions="*,*,*,*,*" Margin="0,4,0,0">
+                          <TextBlock Classes="caption" FontSize="11" Text="0" />
+                          <TextBlock Grid.Column="1" Classes="caption" FontSize="11" Text="20" Margin="-6,0,0,0" />
+                          <TextBlock Grid.Column="2" Classes="caption" FontSize="11" Text="40" HorizontalAlignment="Center" />
+                          <TextBlock Grid.Column="3" Classes="caption" FontSize="11" Text="60" HorizontalAlignment="Right" Margin="0,0,-6,0" />
+                          <TextBlock Grid.Column="4" Classes="caption" FontSize="11" Text="80" HorizontalAlignment="Right" />
+                        </Grid>
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </Border>
+          </Grid>
+
+          <Grid ColumnDefinitions="1.5*,*,*" ColumnSpacing="18" Height="300">
+            <!-- 每日抽卡活跃分布 -->
+            <Border Classes="card">
+              <Grid RowDefinitions="Auto,*,Auto">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="card-title" Text="{loc:Tr Stat_DailyPullChart}" />
+                  <TextBlock Grid.Column="1" Classes="caption" Text="{Binding DailyCaption}" VerticalAlignment="Bottom" />
+                </Grid>
+                <c:BarChart Grid.Row="1" Height="150" VerticalAlignment="Bottom" Values="{Binding DailyValues}" Tips="{Binding DailyTips}"
+                            HighlightPeak="True" Fill="{DynamicResource AccentBrush}" PeakFill="{DynamicResource DangerBrush}"
+                            EmptyFill="{DynamicResource TrackBrush}" />
+                <Grid Grid.Row="2" Margin="0,8,0,0" ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto">
+                  <TextBlock Classes="caption" FontSize="11" Text="{Binding DailyAxis[0], FallbackValue=''}" />
+                  <TextBlock Grid.Column="2" Classes="caption" FontSize="11" Text="{Binding DailyAxis[1], FallbackValue=''}" />
+                  <TextBlock Grid.Column="4" Classes="caption" FontSize="11" Text="{Binding DailyAxis[2], FallbackValue=''}" />
+                  <TextBlock Grid.Column="6" Classes="caption" FontSize="11" Text="{Binding DailyAxis[3], FallbackValue=''}" />
+                </Grid>
+              </Grid>
+            </Border>
+
+            <!-- 各卡池五星分布 -->
+            <Border Grid.Column="1" Classes="card">
+              <StackPanel>
+                <TextBlock Classes="card-title" Text="{loc:Tr Stat_GoldHistoryChart}" Margin="0,0,0,16" />
+                <ItemsControl ItemsSource="{Binding ShareBars}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="12" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:PoolShareBar">
                       <StackPanel Spacing="6">
                         <Grid ColumnDefinitions="*,Auto">
-                          <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Classes="label" FontWeight="SemiBold" Text="{Binding PoolTitle}" VerticalAlignment="Center" />
-                            <Border Classes="tag outline" IsVisible="{Binding HasNextKind}"><TextBlock Text="{Binding NextKindText}" /></Border>
-                          </StackPanel>
-                          <TextBlock Grid.Column="1" Classes="label" VerticalAlignment="Center">
-                            <Run Text="{Binding PityText}" FontWeight="Bold" />
-                            <Run Text="/ 80" />
-                          </TextBlock>
+                          <TextBlock Classes="aux" Text="{Binding PoolTitle}" />
+                          <TextBlock Grid.Column="1" Classes="aux" FontWeight="Bold" Text="{Binding Text}" />
                         </Grid>
-                        <c:SegmentedBar Classes="thin" Value="{Binding Progress.CurrentPity}" Maximum="80" />
+                        <c:SegmentedBar Classes="thin" Value="{Binding Ratio}" Maximum="1" />
                       </StackPanel>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
@@ -222,77 +305,61 @@
               </StackPanel>
             </Border>
 
-            <Border Grid.Column="1" Classes="card">
-              <StackPanel Spacing="12">
-                <StackPanel Spacing="2">
-                  <TextBlock Classes="section-title" Text="{loc:Tr Stat_DailyPullChart}" />
-                  <TextBlock Classes="caption" Text="{Binding DailyCaption}" />
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding DailyBars}" Height="72" VerticalAlignment="Bottom">
-                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" ColumnSpacing="3" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="pulls:DailyBar">
-                      <Border VerticalAlignment="Bottom" Height="{Binding Height}" CornerRadius="3"
-                              Background="{DynamicResource AccentBrush}" ToolTip.Tip="{Binding Tip}" />
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-            </Border>
-          </Grid>
-
-          <Grid ColumnDefinitions="2*,*,*" ColumnSpacing="18">
-            <Border Classes="card">
-              <StackPanel Spacing="12">
-                <StackPanel Spacing="2">
-                  <TextBlock Classes="section-title" Text="{loc:Tr Stat_GoldHistoryChart}" />
-                  <TextBlock Classes="caption" Text="{loc:Tr Pulls_ShareHint}" />
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding ShareBars}">
-                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="10" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="pulls:PoolShareBar">
-                      <Grid ColumnDefinitions="96,*,Auto" ColumnSpacing="12">
-                        <TextBlock Classes="label" Text="{Binding PoolTitle}" VerticalAlignment="Center" />
-                        <c:RatioBar Grid.Column="1" Ratio="{Binding Ratio}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="2" Classes="label" FontWeight="SemiBold" Text="{Binding Text}" VerticalAlignment="Center" />
-                      </Grid>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
-              </StackPanel>
-            </Border>
-            <Border Grid.Column="1" Classes="card">
-              <StackPanel Spacing="10">
-                <TextBlock Classes="section-title" Text="{loc:Tr Stat_MissRatePie}" />
-                <TextBlock Classes="stat-value" Text="{Binding WinRate}" />
-                <c:RatioBar Ratio="{Binding WinRatio}" />
-                <TextBlock Classes="caption" Text="{Binding WinLossText}" />
-              </StackPanel>
-            </Border>
+            <!-- 不歪概率 / 四星获取比例 -->
             <Border Grid.Column="2" Classes="card">
-              <StackPanel Spacing="10">
-                <TextBlock Classes="section-title" Text="{loc:Tr Stat_FourStarPieChart}" />
-                <c:RatioBar Ratio="{Binding FourStarCharacterRatio}" Margin="0,18,0,0" />
-                <TextBlock Classes="caption" Text="{Binding FourStarSplitText}" />
-              </StackPanel>
+              <Grid RowDefinitions="Auto,*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                  <c:DonutChart Width="112" Height="112" Values="{Binding WinValues}" CenterValue="{Binding WinPercent}" CenterFormat="{}{0:0}%"
+                                Brush1="{DynamicResource AccentBrush}" Brush2="{DynamicResource TrackBrush}"
+                                EmptyBrush="{DynamicResource TrackBrush}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                  <StackPanel VerticalAlignment="Center" Spacing="6">
+                    <TextBlock Classes="card-title" Text="{loc:Tr Stat_MissRatePie}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="legend" Background="{DynamicResource AccentBrush}" />
+                      <TextBlock Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding WinLegend}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="legend" Background="{DynamicResource TrackBrush}" />
+                      <TextBlock Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding LossLegend}" />
+                    </StackPanel>
+                  </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="20">
+                  <c:DonutChart Width="112" Height="112" Values="{Binding FourStarValues}" CenterValue="{Binding FourStarPercent}" CenterFormat="{}{0:0}%"
+                                Brush1="{DynamicResource FourStarBrush}" Brush2="{DynamicResource FourStarContainerBrush}"
+                                EmptyBrush="{DynamicResource TrackBrush}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                  <StackPanel VerticalAlignment="Center" Spacing="6">
+                    <TextBlock Classes="card-title" Text="{loc:Tr Stat_FourStarPieChart}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="legend" Background="{DynamicResource FourStarBrush}" />
+                      <TextBlock Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding FourCharacterLegend}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="legend" Background="{DynamicResource FourStarContainerBrush}" />
+                      <TextBlock Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding FourWeaponLegend}" />
+                    </StackPanel>
+                  </StackPanel>
+                </StackPanel>
+              </Grid>
             </Border>
           </Grid>
         </StackPanel>
+      </ScrollViewer>
 
-        <!-- 单卡池记录 -->
-        <pulls:PoolRecordsView DataContext="{Binding Records}">
-          <pulls:PoolRecordsView.IsVisible>
-            <MultiBinding Converter="{x:Static BoolConverters.And}">
-              <Binding Path="$parent[UserControl].((pulls:PullsOverviewViewModel)DataContext).ShowContent" />
-              <Binding Path="$parent[UserControl].((pulls:PullsOverviewViewModel)DataContext).IsPoolView" />
-            </MultiBinding>
-          </pulls:PoolRecordsView.IsVisible>
-        </pulls:PoolRecordsView>
-      </StackPanel>
-    </ScrollViewer>
+      <!-- ── 单卡池：指标卡 + 抽卡记录（列表内部滚动） ── -->
+      <Grid RowDefinitions="Auto,*" RowSpacing="18" Margin="0,18,0,96">
+        <Grid.IsVisible>
+          <MultiBinding Converter="{x:Static BoolConverters.And}">
+            <Binding Path="ShowContent" />
+            <Binding Path="IsPoolView" />
+          </MultiBinding>
+        </Grid.IsVisible>
+        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Metrics}" />
+        <pulls:PoolRecordsView Grid.Row="1" x:Name="RecordsView" DataContext="{Binding Records}" />
+      </Grid>
+    </Panel>
 
-    <ProgressBar IsIndeterminate="True" VerticalAlignment="Top" Height="3" MinHeight="3" Margin="40,0"
+    <ProgressBar Grid.Row="1" IsIndeterminate="True" VerticalAlignment="Top" Height="3" MinHeight="3"
                  IsVisible="{Binding Session.IsLoading}" Foreground="{DynamicResource AccentBrush}" Background="Transparent" />
   </Grid>
 </UserControl>

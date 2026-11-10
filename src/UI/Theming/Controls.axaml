@@ -1,4 +1,4 @@
-<Styles xmlns="https://github.com/avaloniaui"
+﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:c="using:WwTool.UI.Controls">
   <!--
@@ -600,5 +600,52 @@
   </Style>
   <Style Selector="Window.reduced Border.lift:pointerover">
     <Setter Property="RenderTransform" Value="translateY(0px)" />
+  </Style>
+
+  <!-- ── 右键菜单：宽 210–220、内边距 6、圆角 10、菜单阴影；项高 34、圆角 7；悬停 Accent Soft 底；140ms 从 92% 缩放淡入 ── -->
+  <Style Selector="ContextMenu">
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="6" />
+    <Setter Property="MinWidth" Value="214" />
+    <Setter Property="RenderTransformOrigin" Value="0%,0%" />
+  </Style>
+  <Style Selector="ContextMenu /template/ Border">
+    <Setter Property="BoxShadow" Value="{DynamicResource ShadowMenu}" />
+  </Style>
+  <Style Selector="ContextMenu:open">
+    <Style.Animations>
+      <Animation Duration="0:0:0.14" Easing="0.2,0.8,0.2,1" FillMode="Forward">
+        <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0" /><Setter Property="ScaleTransform.ScaleX" Value="0.92" /><Setter Property="ScaleTransform.ScaleY" Value="0.92" /></KeyFrame>
+        <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1" /><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+  <Style Selector="ContextMenu > MenuItem">
+    <Setter Property="Height" Value="34" />
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="CornerRadius" Value="7" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="ContextMenu > MenuItem:pointerover /template/ Border#PART_LayoutRoot, ContextMenu > MenuItem:selected /template/ Border#PART_LayoutRoot">
+    <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+  </Style>
+  <Style Selector="ContextMenu > MenuItem /template/ TextBlock#PART_InputGestureText">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+  </Style>
+  <Style Selector="ContextMenu > MenuItem c|StrokeIcon">
+    <Setter Property="Width" Value="16" />
+    <Setter Property="Height" Value="16" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+  </Style>
+  <Style Selector="ContextMenu > Separator">
+    <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Margin" Value="4,5" />
   </Style>
 </Styles>
