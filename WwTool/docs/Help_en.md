@@ -119,7 +119,7 @@ This data is a snapshot from the last sync. To update it, open **Account Data**,
 
 These pages show the data **last synced to your PC**. To update, click **+ → Refresh data** at the bottom right of the page.
 
-- **Character Data**: owned Resonators (rarity, Resonance Chain) and their equipped weapons, with sorting. Hover an avatar for about half a second to see the half-body art and attributes from the guide site; the avatar is shown if there is no art.
+- **Character Data**: owned Resonators (rarity, Resonance Chain) and their equipped weapons, with sorting. Click a card to open its details next to it, with half-body art and attributes from the guide site (the avatar is shown if there is no art); click it again or click elsewhere to close.
 - **Exploration Data**: opened chests and Tidal Remnants by tier. These are counts from the API, not the in-game exploration percentage.
 - **Vehicle Data**: vehicle level and experience, current equipment, and unlocked skins, stickers, ornaments, frames and in-vehicle music albums.
 
@@ -148,6 +148,8 @@ In the **Import pull history URL** window (also available via **+ → Import URL
 - Click **Read from game log** to search again, or
 - **Paste** the link into the box. A whole log line also works; WwTool extracts the link.
 - **Server** (China / International) is usually detected from the link; choose it yourself if not.
+
+You can also **drag** a Convene link or the `Client.log` file onto the Convene Statistics page. When you drop it, the link is imported and records are fetched.
 
 To find the link by hand: open `Client\Saved\Logs\Client.log` in the game folder with a text editor, search for `gacha/record/query`, and copy the whole URL that contains it.
 

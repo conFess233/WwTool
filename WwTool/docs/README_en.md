@@ -30,7 +30,7 @@ A Windows desktop tool for Wuthering Waves: view your account and Resonators, an
 | Convene Statistics | Finds the Convene link in the game log automatically, then fetches and saves your records. The overview shows pulls, 5-stars, average pulls per 5-star, 50/50 win rate and current pity for each banner, in list or compact view. Each banner also has its own full record list |
 | Detailed charts | 5-star pity distribution, share of pulls by banner, pulls spent on each 5-star, rarity breakdown with 50/50 win rate, and a daily pull heatmap |
 | Account Data | Every locally saved account: switch, refresh, log in again or delete |
-| Character Data | Owned Resonators and weapons, Resonance Chains and current equipment; hover an avatar for half-body art and attributes |
+| Character Data | Owned Resonators and weapons, Resonance Chains and current equipment; click a card for half-body art and attributes |
 | Exploration Data | Collected chests and Tidal Remnants by tier |
 | Vehicle Data | Vehicle level, and unlocked skins, stickers, ornaments, frames and in-vehicle music |
 | Settings | Theme and accent color, launcher background / animated background / custom image, glass effect, language, notification level, reduced motion, logging and network options |
