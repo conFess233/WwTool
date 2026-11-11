@@ -348,7 +348,19 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
 
         UpdateTabs(s);
         StoredSummary = string.Format(_localization["Pulls_StoredCount"], s?.RecordCount ?? 0);
-        if (s is null) return;
+        if (s is null)
+        {
+            // 没有账号（如当前账号刚被删除）：清掉总览里的头像与图表，不留上一个账号的数据。
+            LatestRows.Clear();
+            PityRows.Clear();
+            ShareBars.Clear();
+            DailyValues = [];
+            DailyTips = [];
+            DailyAxis = [];
+            WinValues = [];
+            FourStarValues = [];
+            return;
+        }
 
         CardPoolType? pool = CurrentPool;
         PullsSummary summary = pool is { } p ? PullsSummaryCalculator.ForPool(s, p) : PullsSummaryCalculator.ForAll(s);

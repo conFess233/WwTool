@@ -78,11 +78,11 @@
 
     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="-40,0" Padding="40,0">
       <StackPanel Spacing="18" Margin="0,18,0,96">
-        <Border Classes="card" Padding="28,24" IsVisible="{Binding IsEmpty}" AutomationProperties.AutomationId="charts-empty">
-          <TextBlock Classes="caption" Text="{loc:Tr Stat_EmptyChart}" />
+        <Border Classes="card" MinHeight="360" IsVisible="{Binding IsEmpty}" AutomationProperties.AutomationId="charts-empty">
+          <c:EmptyState Title="{loc:Tr Stat_EmptyChart}" Icon="{StaticResource Icon.Chart}" />
         </Border>
 
-        <Grid ColumnDefinitions="2*,*,*" ColumnSpacing="18" Height="340">
+        <Grid ColumnDefinitions="2*,*,*" ColumnSpacing="18" Height="340" IsVisible="{Binding !IsEmpty}">
           <!-- 每日抽卡活跃分布 -->
           <Border Classes="card">
             <Grid RowDefinitions="Auto,*,Auto">
@@ -155,7 +155,7 @@
           </Border>
         </Grid>
 
-        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="18" Height="340">
+        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="18" Height="340" IsVisible="{Binding !IsEmpty}">
           <!-- 每个五星花费抽数 -->
           <Border Classes="card">
             <Grid RowDefinitions="Auto,*">

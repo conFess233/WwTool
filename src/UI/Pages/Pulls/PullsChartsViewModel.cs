@@ -174,6 +174,27 @@ public sealed partial class PullsChartsViewModel : ObservableObject, INavigation
         if (_isActive) Rebuild();
     }
 
+    private void ClearCharts()
+    {
+        IsEmpty = true;
+        DailyValues = [];
+        DailyTips = [];
+        DailyAxis = ["", "", "", ""];
+        DailyCaption = string.Empty;
+        PityValues = [];
+        PityCaption = string.Empty;
+        ShareValues = [];
+        ShareTotal = 0;
+        ShareLegend = [];
+        ShareCaption = string.Empty;
+        CostRows = [];
+        CumulativeValues = [];
+        CumulativeLabels = [];
+        CumulativeCaption = string.Empty;
+        RarityRows = [];
+        WinRows = [];
+    }
+
     private void Rebuild()
     {
         _dirty = false;
@@ -182,7 +203,8 @@ public sealed partial class PullsChartsViewModel : ObservableObject, INavigation
         Basis = string.Format(_localization["Pulls_ChartsBasis"], snapshot?.RecordCount ?? 0);
         if (snapshot is null)
         {
-            IsEmpty = true;
+            // 没有账号（如当前账号刚被删除）：清空全部图表，不留上一个账号的数据与头像。
+            ClearCharts();
             return;
         }
 
