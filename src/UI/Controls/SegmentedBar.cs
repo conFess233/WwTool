@@ -12,7 +12,7 @@ namespace WwTool.UI.Controls;
 /// <remarks>
 /// <list type="bullet">
 /// <item>标准版高 10、刻 5、隙 3；细版高 8；密版刻 5 隙 1；未出金进度刻 4 隙 1、高 14。</item>
-/// <item><see cref="IsHeat"/>：填充用热力渐变，渐变铺满整条轨道，抽数越多末端越红。</item>
+/// <item><see cref="IsHeat"/>：同色渐深，渐变铺满整条轨道（浅主色 → 主色）；抽数达到阈值（默认 70 / 80）整条转为浅红 → 红。</item>
 /// <item><see cref="Shimmer"/>：填充上叠加一道 60 宽暖白光带，从左到右循环扫过，越接近满扫得越快（3.2 秒到 1 秒）。</item>
 /// <item><see cref="AnimateIn"/>：首次显示时从 0 逐格点亮到目标值（900ms，先快后慢）；之后数值变化平滑过渡。</item>
 /// </list>
@@ -50,11 +50,19 @@ public sealed class SegmentedBar : Control
     public static readonly StyledProperty<bool> AnimateInProperty =
         AvaloniaProperty.Register<SegmentedBar, bool>(nameof(AnimateIn), true);
 
-    /// <summary>热力渐变的固定段（起点取强调色）：45% #B8801F、72% #D0752A、88% #C2452A、100% #A8302A。</summary>
-    private static readonly (double Offset, Color Color)[] HeatStops =
-    [
-        (0.45, Color.Parse("#B8801F")), (0.72, Color.Parse("#D0752A")), (0.88, Color.Parse("#C2452A")), (1.0, Color.Parse("#A8302A")),
-    ];
+    public static readonly StyledProperty<Color> HeatHotProperty =
+        AvaloniaProperty.Register<SegmentedBar, Color>(nameof(HeatHot), Color.Parse("#C2452A"));
+
+    public static readonly StyledProperty<Color> HeatBaseProperty =
+        AvaloniaProperty.Register<SegmentedBar, Color>(nameof(HeatBase), Color.Parse("#FBF9F5"));
+
+    /// <summary>热力条转红的阈值（占 <see cref="Maximum"/> 的比例），默认 70 / 80。</summary>
+    public static readonly StyledProperty<double> HeatThresholdProperty =
+        AvaloniaProperty.Register<SegmentedBar, double>(nameof(HeatThreshold), 70.0 / 80);
+
+    /// <summary>渐变起端的浅色：主色与底色按此比例混合。</summary>
+    private const double ColdLighten = 0.6;
+    private const double HotLighten = 0.55;
 
     /// <summary>光带：暖白，中间约 60% 不透明，两端透明。</summary>
     private static readonly Color ShimmerCore = Color.FromArgb(150, 255, 249, 234);
@@ -70,7 +78,8 @@ public sealed class SegmentedBar : Control
 
     static SegmentedBar()
     {
-        AffectsRender<SegmentedBar>(SegmentWidthProperty, SegmentGapProperty, FillProperty, TrackProperty, IsHeatProperty, HeatStartProperty);
+        AffectsRender<SegmentedBar>(SegmentWidthProperty, SegmentGapProperty, FillProperty, TrackProperty, IsHeatProperty, HeatStartProperty,
+            HeatHotProperty, HeatBaseProperty, HeatThresholdProperty);
         HeightProperty.OverrideDefaultValue<SegmentedBar>(10);
     }
 
@@ -91,8 +100,16 @@ public sealed class SegmentedBar : Control
     /// <summary>热力条：所有抽数 / 保底进度用。</summary>
     public bool IsHeat { get => GetValue(IsHeatProperty); set => SetValue(IsHeatProperty, value); }
 
-    /// <summary>热力渐变起点（跟随强调色）。</summary>
+    /// <summary>热力条主色（跟随强调色）：未到阈值时从浅主色渐深到主色。</summary>
     public Color HeatStart { get => GetValue(HeatStartProperty); set => SetValue(HeatStartProperty, value); }
+
+    /// <summary>到达阈值（即将触底）后整条改用的颜色（Danger），同样由浅到深。</summary>
+    public Color HeatHot { get => GetValue(HeatHotProperty); set => SetValue(HeatHotProperty, value); }
+
+    /// <summary>与主色混合出浅色起端的底色（Surface）。</summary>
+    public Color HeatBase { get => GetValue(HeatBaseProperty); set => SetValue(HeatBaseProperty, value); }
+
+    public double HeatThreshold { get => GetValue(HeatThresholdProperty); set => SetValue(HeatThresholdProperty, value); }
 
     /// <summary>未出金进度的流动光带。</summary>
     public bool Shimmer { get => GetValue(ShimmerProperty); set => SetValue(ShimmerProperty, value); }
@@ -239,8 +256,17 @@ public sealed class SegmentedBar : Control
             StartPoint = new RelativePoint(0, 0, RelativeUnit.Absolute),
             EndPoint = new RelativePoint(width, 0, RelativeUnit.Absolute),
         };
-        brush.GradientStops.Add(new GradientStop(HeatStart, 0));
-        foreach (var (offset, color) in HeatStops) brush.GradientStops.Add(new GradientStop(color, offset));
+        // 同色渐深：浅主色 → 主色；抽数达到阈值时整条改为浅红 → 红。
+        bool hot = Maximum > 0 && Value / Maximum >= HeatThreshold;
+        Color main = hot ? HeatHot : HeatStart;
+        brush.GradientStops.Add(new GradientStop(Mix(main, HeatBase, hot ? HotLighten : ColdLighten), 0));
+        brush.GradientStops.Add(new GradientStop(main, 1));
         return brush;
     }
+
+    private static Color Mix(Color a, Color b, double t) => Color.FromArgb(
+        255,
+        (byte)Math.Round(a.R + (b.R - a.R) * t),
+        (byte)Math.Round(a.G + (b.G - a.G) * t),
+        (byte)Math.Round(a.B + (b.B - a.B) * t));
 }

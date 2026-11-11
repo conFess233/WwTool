@@ -555,6 +555,8 @@
     <Setter Property="Fill" Value="{DynamicResource AccentBrush}" />
     <Setter Property="Track" Value="{DynamicResource TrackBrush}" />
     <Setter Property="HeatStart" Value="{DynamicResource AccentColor}" />
+    <Setter Property="HeatHot" Value="{DynamicResource DangerColor}" />
+    <Setter Property="HeatBase" Value="{DynamicResource SurfaceColor}" />
   </Style>
   <Style Selector="c|SegmentedBar.danger">
     <Setter Property="Fill" Value="{DynamicResource DangerBrush}" />
