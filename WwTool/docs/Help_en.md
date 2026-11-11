@@ -24,7 +24,7 @@ This guide is organized by task. Each section gives the steps first, then what t
 
 Pick an archive on [Releases](https://github.com/conFess233/WwTool/releases). The differences are listed in [README · Download](README_en.md#download). If unsure, choose `single-runtime`; it runs right after unzipping.
 
-1. **Unzip the whole archive** into a folder you can write to, such as `D:\Tools\WwTool`. Don't put it under `C:\Program Files`, and don't take out `WwTool.exe` on its own.
+1. Unzip the archive somewhere you can write to, such as `D:\Tools`; this creates the `D:\Tools\WwTool` folder. Don't put it under `C:\Program Files`, and don't take out `WwTool.exe` on its own.
 2. Keep the `portable` file that comes with it. With it, settings and data are stored in this folder. Without it, WwTool uses `%LocalAppData%\WwTool` instead, and your earlier data seems to disappear.
 3. Run `WwTool.exe`. If you are told .NET is missing, either install the [.NET Desktop Runtime 10 (x64)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) or switch to an archive with `runtime` in its name.
 
@@ -223,7 +223,7 @@ Close WwTool and copy `Config` and `Local\Data\LocalData.db`.
 ### 7.3 Update to a new version
 
 1. Close WwTool.
-2. Unzip the new archive into the same folder and overwrite. Release archives contain no database or settings, so your data is kept.
+2. Unzip the new archive to the place that holds your existing `WwTool` folder (for `D:\Tools\WwTool`, unzip to `D:\Tools`) and overwrite files with the same name. Release archives contain no database or settings, so your data is kept. If your existing folder has a different name (such as a 1.x folder), copy everything inside the new `WwTool` folder into it and overwrite.
 3. Run the new `WwTool.exe`.
 
 Updating from 1.x works the same way: 2.0 reads the 1.2.1 database and login credentials directly.
