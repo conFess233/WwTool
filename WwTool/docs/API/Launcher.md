@@ -209,6 +209,8 @@ Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
 | firstFrameImage    | string | https://hw-pcdownload-qcloud.aki-game.net/launcher/game/50004/G153/official/assets/background/20260930/544e04e45df24686af193a4a256fae8e.webp | 首帧图       | webp；视频加载完成前显示，也可直接作为静态背景使用         |
 | slogan             | string | https://hw-pcdownload-qcloud.aki-game.net/launcher/game/50004/G153/official/assets/background/20260930/1ed926d57c97482fb8691038c7196968.png | 标语图       | 透明 png，叠加在背景上                                     |
 
+语言：国际服 `zh-Hans`、`zh-Hant`、`en`、`ja` 均返回 200，背景与首帧图相同，**标语图按语言不同**；国服只有 `zh-Hans`，其他语言返回 404。
+
 响应直接是业务数据，**没有** `code` / `message` 外层。资源路径中的日期段（如 `20260930`）为资源上传日期，随版本更新变化。
 
 资源所在 CDN 因区服而异：
