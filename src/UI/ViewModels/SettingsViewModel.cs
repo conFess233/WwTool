@@ -53,7 +53,6 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
     private readonly CatalogSyncService _catalogSync;
     private readonly ICatalogImageCache _images;
     private readonly IAppLauncher _launcher;
-    private readonly IAppPaths _paths;
     private readonly IUserDataService _userData;
     private readonly PullsSession _pullsSession;
     private readonly DispatcherTimer _saveDebounce;
@@ -69,7 +68,6 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         CatalogSyncService catalogSync,
         ICatalogImageCache images,
         IAppLauncher launcher,
-        IAppPaths paths,
         IUserDataService userData,
         PullsSession pullsSession)
     {
@@ -82,7 +80,6 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         _catalogSync = catalogSync;
         _images = images;
         _launcher = launcher;
-        _paths = paths;
         Accounts = accounts;
         FabActions =
         [
@@ -330,23 +327,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         ScheduleSave();
     }
 
-    /// <summary>当前数据根目录（启动时确定，便携模式为程序目录）。</summary>
-    public string DataRoot => _paths.DataRoot;
-
-    public bool IsPortable => _paths.IsPortable;
-
-    [RelayCommand]
-    private void OpenDataFolder() => _launcher.OpenFolder(_paths.DataRoot);
-
-    [RelayCommand]
-    private void OpenLogFolder()
-    {
-        string folder = _config.App.LogFolderPath;
-        string path = string.IsNullOrWhiteSpace(folder) ? _paths.LogDirectory
-            : Path.IsPathRooted(folder) ? folder : Path.Combine(_paths.DataRoot, folder);
-        Directory.CreateDirectory(path);
-        _launcher.OpenFolder(path);
-    }
+    // 数据目录、日志目录的打开入口在首页「便捷操作」。
 
     // ── 网络与验证 ────────────────────────────────────────────
 

@@ -283,6 +283,22 @@
                 </ComboBox>
               </Grid>
             </Border>
+            <!-- 通知强度（定稿未画，保留旧版设置项） -->
+            <Border Classes="sr">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Classes="name" Text="{loc:Tr Settings_NotificationMode}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_NotificationModeHint}" />
+                </StackPanel>
+                <ComboBox Grid.Column="1" Classes="input" Width="150" ItemsSource="{Binding NotificationModes}" SelectedItem="{Binding SelectedNotificationMode}"
+                          VerticalAlignment="Center" AutomationProperties.Name="{loc:Tr Settings_NotificationMode}"
+                          AutomationProperties.AutomationId="settings-notification-mode">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </Grid>
+            </Border>
           </StackPanel>
         </Border>
 
@@ -411,8 +427,14 @@
           <StackPanel>
             <Grid ColumnDefinitions="*,Auto">
               <TextBlock Classes="ti" Margin="0" Text="{loc:Tr About_Title}" VerticalAlignment="Bottom" />
-              <TextBlock Grid.Column="1" Classes="cp" Text="{Binding AboutLine}" VerticalAlignment="Bottom" Margin="0,0,0,1"
-                         AutomationProperties.AutomationId="settings-about" />
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Bottom">
+                <TextBlock Classes="cp" Text="{Binding AboutLine}" VerticalAlignment="Center"
+                           AutomationProperties.AutomationId="settings-about" />
+                <!-- 开源地址（定稿未画，保留旧版入口） -->
+                <Button Classes="link" FontSize="12" Content="{loc:Tr About_Github}" Command="{Binding OpenRepositoryCommand}"
+                        ToolTip.Tip="github.com/conFess233/WwTool" VerticalAlignment="Center"
+                        AutomationProperties.AutomationId="settings-open-repo" />
+              </StackPanel>
             </Grid>
             <TextBlock Classes="cp" Margin="0,10,0,0" LineHeight="20.4" TextWrapping="Wrap" Text="{loc:Tr About_DisclaimerText}" />
           </StackPanel>
