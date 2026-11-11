@@ -132,9 +132,9 @@
 - 提供先约电台、探索计数、摩托与音乐专辑资料展示。
 - 支持自动读取游戏日志或手动导入抽卡历史链接，并保存本地记录。
 
-[1.0.0]: https://github.com/conFess233/WwTool/tree/v1.0.0
-[1.0.1]: https://github.com/conFess233/WwTool/tree/v1.0.1
-[1.1.1]: https://github.com/conFess233/WwTool/tree/v1.1.1
-[1.2.0]: https://github.com/conFess233/WwTool/tree/v1.2.0
-[1.2.1]: https://github.com/conFess233/WwTool/tree/v1.2.1
-[2.0.0]: https://github.com/conFess233/WwTool/tree/v2.0.0
+[1.0.0]: https://github.com/conFess233/WwTool/releases/tag/v1.0.0
+[1.0.1]: https://github.com/conFess233/WwTool/releases/tag/v1.0.1
+[1.1.1]: https://github.com/conFess233/WwTool/releases/tag/v1.1.1
+[1.2.0]: https://github.com/conFess233/WwTool/releases/tag/v1.2.0
+[1.2.1]: https://github.com/conFess233/WwTool/releases/tag/v1.2.1
+[2.0.0]: https://github.com/conFess233/WwTool/releases/tag/v2.0.0
