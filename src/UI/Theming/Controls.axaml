@@ -129,6 +129,13 @@
     <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
   </Style>
 
+  <!-- 页面级滚动区：上、左、右各外扩并用等量内边距抵消，布局不变；
+       卡片悬停上浮、按下缩放与阴影不会被视口边缘切掉，滚动条贴窗口右缘 -->
+  <Style Selector="ScrollViewer.page-scroll">
+    <Setter Property="Margin" Value="-40,-12,-40,0" />
+    <Setter Property="Padding" Value="40,12,40,0" />
+  </Style>
+
   <Style Selector="Separator.divider">
     <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
     <Setter Property="Height" Value="1" />

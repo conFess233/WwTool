@@ -296,7 +296,7 @@
       </StackPanel>
 
       <!-- ── 总览：长页面 ── -->
-      <ScrollViewer x:Name="OverviewScroller" HorizontalScrollBarVisibility="Disabled" Margin="-40,0" Padding="40,0">
+      <ScrollViewer x:Name="OverviewScroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
         <ScrollViewer.IsVisible>
           <MultiBinding Converter="{x:Static BoolConverters.And}">
             <Binding Path="ShowContent" />
@@ -525,7 +525,7 @@
           <Grid RowDefinitions="Auto,*" RowSpacing="14">
             <TextBlock FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Text="{loc:Tr Pulls_FiveStarRecords}" />
             <ScrollViewer Grid.Row="1" x:Name="CompactScroller" HorizontalScrollBarVisibility="Disabled" Margin="-8,0,-14,0">
-              <ItemsControl x:Name="CompactGrid" Margin="8,1,7,36" ItemsSource="{Binding Records.CompactTiles}">
+              <ItemsControl x:Name="CompactGrid" Margin="8,5,7,36" ItemsSource="{Binding Records.CompactTiles}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate><UniformGrid ColumnSpacing="5" RowSpacing="7" Columns="8" /></ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>

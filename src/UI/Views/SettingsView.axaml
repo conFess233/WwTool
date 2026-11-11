@@ -128,7 +128,7 @@
     </Style>
   </UserControl.Styles>
 
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+  <ScrollViewer Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
     <Grid Margin="0,0,0,26" ColumnDefinitions="*,*" ColumnSpacing="18">
       <!-- ── 左栏 ── -->
       <StackPanel Spacing="18">

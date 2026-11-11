@@ -122,7 +122,7 @@
   </UserControl.Styles>
 
   <Panel>
-    <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Disabled" Margin="-40,0" Padding="40,0">
+    <ScrollViewer x:Name="Scroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
       <StackPanel Margin="0,0,0,96" Spacing="12">
         <!-- 顶部栏：页签、排序、同步时间 -->
         <Grid Height="40" ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8">

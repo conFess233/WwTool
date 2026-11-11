@@ -20,7 +20,7 @@ public partial class HomeView : UserControl
 
     private void FitRoot()
     {
-        double available = Scroller.Bounds.Height - Root.Margin.Top - Root.Margin.Bottom;
+        double available = Scroller.Bounds.Height - Scroller.Padding.Top - Scroller.Padding.Bottom - Root.Margin.Top - Root.Margin.Bottom;
         if (available > 0) Root.Height = Math.Max(Root.MinHeight, available);
     }
 }

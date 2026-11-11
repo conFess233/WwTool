@@ -77,7 +77,7 @@
     </Style>
   </UserControl.Styles>
 
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+  <ScrollViewer Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Margin="0,0,0,96" Spacing="18">
       <!-- 工具行：「本地已存储 N 个账号」+ 工具按钮「刷新账号列表」 -->
       <Grid Height="40" ColumnDefinitions="*,Auto">

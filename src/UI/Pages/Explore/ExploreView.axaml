@@ -27,7 +27,7 @@
     </Style>
   </UserControl.Styles>
 
-  <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Disabled">
+  <ScrollViewer x:Name="Scroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
     <Panel>
       <Border Classes="card" Padding="28,24" VerticalAlignment="Top" IsVisible="{Binding !HasData}" AutomationProperties.AutomationId="explore-empty">
         <TextBlock Classes="caption" Text="{loc:Tr Explore_Empty}" TextWrapping="Wrap" />

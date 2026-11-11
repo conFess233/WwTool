@@ -45,7 +45,7 @@
     </Style>
   </UserControl.Styles>
 
-  <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+  <ScrollViewer Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
     <Grid Margin="0,0,0,96">
       <Border Classes="card" Padding="28,24" VerticalAlignment="Top" IsVisible="{Binding !HasData}" AutomationProperties.AutomationId="motor-empty">
         <TextBlock Classes="caption" Text="{loc:Tr Motor_Empty}" TextWrapping="Wrap" />

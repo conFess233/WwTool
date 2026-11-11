@@ -76,7 +76,7 @@
       </StackPanel>
     </Grid>
 
-    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="-40,0" Padding="40,0">
+    <ScrollViewer Grid.Row="1" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
       <StackPanel Spacing="18" Margin="0,18,0,96">
         <Border Classes="card" MinHeight="360" IsVisible="{Binding IsEmpty}" AutomationProperties.AutomationId="charts-empty">
           <c:EmptyState Title="{loc:Tr Stat_EmptyChart}" Icon="{StaticResource Icon.Chart}" />
