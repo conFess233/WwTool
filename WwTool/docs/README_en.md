@@ -65,7 +65,7 @@ Download one of the archives from [Releases](https://github.com/conFess233/WwToo
 | `WwTool-<version>-win-x64-multi-lite.zip` | Install separately | Downloaded when needed | ~17 MB | |
 
 - **Runtime**: for archives marked "Install separately", install the [.NET Desktop Runtime 10 (Windows x64)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) first. Pick the "Desktop Runtime" on the download page.
-- **Single-file / multi-file**: a single-file build unzips to just `WwTool.exe`, the `Local` folder and the `portable` marker file. A multi-file build keeps its libraries next to the exe. Both work the same.
+- **Single-file / multi-file**: every archive unzips to a single `WwTool` folder. In a single-file build that folder holds just `WwTool.exe`, the `Local` folder and the `portable` marker file; a multi-file build keeps its libraries next to the exe. Both work the same.
 - **Lite**: leaves out the Resonator, weapon and other icons (`Local/Icons`). Each icon is downloaded from this repository the first time it is shown, then cached so it also works offline.
 - Each release includes `SHA256SUMS.txt` for checking your download.
 
@@ -74,7 +74,7 @@ Requires 64-bit Windows 10 or later.
 <a id="quick-start"></a>
 ## Quick start
 
-1. **Unzip the whole archive** into a folder you can write to (not under `C:\Program Files`), then run `WwTool.exe`.
+1. Unzip the archive somewhere you can write to (not under `C:\Program Files`), open the `WwTool` folder it creates, and run `WwTool.exe`.
 2. **Convene records only**: in the game, open **Convene → History** once. Back in WwTool, go to Convene Statistics and click **Get records**. WwTool looks for the link in the game log; if it can't find one, it asks you to paste the link. Before your first use, set the game installation directory in Settings.
 3. **Account data (International)**: on Home, click **Add Game Account** and log in with your email and password. If a security check is needed, a web page opens; login continues once you complete it.
 
@@ -111,7 +111,7 @@ The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,s
   - `Local/Data/LocalData.db`: account snapshots, Convene records and login credentials
   - `Local/Cache/`: cached images, launcher background and announcements; safe to delete at any time
   - `Local/Logs/`: logs
-- **Updating**: close WwTool and unzip the new archive over the old folder. Release archives contain no database or settings, so your data is not overwritten. To be safe, you can copy `Config` and `Local/Data` first. A 1.x program folder can be updated the same way, and its records keep working.
+- **Updating**: close WwTool and unzip the new archive to the place that holds your existing `WwTool` folder, overwriting files with the same name. Release archives contain no database or settings, so your data is not overwritten. To be safe, you can copy `Config` and `Local/Data` first. A 1.x program folder can be updated the same way, and its records keep working.
 - **Login credentials** are encrypted with Windows DPAPI for the current Windows user. After moving to another PC or Windows user you need to log in again. The rest of the database is not encrypted.
 - **Network access**:
   - Login and account data use Kuro Games' services; Convene records use the gacha API of the matching server.

@@ -2,7 +2,7 @@
 #
 #   powershell -ExecutionPolicy Bypass -File publish.ps1
 #
-# 生成 6 个 zip（解压后直接是 WwTool.exe、Local 与 portable 标记文件）：
+# 生成 6 个 zip，每个解压后是一个 WwTool 目录（单文件版目录里只有 WwTool.exe、Local 与 portable 标记文件）：
 #   WwTool-<版本>-win-x64-single.zip               单文件，不带运行时（需安装 .NET 10 桌面运行时）
 #   WwTool-<版本>-win-x64-single-runtime.zip       单文件，带运行时
 #   WwTool-<版本>-win-x64-multi.zip                多文件，不带运行时
@@ -18,6 +18,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $root = $PSScriptRoot
@@ -67,7 +68,6 @@ foreach ($build in $needed) {
 }
 
 # 2. 组装、检查、压缩。
-$zips = @()
 foreach ($name in $packages.Keys) {
     $spec = $packages[$name]
     $stage = Join-Path $work "pkg-$name"
@@ -96,12 +96,25 @@ foreach ($name in $packages.Keys) {
 
     $zip = Join-Path $out "WwTool-$version-win-x64-$name.zip"
     if (Test-Path $zip) { Remove-Item $zip -Force }
-    [System.IO.Compression.ZipFile]::CreateFromDirectory($stage, $zip, [System.IO.Compression.CompressionLevel]::Optimal, $false)
-    $zips += Get-Item $zip
+    # 条目统一放在 WwTool/ 目录下，解压后不会散落一地。逐个写入条目，路径用 /
+    # （Windows PowerShell 5.1 的 CreateFromDirectory 会写成反斜杠，其他系统的解压工具不认）。
+    $stream = [System.IO.File]::Open($zip, [System.IO.FileMode]::CreateNew)
+    $archive = New-Object System.IO.Compression.ZipArchive($stream, [System.IO.Compression.ZipArchiveMode]::Create)
+    try {
+        foreach ($file in $files) {
+            $entry = 'WwTool/' + $file.FullName.Substring($stage.Length + 1).Replace('\', '/')
+            [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $file.FullName, $entry, [System.IO.Compression.CompressionLevel]::Optimal)
+        }
+    } finally { $archive.Dispose(); $stream.Dispose() }
+
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($zip)
+    try { $outside = @($archive.Entries | Where-Object { -not $_.FullName.StartsWith('WwTool/') -or $_.FullName.Contains('\') }) } finally { $archive.Dispose() }
+    if ($outside.Count) { throw "$name 压缩包里有 WwTool 目录以外的条目：$($outside[0].FullName)" }
     '{0,-46} {1,8:N1} MB  {2,4} 个文件' -f (Split-Path $zip -Leaf), ((Get-Item $zip).Length / 1MB), $files.Count | Write-Host
 }
 
-# 3. 校验和。
+# 3. 校验和：覆盖 publish/ 里这个版本的全部压缩包（用 -Only 只重打部分时，其余的沿用上次的结果）。
+$zips = @(Get-ChildItem $out -Filter "WwTool-$version-win-x64-*.zip" | Sort-Object Name)
 $sums = $zips | ForEach-Object { '{0}  {1}' -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $_.Name }
 [System.IO.File]::WriteAllLines((Join-Path $out 'SHA256SUMS.txt'), [string[]]$sums)
 

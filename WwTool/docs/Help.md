@@ -24,7 +24,7 @@
 
 在 [Releases](https://github.com/conFess233/WwTool/releases) 选一个压缩包。各个包的区别见 [README · 下载](../../README.md#download)。不确定就选 `single-runtime`，解压就能用。
 
-1. 把压缩包**完整解压**到一个你有写入权限的目录，例如 `D:\Tools\WwTool`。不要放在 `C:\Program Files` 下，也不要只拿出 `WwTool.exe`。
+1. 把压缩包解压到一个你有写入权限的位置，例如 `D:\Tools`，会得到 `D:\Tools\WwTool` 文件夹。不要放在 `C:\Program Files` 下，也不要只拿出 `WwTool.exe`。
 2. 保留解压出来的 `portable` 文件。有它，设置和数据都保存在这个目录里；删掉它，程序会改用 `%LocalAppData%\WwTool`，之前的数据就「看不见」了。
 3. 运行 `WwTool.exe`。如果提示缺少 .NET，要么安装 [.NET Desktop Runtime 10（x64）](https://dotnet.microsoft.com/zh-cn/download/dotnet/10.0)，要么换带 `runtime` 的包。
 
@@ -223,7 +223,7 @@
 ### 7.3 更新到新版本
 
 1. 退出 WwTool。
-2. 把新压缩包解压到原目录，选择覆盖。发布包里不含数据库和设置，不会覆盖你的存档。
+2. 把新压缩包解压到原 `WwTool` 文件夹所在的位置（例如原来是 `D:\Tools\WwTool`，就解压到 `D:\Tools`），遇到同名文件选择覆盖。发布包里不含数据库和设置，不会覆盖你的存档。如果原来的文件夹不叫 `WwTool`（比如 1.x 的目录），把解压出的 `WwTool` 文件夹里的全部内容复制进原文件夹覆盖即可。
 3. 运行新的 `WwTool.exe`。
 
 从 1.x 更新的步骤也一样：2.0 能直接读取 1.2.1 的数据库和登录凭据。
