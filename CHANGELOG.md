@@ -1,6 +1,6 @@
 # 更新日志
 
-## 2.0.0 - 未发布
+## [2.0.0] - 2026-11-11
 
 2.0 用 Avalonia 重写了整个界面，按新的设计稿重做了所有页面。本地数据和 1.2.1 兼容：解压覆盖旧目录即可继续使用原来的账号、抽卡记录和登录凭据。
 
@@ -49,7 +49,7 @@
 - 进度刻度条只画整格，右端不再残留一小截。
 - 悬停上浮、按下缩放和阴影不再被页面边缘切掉。
 
-## 1.2.1 - 2026-09-30
+## [1.2.1] - 2026-09-30
 
 ### 新增
 
@@ -132,7 +132,9 @@
 - 提供先约电台、探索计数、摩托与音乐专辑资料展示。
 - 支持自动读取游戏日志或手动导入抽卡历史链接，并保存本地记录。
 
-[1.2.0]: https://github.com/conFess233/WwTool/tree/v1.2.0
-[1.1.1]: https://github.com/conFess233/WwTool/tree/v1.1.1
-[1.0.1]: https://github.com/conFess233/WwTool/tree/v1.0.1
 [1.0.0]: https://github.com/conFess233/WwTool/tree/v1.0.0
+[1.0.1]: https://github.com/conFess233/WwTool/tree/v1.0.1
+[1.1.1]: https://github.com/conFess233/WwTool/tree/v1.1.1
+[1.2.0]: https://github.com/conFess233/WwTool/tree/v1.2.0
+[1.2.1]: https://github.com/conFess233/WwTool/tree/v1.2.1
+[2.0.0]: https://github.com/conFess233/WwTool/tree/v2.0.0
