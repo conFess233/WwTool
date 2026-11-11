@@ -11,6 +11,8 @@
 - [查询账号大区信息](Role_GetUserInfo.md) `https://gar-service.aki-game.net/UserRegion/GetUserInfo`
 - [查询玩家角色详情](Role_QueryRole.md) `https://pc-launcher-sdk-api.kurogame.net/game/queryRole`
 - [攻略站](Guide.md) `https://wuwaguide.kurogames.com`
+- [启动器资讯](Launcher.md#启动器资讯) `https://prod-alicdn-gamestarter.kurogame.com/launcher/app/{gameId}_{launcherKey}/{appCode}/official/information/{language}.json`
+- [启动器背景](Launcher.md#启动器背景) `https://prod-alicdn-gamestarter.kurogame.com/launcher/game/{gameId}_{launcherKey}/{appCode}/official/background/{backgroundId}/{language}.json`
 
 #### 服务器ID
 
