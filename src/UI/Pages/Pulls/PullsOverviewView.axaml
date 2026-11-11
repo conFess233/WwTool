@@ -13,6 +13,86 @@
   -->
   <UserControl.Styles>
     <StyleInclude Source="avares://WwTool/Pages/Pulls/PullsStyles.axaml" />
+
+    <!-- 拖拽导入：拖入时暖色底 + 金色流动虚线；导入完成转绿、画出对勾 -->
+    <Style Selector="Panel.drop c|MarchingAnts">
+      <Setter Property="Fill" Value="{DynamicResource HighlightStrongBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Panel.drop.done c|MarchingAnts">
+      <Setter Property="Fill" Value="{DynamicResource SuccessContainerBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style Selector="c|CheckMark.drop-check, c|CheckMark.refresh-check">
+      <Setter Property="Progress" Value="0" />
+      <Setter Property="Transitions">
+        <Transitions><DoubleTransition Property="Progress" Duration="0:0:0.48" Easing="0.2,0.8,0.2,1" /></Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Panel.drop.done c|CheckMark.drop-check">
+      <Setter Property="Progress" Value="1" />
+    </Style>
+
+    <!-- 刷新完成胶囊：浮入 / 淡出；完成时加载形象缩小淡出、对勾画出、底色转绿、文字换成结果 -->
+    <Style Selector="Border.refresh">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Padding" Value="6,6,18,6" />
+      <Setter Property="BoxShadow" Value="{DynamicResource ShadowFab}" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translateY(10px)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.3" Easing="0.2,0.8,0.2,1" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="0.2,0.8,0.2,1" />
+          <BrushTransition Property="Background" Duration="0:0:0.3" />
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.3" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.refresh.shown">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+    <Style Selector="Border.refresh.done">
+      <Setter Property="Background" Value="{DynamicResource SuccessContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource SuccessLineBrush}" />
+    </Style>
+    <Style Selector="Border.refresh-dot">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    </Style>
+    <Style Selector="Border.refresh.done Border.refresh-dot">
+      <Setter Property="BorderBrush" Value="{DynamicResource SuccessLineBrush}" />
+    </Style>
+    <Style Selector="c|PixelGif.refresh-gif">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="scale(1)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.24" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.24" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.refresh.done c|PixelGif.refresh-gif">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="scale(0.8)" />
+    </Style>
+    <Style Selector="Border.refresh.done c|CheckMark.refresh-check">
+      <Setter Property="Progress" Value="1" />
+    </Style>
+    <Style Selector="TextBlock.refresh-done">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="Border.refresh.done TextBlock.refresh-done">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="Border.refresh.done TextBlock.refresh-busy">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
   </UserControl.Styles>
   <UserControl.Resources>
     <ResourceDictionary>
@@ -375,6 +455,51 @@
         <pulls:PoolRecordsView Grid.Row="1" x:Name="RecordsView" DataContext="{Binding Records}" />
       </Grid>
     </Panel>
+
+    <!-- 动效「拖拽导入」：拖入链接或日志文件时盖在内容上的虚线框；边缘流动并变暖色，松手后变绿显示导入条数 -->
+    <Panel Grid.Row="1" Margin="0,18,0,26" Classes="drop" Classes.done="{Binding IsDropDone}"
+           IsVisible="{Binding IsDropVisible}" IsHitTestVisible="False" AutomationProperties.AutomationId="pulls-drop-zone">
+      <c:MarchingAnts x:Name="DropAnts" Radius="12" />
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+        <c:StrokeIcon Width="30" Height="30" Data="{StaticResource Icon.Upload}" Foreground="{DynamicResource AccentBrush}"
+                      HorizontalAlignment="Center" IsVisible="{Binding !IsDropDone}" />
+        <c:CheckMark Classes="drop-check" Width="30" Height="30" Stroke="{DynamicResource SuccessBrush}" HorizontalAlignment="Center"
+                     IsVisible="{Binding IsDropDone}" />
+        <Panel HorizontalAlignment="Center">
+          <TextBlock FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" IsVisible="{Binding !IsDropBusy}"
+                     Text="{loc:Tr Pulls_DropHint}" />
+          <TextBlock FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"
+                     Text="{loc:Tr Pulls_DropImporting}">
+            <TextBlock.IsVisible>
+              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                <Binding Path="IsDropBusy" />
+                <Binding Path="!IsDropDone" />
+              </MultiBinding>
+            </TextBlock.IsVisible>
+          </TextBlock>
+          <TextBlock FontSize="14" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Center"
+                     Text="{Binding DropDoneText}" IsVisible="{Binding IsDropDone}" AutomationProperties.AutomationId="pulls-drop-done" />
+        </Panel>
+      </StackPanel>
+    </Panel>
+
+    <!-- 动效「刷新完成」：获取云端数据时右下角（悬浮按钮上方）的状态胶囊 -->
+    <Border Grid.Row="1" Classes="refresh" Classes.done="{Binding IsRefreshDone}" Classes.shown="{Binding IsRefreshVisible}"
+            HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,96" IsHitTestVisible="False"
+            AutomationProperties.AutomationId="pulls-refresh-status">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <Border Classes="refresh-dot" Width="40" Height="40" CornerRadius="20" BorderThickness="1">
+          <Panel>
+            <c:PixelGif Classes="refresh-gif" Width="34" Height="34" />
+            <c:CheckMark Classes="refresh-check" Width="22" Height="22" Stroke="{DynamicResource SuccessBrush}" />
+          </Panel>
+        </Border>
+        <Panel VerticalAlignment="Center">
+          <TextBlock Classes="refresh-busy" FontSize="13" Text="{loc:Tr Pulls_Refreshing}" Foreground="{DynamicResource TextSecondaryBrush}" />
+          <TextBlock Classes="refresh-done" FontSize="13" FontWeight="Bold" Text="{Binding RefreshDoneText}" Foreground="{DynamicResource SuccessBrush}" />
+        </Panel>
+      </StackPanel>
+    </Border>
 
     <ProgressBar Grid.Row="1" IsIndeterminate="True" VerticalAlignment="Top" Height="3" MinHeight="3"
                  IsVisible="{Binding Session.IsLoading}" Foreground="{DynamicResource AccentBrush}" Background="Transparent" />

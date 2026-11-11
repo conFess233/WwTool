@@ -722,5 +722,11 @@
   "Accounts_ExpiredTitle": "{0}'s login has expired",
   "Accounts_ExpiredHint": "The authorization has expired. Log in again to refresh this account's data.",
   "Accounts_Relogin": "Log in again",
-  "Accounts_Remove": "Remove account"
+  "Accounts_Remove": "Remove account",
+  "Pulls_Refreshing": "Fetching cloud data",
+  "Pulls_UpToDate": "Up to date",
+  "Pulls_RefreshAdded": "{0} new records",
+  "Pulls_DropHint": "Drop a pull link or log file here",
+  "Pulls_DropImporting": "Importing…",
+  "Pulls_DropImported": "Imported {0} records"
 }

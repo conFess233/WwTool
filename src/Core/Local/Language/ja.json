@@ -722,5 +722,11 @@
   "Accounts_ExpiredTitle": "{0} のログインが無効になりました",
   "Accounts_ExpiredHint": "認証の有効期限が切れました。再ログインするとこのアカウントのデータを更新できます。",
   "Accounts_Relogin": "再ログイン",
-  "Accounts_Remove": "アカウントを削除"
+  "Accounts_Remove": "アカウントを削除",
+  "Pulls_Refreshing": "クラウドデータを取得中",
+  "Pulls_UpToDate": "最新です",
+  "Pulls_RefreshAdded": "{0} 件の新しい記録",
+  "Pulls_DropHint": "ガチャのリンクやログファイルをここにドロップ",
+  "Pulls_DropImporting": "インポート中…",
+  "Pulls_DropImported": "{0} 件の記録をインポートしました"
 }

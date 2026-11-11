@@ -21,6 +21,45 @@ public partial class PullsOverviewView : UserControl
         OverviewScroller.ScrollChanged += (_, _) => BarShadow.Opacity = Math.Clamp(OverviewScroller.Offset.Y / 24, 0, 1);
         AddHandler(TappedEvent, OnTapped);
         AddHandler(ContextRequestedEvent, OnContextRequested);
+
+        // 拖拽导入：拖入链接文字或日志文件。
+        DragDrop.SetAllowDrop(this, true);
+        AddHandler(DragDrop.DragEnterEvent, OnDragEnter);
+        AddHandler(DragDrop.DragOverEvent, OnDragOverPage);
+        AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
+        AddHandler(DragDrop.DropEvent, OnDrop);
+    }
+
+    private static bool CanImport(DragEventArgs e) =>
+        e.DataTransfer.Contains(DataFormat.Text) || e.DataTransfer.Contains(DataFormat.File);
+
+    private void OnDragEnter(object? sender, DragEventArgs e)
+    {
+        e.DragEffects = CanImport(e) ? DragDropEffects.Copy : DragDropEffects.None;
+        if (CanImport(e)) ViewModel?.DragOver(true);
+    }
+
+    private void OnDragOverPage(object? sender, DragEventArgs e) =>
+        e.DragEffects = CanImport(e) ? DragDropEffects.Copy : DragDropEffects.None;
+
+    private void OnDragLeave(object? sender, DragEventArgs e)
+    {
+        // 移到子元素上也会触发离开；只在指针真正离开本页时收起。
+        Point p = e.GetPosition(this);
+        if (p.X <= 0 || p.Y <= 0 || p.X >= Bounds.Width || p.Y >= Bounds.Height) ViewModel?.DragOver(false);
+    }
+
+    private async void OnDrop(object? sender, DragEventArgs e)
+    {
+        if (ViewModel is not { } vm) return;
+        string? file = e.DataTransfer.TryGetFile()?.TryGetLocalPath();
+        string? text = file is null ? e.DataTransfer.TryGetText() : null;
+        if (file is null && string.IsNullOrWhiteSpace(text))
+        {
+            vm.DragOver(false);
+            return;
+        }
+        await vm.DropAsync(text, file);
     }
 
     private PullsOverviewViewModel? ViewModel => DataContext as PullsOverviewViewModel;

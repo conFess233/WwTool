@@ -140,20 +140,23 @@ public sealed partial class PullsSession : ObservableObject
         }
     }
 
-    /// <summary>用当前链接从服务端同步全部卡池，再重新统计。</summary>
-    public async Task SyncAsync()
+    /// <summary>一次「获取云端数据」成功结束，参数为新增条数（动效「刷新完成」据此显示「已是最新」或新增条数）。</summary>
+    public event EventHandler<int>? SyncCompleted;
+
+    /// <summary>用当前链接从服务端同步全部卡池，再重新统计。成功时返回新增条数，未执行或失败时返回 null。</summary>
+    public async Task<int?> SyncAsync()
     {
-        if (IsSyncing) return;
+        if (IsSyncing) return null;
         if (string.IsNullOrWhiteSpace(QueryUrl))
         {
             _uiState.ShowToast(_localization["Toast_Warning"], _localization["Msg_ApiUrlNotFound"], NotificationType.Warning);
-            return;
+            return null;
         }
         string? uid = Uid;
         if (uid is null)
         {
             _uiState.ShowToast(_localization["Toast_Warning"], _localization["Msg_UidEmptyForGacha"], NotificationType.Warning);
-            return;
+            return null;
         }
 
         IsSyncing = true;
@@ -181,6 +184,8 @@ public sealed partial class PullsSession : ObservableObject
                 IsTaskCompleted = true,
             });
             if (Uid == uid) await ReloadAsync();
+            SyncCompleted?.Invoke(this, added);
+            return added;
         }
         catch (Exception ex)
         {
@@ -196,11 +201,54 @@ public sealed partial class PullsSession : ObservableObject
                 TaskKey = task,
                 IsTaskCompleted = true,
             });
+            return null;
         }
         finally
         {
             IsSyncing = false;
         }
+    }
+
+    /// <summary>
+    /// 拖拽导入（动效「拖拽导入」）：拖入的文字或文件（Client.log 等）里找最近一条抽卡链接，导入后立即获取云端数据。
+    /// 返回新增条数；没找到链接或获取失败时返回 null（已提示）。
+    /// </summary>
+    public async Task<int?> ImportDroppedAsync(string? text, string? filePath)
+    {
+        if (filePath is not null)
+        {
+            try
+            {
+                text = await ReadSharedAsync(filePath);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                _errors.Report(ex, _localization["Stat_AutoImportUrl"]);
+                return null;
+            }
+        }
+        string? url = LatestUrlIn(text);
+        if (url is null || !ImportUrl(url)) return null;
+        return await SyncAsync();
+    }
+
+    /// <summary>游戏运行时日志被占用写入，按共享方式读取。</summary>
+    private static async Task<string> ReadSharedAsync(string path)
+    {
+        await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var reader = new StreamReader(stream);
+        return await reader.ReadToEndAsync();
+    }
+
+    /// <summary>文本里最后一条有效的抽卡链接（日志从旧到新，最后一条最新）。</summary>
+    private static string? LatestUrlIn(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return null;
+        foreach (System.Text.RegularExpressions.Match m in UrlPattern.Matches(text).Reverse())
+        {
+            if (ExtractUrl(m.Value, out _) is { } url) return url;
+        }
+        return ExtractUrl(text, out _);
     }
 
     /// <summary>从游戏日志读取最近一次打开抽卡记录时的链接，并切换到链接所属账号。</summary>

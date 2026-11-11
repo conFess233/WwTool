@@ -722,5 +722,11 @@
   "Accounts_ExpiredTitle": "{0}的登录已失效",
   "Accounts_ExpiredHint": "授权已过期，重新登录后才能刷新这个账号的数据。",
   "Accounts_Relogin": "重新登录",
-  "Accounts_Remove": "移除账号"
+  "Accounts_Remove": "移除账号",
+  "Pulls_Refreshing": "正在获取云端数据",
+  "Pulls_UpToDate": "已是最新",
+  "Pulls_RefreshAdded": "新增 {0} 条记录",
+  "Pulls_DropHint": "把抽卡链接或日志文件拖到这里",
+  "Pulls_DropImporting": "正在导入…",
+  "Pulls_DropImported": "已导入 {0} 条记录"
 }

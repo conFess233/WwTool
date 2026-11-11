@@ -116,6 +116,17 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         _otherTab = new PoolTab(null, true, string.Empty);
         Tabs[0].IsSelected = true;
 
+        _session.SyncCompleted += (_, added) => ShowRefreshDone(added);
+#if DEBUG
+        // 本地截图验证：WWTOOL_DEMO_PULLS=drop | drop-done | refresh | refresh-done 时直接显示对应动效状态。
+        switch (Environment.GetEnvironmentVariable("WWTOOL_DEMO_PULLS"))
+        {
+            case "drop": IsDropVisible = true; break;
+            case "drop-done": IsDropVisible = true; IsDropBusy = true; DropDoneText = string.Format(localization["Pulls_DropImported"], 532); IsDropDone = true; break;
+            case "refresh": IsRefreshVisible = true; break;
+            case "refresh-done": RefreshDoneText = localization["Pulls_UpToDate"]; IsRefreshDone = true; IsRefreshVisible = true; break;
+        }
+#endif
         _session.SnapshotReplaced += (_, _) => Refresh();
         _session.PropertyChanged += OnSessionChanged;
         _localization.PropertyChanged += (_, e) =>
@@ -128,6 +139,68 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     }
 
     public PullsSession Session { get; }
+
+    // ── 动效「刷新完成」：获取云端数据时右下角浮出状态胶囊，完成后画出对勾、底色转绿 ──
+
+    [ObservableProperty] private bool _isRefreshVisible;
+    [ObservableProperty] private bool _isRefreshDone;
+    [ObservableProperty] private string _refreshDoneText = string.Empty;
+    private Avalonia.Threading.DispatcherTimer? _refreshHide;
+
+    private void ShowRefreshDone(int added)
+    {
+        RefreshDoneText = added == 0 ? _localization["Pulls_UpToDate"] : string.Format(_localization["Pulls_RefreshAdded"], added);
+        IsRefreshDone = true;
+        IsRefreshVisible = true;
+        _refreshHide?.Stop();
+        _refreshHide = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(2.4) };
+        _refreshHide.Tick += (_, _) =>
+        {
+            _refreshHide?.Stop();
+            IsRefreshVisible = false;
+        };
+        _refreshHide.Start();
+    }
+
+    // ── 动效「拖拽导入」：拖入链接或日志文件时显示虚线框，松手后变绿并显示导入条数 ──
+
+    [ObservableProperty] private bool _isDropVisible;
+    [ObservableProperty] private bool _isDropDone;
+    [ObservableProperty] private bool _isDropBusy;
+    [ObservableProperty] private string _dropDoneText = string.Empty;
+
+    public void DragOver(bool entering)
+    {
+        if (IsDropBusy || IsDropDone) return;
+        IsDropVisible = entering;
+    }
+
+    /// <summary>松手：导入并获取云端数据；成功后绿色「已导入 N 条记录」停留约 2 秒。</summary>
+    public async Task DropAsync(string? text, string? filePath)
+    {
+        if (IsDropBusy) return;
+        IsDropBusy = true;
+        IsDropVisible = true;
+        try
+        {
+            int? added = await _session.ImportDroppedAsync(text, filePath);
+            if (added is not { } count)
+            {
+                IsDropVisible = false;
+                return;
+            }
+            DropDoneText = string.Format(_localization["Pulls_DropImported"], count);
+            IsDropDone = true;
+            await Task.Delay(2200);
+            IsDropVisible = false;
+            await Task.Delay(300);
+            IsDropDone = false;
+        }
+        finally
+        {
+            IsDropBusy = false;
+        }
+    }
 
     /// <summary>空状态「获取记录」。</summary>
     public System.Windows.Input.ICommand SyncCommand => FabActions[0].Command;
@@ -244,7 +317,20 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     private void OnSessionChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(PullsSession.Region) or nameof(PullsSession.Uid) or nameof(PullsSession.IsLoading)) Refresh();
-        if (e.PropertyName == nameof(PullsSession.IsSyncing)) OnPropertyChanged(nameof(IsFabBusy));
+        if (e.PropertyName == nameof(PullsSession.IsSyncing))
+        {
+            OnPropertyChanged(nameof(IsFabBusy));
+            if (_session.IsSyncing)
+            {
+                _refreshHide?.Stop();
+                IsRefreshDone = false;
+                IsRefreshVisible = true;
+            }
+            else if (!IsRefreshDone)
+            {
+                IsRefreshVisible = false;
+            }
+        }
     }
 
     /// <summary>当前页签对应的卡池；总览为 null。</summary>
