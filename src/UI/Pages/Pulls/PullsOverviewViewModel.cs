@@ -100,7 +100,9 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         // 悬浮按钮：扩展态「获取记录」，展开为获取云端数据（主）、加载本地数据、导入链接；清空数据已移到设置页。
         FabActions =
         [
-            new FabAction("cloud", "Stat_GetCloudData", "Icon.Cloud", new AsyncRelayCommand(_session.SyncAsync), localization),
+            new FabAction("cloud", "Stat_GetCloudData", "Icon.Cloud",
+                new AsyncRelayCommand(() => _session.GetRecordsAsync(() => dialogs.ShowAsync(new ImportUrlDialogViewModel(_session, localization, _session.Region)))),
+                localization),
             new FabAction("load-local", "Stat_LoadLocalData", "Icon.FolderOpen", new AsyncRelayCommand(() => _session.ReloadAsync(showMessage: true)), localization),
             new FabAction("import-url", "Pulls_ImportUrl", "Icon.LinkAlt",
                 new AsyncRelayCommand(async () =>

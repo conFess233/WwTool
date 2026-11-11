@@ -272,8 +272,8 @@ public sealed partial class PullsSession : ObservableObject
         });
     }
 
-    /// <summary>从游戏日志读取最近的抽卡链接；失败时提示并返回 null。</summary>
-    public async Task<string?> ReadUrlFromGameLogAsync()
+    /// <summary>从游戏日志读取最近的抽卡链接；失败时提示（<paramref name="quiet"/> 时只记日志）并返回 null。</summary>
+    public async Task<string?> ReadUrlFromGameLogAsync(bool quiet = false)
     {
         try
         {
@@ -289,9 +289,26 @@ public sealed partial class PullsSession : ObservableObject
         }
         catch (Exception ex)
         {
-            _errors.Report(ex, _localization["Stat_AutoImportUrl"]);
+            _errors.Report(ex, _localization["Stat_AutoImportUrl"], notifyUser: !quiet);
             return null;
         }
+    }
+
+    /// <summary>
+    /// 「获取记录」：已有链接时直接获取云端数据；没有链接时先静默从游戏日志找链接，
+    /// 找不到再由 <paramref name="askForUrl"/> 弹出导入链接窗口（返回是否已导入），导入成功后接着获取。
+    /// </summary>
+    public async Task<int?> GetRecordsAsync(Func<Task<bool>> askForUrl)
+    {
+        if (IsSyncing) return null;
+        if (string.IsNullOrWhiteSpace(QueryUrl))
+        {
+            string? url = string.IsNullOrWhiteSpace(_config.User.GamePath) ? null : await ReadUrlFromGameLogAsync(quiet: true);
+            bool imported = url is not null && ImportUrl(url);
+            if (!imported && !await askForUrl()) return null;
+            ShowImported();
+        }
+        return await SyncAsync();
     }
 
     /// <summary>从一段文字（链接或整行日志）中取出抽卡链接；不是有效链接时返回 null。</summary>
