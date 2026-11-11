@@ -125,6 +125,14 @@
       </c:HomeBackdropDecor.Transitions>
     </c:HomeBackdropDecor>
 
+    <!-- 窗口四周留白（内容区外圈）可拖动窗口、双击最大化；在内容、悬浮按钮、提示与对话框之下，只接住空白处的点击 -->
+    <Panel x:Name="DragEdges">
+      <Border x:Name="TopDragBand" Background="Transparent" VerticalAlignment="Top" Height="38" PointerPressed="OnHeaderPointerPressed" />
+      <Border Background="Transparent" HorizontalAlignment="Left" Width="40" PointerPressed="OnHeaderPointerPressed" />
+      <Border Background="Transparent" HorizontalAlignment="Right" Width="40" PointerPressed="OnHeaderPointerPressed" />
+      <Border Background="Transparent" VerticalAlignment="Bottom" Height="26" PointerPressed="OnHeaderPointerPressed" />
+    </Panel>
+
     <Grid x:Name="Frame" RowDefinitions="Auto,*" Margin="40,38,40,0">
       <!-- 页头：空白处拖动窗口，双击最大化 / 还原；Logo、悬浮岛、账号胶囊不参与拖动 -->
       <Grid x:Name="Header" Grid.Row="0" Height="56" ColumnDefinitions="*,Auto,*" Background="Transparent"

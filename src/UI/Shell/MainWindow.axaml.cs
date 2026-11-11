@@ -34,11 +34,13 @@ public partial class MainWindow : Window
             Frame.Margin = new Thickness(40, 26, 40, 0);
             Brand.Margin = new Thickness(72, 0, 0, 0);
             CaptionButtons.IsVisible = false;
+            TopDragBand.Height = 26;
         }
         else
         {
             // Windows：窗口按钮贴右上角（高 32），页头整体下移 12。
             Frame.Margin = new Thickness(40, 26 + 12, 40, 0);
+            TopDragBand.Height = 26 + 12;
             HomeDecor.TopOffset = 12;
         }
         Classes.Set("reduced", Motion.Reduced);
@@ -306,7 +308,7 @@ public partial class MainWindow : Window
     private void OnBrandPointerPressed(object? sender, PointerPressedEventArgs e) => e.Handled = true;
 
     /// <summary>
-    /// 页头空白处：单击拖动窗口（走系统移动循环，保留贴靠），双击切换最大化（Windows；macOS 双击由系统按设置缩放）。
+    /// 页头空白处与窗口四周留白：单击拖动窗口（走系统移动循环，保留贴靠），双击切换最大化（Windows；macOS 双击由系统按设置缩放）。
     /// </summary>
     private void OnHeaderPointerPressed(object? sender, PointerPressedEventArgs e)
     {
