@@ -523,20 +523,7 @@
 
         <Border Grid.Row="1" Classes="card" Padding="22,18,22,0">
           <Grid RowDefinitions="Auto,*" RowSpacing="14">
-            <Grid ColumnDefinitions="*,Auto">
-              <TextBlock FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Text="{loc:Tr Pulls_FiveStarRecords}" />
-              <StackPanel Grid.Column="1" Classes="lgd" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                  <Border Classes="lgd-heat" />
-                  <TextBlock Text="{loc:Tr Pulls_LegendPity}" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                  <Border Classes="wai sm"><TextBlock Text="{loc:Tr Pulls_LostMark}" /></Border>
-                  <TextBlock Text="{loc:Tr Pulls_LegendLost}" />
-                </StackPanel>
-                <TextBlock Text="{loc:Tr Pulls_LegendNewest}" />
-              </StackPanel>
-            </Grid>
+            <TextBlock FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Text="{loc:Tr Pulls_FiveStarRecords}" />
             <ScrollViewer Grid.Row="1" x:Name="CompactScroller" HorizontalScrollBarVisibility="Disabled" Margin="-8,0,-14,0">
               <ItemsControl x:Name="CompactGrid" Margin="8,1,7,36" ItemsSource="{Binding Records.CompactTiles}">
                 <ItemsControl.ItemsPanel>

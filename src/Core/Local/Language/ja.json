@@ -734,10 +734,7 @@
   "Pulls_FiveStarShort": "★5",
   "Pulls_AvgPerUp": "ピックアップ平均",
   "Pulls_FiveStarRecords": "★5 履歴",
-  "Pulls_LegendPity": "回数、赤いほど 80 に近い",
   "Pulls_LostMark": "外",
-  "Pulls_LegendLost": "すり抜け",
-  "Pulls_LegendNewest": "新しい順",
   "Pulls_TilePity": "{0} 回で★5",
   "Pulls_TileLost": "、すり抜け",
   "Pulls_TileNextUp": "次の★5 はピックアップ確定"

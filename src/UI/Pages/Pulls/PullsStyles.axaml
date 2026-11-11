@@ -324,26 +324,6 @@
     <Setter Property="VerticalAlignment" Value="Bottom" />
   </Style>
 
-  <!-- 图例 -->
-  <Style Selector="StackPanel.lgd TextBlock">
-    <Setter Property="FontSize" Value="12" />
-    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
-    <Setter Property="VerticalAlignment" Value="Center" />
-  </Style>
-  <Style Selector="Border.lgd-heat">
-    <Setter Property="Width" Value="46" />
-    <Setter Property="Height" Value="3" />
-    <Setter Property="VerticalAlignment" Value="Center" />
-    <Setter Property="Background">
-      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
-        <GradientStop Color="{DynamicResource AccentColor}" Offset="0" />
-        <GradientStop Color="{DynamicResource AccentColor}" Offset="0.8" />
-        <GradientStop Color="{DynamicResource DangerColor}" Offset="0.88" />
-        <GradientStop Color="{DynamicResource DangerColor}" Offset="1" />
-      </LinearGradientBrush>
-    </Setter>
-  </Style>
-
   <!-- 「歪」角标：28 圆、2px 红框、逆时针 14°，压在头像区右上角外 7 -->
   <Style Selector="Border.wai">
     <Setter Property="Width" Value="28" />
@@ -366,19 +346,6 @@
     <Setter Property="HorizontalAlignment" Value="Center" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
-  <Style Selector="Border.wai.sm">
-    <Setter Property="Width" Value="20" />
-    <Setter Property="Height" Value="20" />
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="BorderThickness" Value="1.5" />
-    <Setter Property="BoxShadow" Value="0 0 0 0 Transparent" />
-    <Setter Property="RenderTransform" Value="rotate(-14deg)" />
-    <Setter Property="VerticalAlignment" Value="Center" />
-  </Style>
-  <Style Selector="Border.wai.sm TextBlock">
-    <Setter Property="FontSize" Value="10" />
-  </Style>
-
   <!-- 磁贴：圆角 12、浅底细框；头像区高 92（顶角 11、金色渐变，88 头像贴底）；数字行 30；底部 3px 抽数线；悬停上浮 3 -->
   <!-- 宿主上、右各留 7 给「歪」角标（网格列距 / 行距相应减 7，视觉间距仍为 12 / 14） -->
   <Style Selector="Panel.gt-host > Border.gt, Panel.gt-host > Rectangle.cur-dash">

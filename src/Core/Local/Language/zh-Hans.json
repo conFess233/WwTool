@@ -734,10 +734,7 @@
   "Pulls_FiveStarShort": "五星",
   "Pulls_AvgPerUp": "平均每 UP",
   "Pulls_FiveStarRecords": "五星记录",
-  "Pulls_LegendPity": "抽数，越红越接近 80",
   "Pulls_LostMark": "歪",
-  "Pulls_LegendLost": "小保底歪",
-  "Pulls_LegendNewest": "最新在前",
   "Pulls_TilePity": "{0} 抽出金",
   "Pulls_TileLost": "，小保底歪",
   "Pulls_TileNextUp": "下一金必为 UP"

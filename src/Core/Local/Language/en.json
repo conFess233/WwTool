@@ -734,10 +734,7 @@
   "Pulls_FiveStarShort": "5★",
   "Pulls_AvgPerUp": "Avg per featured",
   "Pulls_FiveStarRecords": "5★ history",
-  "Pulls_LegendPity": "Pulls; redder means closer to 80",
   "Pulls_LostMark": "L",
-  "Pulls_LegendLost": "Lost 50/50",
-  "Pulls_LegendNewest": "Newest first",
   "Pulls_TilePity": "Pulled at {0}",
   "Pulls_TileLost": ", lost 50/50",
   "Pulls_TileNextUp": "Next 5★ is guaranteed featured"
