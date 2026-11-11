@@ -157,6 +157,43 @@
         </Transitions>
       </Setter>
     </Style>
+    <!-- UID 后的复制按钮：22 方形透明底，悬停浅底；复制成功后图标换绿色对勾 2 秒 -->
+    <Style Selector="Button.copy-uid">
+      <Setter Property="Width" Value="22" />
+      <Setter Property="Height" Value="22" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.copy-uid:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.copy-uid:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+    </Style>
+    <Style Selector="Button.copy-uid c|StrokeIcon">
+      <Setter Property="Width" Value="13" />
+      <Setter Property="Height" Value="13" />
+      <Setter Property="StrokeThickness" Value="1.8" />
+    </Style>
+    <Style Selector="Button.copy-uid c|StrokeIcon.check">
+      <Setter Property="IsVisible" Value="False" />
+      <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style Selector="Button.copy-uid.copied c|StrokeIcon.check">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="Button.copy-uid.copied c|StrokeIcon.copy">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
     <!-- 右下角水印：对应功能的放大图标，一部分伸出按钮边缘被裁掉 -->
     <Style Selector="Button.quick c|StrokeIcon.watermark">
       <Setter Property="Width" Value="76" />
@@ -420,7 +457,17 @@
                     <TextBlock Text="{Binding Accounts.Current.Level, StringFormat='LV.{0}'}" IsVisible="{Binding Accounts.HasLevel}"
                                FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource AccentTextBrush}" VerticalAlignment="Center" Margin="0,3,0,0" />
                   </StackPanel>
-                  <TextBlock Classes="aux muted" Text="{Binding UidLine}" />
+                  <StackPanel Orientation="Horizontal" Spacing="4">
+                    <TextBlock Classes="aux muted" Text="{Binding UidLine}" VerticalAlignment="Center" />
+                    <Button Classes="copy-uid" Classes.copied="{Binding IsUidCopied}" AutomationProperties.AutomationId="home-copy-uid"
+                            Command="{Binding CopyUidCommand}" IsVisible="{Binding Accounts.HasAccount}"
+                            ToolTip.Tip="{Binding CopyUidTip}">
+                      <Panel>
+                        <c:StrokeIcon Classes="copy" Data="{StaticResource Icon.Copy}" />
+                        <c:StrokeIcon Classes="check" Data="{StaticResource Icon.Check}" />
+                      </Panel>
+                    </Button>
+                  </StackPanel>
                 </StackPanel>
               </StackPanel>
 

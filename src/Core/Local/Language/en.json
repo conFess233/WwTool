@@ -745,5 +745,6 @@
   "Home_AnnLoading": "Loading announcements…",
   "Home_AnnFailedTitle": "Couldn't load announcements",
   "Home_AnnFailedHint": "Check your network, or try the other region.",
-  "Home_AnnRetry": "Retry"
+  "Home_AnnRetry": "Retry",
+  "Home_CopyUid": "Copy UID"
 }

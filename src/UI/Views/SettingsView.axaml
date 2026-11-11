@@ -158,7 +158,7 @@
                           AutomationProperties.AutomationId="settings-default-account">
                   <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="domain:AccountSummary">
-                      <TextBlock Text="{Binding MaskedUid}" />
+                      <TextBlock Text="{Binding Uid}" />
                     </DataTemplate>
                   </ComboBox.ItemTemplate>
                 </ComboBox>

@@ -303,6 +303,45 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     public bool ShowNoSnapshot => Accounts.HasAccount && !HasSnapshot && !_player.IsLoading;
 
     [ObservableProperty] private string _uidLine = string.Empty;
+
+    /// <summary>刚复制过 UID：按钮图标换对勾，2 秒后还原。</summary>
+    [ObservableProperty] private bool _isUidCopied;
+
+    public string CopyUidTip => _localization[IsUidCopied ? "Home_Copied" : "Home_CopyUid"];
+
+    partial void OnIsUidCopiedChanged(bool value) => OnPropertyChanged(nameof(CopyUidTip));
+
+    private CancellationTokenSource? _uidCopyReset;
+
+    /// <summary>复制当前账号的完整 UID。</summary>
+    [RelayCommand]
+    private async Task CopyUidAsync()
+    {
+        if (Accounts.Current is not { } account) return;
+        try
+        {
+            await _clipboard.SetTextAsync(account.Uid);
+        }
+        catch (Exception ex)
+        {
+            _errors.Report(ex, _localization["Home_CopyUid"]);
+            return;
+        }
+
+        _uidCopyReset?.Cancel();
+        var cts = new CancellationTokenSource();
+        _uidCopyReset = cts;
+        IsUidCopied = true;
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2), cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        IsUidCopied = false;
+    }
     [ObservableProperty] private string _activeDays = "--";
     [ObservableProperty] private string _createDate = "--";
     [ObservableProperty] private string _worldLevel = "--";
@@ -361,7 +400,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         PlayerBaseSnapshot? b = Snapshot?.Base;
         string none = _localization["Common_Unavailable"];
 
-        UidLine = account is null ? string.Empty : string.Format(_localization["Home_Uid"], MaskUid(account.Uid));
+        UidLine = account is null ? string.Empty : string.Format(_localization["Home_Uid"], account.Uid);
         ActiveDays = b is null ? none : b.ActiveDays.ToString(CultureInfo.CurrentCulture);
         CreateDate = b is null || b.CreatTime <= 0 ? none : FromTimestamp(b.CreatTime).LocalDateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
         WorldLevel = b is null ? none : b.WorldLevel.ToString(CultureInfo.CurrentCulture);
@@ -853,8 +892,6 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     private static DateTimeOffset FromTimestamp(long value) =>
         value > 20_000_000_000 ? DateTimeOffset.FromUnixTimeMilliseconds(value) : DateTimeOffset.FromUnixTimeSeconds(value);
 
-    /// <summary>UID 后 5 位隐藏。</summary>
-    private static string MaskUid(string uid) => uid.Length <= 5 ? uid : uid[..^5] + new string('●', 5);
 }
 
 /// <summary>公告筛选胶囊。</summary>

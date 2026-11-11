@@ -745,5 +745,6 @@
   "Home_AnnLoading": "正在获取公告…",
   "Home_AnnFailedTitle": "暂时无法获取公告",
   "Home_AnnFailedHint": "请检查网络，或切换到另一个区服试试。",
-  "Home_AnnRetry": "重试"
+  "Home_AnnRetry": "重试",
+  "Home_CopyUid": "复制 UID"
 }

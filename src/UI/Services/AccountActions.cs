@@ -51,7 +51,7 @@ public sealed class AccountActions(
         bool confirmed = await dialogs.ConfirmAsync(new ConfirmDialogViewModel
         {
             Title = localization["Dialog_DeleteUser"],
-            Message = string.Format(localization["Dialog_DeleteUserConfirm"], name, account.MaskedUid),
+            Message = string.Format(localization["Dialog_DeleteUserConfirm"], name, account.Uid),
             Warning = localization["Dialog_Irreversible"],
             DangerNote = localization["Dialog_DeleteUserNote"],
             IsDanger = true,

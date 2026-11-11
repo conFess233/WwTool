@@ -62,7 +62,7 @@ public sealed partial class AccountsViewModel : ObservableObject, INavigationAwa
     public bool IsCurrentExpired => _accounts.Current is { } a && _player.AuthExpiredUid == a.Uid;
 
     public string ExpiredTitle => string.Format(_localization["Accounts_ExpiredTitle"],
-        _accounts.Current is { Name: { Length: > 0 } name } ? name : _accounts.Current?.MaskedUid ?? string.Empty);
+        _accounts.Current is { Name: { Length: > 0 } name } ? name : _accounts.Current?.Uid ?? string.Empty);
 
     /// <summary>空状态「登录失效」：重新登录后立即同步。</summary>
     public IAsyncRelayCommand ReloginCommand { get; }
@@ -233,7 +233,7 @@ public sealed partial class AccountsViewModel : ObservableObject, INavigationAwa
             {
                 Account = account,
                 Name = string.IsNullOrWhiteSpace(account.Name) ? account.Uid : account.Name,
-                UidText = "UID " + MaskUid(account.Uid),
+                UidText = "UID " + account.Uid,
                 IsCurrent = account.Uid == _accounts.Current?.Uid,
                 Server = string.IsNullOrWhiteSpace(account.Region) ? none : account.Region,
                 CreateDate = b is null || b.CreatTime <= 0 ? none : FromTimestamp(b.CreatTime).LocalDateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
@@ -256,6 +256,4 @@ public sealed partial class AccountsViewModel : ObservableObject, INavigationAwa
 
     private static DateTimeOffset FromTimestamp(long value) =>
         value > 20_000_000_000 ? DateTimeOffset.FromUnixTimeMilliseconds(value) : DateTimeOffset.FromUnixTimeSeconds(value);
-
-    private static string MaskUid(string uid) => uid.Length <= 4 ? uid : uid[..4] + new string('●', uid.Length - 4);
 }

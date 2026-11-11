@@ -745,5 +745,6 @@
   "Home_AnnLoading": "お知らせを取得しています…",
   "Home_AnnFailedTitle": "お知らせを取得できません",
   "Home_AnnFailedHint": "ネットワークを確認するか、もう一方のサーバーをお試しください。",
-  "Home_AnnRetry": "再試行"
+  "Home_AnnRetry": "再試行",
+  "Home_CopyUid": "UID をコピー"
 }
