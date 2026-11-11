@@ -737,5 +737,8 @@
   "Pulls_LostMark": "歪",
   "Pulls_TilePity": "{0} 抽出金",
   "Pulls_TileLost": "，小保底歪",
-  "Pulls_TileNextUp": "下一金必为 UP"
+  "Pulls_TileNextUp": "下一金必为 UP",
+  "Settings_DynamicBackground": "动态背景",
+  "Settings_DynamicBackgroundHint": "播放游戏启动器的背景视频，窗口最小化或失去焦点时暂停；播放时约多占用 150～200MB 内存",
+  "Settings_DynamicBackgroundCustomHint": "仅在使用默认背景时可用"
 }

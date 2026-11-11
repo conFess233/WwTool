@@ -24,6 +24,7 @@ namespace WwTool.Core.Models.Config
         private NotificationDisplayMode _notificationDisplayMode = NotificationDisplayMode.Concise;
         private bool _useCustomBackground;
         private string? _customBackgroundPath;
+        private bool _useDynamicBackground;
         private bool _pullsCompactView;
 
         public string? GamePath { get => _gamePath; set => SetProperty(ref _gamePath, value); }
@@ -60,6 +61,9 @@ namespace WwTool.Core.Models.Config
         /// <summary>窗口背景：false 用默认底纹，true 用 <see cref="CustomBackgroundPath"/> 指向的图片。</summary>
         public bool UseCustomBackground { get => _useCustomBackground; set => SetProperty(ref _useCustomBackground, value); }
         public string? CustomBackgroundPath { get => _customBackgroundPath; set => SetProperty(ref _customBackgroundPath, value); }
+
+        /// <summary>动态背景：使用启动器背景时播放其背景视频（仅 Windows），默认关闭。</summary>
+        public bool UseDynamicBackground { get => _useDynamicBackground; set => SetProperty(ref _useDynamicBackground, value); }
         /// <summary>抽卡统计单卡池记录用「精简」（头像格子）视图，否则为「列表」。</summary>
         public bool PullsCompactView { get => _pullsCompactView; set => SetProperty(ref _pullsCompactView, value); }
         public bool IsReducedMotionEnabled

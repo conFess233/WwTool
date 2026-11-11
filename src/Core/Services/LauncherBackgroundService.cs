@@ -21,11 +21,15 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
 
     private const string ManifestName = "manifest.json";
     private const long MaxFileBytes = 32L * 1024 * 1024;
+    private const long MaxVideoBytes = 200L * 1024 * 1024;
 
     /// <summary>单个配置请求的超时；图片下载另计。</summary>
     public TimeSpan RequestTimeout { get; init; } = TimeSpan.FromSeconds(10);
 
     public TimeSpan DownloadTimeout { get; init; } = TimeSpan.FromSeconds(45);
+
+    /// <summary>背景视频较大（当前约 11MB），单独给更长的下载时间。</summary>
+    public TimeSpan VideoDownloadTimeout { get; init; } = TimeSpan.FromMinutes(3);
 
     private readonly SemaphoreSlim _gate = new(1, 1);
 
@@ -108,6 +112,8 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
             return null;
         }
         string? sloganUrl = IsHttpUrl(dto.Slogan) ? dto.Slogan : null;
+        // 视频只记下地址，开启「动态背景」时才由 EnsureVideoAsync 下载。
+        string? videoUrl = dto.BackgroundFileType == 2 && IsHttpUrl(dto.BackgroundFile) ? dto.BackgroundFile : null;
 
         Directory.CreateDirectory(CacheDirectory);
         Manifest? old = ReadManifest();
@@ -135,6 +141,8 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
             ImageFile = imageFile,
             SloganUrl = sloganUrl,
             SloganFile = sloganFile,
+            VideoUrl = videoUrl,
+            VideoFile = videoUrl is not null && old?.VideoUrl == videoUrl && old.VideoFile is { } v && File.Exists(Path.Combine(CacheDirectory, v)) ? v : null,
             FetchedAtUtc = DateTimeOffset.UtcNow,
         };
         WriteManifest(manifest);
@@ -144,8 +152,52 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
             sloganFile is null ? null : Path.Combine(CacheDirectory, sloganFile), region, language);
     }
 
+    /// <summary>已缓存的背景视频（与当前缓存的背景图同一次获取）；未下载或不是视频背景时返回 null。</summary>
+    public string? LoadCachedVideo()
+    {
+        Manifest? manifest = ReadManifest();
+        return manifest?.VideoFile is { } file && File.Exists(Path.Combine(CacheDirectory, file)) ? Path.Combine(CacheDirectory, file) : null;
+    }
+
+    /// <summary>
+    /// 确保当前缓存背景对应的视频已下载（「动态背景」开启时调用）；没有视频地址或下载失败返回 null。
+    /// </summary>
+    public async Task<string?> EnsureVideoAsync(CancellationToken token = default)
+    {
+        await _gate.WaitAsync(token).ConfigureAwait(false);
+        try
+        {
+            Manifest? manifest = ReadManifest();
+            if (manifest?.VideoUrl is not { } url) return null;
+            if (manifest.VideoFile is { } existing && File.Exists(Path.Combine(CacheDirectory, existing)))
+                return Path.Combine(CacheDirectory, existing);
+            try
+            {
+                HttpClient client = factory.CreateClient("WwToolClient");
+                string file = await EnsureFileAsync(client, url, "video-", null, token, VideoDownloadTimeout, MaxVideoBytes).ConfigureAwait(false);
+                manifest.VideoFile = file;
+                WriteManifest(manifest);
+                logger.Info($"启动器背景视频已下载（{manifest.Region}）");
+                return Path.Combine(CacheDirectory, file);
+            }
+            catch (Exception ex) when (IsRecoverable(ex, token))
+            {
+                logger.Warn($"启动器背景视频下载失败：{ex.GetType().Name} {ex.Message}");
+                return null;
+            }
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
     /// <summary>地址与已缓存的一致且文件仍在时直接复用，否则下载到临时文件后改名。</summary>
-    private async Task<string> EnsureFileAsync(HttpClient client, string url, string prefix, string? cachedFile, CancellationToken token)
+    private Task<string> EnsureFileAsync(HttpClient client, string url, string prefix, string? cachedFile, CancellationToken token) =>
+        EnsureFileAsync(client, url, prefix, cachedFile, token, DownloadTimeout, MaxFileBytes);
+
+    private async Task<string> EnsureFileAsync(HttpClient client, string url, string prefix, string? cachedFile, CancellationToken token,
+        TimeSpan timeout, long maxBytes)
     {
         if (cachedFile is not null && File.Exists(Path.Combine(CacheDirectory, cachedFile))) return cachedFile;
 
@@ -155,14 +207,14 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
 
         string temp = target + ".part";
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-        cts.CancelAfter(DownloadTimeout);
+        cts.CancelAfter(timeout);
         try
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             AddHeaders(request);
             using HttpResponseMessage response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            if (response.Content.Headers.ContentLength is > MaxFileBytes) throw new InvalidDataException("背景图片过大");
+            if (response.Content.Headers.ContentLength > maxBytes) throw new InvalidDataException("背景文件过大");
             await using (Stream source = await response.Content.ReadAsStreamAsync(cts.Token).ConfigureAwait(false))
             await using (FileStream file = File.Create(temp))
             {
@@ -172,10 +224,10 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
                 while ((read = await source.ReadAsync(buffer, cts.Token).ConfigureAwait(false)) > 0)
                 {
                     total += read;
-                    if (total > MaxFileBytes) throw new InvalidDataException("背景图片过大");
+                    if (total > maxBytes) throw new InvalidDataException("背景文件过大");
                     await file.WriteAsync(buffer.AsMemory(0, read), cts.Token).ConfigureAwait(false);
                 }
-                if (total == 0) throw new InvalidDataException("背景图片为空");
+                if (total == 0) throw new InvalidDataException("背景文件为空");
             }
             File.Move(temp, target, overwrite: true);
             return name;
@@ -201,7 +253,7 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
             foreach (string file in Directory.EnumerateFiles(CacheDirectory))
             {
                 string name = Path.GetFileName(file);
-                if (name == ManifestName || name == manifest.ImageFile || name == manifest.SloganFile) continue;
+                if (name == ManifestName || name == manifest.ImageFile || name == manifest.SloganFile || name == manifest.VideoFile) continue;
                 TryDelete(file);
             }
         }
@@ -219,6 +271,7 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
             if (!File.Exists(path)) return null;
             Manifest? manifest = JsonSerializer.Deserialize<Manifest>(File.ReadAllText(path), JsonOptions);
             return manifest is { ImageFile.Length: > 0 } && SafeRelative(manifest.ImageFile) && (manifest.SloganFile is null || SafeRelative(manifest.SloganFile))
+                && (manifest.VideoFile is null || SafeRelative(manifest.VideoFile))
                 ? manifest : null;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
@@ -280,6 +333,8 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
         public string ImageFile { get; set; } = string.Empty;
         public string? SloganUrl { get; set; }
         public string? SloganFile { get; set; }
+        public string? VideoUrl { get; set; }
+        public string? VideoFile { get; set; }
         public DateTimeOffset FetchedAtUtc { get; set; }
     }
 }

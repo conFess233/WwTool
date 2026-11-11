@@ -737,5 +737,8 @@
   "Pulls_LostMark": "外",
   "Pulls_TilePity": "{0} 回で★5",
   "Pulls_TileLost": "、すり抜け",
-  "Pulls_TileNextUp": "次の★5 はピックアップ確定"
+  "Pulls_TileNextUp": "次の★5 はピックアップ確定",
+  "Settings_DynamicBackground": "動く背景",
+  "Settings_DynamicBackgroundHint": "ゲームランチャーの背景動画を再生します。最小化時やフォーカスを失ったときは一時停止します。再生中はメモリを約 150～200MB 多く使います",
+  "Settings_DynamicBackgroundCustomHint": "既定の背景を使用しているときのみ利用できます"
 }

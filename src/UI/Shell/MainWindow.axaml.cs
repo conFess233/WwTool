@@ -44,7 +44,15 @@ public partial class MainWindow : Window
             HomeDecor.TopOffset = 12;
         }
         Classes.Set("reduced", Motion.Reduced);
-        Motion.ReducedChanged += (_, _) => Classes.Set("reduced", Motion.Reduced);
+        Motion.ReducedChanged += (_, _) =>
+        {
+            Classes.Set("reduced", Motion.Reduced);
+            UpdateVideoPlayback();
+        };
+        Opened += (_, _) => UpdateVideoPlayback();
+        Activated += (_, _) => UpdateVideoPlayback();
+        Deactivated += (_, _) => UpdateVideoPlayback();
+        BackdropVideo.PlaybackFailed += (_, ex) => (DataContext as ShellViewModel)?.ReportVideoFailure(ex);
         AddHandler(PointerMovedEvent, OnParallaxPointerMoved, Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
@@ -133,7 +141,7 @@ public partial class MainWindow : Window
     private void ParallaxTick(TimeSpan _)
     {
         _parallaxCurrent += (_parallaxTarget - _parallaxCurrent) * 0.12;
-        foreach (Image layer in new[] { BackdropImage, BackdropSlogan })
+        foreach (Control layer in new Control[] { BackdropImage, BackdropVideo, BackdropSlogan })
         {
             if (layer.RenderTransform is TranslateTransform translate)
             {
@@ -279,6 +287,21 @@ public partial class MainWindow : Window
         {
             MaximizeGlyph.Data = Geometry.Parse(WindowState == WindowState.Maximized ? RestoreGlyphData : MaximizeGlyphData);
         }
+        if (change.Property == WindowStateProperty || change.Property == IsVisibleProperty) UpdateVideoPlayback();
+    }
+
+    /// <summary>
+    /// 动态背景只在窗口可见、未最小化、处于前台（获得焦点）且未开启「减少动画」时播放，否则暂停在当前画面。
+    /// 窗口被其他窗口完全挡住时它通常也已失去焦点，因此同样暂停。
+    /// </summary>
+    private void UpdateVideoPlayback()
+    {
+        bool foreground = IsActive;
+#if DEBUG
+        // 离屏截图验证时窗口不抢焦点，允许忽略焦点条件。
+        if (Environment.GetEnvironmentVariable("WWTOOL_VIDEO_IGNORE_FOCUS") == "1") foreground = true;
+#endif
+        BackdropVideo.IsPlaying = IsVisible && WindowState != WindowState.Minimized && foreground && !Motion.Reduced;
     }
 
     private void OnMinimizeClick(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;

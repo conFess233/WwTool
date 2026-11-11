@@ -214,6 +214,21 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         if (custom && string.IsNullOrWhiteSpace(_config.User.CustomBackgroundPath)) _ = PickBackgroundImageAsync();
     }
 
+    /// <summary>动态背景只在 Windows 上提供（系统自带的 Media Foundation 解码）。</summary>
+    public bool IsDynamicBackgroundSupported => OperatingSystem.IsWindows();
+
+    /// <summary>动态背景：使用启动器背景时播放其背景视频；选自定义图片时不可用。</summary>
+    public bool UseDynamicBackground
+    {
+        get => _config.User.UseDynamicBackground;
+        set
+        {
+            if (_config.User.UseDynamicBackground == value) return;
+            _config.User.UseDynamicBackground = value;
+            OnPropertyChanged();
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(UseCustomBackground))]
     private async Task PickBackgroundImageAsync()
     {

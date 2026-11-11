@@ -737,5 +737,8 @@
   "Pulls_LostMark": "L",
   "Pulls_TilePity": "Pulled at {0}",
   "Pulls_TileLost": ", lost 50/50",
-  "Pulls_TileNextUp": "Next 5★ is guaranteed featured"
+  "Pulls_TileNextUp": "Next 5★ is guaranteed featured",
+  "Settings_DynamicBackground": "Animated background",
+  "Settings_DynamicBackgroundHint": "Plays the game launcher's background video; pauses when the window is minimized or loses focus. Uses about 150–200 MB more memory while playing",
+  "Settings_DynamicBackgroundCustomHint": "Only available with the default background"
 }

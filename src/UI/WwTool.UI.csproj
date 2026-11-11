@@ -8,6 +8,8 @@
     <ApplicationIcon>Assets\WwTool.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <!-- 动态背景把解码帧逐行复制进位图。 -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
@@ -21,6 +23,8 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Vortice.Direct3D11" />
+    <PackageReference Include="Vortice.MediaFoundation" />
   </ItemGroup>
 
   <ItemGroup>

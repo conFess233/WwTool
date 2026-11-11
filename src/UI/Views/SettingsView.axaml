@@ -249,6 +249,19 @@
                 </StackPanel>
               </Grid>
             </Border>
+            <!-- 动态背景（仅 Windows）：播放启动器背景视频；选自定义图片时不可用 -->
+            <Border Classes="sr" IsVisible="{Binding IsDynamicBackgroundSupported}">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Classes="name" Text="{loc:Tr Settings_DynamicBackground}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_DynamicBackgroundHint}" IsVisible="{Binding !UseCustomBackground}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_DynamicBackgroundCustomHint}" IsVisible="{Binding UseCustomBackground}" />
+                </StackPanel>
+                <ToggleSwitch Grid.Column="1" IsChecked="{Binding UseDynamicBackground}" IsEnabled="{Binding !UseCustomBackground}"
+                              VerticalAlignment="Center" AutomationProperties.Name="{loc:Tr Settings_DynamicBackground}"
+                              AutomationProperties.AutomationId="settings-dynamic-bg" />
+              </Grid>
+            </Border>
             <!-- 窗口毛玻璃效果；开启时下方显示背景不透明度 -->
             <Border Classes="sr">
               <StackPanel Spacing="8" VerticalAlignment="Center">

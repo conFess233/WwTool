@@ -23,6 +23,7 @@ public sealed partial class ShellViewModel : ObservableObject
     private readonly LocalizationService _localization;
     private readonly IConfigService _config;
     private readonly LauncherBackgroundService _launcherBackground;
+    private readonly ILoggerService _logger;
 
     /// <summary>窗口毛玻璃：开启时窗口透明并请求系统模糊材质，背景层按 <see cref="BackdropOpacity"/> 半透明。</summary>
     /// <remarks>本次启动用了软件渲染（启动时毛玻璃为关）时系统材质不可用，运行中打开开关也按不透明处理，重启后生效，见 <see cref="RenderingProfile"/>。</remarks>
@@ -39,10 +40,12 @@ public sealed partial class ShellViewModel : ObservableObject
         IUIStateService uiState,
         AccountContext accounts,
         IConfigService config,
-        LauncherBackgroundService launcherBackground)
+        LauncherBackgroundService launcherBackground,
+        ILoggerService logger)
     {
         _config = config;
         _launcherBackground = launcherBackground;
+        _logger = logger;
         config.User.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(UserConfig.IsGlassEffectEnabled) or nameof(UserConfig.GlassOpacity))
@@ -53,6 +56,10 @@ public sealed partial class ShellViewModel : ObservableObject
             if (e.PropertyName is nameof(UserConfig.UseCustomBackground) or nameof(UserConfig.CustomBackgroundPath))
             {
                 Avalonia.Threading.Dispatcher.UIThread.Post(LoadBackground);
+            }
+            if (e.PropertyName is nameof(UserConfig.UseDynamicBackground))
+            {
+                Avalonia.Threading.Dispatcher.UIThread.Post(UpdateVideo);
             }
         };
         Accounts = accounts;
@@ -123,6 +130,61 @@ public sealed partial class ShellViewModel : ObservableObject
 
     public bool HasBackgroundSlogan => _backgroundSlogan is not null;
 
+    /// <summary>
+    /// 动态背景视频（本地缓存的启动器背景视频）：仅 Windows、设置开启「动态背景」且正在使用启动器背景时有值；
+    /// 是否真正播放还取决于窗口状态，由主窗口决定。
+    /// </summary>
+    [ObservableProperty]
+    private string? _backgroundVideo;
+
+    /// <summary>本次运行中播放失败过：不再尝试，保持静态首帧图。</summary>
+    private bool _videoFailed;
+
+    private bool WantsVideo =>
+        OperatingSystem.IsWindows() && _config.User.UseDynamicBackground && UsesLauncherBackground && !_videoFailed;
+
+    private int _videoVersion;
+
+    /// <summary>按当前设置决定是否需要视频；需要时先用已缓存的，没有再后台下载（约 11MB）。</summary>
+    private void UpdateVideo()
+    {
+        int version = ++_videoVersion;
+        if (!WantsVideo)
+        {
+            BackgroundVideo = null;
+            return;
+        }
+        string? cached = _launcherBackground.LoadCachedVideo();
+        if (cached is not null)
+        {
+            BackgroundVideo = cached;
+            return;
+        }
+        _ = DownloadVideoAsync(version);
+    }
+
+    private async Task DownloadVideoAsync(int version)
+    {
+        string? path;
+        try
+        {
+            path = await Task.Run(() => _launcherBackground.EnsureVideoAsync());
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            path = null;
+        }
+        if (version == _videoVersion && WantsVideo && path is not null) BackgroundVideo = path;
+    }
+
+    /// <summary>视频解码失败（如系统缺少 H.264 解码器）：记录日志，本次运行不再播放。</summary>
+    public void ReportVideoFailure(Exception ex)
+    {
+        _logger.Warn($"动态背景播放失败，改用静态背景：{ex.GetType().Name} {ex.Message}");
+        _videoFailed = true;
+        BackgroundVideo = null;
+    }
+
     /// <summary>每次重新选择背景时递增，丢弃过期的异步结果。</summary>
     private int _backgroundVersion;
 
@@ -140,6 +202,7 @@ public sealed partial class ShellViewModel : ObservableObject
             _shownLauncherImage = _shownLauncherSlogan = null;
             BackgroundSlogan = null;
             BackgroundImage = Decode(_config.User.CustomBackgroundPath!, 2560);
+            UpdateVideo();
             return;
         }
 
@@ -155,6 +218,7 @@ public sealed partial class ShellViewModel : ObservableObject
         {
             _ = ApplyLauncherAsync(cached, version);
         }
+        UpdateVideo();
 
         string language = _localization.CurrentLanguage.GetCode();
         if (_launcherRefreshedLanguage == language) return;
@@ -174,7 +238,11 @@ public sealed partial class ShellViewModel : ObservableObject
         }
         if (files is null) return;
         _launcherRefreshedLanguage = language;
-        if (version == _backgroundVersion) await ApplyLauncherAsync(files, version);
+        if (version != _backgroundVersion) return;
+        await ApplyLauncherAsync(files, version);
+        // 背景换了（如新版本）时视频地址也随之变化，重新确认视频。
+        // 首次启动时刷新前还没有视频地址，刷新后补上。
+        if (BackgroundVideo is null || _launcherBackground.LoadCachedVideo() != BackgroundVideo) UpdateVideo();
     }
 
     /// <summary>后台解码后在界面线程替换；文件没变时不重新解码。</summary>

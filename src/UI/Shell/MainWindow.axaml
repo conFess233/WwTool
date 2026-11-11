@@ -100,6 +100,11 @@
       <Image x:Name="BackdropImage" Source="{Binding BackgroundImage}" Stretch="UniformToFill" Margin="-14">
         <Image.RenderTransform><TranslateTransform /></Image.RenderTransform>
       </Image>
+      <!-- 动态背景（仅 Windows，设置开启时）：启动器背景视频叠在首帧图上，第一帧出来前透明；是否播放由窗口状态决定 -->
+      <c:VideoBackdrop x:Name="BackdropVideo" Source="{Binding BackgroundVideo}" Margin="-14"
+                       IsVisible="{Binding BackgroundVideo, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <c:VideoBackdrop.RenderTransform><TranslateTransform /></c:VideoBackdrop.RenderTransform>
+      </c:VideoBackdrop>
       <Border Background="{DynamicResource BackgroundBrush}">
         <Border.OpacityMask>
           <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
