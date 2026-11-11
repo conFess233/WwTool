@@ -94,10 +94,10 @@
     <Border Background="{DynamicResource BackgroundBrush}" Opacity="{Binding BackdropOpacity}" IsHitTestVisible="False" />
     <c:BackdropTexture GridColor="{DynamicResource GridLineColor}" GridOpacity="{DynamicResource GridLineOpacity}"
                        GlowColor="{DynamicResource GlowColor}" GlowOpacity="{DynamicResource GlowOpacity}"
-                       IsVisible="{Binding !HasCustomBackground}" />
-    <!-- 自定义背景图（设置「窗口背景」）：铺满并四周多留 14 供视差移动；上叠从左 70% 到右 5% 的背景色遮罩 -->
-    <Panel IsVisible="{Binding HasCustomBackground}" IsHitTestVisible="False" ClipToBounds="True">
-      <Image x:Name="BackdropImage" Source="{Binding CustomBackground}" Stretch="UniformToFill" Margin="-14">
+                       IsVisible="{Binding !HasBackgroundImage}" />
+    <!-- 背景图（自定义图片，或未设定时取游戏启动器背景）：铺满并四周多留 14 供视差移动；上叠从左 70% 到右 5% 的背景色遮罩 -->
+    <Panel IsVisible="{Binding HasBackgroundImage}" IsHitTestVisible="False" ClipToBounds="True">
+      <Image x:Name="BackdropImage" Source="{Binding BackgroundImage}" Stretch="UniformToFill" Margin="-14">
         <Image.RenderTransform><TranslateTransform /></Image.RenderTransform>
       </Image>
       <Border Background="{DynamicResource BackgroundBrush}">
@@ -108,6 +108,11 @@
           </LinearGradientBrush>
         </Border.OpacityMask>
       </Border>
+      <!-- 启动器标语图：与背景同比例的透明整幅图，按相同方式铺放并跟随视差，叠在遮罩之上保持清晰 -->
+      <Image x:Name="BackdropSlogan" Source="{Binding BackgroundSlogan}" IsVisible="{Binding HasBackgroundSlogan}"
+             Stretch="UniformToFill" Margin="-14">
+        <Image.RenderTransform><TranslateTransform /></Image.RenderTransform>
+      </Image>
     </Panel>
     <!-- 首页专属装饰：十字定位标记、右侧竖排小字、金色渐隐短线；切换页面时淡入淡出 -->
     <c:HomeBackdropDecor x:Name="HomeDecor" IsHitTestVisible="False" Opacity="0" Classes.show="{Binding IsHomePage}"

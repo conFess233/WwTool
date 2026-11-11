@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using WwTool.Core.Abstractions;
 using WwTool.Core.Localization;
 using WwTool.Core.Models.Config;
+using WwTool.Core.Services;
+using WwTool.Core.Extensions;
 using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
 using WwTool.UI.Services;
@@ -20,6 +22,7 @@ public sealed partial class ShellViewModel : ObservableObject
     private readonly INavigationService _navigation;
     private readonly LocalizationService _localization;
     private readonly IConfigService _config;
+    private readonly LauncherBackgroundService _launcherBackground;
 
     /// <summary>窗口毛玻璃：开启时窗口透明并请求系统模糊材质，背景层按 <see cref="BackdropOpacity"/> 半透明。</summary>
     /// <remarks>本次启动用了软件渲染（启动时毛玻璃为关）时系统材质不可用，运行中打开开关也按不透明处理，重启后生效，见 <see cref="RenderingProfile"/>。</remarks>
@@ -35,9 +38,11 @@ public sealed partial class ShellViewModel : ObservableObject
         DialogService dialogs,
         IUIStateService uiState,
         AccountContext accounts,
-        IConfigService config)
+        IConfigService config,
+        LauncherBackgroundService launcherBackground)
     {
         _config = config;
+        _launcherBackground = launcherBackground;
         config.User.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(UserConfig.IsGlassEffectEnabled) or nameof(UserConfig.GlassOpacity))
@@ -47,13 +52,13 @@ public sealed partial class ShellViewModel : ObservableObject
             }
             if (e.PropertyName is nameof(UserConfig.UseCustomBackground) or nameof(UserConfig.CustomBackgroundPath))
             {
-                Avalonia.Threading.Dispatcher.UIThread.Post(LoadCustomBackground);
+                Avalonia.Threading.Dispatcher.UIThread.Post(LoadBackground);
             }
         };
-        LoadCustomBackground();
         Accounts = accounts;
         _navigation = navigation;
         _localization = localization;
+        LoadBackground();
         Fab = fab;
         Dialogs = dialogs;
         UiState = uiState;
@@ -73,42 +78,146 @@ public sealed partial class ShellViewModel : ObservableObject
         localization.PropertyChanged += OnLocalizationChanged;
     }
 
-    /// <summary>窗口背景自定义图片（设置「窗口背景」选自定义且图片可读时）；为空时用默认底纹。</summary>
-    public Avalonia.Media.Imaging.Bitmap? CustomBackground
+    /// <summary>未选自定义图片时使用的启动器背景（国际服按界面语言 → 国服 → 默认底纹）。</summary>
+    private bool UsesLauncherBackground =>
+        !_config.User.UseCustomBackground || string.IsNullOrWhiteSpace(_config.User.CustomBackgroundPath) || !File.Exists(_config.User.CustomBackgroundPath);
+
+    /// <summary>
+    /// 窗口背景图：设置「窗口背景」选自定义且图片可读时为自定义图片；否则为启动器背景首帧图（先用缓存，后台刷新）；
+    /// 都没有时为空，显示默认底纹。
+    /// </summary>
+    public Avalonia.Media.Imaging.Bitmap? BackgroundImage
     {
-        get => _customBackground;
+        get => _backgroundImage;
         private set
         {
-            if (ReferenceEquals(_customBackground, value)) return;
-            Avalonia.Media.Imaging.Bitmap? old = _customBackground;
-            _customBackground = value;
+            if (ReferenceEquals(_backgroundImage, value)) return;
+            Avalonia.Media.Imaging.Bitmap? old = _backgroundImage;
+            _backgroundImage = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(HasCustomBackground));
+            OnPropertyChanged(nameof(HasBackgroundImage));
             old?.Dispose();
         }
     }
 
-    private Avalonia.Media.Imaging.Bitmap? _customBackground;
+    private Avalonia.Media.Imaging.Bitmap? _backgroundImage;
 
-    public bool HasCustomBackground => _customBackground is not null;
+    public bool HasBackgroundImage => _backgroundImage is not null;
 
-    private void LoadCustomBackground()
+    /// <summary>启动器标语图：与背景同比例的透明整幅叠加层，只随启动器背景显示。</summary>
+    public Avalonia.Media.Imaging.Bitmap? BackgroundSlogan
     {
-        string? path = _config.User.CustomBackgroundPath;
-        if (!_config.User.UseCustomBackground || string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        get => _backgroundSlogan;
+        private set
         {
-            CustomBackground = null;
+            if (ReferenceEquals(_backgroundSlogan, value)) return;
+            Avalonia.Media.Imaging.Bitmap? old = _backgroundSlogan;
+            _backgroundSlogan = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasBackgroundSlogan));
+            old?.Dispose();
+        }
+    }
+
+    private Avalonia.Media.Imaging.Bitmap? _backgroundSlogan;
+
+    public bool HasBackgroundSlogan => _backgroundSlogan is not null;
+
+    /// <summary>每次重新选择背景时递增，丢弃过期的异步结果。</summary>
+    private int _backgroundVersion;
+
+    /// <summary>本次运行已成功刷新过启动器背景的语言；同一语言不重复请求。</summary>
+    private string? _launcherRefreshedLanguage;
+
+    private string? _shownLauncherImage;
+    private string? _shownLauncherSlogan;
+
+    private void LoadBackground()
+    {
+        int version = ++_backgroundVersion;
+        if (!UsesLauncherBackground)
+        {
+            _shownLauncherImage = _shownLauncherSlogan = null;
+            BackgroundSlogan = null;
+            BackgroundImage = Decode(_config.User.CustomBackgroundPath!, 2560);
             return;
         }
+
+        // 先显示上次缓存（若有），再后台刷新；刷新全部失败时保留缓存，没有缓存则为默认底纹。
+        LauncherBackgroundFiles? cached = _launcherBackground.LoadCached();
+        if (cached is null)
+        {
+            _shownLauncherImage = _shownLauncherSlogan = null;
+            BackgroundImage = null;
+            BackgroundSlogan = null;
+        }
+        else
+        {
+            _ = ApplyLauncherAsync(cached, version);
+        }
+
+        string language = _localization.CurrentLanguage.GetCode();
+        if (_launcherRefreshedLanguage == language) return;
+        _ = RefreshLauncherAsync(language, version);
+    }
+
+    private async Task RefreshLauncherAsync(string language, int version)
+    {
+        LauncherBackgroundFiles? files;
         try
         {
-            // 按 2560 宽解码，大图不至于占满内存。
+            files = await Task.Run(() => _launcherBackground.RefreshAsync(language));
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            files = null;
+        }
+        if (files is null) return;
+        _launcherRefreshedLanguage = language;
+        if (version == _backgroundVersion) await ApplyLauncherAsync(files, version);
+    }
+
+    /// <summary>后台解码后在界面线程替换；文件没变时不重新解码。</summary>
+    private async Task ApplyLauncherAsync(LauncherBackgroundFiles files, int version)
+    {
+        bool sameImage = files.ImagePath == _shownLauncherImage && _backgroundImage is not null;
+        bool sameSlogan = files.SloganPath == _shownLauncherSlogan;
+        if (sameImage && sameSlogan) return;
+
+        var (image, slogan) = await Task.Run(() => (
+            sameImage ? null : Decode(files.ImagePath, 2560),
+            sameSlogan || files.SloganPath is null ? null : Decode(files.SloganPath, 1920)));
+
+        if (version != _backgroundVersion || !UsesLauncherBackground)
+        {
+            image?.Dispose();
+            slogan?.Dispose();
+            return;
+        }
+        if (!sameImage)
+        {
+            if (image is null) { slogan?.Dispose(); return; }
+            BackgroundImage = image;
+            _shownLauncherImage = files.ImagePath;
+        }
+        if (!sameSlogan)
+        {
+            BackgroundSlogan = slogan;
+            _shownLauncherSlogan = slogan is null ? null : files.SloganPath;
+        }
+    }
+
+    /// <summary>按宽度解码，大图不至于占满内存；读不了返回 null。</summary>
+    private static Avalonia.Media.Imaging.Bitmap? Decode(string path, int width)
+    {
+        try
+        {
             using FileStream stream = File.OpenRead(path);
-            CustomBackground = Avalonia.Media.Imaging.Bitmap.DecodeToWidth(stream, 2560);
+            return Avalonia.Media.Imaging.Bitmap.DecodeToWidth(stream, width);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException)
         {
-            CustomBackground = null;
+            return null;
         }
     }
 
@@ -203,6 +312,11 @@ public sealed partial class ShellViewModel : ObservableObject
     private void OnLocalizationChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == LocalizationService.IndexerName) UpdatePageTitle();
+        // 国际服标语图按语言区分，换语言后重新获取。
+        if (e.PropertyName == nameof(LocalizationService.CurrentLanguage) && UsesLauncherBackground)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(LoadBackground);
+        }
     }
 
     /// <summary>子页面在页名上方显示父级名（详细图表 → 抽卡统计）；一级页面不显示。</summary>

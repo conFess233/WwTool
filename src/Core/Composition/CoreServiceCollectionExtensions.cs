@@ -60,6 +60,7 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<GameDataService>();
         services.AddSingleton<CatalogRepositorySource>();
         services.AddSingleton<CatalogSyncService>();
+        services.AddSingleton<LauncherBackgroundService>();
 
         // 业务服务
         services.AddSingleton<IUserDataService, UserDataService>();

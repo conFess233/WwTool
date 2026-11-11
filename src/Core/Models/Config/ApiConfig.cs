@@ -85,5 +85,11 @@ namespace WwTool.Core.Models.Config
         public string GuideSiteUrl { get; set; } = "https://wiki.kurobbs.com/mc/home";
         /// <summary>首页公告卡「前往官网查看全部公告」的默认网页。</summary>
         public string OfficialSiteUrl { get; set; } = "https://mc.kurogame.com/";
+
+        /// <summary>国际服启动器背景配置，<c>{0}</c> 为语言代码（zh-Hans / en / ja 等均有）。</summary>
+        public string LauncherBackgroundUrlNET { get; set; } = "https://prod-alicdn-gamestarter.kurogame.com/launcher/game/50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e/G153/official/background/51684874bd1f48e3ab98fb8b06b96ceb/{0}.json";
+
+        /// <summary>国服启动器背景配置，<c>{0}</c> 为语言代码（只有 zh-Hans）。</summary>
+        public string LauncherBackgroundUrlCN { get; set; } = "https://prod-cn-alicdn-gamestarter.kurogame.com/launcher/game/10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ/G152/official/background/e4ea009e702a4961be86c815d87dbe68/{0}.json";
     }
 }

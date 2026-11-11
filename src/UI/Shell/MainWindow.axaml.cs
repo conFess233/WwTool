@@ -120,7 +120,7 @@ public partial class MainWindow : Window
 
     private void OnParallaxPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (Motion.Reduced || DataContext is not ShellViewModel { HasCustomBackground: true }) return;
+        if (Motion.Reduced || DataContext is not ShellViewModel { HasBackgroundImage: true }) return;
         Point p = e.GetPosition(this);
         double nx = Bounds.Width > 0 ? p.X / Bounds.Width * 2 - 1 : 0;
         double ny = Bounds.Height > 0 ? p.Y / Bounds.Height * 2 - 1 : 0;
@@ -133,10 +133,13 @@ public partial class MainWindow : Window
     private void ParallaxTick(TimeSpan _)
     {
         _parallaxCurrent += (_parallaxTarget - _parallaxCurrent) * 0.12;
-        if (BackdropImage.RenderTransform is TranslateTransform translate)
+        foreach (Image layer in new[] { BackdropImage, BackdropSlogan })
         {
-            translate.X = _parallaxCurrent.X;
-            translate.Y = _parallaxCurrent.Y;
+            if (layer.RenderTransform is TranslateTransform translate)
+            {
+                translate.X = _parallaxCurrent.X;
+                translate.Y = _parallaxCurrent.Y;
+            }
         }
         if ((_parallaxTarget - _parallaxCurrent).Length > 0.05)
         {
