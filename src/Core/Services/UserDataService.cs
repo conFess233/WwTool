@@ -43,6 +43,9 @@ public sealed class UserDataService(
     public Task<IReadOnlyList<GachaPull>> ReadGachaInSourceOrderAsync(string uid, int poolType, CancellationToken cancellationToken = default) =>
         gachaRepository.GetPoolRecordsByUidAsync(uid, poolType, cancellationToken);
 
+    public Task<int> ClearGachaAsync(string uid, CancellationToken cancellationToken = default) =>
+        gachaRepository.DeleteByUidAsync(uid, cancellationToken);
+
     public Task<int> ImportGachaAsync(string uid, int poolType, IEnumerable<GachaPull> records, string source, CancellationToken cancellationToken = default) =>
         gachaRepository.SyncGachaDataAsync(uid, poolType, records, source, cancellationToken);
 

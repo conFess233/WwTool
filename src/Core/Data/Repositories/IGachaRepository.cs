@@ -14,4 +14,7 @@ public interface IGachaRepository
         IEnumerable<GachaPull> records,
         string source = "remote",
         CancellationToken cancellationToken = default);
+
+    /// <summary>删除该账号的全部抽卡记录与导入批次，返回删除的记录条数。账号本身与凭据保留。</summary>
+    Task<int> DeleteByUidAsync(string uid, CancellationToken cancellationToken = default);
 }

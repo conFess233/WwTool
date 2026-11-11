@@ -22,6 +22,8 @@ namespace WwTool.Core.Models.Config
         private bool _isReducedMotionEnabled;
         private GachaServerRegion _gachaServerRegion = GachaServerRegion.China;
         private NotificationDisplayMode _notificationDisplayMode = NotificationDisplayMode.Concise;
+        private bool _useCustomBackground;
+        private string? _customBackgroundPath;
 
         public string? GamePath { get => _gamePath; set => SetProperty(ref _gamePath, value); }
         public string? LastUserId { get => _lastUserId; set => SetProperty(ref _lastUserId, value); }
@@ -54,6 +56,9 @@ namespace WwTool.Core.Models.Config
         }
         public string BaseTheme { get => _baseTheme; set => SetProperty(ref _baseTheme, value); }
         public string AccentTheme { get => _accentTheme; set => SetProperty(ref _accentTheme, value); }
+        /// <summary>窗口背景：false 用默认底纹，true 用 <see cref="CustomBackgroundPath"/> 指向的图片。</summary>
+        public bool UseCustomBackground { get => _useCustomBackground; set => SetProperty(ref _useCustomBackground, value); }
+        public string? CustomBackgroundPath { get => _customBackgroundPath; set => SetProperty(ref _customBackgroundPath, value); }
         public bool IsReducedMotionEnabled
         {
             get => _isReducedMotionEnabled;

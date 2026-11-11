@@ -70,6 +70,25 @@ public sealed class GachaRepository(
         }
     }
 
+    public async Task<int> DeleteByUidAsync(string uid, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(uid);
+        try
+        {
+            return await writeCoordinator.ExecuteAsync(async (db, token) =>
+            {
+                // 写协调器已在事务中执行。记录引用导入批次，先删记录。
+                int removed = await db.GachaRecords.Where(x => x.Uid == uid).ExecuteDeleteAsync(token);
+                await db.GachaImportBatches.Where(x => x.Uid == uid).ExecuteDeleteAsync(token);
+                return removed;
+            }, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            throw new WwToolDatabaseException("清空本地抽卡记录失败。", ex);
+        }
+    }
+
     public async Task<int> SyncGachaDataAsync(
         string uid,
         int poolType,
