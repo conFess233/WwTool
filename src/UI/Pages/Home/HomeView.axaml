@@ -112,9 +112,6 @@
               </Transitions>
             </Border.Transitions>
             <Panel>
-              <!-- 右下淡圆环 -->
-              <Ellipse Name="PART_Ring" Width="64" Height="64" StrokeThickness="10" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                       Margin="0,0,-18,-18" Stroke="{DynamicResource AccentBrush}" Opacity="0.07" />
               <!-- 启动中的微光 -->
               <Border Name="PART_Shimmer" Width="90" HorizontalAlignment="Left" IsVisible="False" Opacity="0.35">
                 <Border.Background>
@@ -160,6 +157,21 @@
         </Transitions>
       </Setter>
     </Style>
+    <!-- 右下角水印：对应功能的放大图标，一部分伸出按钮边缘被裁掉 -->
+    <Style Selector="Button.quick c|StrokeIcon.watermark">
+      <Setter Property="Width" Value="76" />
+      <Setter Property="Height" Value="76" />
+      <Setter Property="StrokeThickness" Value="1.6" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="Margin" Value="0,0,-22,-24" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Opacity" Value="0.09" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+    <Style Selector="Button.quick.success c|StrokeIcon.watermark">
+      <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+    </Style>
     <Style Selector="Button.quick TextBlock.title">
       <Setter Property="FontSize" Value="14" />
       <Setter Property="FontWeight" Value="SemiBold" />
@@ -177,9 +189,9 @@
     <Style Selector="Button.quick.primary:pointerover /template/ Border#PART_Body">
       <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
     </Style>
-    <Style Selector="Button.quick.primary /template/ Ellipse#PART_Ring">
-      <Setter Property="Stroke" Value="White" />
-      <Setter Property="Opacity" Value="0.14" />
+    <Style Selector="Button.quick.primary c|StrokeIcon.watermark">
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="Opacity" Value="0.16" />
     </Style>
     <Style Selector="Button.quick.primary Border.disc">
       <Setter Property="Background" Value="#33FFFFFF" />
@@ -335,7 +347,7 @@
     </Style>
   </UserControl.Styles>
 
-  <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+  <ScrollViewer x:Name="Scroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <Grid x:Name="Root" ColumnDefinitions="*,430" RowDefinitions="Auto,*" ColumnSpacing="18" Margin="0,0,0,26" MinHeight="620">
 
       <!-- 网络异常（定稿「空状态与异常」）：顶部红色横条，下方照常显示缓存数据 -->
@@ -515,6 +527,7 @@
                             Command="{Binding Command}" AutomationProperties.AutomationId="{Binding AutomationId}"
                             AutomationProperties.Name="{Binding Title}">
                       <Grid RowDefinitions="*,Auto" RowSpacing="8">
+                        <c:StrokeIcon Grid.RowSpan="2" Classes="watermark" Data="{Binding Icon, Converter={x:Static home:IconKeyConverter.Instance}}" />
                         <Border Classes="disc">
                           <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
                             <c:StrokeIcon Width="20" Height="20" Data="{Binding Icon, Converter={x:Static home:IconKeyConverter.Instance}}">
