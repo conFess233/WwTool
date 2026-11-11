@@ -3,152 +3,200 @@
              xmlns:vm="using:WwTool.UI.ViewModels"
              xmlns:domain="using:WwTool.Core.Models.Domain"
              xmlns:loc="using:WwTool.UI.Localization"
+             xmlns:c="using:WwTool.UI.Controls"
              x:Class="WwTool.UI.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
-  <!-- 设置（定稿 FinalSettings）：左列常规 / 界面 / 日志，右列网络 / 资料缓存 / 关于。
-       每行左侧名称与说明，右侧控件。用户配置改动即自动保存。 -->
+  <!-- 设置（定稿 FinalSettings）：两栏等宽各三张卡。左：常规游戏设置 / 界面设置 / 运行日志；
+       右：网络与验证 / 游戏资料与图片缓存 / 关于 WwTool。行高 44、行上下内边距 7、卡片上下内边距 14 / 12。
+       用户配置改动即自动保存，右下角扩展态悬浮按钮「保存设置」立即写盘。 -->
   <UserControl.Styles>
-    <Style Selector="TextBlock.section">
+    <Style Selector="Border.card.set">
+      <Setter Property="Padding" Value="22,14,22,12" />
+    </Style>
+    <Style Selector="TextBlock.ti">
       <Setter Property="FontSize" Value="15" />
       <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="Margin" Value="0,0,0,6" />
+      <Setter Property="Margin" Value="0,0,0,4" />
       <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     </Style>
     <!-- 设置行：上边框分隔，首行无边框 -->
-    <Style Selector="Border.row">
+    <Style Selector="Border.sr">
       <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
       <Setter Property="BorderThickness" Value="0,1,0,0" />
-      <Setter Property="Padding" Value="0,11" />
-      <Setter Property="MinHeight" Value="52" />
+      <Setter Property="Padding" Value="0,7" />
+      <Setter Property="MinHeight" Value="44" />
     </Style>
-    <Style Selector="Border.row.first">
+    <Style Selector="Border.sr.first">
       <Setter Property="BorderThickness" Value="0" />
     </Style>
-    <Style Selector="Border.row TextBlock.name">
+    <Style Selector="Border.sr > Grid">
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBlock.name">
       <Setter Property="FontSize" Value="14" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
-    <Style Selector="Border.row TextBlock.hint">
+    <Style Selector="TextBlock.hint">
       <Setter Property="FontSize" Value="12" />
       <Setter Property="Margin" Value="0,2,0,0" />
       <Setter Property="TextWrapping" Value="Wrap" />
       <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
     </Style>
-    <Style Selector="ComboBox">
-      <Setter Property="MinWidth" Value="180" />
+    <Style Selector="TextBlock.cp">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
     </Style>
-    <Style Selector="NumericUpDown">
-      <Setter Property="Width" Value="130" />
+    <Style Selector="NumericUpDown.input">
+      <Setter Property="ShowButtonSpinner" Value="False" />
+      <Setter Property="Padding" Value="12,0,34,0" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
-    <Style Selector="ToggleSwitch">
-      <Setter Property="OnContent" Value="{x:Null}" />
-      <Setter Property="OffContent" Value="{x:Null}" />
-      <Setter Property="MinWidth" Value="0" />
+    <Style Selector="TextBlock.suffix">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="0,0,12,0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
     </Style>
-    <!-- 主题色板：选中项描强调色边 -->
+    <Style Selector="ToggleButton.chip.set">
+      <Setter Property="Height" Value="30" />
+    </Style>
+    <Style Selector="Button.btn.set">
+      <Setter Property="Height" Value="30" />
+    </Style>
+
+    <!-- 主题圆形色块：38；选中时外圈 Accent 双环（3 间隙 + 2 环）；悬停放大 -->
     <Style Selector="Button.swatch">
       <Setter Property="Padding" Value="0" />
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="ClipToBounds" Value="False" />
     </Style>
-    <Style Selector="Button.swatch:pointerover /template/ ContentPresenter">
+    <Style Selector="Button.swatch:pointerover /template/ ContentPresenter, Button.swatch:pressed /template/ ContentPresenter">
       <Setter Property="Background" Value="Transparent" />
     </Style>
-    <Style Selector="Border.preset">
-      <Setter Property="Width" Value="76" />
-      <Setter Property="Height" Value="52" />
-      <Setter Property="CornerRadius" Value="10" />
-      <Setter Property="BorderThickness" Value="2" />
-      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-      <Setter Property="ClipToBounds" Value="True" />
+    <Style Selector="Panel.orb">
+      <Setter Property="RenderTransform" Value="scale(1)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="0.2,0.8,0.2,1" />
+        </Transitions>
+      </Setter>
     </Style>
-    <Style Selector="Border.preset.selected">
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Style Selector="Button.swatch:pointerover Panel.orb">
+      <Setter Property="RenderTransform" Value="scale(1.08)" />
     </Style>
-    <Style Selector="Border.dot">
-      <Setter Property="Width" Value="30" />
-      <Setter Property="Height" Value="30" />
-      <Setter Property="CornerRadius" Value="15" />
+    <Style Selector="Border.ring">
       <Setter Property="BorderThickness" Value="2" />
       <Setter Property="BorderBrush" Value="Transparent" />
-      <Setter Property="Padding" Value="3" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.2" />
+        </Transitions>
+      </Setter>
     </Style>
-    <Style Selector="Border.dot.selected">
+    <Style Selector="Border.ring.selected">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Border.ring.dot.selected">
       <Setter Property="BorderBrush" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+
+    <Style Selector="c|HoldButton">
+      <Setter Property="Height" Value="36" />
+      <Setter Property="Padding" Value="16,0" />
+      <Setter Property="CornerRadius" Value="7" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource DangerLineBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+      <Setter Property="FillBrush" Value="{DynamicResource DangerBrush}" />
+      <Setter Property="FillForeground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="c|HoldButton:pointerover">
+      <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
+    </Style>
+    <Style Selector="c|HoldButton:disabled">
+      <Setter Property="Opacity" Value="0.45" />
     </Style>
   </UserControl.Styles>
 
   <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-    <Grid Margin="40,0,40,120" ColumnDefinitions="*,*" ColumnSpacing="18">
-      <!-- 左列 -->
+    <Grid Margin="0,0,0,26" ColumnDefinitions="*,*" ColumnSpacing="18">
+      <!-- ── 左栏 ── -->
       <StackPanel Spacing="18">
         <!-- 常规游戏设置 -->
-        <Border Classes="card" Padding="22,18">
+        <Border Classes="card set">
           <StackPanel>
-            <TextBlock Classes="section" Text="{loc:Tr Settings_General}" />
-            <Border Classes="row first">
+            <TextBlock Classes="ti" Text="{loc:Tr Settings_General}" />
+            <Border Classes="sr first">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
-                  <TextBlock Classes="name" Text="{loc:Tr Settings_GamePath}" />
-                  <TextBlock Classes="hint" Text="{Binding GamePath}" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
-                             ToolTip.Tip="{Binding GamePath}" AutomationProperties.AutomationId="settings-game-path" />
+                <TextBlock Classes="name" Text="{loc:Tr Settings_GamePath}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <TextBox Classes="input" Width="250" IsReadOnly="True" Text="{Binding GamePath}" ToolTip.Tip="{Binding GamePath}"
+                           AutomationProperties.Name="{loc:Tr Settings_GamePath}" AutomationProperties.AutomationId="settings-game-path" />
+                  <Button Classes="btn" Content="{loc:Tr Action_SelectPath}" Command="{Binding SelectGamePathCommand}"
+                          AutomationProperties.AutomationId="settings-select-game-path" />
                 </StackPanel>
-                <Button Grid.Column="1" Classes="pill" Content="{loc:Tr Action_SelectPath}" Command="{Binding SelectGamePathCommand}"
-                        VerticalAlignment="Center" AutomationProperties.AutomationId="settings-select-game-path" />
               </Grid>
             </Border>
-            <Border Classes="row">
+            <Border Classes="sr">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
+                <StackPanel VerticalAlignment="Center">
                   <TextBlock Classes="name" Text="{loc:Tr Settings_DefaultUid}" />
                   <TextBlock Classes="hint" Text="{loc:Tr Settings_UidHintShort}" />
                 </StackPanel>
-                <ComboBox Grid.Column="1" ItemsSource="{Binding Accounts.Accounts}" SelectedItem="{Binding Accounts.Current}"
-                          VerticalAlignment="Center" AutomationProperties.AutomationId="settings-default-account">
+                <ComboBox Grid.Column="1" Classes="input" Width="190" ItemsSource="{Binding Accounts.Accounts}" SelectedItem="{Binding Accounts.Current}"
+                          VerticalAlignment="Center" AutomationProperties.Name="{loc:Tr Settings_DefaultUid}"
+                          AutomationProperties.AutomationId="settings-default-account">
                   <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="domain:AccountSummary">
-                      <TextBlock Text="{Binding Uid}" />
+                      <TextBlock Text="{Binding MaskedUid}" />
                     </DataTemplate>
                   </ComboBox.ItemTemplate>
                 </ComboBox>
               </Grid>
             </Border>
-            <Border Classes="row">
+            <Border Classes="sr">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
+                <StackPanel VerticalAlignment="Center">
                   <TextBlock Classes="name" Text="{loc:Tr Settings_AutoLoadTitle}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_AutoLoadHint}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_AutoLoadHintShort}" />
                 </StackPanel>
                 <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoLoadLocalData}" VerticalAlignment="Center"
-                              AutomationProperties.AutomationId="settings-autoload" />
+                              AutomationProperties.Name="{loc:Tr Settings_AutoLoadTitle}" AutomationProperties.AutomationId="settings-autoload" />
               </Grid>
             </Border>
           </StackPanel>
         </Border>
 
         <!-- 界面设置 -->
-        <Border Classes="card" Padding="22,18">
+        <Border Classes="card set">
           <StackPanel>
-            <TextBlock Classes="section" Text="{loc:Tr Settings_UI}" />
-            <Border Classes="row first">
-              <StackPanel Spacing="10">
-                <TextBlock Classes="name" Text="{loc:Tr Settings_Theme}" />
-                <ItemsControl ItemsSource="{Binding Presets}">
-                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <TextBlock Classes="ti" Text="{loc:Tr Settings_UI}" Margin="0,0,0,12" />
+            <!-- 软件主题配色：5 个 38 圆形色块 + 名称 -->
+            <Border Classes="sr first">
+              <StackPanel>
+                <TextBlock Classes="name" Text="{loc:Tr Settings_Theme}" Margin="0,0,0,12" />
+                <ItemsControl ItemsSource="{Binding Presets}" Margin="-5,-5,0,0">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="16" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:ThemeSwatch">
-                      <Button Classes="swatch" Margin="0,0,12,8"
-                              Command="{Binding $parent[UserControl].((vm:SettingsViewModel)DataContext).SelectPresetCommand}" CommandParameter="{Binding}"
+                      <Button Classes="swatch theme"
                               AutomationProperties.AutomationId="{Binding AutomationId}" AutomationProperties.Name="{Binding Option.Title}">
-                        <StackPanel Spacing="6">
-                          <Border Classes="preset" Classes.selected="{Binding IsSelected}" Background="{Binding Background}">
-                            <Grid RowDefinitions="*,*" ColumnDefinitions="*,*" Margin="8">
-                              <Border Grid.ColumnSpan="2" CornerRadius="4" Background="{Binding Surface}" Margin="0,0,0,3" />
-                              <Border Grid.Row="1" CornerRadius="4" Background="{Binding Accent}" Margin="0,3,3,0" />
-                            </Grid>
-                          </Border>
+                        <StackPanel Spacing="1">
+                          <!-- 圆 38，四周留 5 放选中双环（间隙 3 + 环 2），避免被按钮裁切 -->
+                          <Panel Classes="orb" Width="48" Height="48" HorizontalAlignment="Center">
+                            <Border Classes="ring" Classes.selected="{Binding IsSelected}" CornerRadius="24" />
+                            <Ellipse Margin="5" Fill="{Binding Background}" Stroke="{DynamicResource InputBorderBrush}" StrokeThickness="1" />
+                          </Panel>
                           <TextBlock Text="{Binding Option.Title}" FontSize="12" HorizontalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
                         </StackPanel>
                       </Button>
@@ -157,55 +205,77 @@
                 </ItemsControl>
               </StackPanel>
             </Border>
-            <Border Classes="row">
-              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
-                <TextBlock Classes="name" Text="{loc:Tr Settings_AccentTheme}" VerticalAlignment="Center" />
-                <ItemsControl Grid.Column="1" ItemsSource="{Binding Accents}" HorizontalAlignment="Right">
-                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                  <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ThemeSwatch">
-                      <Button Classes="swatch" ToolTip.Tip="{Binding Option.Title}"
-                              Command="{Binding $parent[UserControl].((vm:SettingsViewModel)DataContext).SelectAccentCommand}" CommandParameter="{Binding}"
-                              AutomationProperties.AutomationId="{Binding AutomationId}" AutomationProperties.Name="{Binding Option.Title}">
-                        <Border Classes="dot" Classes.selected="{Binding IsSelected}">
-                          <Panel>
-                            <!-- 跟随主题：半边强调色、半边描边 -->
-                            <Ellipse Fill="{Binding Accent}" />
-                            <Ellipse Stroke="{DynamicResource BorderStrongBrush}" StrokeThickness="1.5" StrokeDashArray="2,2"
-                                     IsVisible="{Binding Option.Value, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=FollowTheme}" />
+            <!-- 强调色：「跟随主题」胶囊 + 6 个 22 色点 -->
+            <Border Classes="sr">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <TextBlock Classes="name" Text="{loc:Tr Settings_AccentTheme}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                  <ToggleButton Classes="chip set swatch-follow" Margin="0,0,14,0" DataContext="{Binding FollowAccent}"
+                                IsChecked="{Binding IsSelected, Mode=OneWay}" Content="{Binding Option.Title}"
+                                AutomationProperties.AutomationId="{Binding AutomationId}" />
+                  <ItemsControl ItemsSource="{Binding AccentColors}" Margin="-4,0,-4,0">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:ThemeSwatch">
+                        <Button Classes="swatch accent-dot" ToolTip.Tip="{Binding Option.Title}"
+                                AutomationProperties.AutomationId="{Binding AutomationId}" AutomationProperties.Name="{Binding Option.Title}">
+                          <Panel Classes="orb" Width="30" Height="30">
+                            <Border Classes="ring dot" Classes.selected="{Binding IsSelected}" CornerRadius="15" />
+                            <Ellipse Margin="4" Fill="{Binding Accent}" />
                           </Panel>
-                        </Border>
-                      </Button>
-                    </DataTemplate>
-                  </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
               </Grid>
             </Border>
-            <Border Classes="row">
-              <StackPanel Spacing="10">
+            <!-- 窗口背景：默认底纹 / 自定义图片 + 选择图片 -->
+            <Border Classes="sr">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Classes="name" Text="{loc:Tr Settings_WindowBackground}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_WindowBackgroundHint}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                  <ToggleButton Classes="chip set" Content="{loc:Tr Settings_BackgroundTexture}" IsChecked="{Binding !UseCustomBackground, Mode=OneWay}"
+                                Command="{Binding SetBackgroundModeCommand}" CommandParameter="texture"
+                                AutomationProperties.AutomationId="settings-bg-texture" />
+                  <ToggleButton Classes="chip set" Content="{loc:Tr Settings_BackgroundCustom}" IsChecked="{Binding UseCustomBackground, Mode=OneWay}"
+                                Command="{Binding SetBackgroundModeCommand}" CommandParameter="custom"
+                                AutomationProperties.AutomationId="settings-bg-custom" />
+                  <Button Classes="btn set" Content="{loc:Tr Settings_PickImage}" Command="{Binding PickBackgroundImageCommand}"
+                          AutomationProperties.AutomationId="settings-bg-pick" />
+                </StackPanel>
+              </Grid>
+            </Border>
+            <!-- 窗口毛玻璃效果；开启时下方显示背景不透明度 -->
+            <Border Classes="sr">
+              <StackPanel Spacing="8" VerticalAlignment="Center">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                  <StackPanel>
-                    <TextBlock Classes="name" Text="{loc:Tr Settings_EnableGlass}" />
-                    <TextBlock Classes="hint" Text="{loc:Tr Settings_EnableGlassHint}" />
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Classes="name" Text="{loc:Tr Settings_GlassTitle}" />
+                    <TextBlock Classes="hint" Text="{loc:Tr Settings_GlassHintShort}" />
                     <TextBlock Classes="hint" Text="{loc:Tr Settings_GlassRestartToShow}" IsVisible="{Binding GlassNeedsRestartToShow}"
                                Foreground="{DynamicResource WarningBrush}" />
                     <TextBlock Classes="hint" Text="{loc:Tr Settings_GlassRestartToSave}" IsVisible="{Binding GlassNeedsRestartToSave}" />
                   </StackPanel>
                   <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsGlassEnabled}" VerticalAlignment="Center"
-                                AutomationProperties.AutomationId="settings-glass" />
+                                AutomationProperties.Name="{loc:Tr Settings_GlassTitle}" AutomationProperties.AutomationId="settings-glass" />
                 </Grid>
                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" IsVisible="{Binding IsGlassEnabled}">
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_GlassOpacityShort}" VerticalAlignment="Center" Margin="0" />
+                  <TextBlock Classes="cp" Text="{loc:Tr Settings_GlassOpacityShort}" VerticalAlignment="Center" />
                   <Slider Grid.Column="1" Minimum="10" Maximum="95" Value="{Binding GlassOpacity}" TickFrequency="5" IsSnapToTickEnabled="True"
                           AutomationProperties.AutomationId="settings-glass-opacity" />
-                  <TextBlock Grid.Column="2" Classes="hint" Text="{Binding GlassOpacityText}" VerticalAlignment="Center" Margin="0" MinWidth="36" />
+                  <TextBlock Grid.Column="2" Classes="cp" Text="{Binding GlassOpacityText}" VerticalAlignment="Center" MinWidth="36" />
                 </Grid>
               </StackPanel>
             </Border>
-            <Border Classes="row">
+            <Border Classes="sr">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <TextBlock Classes="name" Text="{loc:Tr Settings_AppLanguage}" VerticalAlignment="Center" />
-                <ComboBox Grid.Column="1" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}"
+                <TextBlock Classes="name" Text="{loc:Tr Settings_AppLanguage}" />
+                <ComboBox Grid.Column="1" Classes="input" Width="150" ItemsSource="{Binding Languages}" SelectedItem="{Binding SelectedLanguage}"
+                          VerticalAlignment="Center" AutomationProperties.Name="{loc:Tr Settings_AppLanguage}"
                           AutomationProperties.AutomationId="settings-language">
                   <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
@@ -213,122 +283,83 @@
                 </ComboBox>
               </Grid>
             </Border>
-            <Border Classes="row">
-              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
-                  <TextBlock Classes="name" Text="{loc:Tr Settings_NotificationMode}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_NotificationModeHint}" />
-                </StackPanel>
-                <ComboBox Grid.Column="1" ItemsSource="{Binding NotificationModes}" SelectedItem="{Binding SelectedNotificationMode}"
-                          VerticalAlignment="Center" AutomationProperties.AutomationId="settings-notification-mode">
-                  <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
-                  </ComboBox.ItemTemplate>
-                </ComboBox>
-              </Grid>
-            </Border>
-            <Border Classes="row">
-              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
-                  <TextBlock Classes="name" Text="{loc:Tr Settings_ReducedMotion}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_ReducedMotionHint}" />
-                </StackPanel>
-                <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsReducedMotion}" VerticalAlignment="Center"
-                              AutomationProperties.AutomationId="settings-reduced-motion" />
-              </Grid>
-            </Border>
           </StackPanel>
         </Border>
 
         <!-- 运行日志 -->
-        <Border Classes="card" Padding="22,18">
+        <Border Classes="card set">
           <StackPanel>
-            <TextBlock Classes="section" Text="{loc:Tr Settings_DataAndLog}" />
-            <Border Classes="row first">
+            <TextBlock Classes="ti" Text="{loc:Tr Settings_LogShort}" />
+            <Border Classes="sr first">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
-                  <TextBlock Classes="name" Text="{loc:Tr Settings_DataDirectory}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_DataDirectoryPortable}" IsVisible="{Binding IsPortable}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_DataDirectorySystem}" IsVisible="{Binding !IsPortable}" />
-                  <SelectableTextBlock Classes="hint" Text="{Binding DataRoot}" TextWrapping="Wrap"
-                                       AutomationProperties.AutomationId="settings-data-root" />
-                </StackPanel>
-                <Button Grid.Column="1" Classes="pill" Content="{loc:Tr Settings_OpenDataFolder}" Command="{Binding OpenDataFolderCommand}"
-                        VerticalAlignment="Center" AutomationProperties.AutomationId="settings-open-data" />
-              </Grid>
-            </Border>
-            <Border Classes="row">
-              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
+                <StackPanel VerticalAlignment="Center">
                   <TextBlock Classes="name" Text="{loc:Tr Settings_EnableLog}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_EnableLogHint}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_EnableLogHintShort}" />
                 </StackPanel>
                 <ToggleSwitch Grid.Column="1" IsChecked="{Binding EnableFileLogging}" VerticalAlignment="Center"
-                              AutomationProperties.AutomationId="settings-file-logging" />
+                              AutomationProperties.Name="{loc:Tr Settings_EnableLog}" AutomationProperties.AutomationId="settings-file-logging" />
               </Grid>
             </Border>
-            <Border Classes="row">
+            <Border Classes="sr">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
-                  <TextBlock Classes="name" Text="{loc:Tr Settings_MinLogLevel}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_LogLevelHint}" />
-                </StackPanel>
-                <ComboBox Grid.Column="1" ItemsSource="{Binding LogLevels}" SelectedItem="{Binding SelectedLogLevel}"
-                          IsEnabled="{Binding EnableFileLogging}" VerticalAlignment="Center" AutomationProperties.AutomationId="settings-log-level">
+                <TextBlock Classes="name" Text="{loc:Tr Settings_MinLogLevel}" />
+                <ComboBox Grid.Column="1" Classes="input" MinWidth="130" ItemsSource="{Binding LogLevels}" SelectedItem="{Binding SelectedLogLevel}"
+                          IsEnabled="{Binding EnableFileLogging}" VerticalAlignment="Center"
+                          AutomationProperties.Name="{loc:Tr Settings_MinLogLevel}" AutomationProperties.AutomationId="settings-log-level">
                   <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
                   </ComboBox.ItemTemplate>
                 </ComboBox>
               </Grid>
-            </Border>
-            <Border Classes="row">
-              <Button Classes="pill" Content="{loc:Tr Settings_OpenLogFolder}" Command="{Binding OpenLogFolderCommand}"
-                      AutomationProperties.AutomationId="settings-open-logs" />
             </Border>
           </StackPanel>
         </Border>
       </StackPanel>
 
-      <!-- 右列 -->
+      <!-- ── 右栏 ── -->
       <StackPanel Grid.Column="1" Spacing="18">
         <!-- 网络与验证 -->
-        <Border Classes="card" Padding="22,18">
+        <Border Classes="card set">
           <StackPanel>
-            <TextBlock Classes="section" Text="{loc:Tr Settings_Network}" />
-            <Border Classes="row first">
+            <TextBlock Classes="ti" Text="{loc:Tr Settings_NetworkShort}" />
+            <Border Classes="sr first">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
+                <StackPanel VerticalAlignment="Center">
                   <TextBlock Classes="name" Text="{loc:Tr Settings_LogApiKeyword}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_LogApiHint}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_LogApiHintShort}" />
                 </StackPanel>
-                <TextBox Grid.Column="1" Width="180" Text="{Binding ApiKeyword}" VerticalAlignment="Center"
+                <TextBox Grid.Column="1" Classes="input" Width="190" Text="{Binding ApiKeyword}" VerticalAlignment="Center"
                          AutomationProperties.Name="{loc:Tr Settings_LogApiKeyword}" AutomationProperties.AutomationId="settings-api-keyword" />
               </Grid>
             </Border>
-            <Border Classes="row">
+            <Border Classes="sr">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
+                <StackPanel VerticalAlignment="Center">
                   <TextBlock Classes="name" Text="{loc:Tr Settings_GeetestPort}" />
-                  <TextBlock Classes="hint" Text="{loc:Tr Settings_GeetestPortHint}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_GeetestHintShort}" />
                 </StackPanel>
-                <NumericUpDown Grid.Column="1" Value="{Binding GeetestPort}" Minimum="1024" Maximum="65000" Increment="1" FormatString="0"
-                               VerticalAlignment="Center" AutomationProperties.Name="{loc:Tr Settings_GeetestPort}"
-                               AutomationProperties.AutomationId="settings-geetest-port" />
+                <NumericUpDown Grid.Column="1" Classes="input" Width="110" Padding="12,0" Value="{Binding GeetestPort}" Minimum="1024" Maximum="65000"
+                               Increment="1" FormatString="0" VerticalAlignment="Center"
+                               AutomationProperties.Name="{loc:Tr Settings_GeetestPort}" AutomationProperties.AutomationId="settings-geetest-port" />
               </Grid>
             </Border>
-            <Border Classes="row">
+            <Border Classes="sr">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel>
-                  <TextBlock Classes="name" Text="{loc:Tr Settings_RetryConfig}" />
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Classes="name" Text="{loc:Tr Settings_RetryTitle}" />
                   <TextBlock Classes="hint" Text="{loc:Tr Settings_RetryShort}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                  <NumericUpDown Width="110" Value="{Binding MaxRetries}" Minimum="0" Maximum="10" Increment="1" FormatString="0"
-                                 AutomationProperties.Name="{loc:Tr Settings_RetryCount}" AutomationProperties.AutomationId="settings-retries" />
-                  <TextBlock Classes="caption" Text="{loc:Tr Settings_RetryTimes}" VerticalAlignment="Center" />
-                  <NumericUpDown Width="130" Value="{Binding RetryDelay}" Minimum="0" Maximum="60000" Increment="100" FormatString="0"
-                                 AutomationProperties.Name="{loc:Tr Settings_RetryDelay}" AutomationProperties.AutomationId="settings-retry-delay" />
-                  <TextBlock Classes="caption" Text="ms" VerticalAlignment="Center" />
+                  <Panel Width="70">
+                    <NumericUpDown Classes="input" Value="{Binding MaxRetries}" Minimum="0" Maximum="10" Increment="1" FormatString="0"
+                                   AutomationProperties.Name="{loc:Tr Settings_RetryCount}" AutomationProperties.AutomationId="settings-retries" />
+                    <TextBlock Classes="suffix" Text="{loc:Tr Settings_RetryTimes}" />
+                  </Panel>
+                  <Panel Width="100">
+                    <NumericUpDown Classes="input" Value="{Binding RetryDelay}" Minimum="0" Maximum="60000" Increment="100" FormatString="0"
+                                   AutomationProperties.Name="{loc:Tr Settings_RetryDelay}" AutomationProperties.AutomationId="settings-retry-delay" />
+                    <TextBlock Classes="suffix" Text="ms" />
+                  </Panel>
                 </StackPanel>
               </Grid>
             </Border>
@@ -336,47 +367,54 @@
         </Border>
 
         <!-- 游戏资料与图片缓存 -->
-        <Border Classes="card" Padding="22,18">
+        <Border Classes="card set">
           <StackPanel>
-            <TextBlock Classes="section" Text="{loc:Tr Catalog_Title}" />
-            <TextBlock Classes="caption" Text="{loc:Tr Catalog_Hint}" TextWrapping="Wrap" Margin="0,0,0,6" />
+            <TextBlock Classes="ti" Text="{loc:Tr Catalog_Title}" />
             <ItemsControl ItemsSource="{Binding CatalogRows}">
+              <ItemsControl.Styles>
+                <Style Selector="ContentPresenter:nth-child(1) > Border.sr">
+                  <Setter Property="BorderThickness" Value="0" />
+                </Style>
+              </ItemsControl.Styles>
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:CatalogRow">
-                  <Border Classes="row" MinHeight="0" Padding="0,9">
-                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="14">
-                      <TextBlock Classes="name" Text="{Binding Name}" />
-                      <TextBlock Grid.Column="1" Classes="caption" Text="{Binding Version}" VerticalAlignment="Center" />
-                      <TextBlock Grid.Column="2" Classes="caption" Text="{Binding Status}" VerticalAlignment="Center" />
+                  <Border Classes="sr" MinHeight="42" Padding="0,8">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                      <TextBlock Classes="name" FontWeight="Medium" Text="{Binding Name}" />
+                      <TextBlock Grid.Column="1" Classes="cp" Text="{Binding Count}" VerticalAlignment="Center" />
                     </Grid>
                   </Border>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <Border Classes="row">
-              <WrapPanel>
-                <Button Classes="pill" Margin="0,0,8,6" Content="{loc:Tr Catalog_Sync}" Command="{Binding SyncCatalogCommand}"
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="10" Margin="0,12,0,0">
+              <Panel>
+                <Button Classes="btn primary" Content="{loc:Tr Catalog_Sync}" Command="{Binding SyncCatalogCommand}"
                         IsVisible="{Binding !IsCatalogSyncing}" AutomationProperties.AutomationId="settings-catalog-sync" />
-                <Button Classes="pill" Margin="0,0,8,6" Content="{loc:Tr Catalog_Cancel}" Command="{Binding CancelCatalogCommand}"
+                <Button Classes="btn" Content="{loc:Tr Catalog_Cancel}" Command="{Binding CancelCatalogCommand}"
                         IsVisible="{Binding IsCatalogSyncing}" AutomationProperties.AutomationId="settings-catalog-cancel" />
-                <Button Classes="pill" Margin="0,0,14,6" Content="{loc:Tr Catalog_Clear}" Command="{Binding ClearImageCacheCommand}"
-                        AutomationProperties.AutomationId="settings-catalog-clear" />
-                <TextBlock Classes="caption" Text="{Binding CatalogLastSuccess}" VerticalAlignment="Center" Margin="0,0,0,6" />
-              </WrapPanel>
-            </Border>
-            <TextBlock Classes="caption" Text="{Binding CatalogMessage}" TextWrapping="Wrap"
+              </Panel>
+              <Button Grid.Column="1" Classes="btn" Content="{loc:Tr Catalog_Clear}" Command="{Binding ClearImageCacheCommand}"
+                      AutomationProperties.AutomationId="settings-catalog-clear" />
+              <c:HoldButton Grid.Column="3" Text="{loc:Tr Settings_HoldClearGacha}" DoneText="{loc:Tr Settings_GachaCleared}"
+                            Command="{Binding ClearGachaCommand}" IsEnabled="{Binding Accounts.Current, Converter={x:Static ObjectConverters.IsNotNull}}"
+                            AutomationProperties.Name="{loc:Tr Settings_HoldClearGacha}" AutomationProperties.AutomationId="settings-hold-clear" />
+            </Grid>
+            <TextBlock Classes="cp" Margin="0,10,0,0" Text="{Binding CatalogLastSuccess}" AutomationProperties.AutomationId="settings-catalog-status" />
+            <TextBlock Classes="cp" Margin="0,4,0,0" Text="{Binding CatalogMessage}" TextWrapping="Wrap"
                        IsVisible="{Binding CatalogMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
           </StackPanel>
         </Border>
 
-        <!-- 关于 -->
-        <Border Classes="card" Padding="22,18" Margin="0,0,84,0">
-          <StackPanel Spacing="8">
-            <TextBlock Classes="section" Text="{loc:Tr About_Title}" />
-            <TextBlock Classes="caption" Text="{Binding AboutLine}" AutomationProperties.AutomationId="settings-about" />
-            <TextBlock Classes="caption" Text="{loc:Tr About_DisclaimerText}" TextWrapping="Wrap" />
-            <Button Classes="pill" HorizontalAlignment="Left" Margin="0,4,0,0" Content="{loc:Tr Settings_OpenRepository}"
-                    Command="{Binding OpenRepositoryCommand}" AutomationProperties.AutomationId="settings-open-repo" />
+        <!-- 关于 WwTool -->
+        <Border Classes="card set">
+          <StackPanel>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="ti" Margin="0" Text="{loc:Tr About_Title}" VerticalAlignment="Bottom" />
+              <TextBlock Grid.Column="1" Classes="cp" Text="{Binding AboutLine}" VerticalAlignment="Bottom" Margin="0,0,0,1"
+                         AutomationProperties.AutomationId="settings-about" />
+            </Grid>
+            <TextBlock Classes="cp" Margin="0,10,0,0" LineHeight="20.4" TextWrapping="Wrap" Text="{loc:Tr About_DisclaimerText}" />
           </StackPanel>
         </Border>
       </StackPanel>

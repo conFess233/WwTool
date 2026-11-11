@@ -93,7 +93,22 @@
     <!-- 背景：主题背景色（开启毛玻璃时半透明）+ 默认底纹 -->
     <Border Background="{DynamicResource BackgroundBrush}" Opacity="{Binding BackdropOpacity}" IsHitTestVisible="False" />
     <c:BackdropTexture GridColor="{DynamicResource GridLineColor}" GridOpacity="{DynamicResource GridLineOpacity}"
-                       GlowColor="{DynamicResource GlowColor}" GlowOpacity="{DynamicResource GlowOpacity}" />
+                       GlowColor="{DynamicResource GlowColor}" GlowOpacity="{DynamicResource GlowOpacity}"
+                       IsVisible="{Binding !HasCustomBackground}" />
+    <!-- 自定义背景图（设置「窗口背景」）：铺满并四周多留 14 供视差移动；上叠从左 70% 到右 5% 的背景色遮罩 -->
+    <Panel IsVisible="{Binding HasCustomBackground}" IsHitTestVisible="False" ClipToBounds="True">
+      <Image x:Name="BackdropImage" Source="{Binding CustomBackground}" Stretch="UniformToFill" Margin="-14">
+        <Image.RenderTransform><TranslateTransform /></Image.RenderTransform>
+      </Image>
+      <Border Background="{DynamicResource BackgroundBrush}">
+        <Border.OpacityMask>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+            <GradientStop Offset="0" Color="#B3000000" />
+            <GradientStop Offset="1" Color="#0D000000" />
+          </LinearGradientBrush>
+        </Border.OpacityMask>
+      </Border>
+    </Panel>
     <!-- 首页专属装饰：十字定位标记、右侧竖排小字、金色渐隐短线；切换页面时淡入淡出 -->
     <c:HomeBackdropDecor x:Name="HomeDecor" IsHitTestVisible="False" Opacity="0" Classes.show="{Binding IsHomePage}"
                          GoldColor="{DynamicResource GlowColor}">
@@ -203,5 +218,8 @@
         <Path Data="M1.5,1.5 L10.5,10.5 M10.5,1.5 L1.5,10.5" />
       </Button>
     </StackPanel>
+
+    <!-- 主题切换（动效「主题切换」）：旧主题截图盖在最上层，新主题从点击处圆形扩散露出 -->
+    <Image x:Name="ThemeSnapshot" IsVisible="False" IsHitTestVisible="False" Stretch="Fill" />
   </Panel>
 </Window>

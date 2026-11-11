@@ -16,6 +16,7 @@ using WwTool.Core.Localization;
 using WwTool.Core.Services;
 using WwTool.UI.Feedback;
 using WwTool.UI.Navigation;
+using WwTool.UI.Pages.Pulls;
 using WwTool.UI.Services;
 using WwTool.UI.Shell;
 
@@ -33,8 +34,8 @@ public sealed partial class ThemeSwatch(LocalizedOption option, IBrush backgroun
     [ObservableProperty] private bool _isSelected;
 }
 
-/// <summary>“游戏资料与图片缓存”里的一类资料。</summary>
-public sealed record CatalogRow(string Name, string Version, string Status);
+/// <summary>“游戏资料与图片缓存”里的一类资料：名称与条数。</summary>
+public sealed record CatalogRow(string Name, string Count);
 
 /// <summary>
 /// 设置页：常规游戏设置、界面、运行日志、网络与验证、游戏资料与图片缓存、关于。
@@ -53,6 +54,8 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
     private readonly ICatalogImageCache _images;
     private readonly IAppLauncher _launcher;
     private readonly IAppPaths _paths;
+    private readonly IUserDataService _userData;
+    private readonly PullsSession _pullsSession;
     private readonly DispatcherTimer _saveDebounce;
     private CancellationTokenSource? _catalogCts;
     private bool _clearingCache;
@@ -66,8 +69,12 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         CatalogSyncService catalogSync,
         ICatalogImageCache images,
         IAppLauncher launcher,
-        IAppPaths paths)
+        IAppPaths paths,
+        IUserDataService userData,
+        PullsSession pullsSession)
     {
+        _userData = userData;
+        _pullsSession = pullsSession;
         _config = config;
         _uiState = uiState;
         _logger = logger;
@@ -88,7 +95,9 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
             return new ThemeSwatch(new LocalizedOption(p, "Theme_" + p, localization),
                 Brush(file, "BackgroundColor"), Brush(file, "SurfaceColor"), Brush(file, "AccentColor"));
         }).ToArray();
-        Accents = ThemeService.Accents.Select(a =>
+        // 定稿色点顺序：蓝、绿、紫、红、橙、黄；「跟随主题」单独为胶囊。
+        string[] accentOrder = [ThemeService.FollowTheme, "Blue", "Green", "Purple", "Red", "Orange", "Yellow"];
+        Accents = accentOrder.Where(ThemeService.Accents.Contains).Select(a =>
         {
             var option = new LocalizedOption(ThemeService.AccentToConfig(a), a == ThemeService.FollowTheme ? "Theme_Follow" : "Theme_" + a, localization);
             IBrush accent = a == ThemeService.FollowTheme ? Brushes.Transparent : Brush($"Accents/{a}.axaml", "AccentColor");
@@ -144,6 +153,12 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
 
     /// <summary>强调色色板，值为配置格式（<c>BlueAccent</c>），与 1.2.x 的配置文件兼容。</summary>
     public IReadOnlyList<ThemeSwatch> Accents { get; }
+
+    /// <summary>「跟随主题」胶囊。</summary>
+    public ThemeSwatch FollowAccent => Accents[0];
+
+    /// <summary>六个强调色点。</summary>
+    public IEnumerable<ThemeSwatch> AccentColors => Accents.Skip(1);
 
     public IReadOnlyList<LocalizedOption> Languages { get; }
     public IReadOnlyList<LocalizedOption> NotificationModes { get; }
@@ -203,6 +218,37 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
     {
         SelectSwatch(Accents, (string)swatch.Option.Value);
         _config.User.AccentTheme = (string)swatch.Option.Value;
+    }
+
+    // 窗口背景：默认底纹 / 自定义图片。
+
+    public bool UseCustomBackground => _config.User.UseCustomBackground;
+
+    [RelayCommand]
+    private void SetBackgroundMode(string mode)
+    {
+        bool custom = mode == "custom";
+        if (_config.User.UseCustomBackground == custom) return;
+        _config.User.UseCustomBackground = custom;
+        OnPropertyChanged(nameof(UseCustomBackground));
+        PickBackgroundImageCommand.NotifyCanExecuteChanged();
+        if (custom && string.IsNullOrWhiteSpace(_config.User.CustomBackgroundPath)) _ = PickBackgroundImageAsync();
+    }
+
+    [RelayCommand(CanExecute = nameof(UseCustomBackground))]
+    private async Task PickBackgroundImageAsync()
+    {
+        IStorageProvider? storage = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow?.StorageProvider;
+        if (storage is null) return;
+        IReadOnlyList<IStorageFile> picked = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = _localization["SelectFile_BackgroundTitle"],
+            AllowMultiple = false,
+            FileTypeFilter = [FilePickerFileTypes.ImageAll],
+        });
+        string? file = picked.FirstOrDefault()?.TryGetLocalPath();
+        if (file is null) return;
+        _config.User.CustomBackgroundPath = file;
     }
 
     public bool IsGlassEnabled
@@ -376,6 +422,32 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         }
     }
 
+    /// <summary>「按住清空抽卡数据」按满 1.5 秒后执行：删除当前账号的全部本地抽卡记录（账号与凭据保留）。</summary>
+    [RelayCommand]
+    private async Task ClearGachaAsync()
+    {
+        string? uid = Accounts.Current?.Uid;
+        if (string.IsNullOrWhiteSpace(uid)) return;
+        try
+        {
+            int removed = await _userData.ClearGachaAsync(uid);
+            _uiState.ShowToast(new NotificationRequest
+            {
+                Title = _localization["Toast_Success"],
+                Message = string.Format(_localization["Settings_GachaClearedToast"], removed),
+                Type = NotificationType.Success,
+                Priority = NotificationPriority.Important,
+                Source = "Settings",
+            });
+            await _pullsSession.ReloadAsync();
+        }
+        catch (Exception ex) when (ex is WwToolException or IOException)
+        {
+            _logger.Error("清空抽卡数据失败", ex);
+            _uiState.ShowToast(_localization["Toast_Error"], _localization["Settings_GachaClearFailed"], NotificationType.Error);
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(IsCatalogSyncing))]
     private void CancelCatalog() => _catalogCts?.Cancel();
 
@@ -407,16 +479,32 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
     {
         CatalogRows.Clear();
         DateTimeOffset? last = null;
+        Core.Models.Domain.CatalogVersion? version = null;
         foreach (var status in _catalogSync.Statuses)
         {
             CatalogRows.Add(new CatalogRow(
                 _localization["Catalog_" + status.Category],
-                string.Format(_localization["Catalog_VersionCount"], status.Version, status.Count),
-                _localization[_catalogSync.IsBusy ? "Catalog_Syncing" : status.StatusKey]));
+                string.Format(_localization["Catalog_Count"], status.Count)));
             if (status.LastSuccessUtc is { } at && (last is null || at > last)) last = at;
+            if (version is null || status.Version.CompareTo(version.Value) > 0) version = status.Version;
         }
-        CatalogLastSuccess = string.Format(_localization["Catalog_LastSuccess"],
-            last?.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? _localization["Catalog_NotSynced"]);
+        // 状态行：「资料版本 3.7.0，今天 09:12 同步」。
+        if (_catalogSync.IsBusy || IsCatalogSyncing)
+        {
+            CatalogLastSuccess = _localization["Catalog_Syncing"];
+        }
+        else if (last is { } when)
+        {
+            DateTime local = when.ToLocalTime().DateTime;
+            string time = local.Date == DateTime.Today
+                ? string.Format(_localization["Catalog_Today"], local.ToString("HH:mm", CultureInfo.InvariantCulture))
+                : local.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+            CatalogLastSuccess = string.Format(_localization["Catalog_StatusLine"], version?.ToString() ?? "-", time);
+        }
+        else
+        {
+            CatalogLastSuccess = _localization["Catalog_StatusNever"];
+        }
         UpdateCatalogCommands();
     }
 
@@ -430,7 +518,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
 
     // ── 关于 ──────────────────────────────────────────────────
 
-    public string AboutLine => string.Format(_localization["Settings_AboutLine"], Version, _config.App.AppAuther, "github.com/conFess233/WwTool");
+    public string AboutLine => string.Format(_localization["Settings_AboutVersion"], Version.TrimStart('v'), _config.App.AppAuther);
 
     public static string Version { get; } =
         typeof(SettingsViewModel).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? "v2.0.0";

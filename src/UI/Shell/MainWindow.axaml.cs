@@ -5,6 +5,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Rendering.Composition;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using WwTool.UI.Theming;
@@ -41,6 +43,107 @@ public partial class MainWindow : Window
         }
         Classes.Set("reduced", Motion.Reduced);
         Motion.ReducedChanged += (_, _) => Classes.Set("reduced", Motion.Reduced);
+        AddHandler(PointerMovedEvent, OnParallaxPointerMoved, Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
+    }
+
+    // ── 主题切换：旧主题截图 + 圆形扩散 ─────────────────────────
+
+    private Bitmap? _themeSnapshot;
+    private int _revealToken;
+
+    /// <summary>
+    /// 动效「主题切换」：在应用新主题之前调用并等待完成。用合成器截下当前真实画面盖在最上层，
+    /// 调用方随后切换主题；截图从 <paramref name="origin"/>（窗口坐标）挖出一个 700ms 内扩大到覆盖全窗口的圆，
+    /// 露出下面已换成新主题的界面。截图层不接收指针，期间可照常操作。
+    /// </summary>
+    public async Task BeginThemeRevealAsync(Point origin)
+    {
+        if (Motion.Reduced || Content is not Visual root || Bounds.Width < 1 || Bounds.Height < 1) return;
+        if (ElementComposition.GetElementVisual(root) is not { } visual) return;
+        Bitmap snapshot;
+        try
+        {
+            ThemeSnapshot.IsVisible = false;
+            snapshot = await visual.Compositor.CreateCompositionVisualSnapshot(visual, RenderScaling);
+        }
+        catch (Exception)
+        {
+            return;
+        }
+#if DEBUG
+        if (Environment.GetEnvironmentVariable("WWTOOL_DUMP_SNAPSHOT") is { Length: > 0 } dump) snapshot.Save(dump);
+#endif
+        _themeSnapshot?.Dispose();
+        _themeSnapshot = snapshot;
+        ThemeSnapshot.Source = snapshot;
+        ThemeSnapshot.Clip = new RectangleGeometry(new Rect(Bounds.Size));
+        ThemeSnapshot.IsVisible = true;
+        _ = RunRevealAsync(origin, ++_revealToken);
+    }
+
+    private async Task RunRevealAsync(Point origin, int token)
+    {
+        var size = Bounds.Size;
+        double max = new[] { new Point(0, 0), new Point(size.Width, 0), new Point(0, size.Height), new Point(size.Width, size.Height) }
+            .Max(c => Math.Sqrt(Math.Pow(c.X - origin.X, 2) + Math.Pow(c.Y - origin.Y, 2)));
+        var full = new RectangleGeometry(new Rect(size));
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        double duration = 700;
+#if DEBUG
+        // 本地验证：WWTOOL_SLOW_MOTION=N 时动效放慢 N 倍，便于截取中间帧。
+        if (double.TryParse(Environment.GetEnvironmentVariable("WWTOOL_SLOW_MOTION"), out double slow) && slow > 1) duration *= slow;
+#endif
+        while (token == _revealToken)
+        {
+            double t = Math.Min(1, clock.Elapsed.TotalMilliseconds / duration);
+            double r = max * Motion.StandardEasing.Ease(t);
+            ThemeSnapshot.Clip = new CombinedGeometry(GeometryCombineMode.Exclude, full,
+                new EllipseGeometry(new Rect(origin.X - r, origin.Y - r, r * 2, r * 2)));
+            if (t >= 1) break;
+            await Task.Delay(16);
+        }
+        if (token != _revealToken) return;
+        ThemeSnapshot.IsVisible = false;
+        ThemeSnapshot.Source = null;
+        ThemeSnapshot.Clip = null;
+        _themeSnapshot?.Dispose();
+        _themeSnapshot = null;
+    }
+
+    // ── 背景视差：自定义背景图随指针反向移动，最多 14 ─────────────
+
+    private Vector _parallaxTarget;
+    private Vector _parallaxCurrent;
+    private bool _parallaxTicking;
+
+    private void OnParallaxPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (Motion.Reduced || DataContext is not ShellViewModel { HasCustomBackground: true }) return;
+        Point p = e.GetPosition(this);
+        double nx = Bounds.Width > 0 ? p.X / Bounds.Width * 2 - 1 : 0;
+        double ny = Bounds.Height > 0 ? p.Y / Bounds.Height * 2 - 1 : 0;
+        _parallaxTarget = new Vector(-Math.Clamp(nx, -1, 1) * 14, -Math.Clamp(ny, -1, 1) * 14);
+        if (_parallaxTicking) return;
+        _parallaxTicking = true;
+        RequestAnimationFrame(ParallaxTick);
+    }
+
+    private void ParallaxTick(TimeSpan _)
+    {
+        _parallaxCurrent += (_parallaxTarget - _parallaxCurrent) * 0.12;
+        if (BackdropImage.RenderTransform is TranslateTransform translate)
+        {
+            translate.X = _parallaxCurrent.X;
+            translate.Y = _parallaxCurrent.Y;
+        }
+        if ((_parallaxTarget - _parallaxCurrent).Length > 0.05)
+        {
+            RequestAnimationFrame(ParallaxTick);
+        }
+        else
+        {
+            _parallaxTicking = false;
+        }
     }
 
     public MainWindow(ShellViewModel viewModel) : this()

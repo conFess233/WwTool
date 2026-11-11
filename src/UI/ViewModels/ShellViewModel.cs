@@ -45,7 +45,12 @@ public sealed partial class ShellViewModel : ObservableObject
                 OnPropertyChanged(nameof(IsGlassEnabled));
                 OnPropertyChanged(nameof(BackdropOpacity));
             }
+            if (e.PropertyName is nameof(UserConfig.UseCustomBackground) or nameof(UserConfig.CustomBackgroundPath))
+            {
+                Avalonia.Threading.Dispatcher.UIThread.Post(LoadCustomBackground);
+            }
         };
+        LoadCustomBackground();
         Accounts = accounts;
         _navigation = navigation;
         _localization = localization;
@@ -66,6 +71,45 @@ public sealed partial class ShellViewModel : ObservableObject
 
         navigation.Navigated += OnNavigated;
         localization.PropertyChanged += OnLocalizationChanged;
+    }
+
+    /// <summary>窗口背景自定义图片（设置「窗口背景」选自定义且图片可读时）；为空时用默认底纹。</summary>
+    public Avalonia.Media.Imaging.Bitmap? CustomBackground
+    {
+        get => _customBackground;
+        private set
+        {
+            if (ReferenceEquals(_customBackground, value)) return;
+            Avalonia.Media.Imaging.Bitmap? old = _customBackground;
+            _customBackground = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HasCustomBackground));
+            old?.Dispose();
+        }
+    }
+
+    private Avalonia.Media.Imaging.Bitmap? _customBackground;
+
+    public bool HasCustomBackground => _customBackground is not null;
+
+    private void LoadCustomBackground()
+    {
+        string? path = _config.User.CustomBackgroundPath;
+        if (!_config.User.UseCustomBackground || string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            CustomBackground = null;
+            return;
+        }
+        try
+        {
+            // 按 2560 宽解码，大图不至于占满内存。
+            using FileStream stream = File.OpenRead(path);
+            CustomBackground = Avalonia.Media.Imaging.Bitmap.DecodeToWidth(stream, 2560);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or NotSupportedException)
+        {
+            CustomBackground = null;
+        }
     }
 
     /// <summary>当前账号（页头账号胶囊）。</summary>
