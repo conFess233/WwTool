@@ -38,6 +38,7 @@
 | ---------------------- | ---------------------------- | ---------------------------------- |
 | launcherKey（国服）    | 国服启动器 Key               | 32 位字母数字                      |
 | launcherKey（国际服）  | 国际服启动器 Key             | 32 位字母数字                      |
+| backgroundId（国服）   | 国服背景配置 ID              | 32 位十六进制；与国际服不同；来源未确认，可能随版本更换 |
 | backgroundId（国际服） | 国际服背景配置 ID            | 32 位十六进制；来源未确认，可能随版本更换 |
 
 ---
@@ -183,7 +184,7 @@ Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
 
 | 区服   | 示例                                                                                                                            |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| 国服   | 未抓包确认                                                                                                                      |
+| 国服   | `https://prod-cn-alicdn-gamestarter.kurogame.com/launcher/game/10003_<launcherKey>/G152/official/background/<backgroundId>/zh-Hans.json` |
 | 国际服 | `https://prod-alicdn-gamestarter.kurogame.com/launcher/game/50004_<launcherKey>/G153/official/background/<backgroundId>/zh-Hans.json` |
 
 > 注意资讯接口路径是 `/launcher/app/`，背景接口是 `/launcher/game/`，且多一级 `backgroundId`。
@@ -210,9 +211,38 @@ Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
 
 响应直接是业务数据，**没有** `code` / `message` 外层。资源路径中的日期段（如 `20260930`）为资源上传日期，随版本更新变化。
 
+资源所在 CDN 因区服而异：
+
+| 区服   | 资源地址前缀                                                                      | 备注                                                                 |
+| ------ | --------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| 国服   | `https://pcdownload-huoshan.aki-game.com/launcher/game/10004/G152/bilibili/assets/background/` | 请求用 `10003` / `official`，资源路径却是 `10004` / `bilibili`，样本如此，原因未确认；直接使用返回的完整地址即可 |
+| 国际服 | `https://hw-pcdownload-qcloud.aki-game.net/launcher/game/50004/G153/official/assets/background/` |                                                                      |
+
 ### 示例
 
-#### 请求
+#### 请求（国服）
+
+```http
+GET /launcher/game/10003_<launcherKey>/G152/official/background/<backgroundId>/zh-Hans.json?_t=1794382011 HTTP/2
+Host: prod-cn-alicdn-gamestarter.kurogame.com
+Accept: application/json, text/plain, */*
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
+```
+
+#### 响应（国服）
+
+```json
+{
+  "functionSwitch": 1,
+  "backgroundFile": "https://pcdownload-huoshan.aki-game.com/launcher/game/10004/G152/bilibili/assets/background/20260930/dc839ed8df284b1fb37d03ee34f188e3.mp4",
+  "backgroundFileType": 2,
+  "firstFrameImage": "https://pcdownload-huoshan.aki-game.com/launcher/game/10004/G152/bilibili/assets/background/20260930/875d3f84219443c88065b34fe2a35a60.webp",
+  "slogan": "https://pcdownload-huoshan.aki-game.com/launcher/game/10004/G152/bilibili/assets/background/20260930/6d10bef9a08b485cac5dc946ee1145b9.png"
+}
+```
+
+#### 请求（国际服）
 
 ```http
 GET /launcher/game/50004_<launcherKey>/G153/official/background/<backgroundId>/zh-Hans.json?_t=1794381002 HTTP/2
@@ -222,7 +252,7 @@ Accept-Encoding: gzip, deflate, br, zstd
 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
 ```
 
-#### 响应
+#### 响应（国际服）
 
 ```json
 {
