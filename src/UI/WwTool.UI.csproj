@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Avalonia 桌面程序。输出程序集名仍为 WwTool，Windows 上产物仍是 WwTool.exe。 -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>WwTool.UI</RootNamespace>
+    <AssemblyName>WwTool</AssemblyName>
+    <ApplicationIcon>Assets\WwTool.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <!-- 动态背景把解码帧逐行复制进位图。 -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Vortice.Direct3D11" />
+    <PackageReference Include="Vortice.MediaFoundation" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\WwTool.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 便携模式标记：数据写在程序目录，见 AppPaths。只随 Windows 包发布（及不指定平台的本地构建）；
+         Linux/macOS 包不带，数据写到系统用户数据目录（macOS 的 .app 内不可写）。 -->
+    <None Include="portable" CopyToOutputDirectory="PreserveNewest"
+          Condition="'$(RuntimeIdentifier)' == '' or $(RuntimeIdentifier.StartsWith('win'))" />
+  </ItemGroup>
+
+  <!-- SkiaSharp/HarfBuzz 原生包自带约 100 MB 的 .pdb，发布时不需要。 -->
+  <Target Name="ExcludeNativeSymbolsFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(Extension)' == '.pdb' and $([System.String]::Copy('%(Filename)').StartsWith('lib'))" />
+    </ItemGroup>
+  </Target>
+
+</Project>

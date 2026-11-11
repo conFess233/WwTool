@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fb="using:WwTool.UI.Feedback"
+             x:Class="WwTool.UI.Feedback.DialogOverlay"
+             x:DataType="fb:DialogService"
+             IsVisible="{Binding IsOpen}">
+  <!-- 窗口内对话框（定稿「对话框」）：背景遮罩淡入，对话框 420ms 淡入并上移 8；Tab 焦点在卡片内循环。
+       外观：Surface 底、圆角 16、内边距 28 / 30、对话框阴影；按钮用全局 btn 样式，右对齐、间距 10、次要在左主要在右。 -->
+  <UserControl.Styles>
+    <Style Selector="Border#Scrim">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.42" Easing="0.2,0.8,0.2,1" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border#Scrim.shown">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="Border#Card">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translateY(8px)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.42" Easing="0.2,0.8,0.2,1" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.42" Easing="0.2,0.8,0.2,1" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Window.reduced Border#Card">
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+    <Style Selector="Border#Card.shown">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+    <!-- 对话框通用排版 -->
+    <Style Selector="TextBlock.dialog-title">
+      <Setter Property="FontSize" Value="19" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="TextBlock.dialog-body">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="LineHeight" Value="22" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+    <Style Selector="StackPanel.dialog-actions">
+      <Setter Property="Orientation" Value="Horizontal" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="Spacing" Value="10" />
+      <Setter Property="Margin" Value="0,18,0,0" />
+    </Style>
+    <Style Selector="StackPanel.dialog-actions > Button">
+      <Setter Property="MinWidth" Value="72" />
+    </Style>
+  </UserControl.Styles>
+
+  <Grid>
+    <Border x:Name="Scrim" Background="{DynamicResource ScrimBrush}" PointerPressed="OnScrimPressed" />
+    <Border x:Name="Card" MaxWidth="640" MinWidth="420" Margin="24" Padding="30,28"
+            HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="16"
+            Background="{DynamicResource SurfaceBrush}" BoxShadow="{DynamicResource ShadowDialog}"
+            KeyboardNavigation.TabNavigation="Cycle"
+            AutomationProperties.AutomationId="dialog-card">
+      <ContentControl Content="{Binding Current}" />
+    </Border>
+  </Grid>
+</UserControl>

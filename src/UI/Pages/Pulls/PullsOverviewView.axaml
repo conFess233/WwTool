@@ -1,0 +1,644 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:vm="using:WwTool.UI.ViewModels"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Pulls.PullsOverviewView"
+             x:DataType="pulls:PullsOverviewViewModel">
+  <!--
+    抽卡统计（定稿 FinalPulls / FinalPullsAll）：顶部筛选栏（五个视图共用，滚动时吸顶、下方阴影渐显）、五张指标卡；
+    「总览」为长页面：各卡池最近五星 + 未出金进度、每日活跃 / 五星分布 / 两个环形图；
+    单卡池视图为「抽卡记录」卡，列表内部滚动。底部留 96 给悬浮按钮。
+  -->
+  <UserControl.Styles>
+    <StyleInclude Source="avares://WwTool/Pages/Pulls/PullsStyles.axaml" />
+
+    <!-- 拖拽导入：拖入时暖色底 + 金色流动虚线；导入完成转绿、画出对勾 -->
+    <Style Selector="Panel.drop c|MarchingAnts">
+      <Setter Property="Fill" Value="{DynamicResource HighlightStrongBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Panel.drop.done c|MarchingAnts">
+      <Setter Property="Fill" Value="{DynamicResource SuccessContainerBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style Selector="c|CheckMark.drop-check, c|CheckMark.refresh-check">
+      <Setter Property="Progress" Value="0" />
+      <Setter Property="Transitions">
+        <Transitions><DoubleTransition Property="Progress" Duration="0:0:0.48" Easing="0.2,0.8,0.2,1" /></Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Panel.drop.done c|CheckMark.drop-check">
+      <Setter Property="Progress" Value="1" />
+    </Style>
+
+    <!-- 刷新完成胶囊：浮入 / 淡出；完成时加载形象缩小淡出、对勾画出、底色转绿、文字换成结果 -->
+    <Style Selector="Border.refresh">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Padding" Value="6,6,18,6" />
+      <Setter Property="BoxShadow" Value="{DynamicResource ShadowFab}" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translateY(10px)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.3" Easing="0.2,0.8,0.2,1" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="0.2,0.8,0.2,1" />
+          <BrushTransition Property="Background" Duration="0:0:0.3" />
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.3" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.refresh.shown">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+    <Style Selector="Border.refresh.done">
+      <Setter Property="Background" Value="{DynamicResource SuccessContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource SuccessLineBrush}" />
+    </Style>
+    <Style Selector="Border.refresh-dot">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    </Style>
+    <Style Selector="Border.refresh.done Border.refresh-dot">
+      <Setter Property="BorderBrush" Value="{DynamicResource SuccessLineBrush}" />
+    </Style>
+    <Style Selector="c|PixelGif.refresh-gif">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="scale(1)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.24" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.24" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.refresh.done c|PixelGif.refresh-gif">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="scale(0.8)" />
+    </Style>
+    <Style Selector="Border.refresh.done c|CheckMark.refresh-check">
+      <Setter Property="Progress" Value="1" />
+    </Style>
+    <Style Selector="TextBlock.refresh-done">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="Border.refresh.done TextBlock.refresh-done">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="Border.refresh.done TextBlock.refresh-busy">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+  </UserControl.Styles>
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://WwTool/Pages/Pulls/PullsResources.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+    <!-- 五张指标卡 -->
+    <DataTemplate x:Key="Metrics" x:DataType="pulls:PullsOverviewViewModel">
+      <UniformGrid Columns="5" ColumnSpacing="18">
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-total">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Stat_TotalTides}" />
+            <c:RollingText Classes="metric-value" Text="{Binding TotalPulls}" VerticalAlignment="Bottom" />
+          </DockPanel>
+        </Border>
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-five">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Pulls_FiveStars}" />
+            <TextBlock DockPanel.Dock="Bottom" Classes="caption" Text="{Binding FiveStarsCaption}" />
+            <c:RollingText Classes="metric-value" Text="{Binding FiveStars}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+          </DockPanel>
+        </Border>
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-average">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Pulls_AvgPerFiveStar}" />
+            <TextBlock DockPanel.Dock="Bottom" Classes="caption" Text="{Binding AveragePerLimitedCaption}" />
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,0,0,2">
+              <c:RollingText Classes="metric-value" Text="{Binding AveragePerFiveStar}" />
+              <TextBlock Classes="unit" FontSize="16" Margin="6,0,0,3" VerticalAlignment="Bottom" Text="{loc:Tr Pulls_PullUnit}" />
+            </StackPanel>
+          </DockPanel>
+        </Border>
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-winrate">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Pulls_WinRate}" />
+            <TextBlock DockPanel.Dock="Bottom" Classes="caption" Text="{Binding WinRateCaption}" />
+            <c:RollingText Classes="metric-value" Text="{Binding WinRate}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+          </DockPanel>
+        </Border>
+        <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-astrites">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top" Classes="label" Text="{loc:Tr Pulls_Astrites}" />
+            <c:RollingText Classes="metric-value" Text="{Binding Astrites}" VerticalAlignment="Bottom" />
+          </DockPanel>
+        </Border>
+      </UniformGrid>
+    </DataTemplate>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- ── 筛选栏 ── -->
+    <Grid x:Name="FilterBar" Height="40" ColumnDefinitions="*,Auto" ColumnSpacing="12" ZIndex="2">
+      <!-- 左侧标签放不下时裁切，不压到右侧筛选项 -->
+      <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" ClipToBounds="True">
+        <ItemsControl ItemsSource="{Binding Tabs}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="pulls:PoolTab">
+              <ToggleButton Classes="chip" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                            Command="{Binding $parent[UserControl].((pulls:PullsOverviewViewModel)DataContext).SelectTabCommand}"
+                            CommandParameter="{Binding}"
+                            AutomationProperties.AutomationId="{Binding AutomationId}"
+                            AutomationProperties.Name="{Binding Title}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                  <TextBlock Classes="count" Text="{Binding Count}" VerticalAlignment="Center" />
+                </StackPanel>
+              </ToggleButton>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <!-- 其他卡池：子选择 -->
+        <ItemsControl ItemsSource="{Binding OtherPools}" IsVisible="{Binding IsOtherSelected}" VerticalAlignment="Center">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="pulls:PoolTab">
+              <ToggleButton Classes="chip small" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                            Command="{Binding $parent[UserControl].((pulls:PullsOverviewViewModel)DataContext).SelectOtherPoolCommand}"
+                            CommandParameter="{Binding}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                  <TextBlock Classes="count" Text="{Binding Count}" VerticalAlignment="Center" />
+                </StackPanel>
+              </ToggleButton>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <!-- 选「其他卡池」时子卡池标签占位，隐藏存储条数 -->
+        <TextBlock Classes="caption" Text="{Binding StoredSummary}" VerticalAlignment="Center" Margin="0,0,8,0" IsVisible="{Binding !IsOtherSelected}" />
+        <ComboBox Classes="filter" Tag="{loc:Tr Stat_Filter_DateRange}"
+                  ItemsSource="{Binding Records.TimeRanges}" SelectedItem="{Binding Records.SelectedTimeRange}"
+                  AutomationProperties.Name="{loc:Tr Stat_Filter_DateRange}" AutomationProperties.AutomationId="pulls-time-range">
+          <ComboBox.SelectionBoxItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock FontWeight="Normal" Foreground="{DynamicResource TextMutedBrush}" Text="{Binding $parent[ComboBox].Tag}" />
+                <TextBlock Text="{Binding Title}" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.SelectionBoxItemTemplate>
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <ComboBox Classes="filter" Tag="{loc:Tr Pulls_FilterFiveStar}"
+                  ItemsSource="{Binding Records.FiveStarFilters}" SelectedItem="{Binding Records.SelectedFiveStarFilter}"
+                  AutomationProperties.Name="{loc:Tr Pulls_FilterFiveStar}" AutomationProperties.AutomationId="pulls-five-star-filter">
+          <ComboBox.SelectionBoxItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock FontWeight="Normal" Foreground="{DynamicResource TextMutedBrush}" Text="{Binding $parent[ComboBox].Tag}" />
+                <TextBlock Text="{Binding Title}" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.SelectionBoxItemTemplate>
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <!-- 视图切换（定稿 FinalPullsGrid）：列表 / 精简，仅单卡池视图显示 -->
+        <Border Classes="vt" IsVisible="{Binding IsPoolView}">
+          <StackPanel Orientation="Horizontal" Spacing="2">
+            <ToggleButton Classes="vt" IsChecked="{Binding IsListView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="list"
+                          AutomationProperties.AutomationId="pulls-view-list">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.ViewList}" />
+                <TextBlock Text="{loc:Tr Pulls_ViewList}" VerticalAlignment="Center" />
+              </StackPanel>
+            </ToggleButton>
+            <ToggleButton Classes="vt" IsChecked="{Binding IsCompactView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="compact"
+                          AutomationProperties.AutomationId="pulls-view-compact">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.ViewGrid}" />
+                <TextBlock Text="{loc:Tr Pulls_ViewCompact}" VerticalAlignment="Center" />
+              </StackPanel>
+            </ToggleButton>
+          </StackPanel>
+        </Border>
+        <Button Classes="btn" Command="{Binding OpenChartsCommand}" AutomationProperties.AutomationId="pulls-open-charts">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.Chart}" />
+            <TextBlock Text="{loc:Tr Pulls_DetailedCharts}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </Grid>
+    <!-- 吸顶阴影：随滚动渐显 -->
+    <Border x:Name="BarShadow" Grid.Row="1" Height="14" VerticalAlignment="Top" Margin="-40,0" Opacity="0" ZIndex="2" IsHitTestVisible="False">
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Color="#33281C0A" Offset="0" />
+          <GradientStop Color="#00281C0A" Offset="1" />
+        </LinearGradientBrush>
+      </Border.Background>
+    </Border>
+
+    <Panel Grid.Row="1">
+      <!-- 状态：未选账号 / 无记录 / 加载失败 -->
+      <StackPanel Margin="0,18,0,0" Spacing="18">
+        <Border Classes="card" MinHeight="360" IsVisible="{Binding ShowNoAccount}" AutomationProperties.AutomationId="pulls-no-account">
+          <c:EmptyState Title="{loc:Tr Pulls_NoAccountTitle}" Description="{loc:Tr Pulls_NoAccountHint}" Icon="{StaticResource Icon.User}">
+            <StackPanel Classes="empty-actions">
+              <Button Classes="btn primary" Content="{loc:Tr Pulls_PasteLink}" Command="{Binding ImportUrlCommand}" />
+            </StackPanel>
+          </c:EmptyState>
+        </Border>
+        <!-- 空状态：找不到游戏目录 / 还没有记录 -->
+        <Border Classes="card" MinHeight="360" IsVisible="{Binding ShowNoGamePath}" AutomationProperties.AutomationId="pulls-no-game-path">
+          <c:EmptyState Title="{loc:Tr Pulls_NoGamePathTitle}" Description="{loc:Tr Pulls_NoGamePathHint}" Icon="{StaticResource Icon.FolderOff}">
+            <StackPanel Classes="empty-actions">
+              <Button Classes="btn primary" Content="{loc:Tr Pulls_PickGamePath}" Command="{Binding PickGamePathCommand}"
+                      AutomationProperties.AutomationId="pulls-pick-game-path" />
+              <Button Classes="btn" Content="{loc:Tr Pulls_PasteLink}" Command="{Binding ImportUrlCommand}"
+                      AutomationProperties.AutomationId="pulls-paste-link" />
+            </StackPanel>
+          </c:EmptyState>
+        </Border>
+        <Border Classes="card" MinHeight="360" IsVisible="{Binding ShowNoRecords}" AutomationProperties.AutomationId="pulls-empty">
+          <c:EmptyState Title="{loc:Tr Pulls_EmptyTitle}" Description="{loc:Tr Pulls_EmptyHint}" Icon="{StaticResource Icon.Document}">
+            <StackPanel Classes="empty-actions">
+              <Button Classes="btn primary" Content="{loc:Tr Fab_GetRecords}" Command="{Binding SyncCommand}"
+                      AutomationProperties.AutomationId="pulls-empty-sync" />
+              <Button Classes="btn" Content="{loc:Tr Pulls_PasteLink}" Command="{Binding ImportUrlCommand}" />
+            </StackPanel>
+          </c:EmptyState>
+        </Border>
+        <Border Classes="card" Padding="28,24" IsVisible="{Binding Session.LoadError, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="section-title" Text="{loc:Tr Pulls_LoadFailed}" />
+              <TextBlock Classes="caption" Text="{Binding Session.LoadError}" />
+            </StackPanel>
+            <Button Grid.Column="1" Classes="btn" VerticalAlignment="Center" Content="{loc:Tr Pulls_Retry}" Command="{Binding RetryCommand}" />
+          </Grid>
+        </Border>
+      </StackPanel>
+
+      <!-- ── 总览：长页面 ── -->
+      <ScrollViewer x:Name="OverviewScroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer.IsVisible>
+          <MultiBinding Converter="{x:Static BoolConverters.And}">
+            <Binding Path="ShowContent" />
+            <Binding Path="IsOverview" />
+          </MultiBinding>
+        </ScrollViewer.IsVisible>
+        <StackPanel Spacing="18" Margin="0,18,0,96">
+          <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Metrics}" />
+
+          <Grid ColumnDefinitions="*,444" ColumnSpacing="18" Height="640">
+            <!-- 各卡池最近五星 -->
+            <Border Classes="card" Padding="22,20">
+              <Grid RowDefinitions="Auto,*">
+                <TextBlock Classes="section-title" Text="{loc:Tr Pulls_LatestPerPool}" />
+                <ItemsControl Grid.Row="1" Classes="rec-list compact" Margin="0,10,0,0" ItemsSource="{Binding LatestRows}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:LatestFiveStarRow">
+                      <Panel>
+                        <ContentControl Content="{Binding Card}" ContentTemplate="{StaticResource FiveStarRow}" IsVisible="{Binding HasCard}"
+                                        VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" />
+                        <Border Classes="rec-row" IsVisible="{Binding NoCard}" Cursor="Arrow">
+                          <Border Classes="rec-body">
+                            <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                              <Panel Classes="unknown-face"><Rectangle /><TextBlock Text="?" /></Panel>
+                              <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="rec-name" Foreground="{DynamicResource TextMutedBrush}" Text="{loc:Tr Pulls_NoFiveStarRecord}" />
+                                <TextBlock Classes="caption" Margin="0,3,0,0" Text="{Binding PoolTitle}" />
+                              </StackPanel>
+                            </StackPanel>
+                          </Border>
+                        </Border>
+                      </Panel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </Border>
+
+            <!-- 未出金进度 -->
+            <Border Grid.Column="1" Classes="card" Padding="22,20">
+              <Grid RowDefinitions="Auto,*">
+                <TextBlock Classes="section-title" Text="{loc:Tr Pulls_PityPerPool}" />
+                <ItemsControl Grid.Row="1" Margin="0,4,0,0" ItemsSource="{Binding PityRows}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:PityProgressRow">
+                      <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8" Height="22">
+                          <TextBlock FontSize="14" FontWeight="Bold" Text="{Binding PoolTitle}" VerticalAlignment="Center" />
+                          <Border Classes="tag sm" IsVisible="{Binding HasNextKind}"><TextBlock Text="{Binding NextKindText}" /></Border>
+                          <Panel IsVisible="{Binding IsNearHardPity}" VerticalAlignment="Center">
+                            <Border Classes="near-ring" />
+                            <Border Classes="tag sm red"><TextBlock Text="{loc:Tr Pulls_NearHardPity}" /></Border>
+                          </Panel>
+                        </StackPanel>
+                        <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="8" Margin="0,6,0,8">
+                          <TextBlock FontSize="14" Text="{loc:Tr Pulls_HavePrefix}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+                          <TextBlock Grid.Column="1" FontSize="30" FontWeight="Bold" LetterSpacing="-1" Text="{Binding Pity}"
+                                     Classes.heartbeat="{Binding IsNearHardPity}" Classes.danger-text="{Binding IsNearHardPity}" />
+                          <TextBlock Grid.Column="2" FontSize="14" Text="{loc:Tr Pulls_HaveSuffix}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+                          <TextBlock Grid.Column="3" Classes="caption" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,3"
+                                     Text="{Binding ToHardPityText}" />
+                        </Grid>
+                        <Panel>
+                          <Border Classes="bar-glow" IsVisible="{Binding IsNearHardPity}" />
+                          <c:SegmentedBar Classes="pity" Shimmer="True" Maximum="80" Value="{Binding Pity}" />
+                        </Panel>
+                        <Grid ColumnDefinitions="*,*,*,*,*" Margin="0,4,0,0">
+                          <TextBlock Classes="caption" FontSize="11" Text="0" />
+                          <TextBlock Grid.Column="1" Classes="caption" FontSize="11" Text="20" Margin="-6,0,0,0" />
+                          <TextBlock Grid.Column="2" Classes="caption" FontSize="11" Text="40" HorizontalAlignment="Center" />
+                          <TextBlock Grid.Column="3" Classes="caption" FontSize="11" Text="60" HorizontalAlignment="Right" Margin="0,0,-6,0" />
+                          <TextBlock Grid.Column="4" Classes="caption" FontSize="11" Text="80" HorizontalAlignment="Right" />
+                        </Grid>
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </Border>
+          </Grid>
+
+          <Grid ColumnDefinitions="1.5*,*,*" ColumnSpacing="18" Height="300">
+            <!-- 每日抽卡活跃分布 -->
+            <Border Classes="card">
+              <Grid RowDefinitions="Auto,*,Auto">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="card-title" Text="{loc:Tr Stat_DailyPullChart}" />
+                  <TextBlock Grid.Column="1" Classes="caption" Text="{Binding DailyCaption}" VerticalAlignment="Bottom" />
+                </Grid>
+                <c:BarChart Grid.Row="1" Height="150" VerticalAlignment="Bottom" Values="{Binding DailyValues}" Tips="{Binding DailyTips}"
+                            HighlightPeak="True" Fill="{DynamicResource AccentBrush}" PeakFill="{DynamicResource DangerBrush}"
+                            EmptyFill="{DynamicResource TrackBrush}" />
+                <Grid Grid.Row="2" Margin="0,8,0,0" ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto">
+                  <TextBlock Classes="caption" FontSize="11" Text="{Binding DailyAxis[0], FallbackValue=''}" />
+                  <TextBlock Grid.Column="2" Classes="caption" FontSize="11" Text="{Binding DailyAxis[1], FallbackValue=''}" />
+                  <TextBlock Grid.Column="4" Classes="caption" FontSize="11" Text="{Binding DailyAxis[2], FallbackValue=''}" />
+                  <TextBlock Grid.Column="6" Classes="caption" FontSize="11" Text="{Binding DailyAxis[3], FallbackValue=''}" />
+                </Grid>
+              </Grid>
+            </Border>
+
+            <!-- 各卡池五星分布 -->
+            <Border Grid.Column="1" Classes="card">
+              <StackPanel>
+                <TextBlock Classes="card-title" Text="{loc:Tr Stat_GoldHistoryChart}" Margin="0,0,0,16" />
+                <ItemsControl ItemsSource="{Binding ShareBars}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="12" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:PoolShareBar">
+                      <StackPanel Spacing="6">
+                        <Grid ColumnDefinitions="*,Auto">
+                          <TextBlock Classes="aux" Text="{Binding PoolTitle}" />
+                          <TextBlock Grid.Column="1" Classes="aux" FontWeight="Bold" Text="{Binding Text}" />
+                        </Grid>
+                        <c:SegmentedBar Classes="thin" Value="{Binding Ratio}" Maximum="1" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+
+            <!-- 不歪概率 / 四星获取比例 -->
+            <Border Grid.Column="2" Classes="card">
+              <Grid RowDefinitions="Auto,*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                  <c:DonutChart Width="112" Height="112" Values="{Binding WinValues}" CenterValue="{Binding WinPercent}" CenterFormat="{}{0:0}%"
+                                Brush1="{DynamicResource AccentBrush}" Brush2="{DynamicResource TrackBrush}"
+                                EmptyBrush="{DynamicResource TrackBrush}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                  <StackPanel VerticalAlignment="Center" Spacing="6">
+                    <TextBlock Classes="card-title" Text="{loc:Tr Stat_MissRatePie}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="legend" Background="{DynamicResource AccentBrush}" />
+                      <TextBlock Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding WinLegend}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="legend" Background="{DynamicResource TrackBrush}" />
+                      <TextBlock Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding LossLegend}" />
+                    </StackPanel>
+                  </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="20">
+                  <c:DonutChart Width="112" Height="112" Values="{Binding FourStarValues}" CenterValue="{Binding FourStarPercent}" CenterFormat="{}{0:0}%"
+                                Brush1="{DynamicResource FourStarBrush}" Brush2="{DynamicResource FourStarContainerBrush}"
+                                EmptyBrush="{DynamicResource TrackBrush}" Foreground="{DynamicResource TextPrimaryBrush}" />
+                  <StackPanel VerticalAlignment="Center" Spacing="6">
+                    <TextBlock Classes="card-title" Text="{loc:Tr Stat_FourStarPieChart}" />
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="legend" Background="{DynamicResource FourStarBrush}" />
+                      <TextBlock Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding FourCharacterLegend}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="legend" Background="{DynamicResource FourStarContainerBrush}" />
+                      <TextBlock Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding FourWeaponLegend}" />
+                    </StackPanel>
+                  </StackPanel>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </Grid>
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- ── 单卡池：指标卡 + 抽卡记录（列表内部滚动） ── -->
+      <Grid RowDefinitions="Auto,*" RowSpacing="18" Margin="0,18,0,96" IsVisible="{Binding ShowListPool}">
+        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Metrics}" />
+        <pulls:PoolRecordsView Grid.Row="1" x:Name="RecordsView" DataContext="{Binding Records}" />
+      </Grid>
+
+      <!-- ── 单卡池·精简视图（定稿 FinalPullsGrid）：一行统计条 + 五星头像网格（最新在前，底部渐隐） ── -->
+      <Grid RowDefinitions="Auto,*" RowSpacing="18" Margin="0,18,0,96" IsVisible="{Binding ShowCompactPool}"
+            AutomationProperties.AutomationId="pulls-compact">
+        <Border Classes="card gs">
+          <UniformGrid Columns="6">
+            <Border Classes="gs-cell first">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Stat_TotalTides}" />
+                <c:RollingText Classes="gs-value" Text="{Binding TotalPulls}" />
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_FiveStarShort}" />
+                <c:RollingText Classes="gs-value" Text="{Binding FiveStars}" />
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_AvgPerFiveStar}" />
+                <StackPanel Orientation="Horizontal">
+                  <c:RollingText Classes="gs-value" Text="{Binding AveragePerFiveStar}" />
+                  <TextBlock Classes="gs-unit" Text="{loc:Tr Pulls_PullUnit}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_AvgPerUp}" />
+                <StackPanel Orientation="Horizontal">
+                  <c:RollingText Classes="gs-value" Text="{Binding AveragePerUp}" />
+                  <TextBlock Classes="gs-unit" Text="{loc:Tr Pulls_PullUnit}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_WinRate}" />
+                <StackPanel Orientation="Horizontal">
+                  <c:RollingText Classes="gs-value" Text="{Binding WinRate}" />
+                  <TextBlock Classes="gs-unit" Text="{Binding WinRatio}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_Astrites}" />
+                <c:RollingText Classes="gs-value" Text="{Binding Astrites}" />
+              </StackPanel>
+            </Border>
+          </UniformGrid>
+        </Border>
+
+        <Border Grid.Row="1" Classes="card" Padding="22,18,22,0">
+          <Grid RowDefinitions="Auto,*" RowSpacing="14">
+            <TextBlock FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Text="{loc:Tr Pulls_FiveStarRecords}" />
+            <ScrollViewer Grid.Row="1" x:Name="CompactScroller" HorizontalScrollBarVisibility="Disabled" Margin="-8,0,-14,0">
+              <ItemsControl x:Name="CompactGrid" Margin="8,5,7,36" ItemsSource="{Binding Records.CompactTiles}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><UniformGrid ColumnSpacing="5" RowSpacing="7" Columns="8" /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.DataTemplates>
+                  <!-- 未出金：虚线框、暖色斜纹头像区、问号，数字为当前已垫抽数 -->
+                  <DataTemplate DataType="pulls:NotYetCard">
+                    <Panel Classes="gt-host" ToolTip.ShowDelay="200" ToolTip.Placement="Bottom" ToolTip.VerticalOffset="10">
+                      <ToolTip.Tip>
+                        <ToolTip Classes="tile-tip">
+                          <StackPanel>
+                            <TextBlock FontSize="13" FontWeight="Bold" Text="{loc:Tr Pulls_NoFiveStarYet}" />
+                            <TextBlock Text="{Binding ToHardPityText}" />
+                          </StackPanel>
+                        </ToolTip>
+                      </ToolTip.Tip>
+                      <Border Classes="gt cur">
+                        <Grid RowDefinitions="92,30">
+                          <Panel Classes="ga cur">
+                            <c:StripeFill />
+                            <TextBlock Text="?" />
+                          </Panel>
+                          <TextBlock Grid.Row="1" Classes="gn" Text="{Binding Pity}" />
+                          <c:RatioBar Grid.Row="1" Classes="gh" Ratio="{Binding PityRatio}" />
+                        </Grid>
+                      </Border>
+                      <Rectangle Classes="cur-dash" />
+                    </Panel>
+                  </DataTemplate>
+                  <DataTemplate DataType="pulls:FiveStarCard">
+                    <Panel Classes="gt-host" ToolTip.ShowDelay="200" ToolTip.Placement="Bottom" ToolTip.VerticalOffset="10">
+                      <ToolTip.Tip>
+                        <ToolTip Classes="tile-tip">
+                          <StackPanel>
+                            <TextBlock>
+                              <Run FontSize="13" FontWeight="Bold" Text="{Binding Name}" />
+                              <Run Text=" · " />
+                              <Run FontSize="11" Foreground="#C9B892" Text="{Binding TimeText}" />
+                            </TextBlock>
+                            <TextBlock>
+                              <Run Text="{Binding PityLine}" />
+                              <Run FontWeight="Bold" Foreground="#F09A8C" Text="{Binding LostLine}" />
+                            </TextBlock>
+                            <TextBlock Classes="tip-sub" Text="{Binding NextLine}" IsVisible="{Binding HasNextLine}" />
+                          </StackPanel>
+                        </ToolTip>
+                      </ToolTip.Tip>
+                      <Border Classes="gt">
+                        <Grid RowDefinitions="92,30">
+                          <Border Classes="ga">
+                            <c:CatalogImage Width="88" Height="88" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                            Path="{Binding IconPath}" DecodeWidth="176" Stretch="UniformToFill" />
+                          </Border>
+                          <TextBlock Grid.Row="1" Classes="gn" Classes.hot="{Binding IsNearHardPity}" Text="{Binding Pity}" />
+                          <c:RatioBar Grid.Row="1" Classes="gh" Classes.hot="{Binding IsNearHardPity}" Ratio="{Binding PityRatio}" />
+                        </Grid>
+                      </Border>
+                      <Border Classes="wai" IsVisible="{Binding IsLost}"><TextBlock Text="{loc:Tr Pulls_LostMark}" /></Border>
+                    </Panel>
+                  </DataTemplate>
+                </ItemsControl.DataTemplates>
+              </ItemsControl>
+            </ScrollViewer>
+          </Grid>
+        </Border>
+      </Grid>
+    </Panel>
+
+    <!-- 动效「拖拽导入」：拖入链接或日志文件时盖在内容上的虚线框；边缘流动并变暖色，松手后变绿显示导入条数 -->
+    <Panel Grid.Row="1" Margin="0,18,0,26" Classes="drop" Classes.done="{Binding IsDropDone}"
+           IsVisible="{Binding IsDropVisible}" IsHitTestVisible="False" AutomationProperties.AutomationId="pulls-drop-zone">
+      <c:MarchingAnts x:Name="DropAnts" Radius="12" />
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+        <c:StrokeIcon Width="30" Height="30" Data="{StaticResource Icon.Upload}" Foreground="{DynamicResource AccentBrush}"
+                      HorizontalAlignment="Center" IsVisible="{Binding !IsDropDone}" />
+        <c:CheckMark Classes="drop-check" Width="30" Height="30" Stroke="{DynamicResource SuccessBrush}" HorizontalAlignment="Center"
+                     IsVisible="{Binding IsDropDone}" />
+        <Panel HorizontalAlignment="Center">
+          <TextBlock FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" IsVisible="{Binding !IsDropBusy}"
+                     Text="{loc:Tr Pulls_DropHint}" />
+          <TextBlock FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"
+                     Text="{loc:Tr Pulls_DropImporting}">
+            <TextBlock.IsVisible>
+              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                <Binding Path="IsDropBusy" />
+                <Binding Path="!IsDropDone" />
+              </MultiBinding>
+            </TextBlock.IsVisible>
+          </TextBlock>
+          <TextBlock FontSize="14" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" HorizontalAlignment="Center"
+                     Text="{Binding DropDoneText}" IsVisible="{Binding IsDropDone}" AutomationProperties.AutomationId="pulls-drop-done" />
+        </Panel>
+      </StackPanel>
+    </Panel>
+
+    <!-- 动效「刷新完成」：获取云端数据时右下角（悬浮按钮上方）的状态胶囊 -->
+    <Border Grid.Row="1" Classes="refresh" Classes.done="{Binding IsRefreshDone}" Classes.shown="{Binding IsRefreshVisible}"
+            HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,96" IsHitTestVisible="False"
+            AutomationProperties.AutomationId="pulls-refresh-status">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <Border Classes="refresh-dot" Width="40" Height="40" CornerRadius="20" BorderThickness="1">
+          <Panel>
+            <c:PixelGif Classes="refresh-gif" Width="34" Height="34" />
+            <c:CheckMark Classes="refresh-check" Width="22" Height="22" Stroke="{DynamicResource SuccessBrush}" />
+          </Panel>
+        </Border>
+        <Panel VerticalAlignment="Center">
+          <TextBlock Classes="refresh-busy" FontSize="13" Text="{loc:Tr Pulls_Refreshing}" Foreground="{DynamicResource TextSecondaryBrush}" />
+          <TextBlock Classes="refresh-done" FontSize="13" FontWeight="Bold" Text="{Binding RefreshDoneText}" Foreground="{DynamicResource SuccessBrush}" />
+        </Panel>
+      </StackPanel>
+    </Border>
+
+    <ProgressBar Grid.Row="1" IsIndeterminate="True" VerticalAlignment="Top" Height="3" MinHeight="3"
+                 IsVisible="{Binding Session.IsLoading}" Foreground="{DynamicResource AccentBrush}" Background="Transparent" />
+  </Grid>
+</UserControl>

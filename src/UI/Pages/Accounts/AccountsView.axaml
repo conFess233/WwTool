@@ -1,0 +1,199 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:accounts="using:WwTool.UI.Pages.Accounts"
+             xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Accounts.AccountsView"
+             x:DataType="accounts:AccountsViewModel">
+  <!-- 账号数据：本地账号卡片、切换、删除、添加（定稿 FinalAccounts）。 -->
+  <UserControl.Styles>
+    <Style Selector="Border.account">
+      <Setter Property="Padding" Value="22,24" />
+      <Setter Property="MinHeight" Value="420" />
+    </Style>
+    <Style Selector="Border.account.current">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="Background" Value="{DynamicResource HighlightStrongBrush}" />
+    </Style>
+    <Style Selector="Grid.kv">
+      <Setter Property="Margin" Value="0,10" />
+    </Style>
+    <!-- 当前账号：强调色实底标签；其他账号：描边按钮“切换到此账号” -->
+    <Style Selector="Border.current-label">
+      <Setter Property="Height" Value="36" />
+      <Setter Property="CornerRadius" Value="7" />
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Border.current-label > TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.switch">
+      <Setter Property="Height" Value="38" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.switch:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.danger-outline">
+      <Setter Property="Height" Value="38" />
+      <Setter Property="Width" Value="44" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.danger-outline:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource DangerContainerBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    </Style>
+    <Style Selector="Button.add-card">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.add-card:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="0,0,0,96" Spacing="18">
+      <!-- 工具行：「本地已存储 N 个账号」+ 工具按钮「刷新账号列表」 -->
+      <Grid Height="40" ColumnDefinitions="*,Auto">
+        <TextBlock Classes="label" Text="{Binding Summary}" VerticalAlignment="Center" TextWrapping="Wrap" />
+        <Button Grid.Column="1" Classes="btn" Command="{Binding RefreshCommand}" VerticalAlignment="Center"
+                IsEnabled="{Binding !IsBusy}" AutomationProperties.AutomationId="accounts-refresh">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Panel Width="16" Height="16">
+              <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.Sync}" IsVisible="{Binding !IsBusy}" />
+              <c:PixelGif Width="22" Height="22" Margin="-3" IsVisible="{Binding IsBusy}" />
+            </Panel>
+            <TextBlock Text="{loc:Tr Index_RefreshAccountList}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+      </Grid>
+
+      <!-- 登录失效（定稿「空状态与异常」）：红色锁图标，重新登录 / 移除账号 -->
+      <Border Classes="card" MinHeight="300" IsVisible="{Binding IsCurrentExpired}" AutomationProperties.AutomationId="accounts-expired">
+        <c:EmptyState IsDanger="True" Icon="{StaticResource Icon.Lock}" Title="{Binding ExpiredTitle}" Description="{loc:Tr Accounts_ExpiredHint}">
+          <StackPanel Classes="empty-actions">
+            <Button Classes="btn primary" Content="{loc:Tr Accounts_Relogin}" Command="{Binding ReloginCommand}"
+                    AutomationProperties.AutomationId="accounts-relogin" />
+            <Button Classes="btn" Content="{loc:Tr Accounts_Remove}" Command="{Binding RemoveExpiredCommand}"
+                    AutomationProperties.AutomationId="accounts-remove-expired" />
+          </StackPanel>
+        </c:EmptyState>
+      </Border>
+
+      <ItemsControl ItemsSource="{Binding Cards}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate><UniformGrid Columns="4" ColumnSpacing="18" RowSpacing="18" /></ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.DataTemplates>
+          <DataTemplate DataType="accounts:AccountCard">
+            <Border Classes="card account" Classes.current="{Binding IsCurrent}"
+                    AutomationProperties.AutomationId="{Binding AutomationId}" AutomationProperties.Name="{Binding Name}">
+              <DockPanel>
+                <!-- 底部操作：当前账号 / 切换，删除 -->
+                <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="0,16,0,0">
+                  <Border Classes="current-label" IsVisible="{Binding IsCurrent}">
+                    <TextBlock Text="{loc:Tr Accounts_Current}" />
+                  </Border>
+                  <Button Classes="btn" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Content="{loc:Tr Accounts_SwitchTo}" IsVisible="{Binding IsNotCurrent}"
+                          Command="{Binding $parent[UserControl].((accounts:AccountsViewModel)DataContext).SwitchCommand}" CommandParameter="{Binding}"
+                          AutomationProperties.AutomationId="{Binding AutomationId, StringFormat='{}{0}-switch'}" />
+                  <Button Grid.Column="1" Classes="btn danger" Padding="10,0"
+                          Command="{Binding $parent[UserControl].((accounts:AccountsViewModel)DataContext).DeleteCommand}" CommandParameter="{Binding}"
+                          ToolTip.Tip="{loc:Tr Accounts_Delete}" AutomationProperties.Name="{loc:Tr Accounts_Delete}"
+                          AutomationProperties.AutomationId="{Binding AutomationId, StringFormat='{}{0}-delete'}">
+                    <c:StrokeIcon Width="18" Height="18" Data="{StaticResource Icon.Trash}" />
+                  </Button>
+                </Grid>
+                <StackPanel>
+                  <Border Width="84" Height="84" CornerRadius="42" ClipToBounds="True" HorizontalAlignment="Center"
+                          Background="{DynamicResource SurfaceMutedBrush}">
+                    <Panel>
+                      <TextBlock Text="{Binding Name, Converter={x:Static pulls:InitialConverter.Instance}}" FontSize="30" FontWeight="Bold"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}"
+                                 IsVisible="{Binding #Avatar.Source, Converter={x:Static ObjectConverters.IsNull}}" />
+                      <c:CatalogImage x:Name="Avatar" Path="{Binding IconPath}" DecodeWidth="168" Stretch="UniformToFill" />
+                    </Panel>
+                  </Border>
+                  <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,14,0,0"
+                             TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextPrimaryBrush}" />
+                  <TextBlock Classes="caption" Text="{Binding UidText}" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                  <Panel Height="26" Margin="0,8,0,0">
+                    <Border Classes="tag accent" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsCurrent}">
+                      <TextBlock Text="{loc:Tr Accounts_CurrentTag}" />
+                    </Border>
+                  </Panel>
+                  <StackPanel Margin="0,10,0,0">
+                    <Border Height="1" Background="{DynamicResource DividerBrush}" />
+                    <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="label" Text="{loc:Tr Index_Server}" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Grid.Column="1" Classes="label" FontWeight="SemiBold" Text="{Binding Server}" />
+                    </Grid>
+                    <Border Height="1" Background="{DynamicResource DividerBrush}" />
+                    <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="label" Text="{loc:Tr Index_CreateDate}" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Grid.Column="1" Classes="label" FontWeight="SemiBold" Text="{Binding CreateDate}" />
+                    </Grid>
+                    <Border Height="1" Background="{DynamicResource DividerBrush}" />
+                    <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="label" Text="{loc:Tr Index_ActiveDays}" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Grid.Column="1" Classes="label" FontWeight="SemiBold" Text="{Binding ActiveDays}" />
+                    </Grid>
+                    <Border Height="1" Background="{DynamicResource DividerBrush}" />
+                    <Grid Classes="kv" ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="label" Text="{loc:Tr Accounts_LastSynced}" Foreground="{DynamicResource TextMutedBrush}" />
+                      <TextBlock Grid.Column="1" Classes="label" FontWeight="SemiBold" Text="{Binding LastSynced}" />
+                    </Grid>
+                  </StackPanel>
+                </StackPanel>
+              </DockPanel>
+            </Border>
+          </DataTemplate>
+          <!-- 添加账号：虚线框 -->
+          <DataTemplate DataType="accounts:AddAccountTile">
+      <Button Classes="add-card" Command="{Binding $parent[UserControl].((accounts:AccountsViewModel)DataContext).AddCommand}" MinHeight="420"
+              AutomationProperties.AutomationId="accounts-add" AutomationProperties.Name="{loc:Tr Dialog_AddAccount}">
+        <Panel>
+          <Rectangle Stroke="{DynamicResource BorderStrongBrush}" StrokeThickness="2" StrokeDashArray="4,3" RadiusX="12" RadiusY="12" />
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="16">
+            <Border Width="56" Height="56" CornerRadius="28" HorizontalAlignment="Center" Background="{DynamicResource AccentContainerBrush}">
+              <Path Data="M12,5 L12,19 M5,12 L19,12" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2.2" StrokeLineCap="Round"
+                    Width="24" Height="24" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="{loc:Tr Dialog_AddAccount}" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" />
+            <TextBlock Classes="caption" Text="{loc:Tr Login_Hint}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+          </StackPanel>
+        </Panel>
+      </Button>
+          </DataTemplate>
+        </ItemsControl.DataTemplates>
+      </ItemsControl>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

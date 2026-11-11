@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- 不含界面、不调用平台专有 API 的核心库。
+       CA1416 设为错误：误用只能在某个系统上运行的 API 会直接编译失败。 -->
+  <PropertyGroup>
+    <RootNamespace>WwTool.Core</RootNamespace>
+    <AssemblyName>WwTool.Core</AssemblyName>
+    <WarningsAsErrors>$(WarningsAsErrors);CA1416</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 只用 ObservableObject 做配置与统计模型的变更通知，与具体 UI 框架无关。 -->
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
+    <!-- 仅在 Windows 分支调用（OperatingSystem.IsWindows 守卫 + SupportedOSPlatform），CA1416 仍生效。 -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 内置游戏资料：嵌入程序集作为损坏时的回退，同时复制到输出目录 Local/Data。
+         源文件放在仓库的 WwTool/Local/Data：已发布的客户端从主分支这个路径同步资料，路径不能变。 -->
+    <EmbeddedResource Include="../../WwTool/Local/Data/*.json">
+      <LogicalName>WwTool.Catalogs.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <None Include="../../WwTool/Local/Data/*.json" CopyToOutputDirectory="PreserveNewest" Link="Local/Data/%(Filename)%(Extension)" />
+    <!-- 界面语言资源（中/英/日键集合必须一致），复制到输出目录 Local/Language。 -->
+    <None Include="Local/Language/*.json" CopyToOutputDirectory="PreserveNewest" Link="Local/Language/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 本地测试（/tests，不提交）访问内部计算方法。 -->
+    <InternalsVisibleTo Include="WwTool.Core.Tests" />
+  </ItemGroup>
+
+</Project>

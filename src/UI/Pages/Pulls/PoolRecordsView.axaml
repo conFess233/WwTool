@@ -1,0 +1,115 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Pulls.PoolRecordsView"
+             x:DataType="pulls:PoolRecordsViewModel">
+  <!--
+    单卡池「抽卡记录」卡（定稿 FinalPulls）：右上「仅能获取近半年数据」；首行固定为「未出金」（吸顶、Highlight 底、轻阴影），
+    其后五星记录由新到旧，列表内部滚动，滚到底自动加载更早记录（骨架行 + 加载形象）。
+  -->
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://WwTool/Pages/Pulls/PullsResources.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <Border Classes="card" Padding="22,20">
+    <Grid RowDefinitions="Auto,Auto,*">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Classes="section-title" Text="{loc:Tr Pulls_Records}" VerticalAlignment="Bottom" />
+        <TextBlock Grid.Column="1" Classes="aux" Foreground="{DynamicResource LabelBrush}" Text="{loc:Tr Pulls_RecordsNote}" VerticalAlignment="Bottom" />
+      </Grid>
+
+      <!-- 未出金（吸顶）：列表滚动时下方阴影渐显 -->
+      <Border Grid.Row="1" x:Name="NotYetRow" Margin="-8,10,-8,4" Height="104" Padding="12,0" CornerRadius="10"
+              Background="{DynamicResource HighlightStrongBrush}" BorderBrush="{DynamicResource AccentLineBrush}" BorderThickness="1"
+              BoxShadow="0 8 10 -8 #59281C0A" ZIndex="1"
+              IsVisible="{Binding NotYet, Converter={x:Static ObjectConverters.IsNotNull}}" AutomationProperties.AutomationId="pulls-not-yet">
+        <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="16">
+          <Panel Classes="unknown-face">
+            <Rectangle />
+            <TextBlock Text="?" />
+          </Panel>
+          <StackPanel Grid.Column="1" Classes="c1" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Classes="rec-name" Text="{loc:Tr Pulls_NoFiveStarYet}" />
+              <Border Classes="tag sm" IsVisible="{Binding NotYet.IsNextGuaranteed, FallbackValue=False}">
+                <TextBlock Text="{loc:Tr Pulls_NextGuaranteed}" />
+              </Border>
+              <Border Classes="tag sm" IsVisible="{Binding NotYet.IsNextSoftPity, FallbackValue=False}">
+                <TextBlock Text="{loc:Tr Pulls_NextSoftPity}" />
+              </Border>
+            </StackPanel>
+            <TextBlock Classes="caption" Margin="0,3,0,0" Text="{Binding NotYet.LastPullText, FallbackValue=''}" />
+            <WrapPanel Margin="0,8,0,0">
+              <Border Classes="tag sm gray"><TextBlock Text="{loc:Tr Pulls_LatestRecord}" /></Border>
+            </WrapPanel>
+          </StackPanel>
+          <StackPanel Grid.Column="2" Classes="c2" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock FontSize="14" Text="{loc:Tr Pulls_HavePrefix}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+              <TextBlock Classes="pity-big" Foreground="{DynamicResource AccentTextBrush}" Text="{Binding NotYet.Pity, FallbackValue=0}" />
+              <TextBlock FontSize="14" Text="{loc:Tr Pulls_HaveSuffix}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+            </StackPanel>
+            <c:SegmentedBar Classes="row-bar" Shimmer="True" Value="{Binding NotYet.Pity, FallbackValue=0}" />
+          </StackPanel>
+          <Grid Grid.Column="3" ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+            <ItemsControl ItemsSource="{Binding NotYet.FourStars, FallbackValue={x:Null}}" ItemTemplate="{StaticResource ChipCompact}"
+                          MaxHeight="70" ClipToBounds="True" VerticalAlignment="Center">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <TextBlock Grid.Column="1" FontSize="13" Foreground="{DynamicResource LabelBrush}" Margin="16,0,0,0" VerticalAlignment="Center">
+              <Run Text="{loc:Tr Pulls_ToHardPityPrefix}" />
+              <Run Text="{Binding NotYet.ToHardPity, FallbackValue=0}" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AccentTextBrush}" />
+              <Run Text="{loc:Tr Pulls_PullUnit}" />
+            </TextBlock>
+          </Grid>
+        </Grid>
+      </Border>
+
+      <!-- 卡池暂无记录：空状态 + 底部虚线上慢走的加载形象（停留 3 秒后出现） -->
+      <Panel Grid.Row="1" Grid.RowSpan="2" Margin="-22,0,-22,-20" IsVisible="{Binding IsEmpty}" AutomationProperties.AutomationId="pool-empty">
+        <c:EmptyState Title="{loc:Tr Pulls_PoolEmptyTitle}" Description="{loc:Tr Pulls_PoolEmptyHint}" Icon="{StaticResource Icon.Document}"
+                      Margin="0,0,0,60">
+          <StackPanel Classes="empty-actions">
+            <Button Classes="btn primary" Content="{loc:Tr Fab_GetRecords}" Command="{Binding SyncCommand}"
+                    AutomationProperties.AutomationId="pool-empty-sync" />
+          </StackPanel>
+        </c:EmptyState>
+        <c:EmptyWalker Bubble="{loc:Tr Pulls_EmptyBubble}" />
+      </Panel>
+
+      <ScrollViewer Grid.Row="2" x:Name="ListScroller" IsVisible="{Binding !IsEmpty}" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-8,0" Padding="0,0,8,0">
+        <StackPanel>
+          <ItemsControl Classes="rec-list" ItemsSource="{Binding Items}" ItemTemplate="{StaticResource FiveStarRow}" />
+
+          <!-- 更早的记录：骨架行 + 加载形象 -->
+          <StackPanel IsVisible="{Binding HasMore}">
+            <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Height="92" Padding="4,0">
+              <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="16">
+                <c:Skeleton Width="56" Height="56" Radius="14" />
+                <StackPanel Grid.Column="1" Classes="c1" VerticalAlignment="Center" Spacing="9">
+                  <c:Skeleton Width="110" Height="16" HorizontalAlignment="Left" />
+                  <c:Skeleton Width="140" Height="12" HorizontalAlignment="Left" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Classes="c2" VerticalAlignment="Center" Spacing="10">
+                  <c:Skeleton Width="64" Height="26" HorizontalAlignment="Left" />
+                  <c:Skeleton Height="10" />
+                </StackPanel>
+                <c:Skeleton Grid.Column="3" Width="150" Height="30" Radius="15" HorizontalAlignment="Left" />
+              </Grid>
+            </Border>
+            <StackPanel Orientation="Horizontal" Spacing="10" Height="52" HorizontalAlignment="Center">
+              <c:PixelGif Width="40" Height="40" VerticalAlignment="Center" />
+              <TextBlock Classes="aux muted" Text="{loc:Tr Pulls_LoadingMore}" VerticalAlignment="Center" />
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Border>
+</UserControl>

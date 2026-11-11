@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="WwTool/WwTool.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/Core/WwTool.Core.csproj" />
+    <Project Path="src/UI/WwTool.UI.csproj" />
+  </Folder>
 </Solution>

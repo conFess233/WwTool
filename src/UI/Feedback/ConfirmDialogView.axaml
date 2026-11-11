@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fb="using:WwTool.UI.Feedback"
+             xmlns:c="using:WwTool.UI.Controls"
+             x:Class="WwTool.UI.Feedback.ConfirmDialogView"
+             x:DataType="fb:ConfirmDialogViewModel"
+             Width="440">
+  <!-- 确认 / 提示（定稿「删除用户」「确认退出」）：标题 19 Bold，正文 13 行高 1.7；
+       危险操作在正文后加 Danger Bold 警示行与危险说明框（Danger Line 描边、Danger Soft 底、垃圾桶图标）。 -->
+  <StackPanel>
+    <TextBlock Classes="dialog-title" Text="{Binding Title}" />
+    <TextBlock Classes="dialog-body" Text="{Binding Message}" AutomationProperties.AutomationId="dialog-message" />
+    <TextBlock Classes="dialog-body" Text="{Binding Warning}" FontWeight="Bold" Foreground="{DynamicResource DangerBrush}"
+               IsVisible="{Binding Warning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <Border Margin="0,18,0,0" Padding="14" CornerRadius="10" BorderThickness="1"
+            BorderBrush="{DynamicResource DangerLineBrush}" Background="{DynamicResource DangerSoftBrush}"
+            IsVisible="{Binding DangerNote, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <c:StrokeIcon Width="18" Height="18" Data="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" Foreground="{DynamicResource DangerBrush}" VerticalAlignment="Center" />
+        <TextBlock Text="{Binding DangerNote}" FontSize="13" TextWrapping="Wrap" Foreground="{DynamicResource DangerBrush}" VerticalAlignment="Center" />
+      </StackPanel>
+    </Border>
+    <StackPanel Classes="dialog-actions" Margin="{Binding ActionsMargin}">
+      <Button x:Name="CancelButton" Classes="btn" Content="{Binding CancelText}" IsVisible="{Binding HasCancel}"
+              Command="{Binding DismissCommand}" AutomationProperties.AutomationId="dialog-cancel" />
+      <Button x:Name="ConfirmButton" Classes="btn" Classes.primary="{Binding !IsDanger}" Classes.danger="{Binding IsDanger}" Classes.confirm="{Binding IsDanger}"
+              Content="{Binding ConfirmText}" Command="{Binding ConfirmCommand}"
+              AutomationProperties.AutomationId="dialog-confirm" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

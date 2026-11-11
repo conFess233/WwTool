@@ -1,0 +1,37 @@
+using WwTool.Core.Models.Statistics;
+using System.Collections.Generic;
+using WwTool.Core.Enums;
+using WwTool.Core.Data.Entities;
+using WwTool.Core.Models.Api.Responses;
+using WwTool.Core.Models.Domain;
+
+namespace WwTool.Core.Abstractions
+{
+    public class GachaStatisticsResult
+    {
+        public CardPoolStatistics PoolStatistics { get; set; } = new();
+        public int SuccessCount { get; set; }
+        public int MissCount { get; set; }
+        public int FeaturedCount { get; set; }
+        public List<int> GoldValues { get; set; } = new();
+        public List<string> GoldLabels { get; set; } = new();
+    }
+
+    public interface IGachaStatisticsService
+    {
+        GachaStatisticsResult OrganizeData(IEnumerable<GachaPull> data, CardPoolType poolType, string languageCode);
+        GlobalStatisticsResult CalculateGlobalStatistics(IEnumerable<CardPoolStatistics> poolStatistics, int successCount, int missCount, int featuredCount);
+        GachaInsights CalculateInsights(IEnumerable<GachaPull> data, string languageCode);
+    }
+
+    public class GlobalStatisticsResult
+    {
+        public int TotalTides { get; set; }
+        public int TotalAstrites { get; set; }
+        public int TotalHitGold { get; set; }
+        public double SuccessRate { get; set; }
+        public int LimitedGoldCount { get; set; }
+        public double? AvgCharaTide { get; set; }
+        public double? AvgLimitCharaTide { get; set; }
+    }
+}

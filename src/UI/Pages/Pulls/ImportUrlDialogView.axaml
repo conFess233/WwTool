@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Pulls.ImportUrlDialogView"
+             x:DataType="pulls:ImportUrlDialogViewModel"
+             Width="460">
+  <UserControl.Styles>
+    <Style Selector="TextBlock.caption.error">
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    </Style>
+  </UserControl.Styles>
+  <StackPanel Spacing="14">
+    <StackPanel>
+      <TextBlock Classes="dialog-title" Text="{loc:Tr Pulls_ImportTitle}" />
+      <TextBlock Classes="dialog-body" Text="{loc:Tr Pulls_ImportHint}" />
+    </StackPanel>
+
+    <StackPanel Spacing="6">
+      <TextBlock Classes="caption" Text="{loc:Tr Pulls_ImportField}" />
+      <TextBox x:Name="UrlBox" Classes="input" Height="NaN" Padding="12,8" VerticalContentAlignment="Top" Text="{Binding Text}" AcceptsReturn="False" TextWrapping="Wrap" MinHeight="72" MaxHeight="120"
+               PlaceholderText="https://…" AutomationProperties.Name="{loc:Tr Pulls_ImportField}"
+               AutomationProperties.AutomationId="import-url-text" />
+      <TextBlock Classes="caption" Text="{Binding Status}" IsVisible="{Binding Status, Converter={x:Static ObjectConverters.IsNotNull}}"
+                 Classes.error="{Binding IsStatusError}" />
+    </StackPanel>
+
+    <StackPanel Spacing="6">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Classes="caption" Text="{loc:Tr Pulls_Server}" />
+        <TextBlock Classes="caption" Text="{loc:Tr Pulls_ServerDetected}" IsVisible="{Binding IsServerDetected}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="16" IsEnabled="{Binding CanChooseServer}">
+        <RadioButton GroupName="ImportServer" Content="{loc:Tr Stat_GachaServerCN}" IsChecked="{Binding IsChina}"
+                     AutomationProperties.AutomationId="import-server-cn" />
+        <RadioButton GroupName="ImportServer" Content="{loc:Tr Stat_GachaServerInternational}" IsChecked="{Binding IsInternational}"
+                     AutomationProperties.AutomationId="import-server-global" />
+      </StackPanel>
+    </StackPanel>
+
+    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,0">
+      <Button Classes="btn" Content="{loc:Tr Pulls_ReadFromLog}" Command="{Binding ReadFromLogCommand}"
+              AutomationProperties.AutomationId="import-read-log" />
+      <StackPanel Grid.Column="2" Classes="dialog-actions" Margin="0">
+        <Button Classes="btn" Content="{loc:Tr Common_Cancel}" Command="{Binding DismissCommand}"
+                AutomationProperties.AutomationId="dialog-cancel" />
+        <Button Classes="btn primary" Content="{loc:Tr Pulls_Import}" Command="{Binding ImportCommand}"
+                AutomationProperties.AutomationId="dialog-confirm" />
+      </StackPanel>
+    </Grid>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,242 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:vm="using:WwTool.UI.ViewModels"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Pulls.PullsChartsView"
+             x:DataType="pulls:PullsChartsViewModel">
+  <!--
+    详细图表（定稿 FinalCharts）：筛选栏（卡池胶囊不带计数、「基于本地 N 条记录」、时间范围、返回统计），
+    六张图表分两行：每日活跃 / 五星出货抽数分布 / 各卡池抽数占比；每个五星花费抽数 / 累计抽数 / 稀有度构成与不歪率。
+    入场：环形图顺时针画出并计数，柱状图自左向右依次长出。
+  -->
+  <UserControl.Styles>
+    <StyleInclude Source="avares://WwTool/Pages/Pulls/PullsStyles.axaml" />
+    <Style Selector="c|SegmentedBar.cost">
+      <Setter Property="Height" Value="10" />
+      <Setter Property="SegmentWidth" Value="3" />
+      <Setter Property="SegmentGap" Value="1" />
+      <Setter Property="IsHeat" Value="True" />
+      <Setter Property="Maximum" Value="80" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="c|SegmentedBar.rarity">
+      <Setter Property="Height" Value="8" />
+      <Setter Property="Maximum" Value="1" />
+      <Setter Property="Margin" Value="0,6,0,0" />
+    </Style>
+    <Style Selector="c|SegmentedBar.rarity.four">
+      <Setter Property="Fill" Value="{DynamicResource FourStarBrush}" />
+    </Style>
+    <Style Selector="c|SegmentedBar.rarity.muted">
+      <Setter Property="Fill" Value="{DynamicResource TextMutedBrush}" />
+    </Style>
+    <Style Selector="Border.legend.s1"><Setter Property="Background" Value="{DynamicResource AccentBrush}" /></Style>
+    <Style Selector="Border.legend.s2"><Setter Property="Background" Value="{DynamicResource TextPrimaryBrush}" /></Style>
+    <Style Selector="Border.legend.s3"><Setter Property="Background" Value="{DynamicResource TextMutedBrush}" /></Style>
+    <Style Selector="Border.legend.s4"><Setter Property="Background" Value="{DynamicResource TrackBrush}" /></Style>
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- 筛选栏 -->
+    <Grid Height="40" ColumnDefinitions="*,Auto">
+      <ItemsControl ItemsSource="{Binding PoolOptions}" VerticalAlignment="Center">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="pulls:ChartPoolOption">
+            <ToggleButton Classes="chip" IsChecked="{Binding IsSelected, Mode=OneWay}" Content="{Binding Title}"
+                          Command="{Binding $parent[UserControl].((pulls:PullsChartsViewModel)DataContext).SelectPoolCommand}"
+                          CommandParameter="{Binding}" AutomationProperties.AutomationId="{Binding AutomationId}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <TextBlock Classes="caption" Text="{Binding Basis}" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <ComboBox Classes="filter" Tag="{loc:Tr Stat_Filter_DateRange}" ItemsSource="{Binding TimeRanges}" SelectedItem="{Binding SelectedTimeRange}"
+                  AutomationProperties.Name="{loc:Tr Stat_Filter_DateRange}" AutomationProperties.AutomationId="charts-time-range">
+          <ComboBox.SelectionBoxItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock FontWeight="Normal" Foreground="{DynamicResource TextMutedBrush}" Text="{Binding $parent[ComboBox].Tag}" />
+                <TextBlock Text="{Binding Title}" />
+              </StackPanel>
+            </DataTemplate>
+          </ComboBox.SelectionBoxItemTemplate>
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button Classes="btn" Command="{Binding BackCommand}" AutomationProperties.AutomationId="charts-back">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.ChevronLeft}" />
+            <TextBlock Text="{loc:Tr Pulls_BackToStatistics}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+    </Grid>
+
+    <ScrollViewer Grid.Row="1" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Spacing="18" Margin="0,18,0,96">
+        <Border Classes="card" MinHeight="360" IsVisible="{Binding IsEmpty}" AutomationProperties.AutomationId="charts-empty">
+          <c:EmptyState Title="{loc:Tr Stat_EmptyChart}" Icon="{StaticResource Icon.Chart}" />
+        </Border>
+
+        <Grid ColumnDefinitions="2*,*,*" ColumnSpacing="18" Height="340" IsVisible="{Binding !IsEmpty}">
+          <!-- 每日抽卡活跃分布 -->
+          <Border Classes="card">
+            <Grid RowDefinitions="Auto,*,Auto">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="card-title" Text="{loc:Tr Stat_DailyPullChart}" />
+                <TextBlock Grid.Column="1" Classes="caption" Text="{Binding DailyCaption}" VerticalAlignment="Bottom" />
+              </Grid>
+              <c:BarChart Grid.Row="1" Height="210" VerticalAlignment="Bottom" BarGap="3" Values="{Binding DailyValues}" Tips="{Binding DailyTips}"
+                          HighlightPeak="True" Fill="{DynamicResource AccentBrush}" PeakFill="{DynamicResource DangerBrush}"
+                          EmptyFill="{DynamicResource TrackBrush}" AutomationProperties.AutomationId="charts-daily" />
+              <Grid Grid.Row="2" Margin="0,8,0,0" ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto">
+                <TextBlock Classes="caption" FontSize="11" Text="{Binding DailyAxis[0], FallbackValue=''}" />
+                <TextBlock Grid.Column="2" Classes="caption" FontSize="11" Text="{Binding DailyAxis[1], FallbackValue=''}" />
+                <TextBlock Grid.Column="4" Classes="caption" FontSize="11" Text="{Binding DailyAxis[2], FallbackValue=''}" />
+                <TextBlock Grid.Column="6" Classes="caption" FontSize="11" Text="{Binding DailyAxis[3], FallbackValue=''}" />
+              </Grid>
+            </Grid>
+          </Border>
+
+          <!-- 五星出货抽数分布 -->
+          <Border Grid.Column="1" Classes="card">
+            <Grid RowDefinitions="Auto,*,Auto">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="card-title" Text="{loc:Tr Pulls_PityChart}" />
+                <TextBlock Grid.Column="1" Classes="caption" Text="{Binding PityCaption}" VerticalAlignment="Bottom" />
+              </Grid>
+              <c:BarChart Grid.Row="1" Height="210" VerticalAlignment="Bottom" BarGap="10" BarRadius="3" ShowValues="True"
+                          Values="{Binding PityValues}" Fill="{DynamicResource AccentBrush}" EmptyFill="{DynamicResource TrackBrush}"
+                          LabelBrush="{DynamicResource TextPrimaryBrush}" AutomationProperties.AutomationId="charts-pity" />
+              <ItemsControl Grid.Row="2" Margin="0,8,0,0" ItemsSource="{Binding PityLabels}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="x:String">
+                    <TextBlock Classes="caption" FontSize="11" HorizontalAlignment="Center" TextTrimming="None" Margin="-6,0" Text="{Binding}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+          </Border>
+
+          <!-- 各卡池抽数占比 -->
+          <Border Grid.Column="2" Classes="card">
+            <Grid RowDefinitions="Auto,*">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="card-title" Text="{loc:Tr Pulls_PoolShareChart}" />
+                <TextBlock Grid.Column="1" Classes="caption" Text="{Binding ShareCaption}" VerticalAlignment="Bottom" />
+              </Grid>
+              <Grid Grid.Row="1" ColumnDefinitions="Auto,*" ColumnSpacing="14" VerticalAlignment="Center">
+                <c:DonutChart Width="108" Height="108" Values="{Binding ShareValues}" CenterValue="{Binding ShareTotal}" CenterFormat="{}{0:N0}"
+                              Brush1="{DynamicResource AccentBrush}" Brush2="{DynamicResource TextPrimaryBrush}"
+                              Brush3="{DynamicResource TextMutedBrush}" Brush4="{DynamicResource TrackBrush}"
+                              EmptyBrush="{DynamicResource TrackBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+                              AutomationProperties.AutomationId="charts-share" />
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding ShareLegend}" VerticalAlignment="Center">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="10" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="pulls:ShareLegendRow">
+                      <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="6">
+                        <Border Classes="legend" Classes.s1="{Binding IsFirst}" Classes.s2="{Binding IsSecond}"
+                                Classes.s3="{Binding IsThird}" Classes.s4="{Binding IsFourth}" />
+                        <TextBlock Grid.Column="1" Classes="caption" Foreground="{DynamicResource LabelBrush}" Text="{Binding Title}" />
+                        <TextBlock Grid.Column="2" Classes="caption" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"
+                                   HorizontalAlignment="Right" Text="{Binding Text}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </Grid>
+          </Border>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="18" Height="340" IsVisible="{Binding !IsEmpty}">
+          <!-- 每个五星花费抽数 -->
+          <Border Classes="card">
+            <Grid RowDefinitions="Auto,*">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="card-title" Text="{loc:Tr Pulls_FiveStarCostChart}" />
+                <TextBlock Grid.Column="1" Classes="caption" Text="{loc:Tr Pulls_FiveStarCostHint}" VerticalAlignment="Bottom" />
+              </Grid>
+              <ItemsControl Grid.Row="1" ItemsSource="{Binding CostRows}" VerticalAlignment="Bottom">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="11" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="pulls:FiveStarCostRow">
+                    <Grid ColumnDefinitions="82,*,26" ColumnSpacing="10">
+                      <TextBlock Classes="aux" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                      <c:SegmentedBar Grid.Column="1" Classes="cost" Value="{Binding Pity}" />
+                      <TextBlock Grid.Column="2" Classes="aux" FontWeight="Bold" HorizontalAlignment="Right" Text="{Binding Pity}" VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+          </Border>
+
+          <!-- 累计抽数 -->
+          <Border Grid.Column="1" Classes="card">
+            <Grid RowDefinitions="Auto,*,Auto">
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Classes="card-title" Text="{loc:Tr Stat_CumulativePulls}" />
+                <TextBlock Grid.Column="1" Classes="caption" Text="{Binding CumulativeCaption}" VerticalAlignment="Bottom" />
+              </Grid>
+              <c:AreaLineChart Grid.Row="1" Margin="0,12,0,0" Values="{Binding CumulativeValues}" Color="{DynamicResource AccentColor}"
+                               GridBrush="{DynamicResource DividerBrush}" LabelBrush="{DynamicResource TextMutedBrush}"
+                               ValueBrush="{DynamicResource TextPrimaryBrush}" DotFill="{DynamicResource SurfaceBrush}"
+                               AutomationProperties.AutomationId="charts-cumulative" />
+              <ItemsControl x:Name="CumulativeAxis" Grid.Row="2" Margin="18,6,0,0" ItemsSource="{Binding CumulativeLabels}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="x:String">
+                    <TextBlock Classes="caption" FontSize="11" HorizontalAlignment="Center" Text="{Binding}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+          </Border>
+
+          <!-- 稀有度构成与不歪率 -->
+          <Border Grid.Column="2" Classes="card">
+            <StackPanel>
+              <TextBlock Classes="card-title" Text="{loc:Tr Pulls_RarityChart}" />
+              <ItemsControl Margin="0,14,0,0" ItemsSource="{Binding RarityRows}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="12" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="pulls:RarityRow">
+                    <StackPanel>
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="aux" Text="{Binding Title}" />
+                        <TextBlock Grid.Column="1" Classes="aux" FontWeight="Bold" Text="{Binding Text}" />
+                      </Grid>
+                      <c:SegmentedBar Classes="rarity thin" Classes.four="{Binding IsFour}" Classes.muted="{Binding IsMuted}" Value="{Binding Ratio}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <Border Height="1" Background="{DynamicResource DividerBrush}" Margin="0,16,0,14" />
+              <ItemsControl ItemsSource="{Binding WinRows}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="12" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="pulls:RarityRow">
+                    <StackPanel>
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="aux" Text="{Binding Title}" />
+                        <TextBlock Grid.Column="1" Classes="aux" FontWeight="Bold" Text="{Binding Text}" />
+                      </Grid>
+                      <c:SegmentedBar Classes="rarity thin" Value="{Binding Ratio}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fb="using:WwTool.UI.Feedback"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Feedback.ToastHost"
+             x:DataType="fb:IUIStateService">
+  <!-- 提示（定稿「提示」）：右上角，Surface 底、圆角 12、内边距 14 / 18、左侧 5 宽类型色条；标题 14 Bold 用类型色，正文 13。
+       动效「提示滑入」：从右侧带回弹滑入 360ms，底部细线倒计时，到时上移 12 淡出。悬停暂停倒计时。 -->
+  <UserControl.Styles>
+    <Style Selector="Border.toast">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="ClipToBounds" Value="True" />
+      <Setter Property="BoxShadow" Value="0 14 30 -14 #80281C0A" />
+    </Style>
+    <Style Selector="Border.toast Border.strip">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Border.toast TextBlock.title">
+      <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Border.toast.success Border.strip"><Setter Property="Background" Value="{DynamicResource SuccessBrush}" /></Style>
+    <Style Selector="Border.toast.success TextBlock.title"><Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" /></Style>
+    <Style Selector="Border.toast.warning Border.strip"><Setter Property="Background" Value="{DynamicResource WarningBrush}" /></Style>
+    <Style Selector="Border.toast.warning TextBlock.title"><Setter Property="Foreground" Value="{DynamicResource WarningBrush}" /></Style>
+    <Style Selector="Border.toast.error Border.strip"><Setter Property="Background" Value="{DynamicResource DangerBrush}" /></Style>
+    <Style Selector="Border.toast.error TextBlock.title"><Setter Property="Foreground" Value="{DynamicResource DangerBrush}" /></Style>
+    <Style Selector="Button.toast-close">
+      <Setter Property="Width" Value="24" />
+      <Setter Property="Height" Value="24" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.toast:pointerover Button.toast-close, Button.toast-close:focus-visible">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="Button.toast-action">
+      <Setter Property="Padding" Value="12,4" />
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+  </UserControl.Styles>
+
+  <ItemsControl ItemsSource="{Binding Toasts}" Width="360" ClipToBounds="False">
+    <ItemsControl.ItemsPanel>
+      <ItemsPanelTemplate>
+        <StackPanel Spacing="12" />
+      </ItemsPanelTemplate>
+    </ItemsControl.ItemsPanel>
+    <ItemsControl.ItemTemplate>
+      <DataTemplate x:DataType="fb:ToastItem">
+        <Border Classes="toast" Classes.success="{Binding IsSuccess}" Classes.warning="{Binding IsWarning}" Classes.error="{Binding IsError}"
+                AttachedToVisualTree="OnToastAttached"
+                PointerEntered="OnToastPointerEntered" PointerExited="OnToastPointerExited"
+                AutomationProperties.AutomationId="toast">
+          <Border.RenderTransform><TranslateTransform /></Border.RenderTransform>
+          <Grid ColumnDefinitions="5,*" RowDefinitions="*,Auto">
+            <Border x:Name="Strip" Grid.RowSpan="2" Classes="strip" />
+            <Grid Grid.Column="1" Margin="18,14,10,14" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Classes="title" Text="{Binding Title}" FontSize="14" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                <Border IsVisible="{Binding HasRepeat}" CornerRadius="999" Padding="6,0" VerticalAlignment="Center"
+                        Background="{DynamicResource SurfaceSunkenBrush}">
+                  <TextBlock Text="{Binding RepeatCount, StringFormat='×{0}'}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                </Border>
+              </StackPanel>
+              <Button Grid.Column="1" Classes="toast-close" VerticalAlignment="Top" Margin="0,-4,0,0"
+                      Command="{Binding CloseCommand}" ToolTip.Tip="{loc:Tr Toast_Dismiss}"
+                      AutomationProperties.Name="{loc:Tr Toast_Dismiss}">
+                <Path Data="M0,0 L8,8 M8,0 L0,8" Stroke="{DynamicResource TextMutedBrush}" StrokeThickness="1.4"
+                      Width="8" Height="8" Stretch="None" />
+              </Button>
+              <SelectableTextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0,2,0,0" Text="{Binding Message}" FontSize="13" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+              <Button Grid.Row="2" Margin="0,10,0,0" Classes="toast-action" HorizontalAlignment="Left"
+                      IsVisible="{Binding HasAction}" Content="{Binding ActionText}" Command="{Binding ActionCommand}" />
+            </Grid>
+            <!-- 底部细线：倒计时，或任务进度 -->
+            <ProgressBar Grid.Row="1" Grid.Column="1" Height="2" MinHeight="2" CornerRadius="0" Minimum="0" Maximum="1"
+                         Value="{Binding RemainingRatio}" IsVisible="{Binding !IsProgress}" Opacity="0.45"
+                         Background="Transparent" Foreground="{Binding #Strip.Background}" />
+            <ProgressBar Grid.Row="1" Grid.Column="1" Height="2" MinHeight="2" CornerRadius="0" Minimum="0" Maximum="1"
+                         Value="{Binding Progress}" IsVisible="{Binding IsProgress}"
+                         Background="Transparent" Foreground="{Binding #Strip.Background}" />
+          </Grid>
+        </Border>
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>

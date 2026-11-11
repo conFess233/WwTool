@@ -1,0 +1,244 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="using:WwTool.UI.Shell"
+        xmlns:vm="using:WwTool.UI.ViewModels"
+        xmlns:fb="using:WwTool.UI.Feedback"
+        xmlns:c="using:WwTool.UI.Controls"
+        xmlns:loc="using:WwTool.UI.Localization"
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
+        x:Class="WwTool.UI.Shell.MainWindow"
+        x:DataType="vm:ShellViewModel"
+        Title="WwTool"
+        Width="1440" Height="900"
+        MinWidth="1200" MinHeight="760"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="0"
+        WindowDecorations="BorderOnly"
+        Icon="avares://WwTool/Assets/WwTool.ico">
+  <!--
+    全局框架（开发文档「全局框架」「窗口外框」）：页头即标题栏，没有侧边栏。
+    页头高 56、三列（左右等宽、中列按内容），左 Logo 与页名、中悬浮岛、右账号胶囊；页边距左右 40、上下 26，卡片间距 18。
+    Windows：窗口按钮 46 × 32 贴右上角，页头整体下移 12；macOS：系统红绿灯在左，Logo 与页名右移到 112（由代码按平台设置）。
+  -->
+  <Window.Styles>
+    <!-- 账号胶囊：高 44、左 6 右 12、Surface 底、Border 描边 -->
+    <Style Selector="Button#AccountCapsule">
+      <Setter Property="ClipToBounds" Value="False" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel>
+            <Border Name="Ring" Margin="-3" CornerRadius="999" BorderThickness="3" BorderBrush="{DynamicResource AccentContainerBrush}"
+                    IsVisible="False" />
+            <Border Name="Body" Height="44" Padding="6,0,12,0" CornerRadius="999" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+                </Transitions>
+              </Border.Transitions>
+              <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+            </Border>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button#AccountCapsule:pointerover /template/ Border#Body">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
+    </Style>
+    <Style Selector="Button#AccountCapsule.on /template/ Border#Body">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="Button#AccountCapsule.on /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Windows 窗口按钮：46 × 32；关闭悬停 #C42B1C 底、白色图标 -->
+    <Style Selector="Button.caption">
+      <Setter Property="Width" Value="46" />
+      <Setter Property="Height" Value="32" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Button.caption /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.caption:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
+    </Style>
+    <Style Selector="Button.caption.close:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource CloseHoverBrush}" />
+    </Style>
+    <Style Selector="Button.caption.close:pointerover">
+      <Setter Property="Foreground" Value="#FFFFFF" />
+    </Style>
+    <Style Selector="Button.caption Path">
+      <Setter Property="Stroke" Value="{Binding $parent[Button].Foreground}" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="Width" Value="12" />
+      <Setter Property="Height" Value="12" />
+      <Setter Property="Stretch" Value="None" />
+    </Style>
+    <Style Selector="c|HomeBackdropDecor.show">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </Window.Styles>
+
+  <Panel>
+    <!-- 背景：主题背景色（开启毛玻璃时半透明）+ 默认底纹 -->
+    <Border Background="{DynamicResource BackgroundBrush}" Opacity="{Binding BackdropOpacity}" IsHitTestVisible="False" />
+    <c:BackdropTexture GridColor="{DynamicResource GridLineColor}" GridOpacity="{DynamicResource GridLineOpacity}"
+                       GlowColor="{DynamicResource GlowColor}" GlowOpacity="{DynamicResource GlowOpacity}"
+                       IsVisible="{Binding !HasBackgroundImage}" />
+    <!-- 背景图（自定义图片，或未设定时取游戏启动器背景）：铺满并四周多留 14 供视差移动；左侧叠一层背景色遮罩（45% 渐隐到 0，止于 45% 宽处），保证页名可读、其余部分保持清晰 -->
+    <Panel IsVisible="{Binding HasBackgroundImage}" IsHitTestVisible="False" ClipToBounds="True">
+      <Image x:Name="BackdropImage" Source="{Binding BackgroundImage}" Stretch="UniformToFill" Margin="-14"
+             IsVisible="{Binding !#BackdropVideo.HasFrame}">
+        <Image.RenderTransform><TranslateTransform /></Image.RenderTransform>
+      </Image>
+      <!-- 动态背景（仅 Windows，设置开启时）：启动器背景视频叠在首帧图上，第一帧出来前透明；是否播放由窗口状态决定 -->
+      <c:VideoBackdrop x:Name="BackdropVideo" Source="{Binding BackgroundVideo}" Margin="-14"
+                       IsVisible="{Binding BackgroundVideo, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <c:VideoBackdrop.RenderTransform><TranslateTransform /></c:VideoBackdrop.RenderTransform>
+      </c:VideoBackdrop>
+      <Border Background="{DynamicResource BackgroundBrush}">
+        <Border.OpacityMask>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+            <GradientStop Offset="0" Color="#73000000" />
+            <GradientStop Offset="0.45" Color="#00000000" />
+          </LinearGradientBrush>
+        </Border.OpacityMask>
+      </Border>
+      <!-- 启动器标语图：与背景同比例的透明整幅图，按相同方式铺放并跟随视差，叠在遮罩之上保持清晰 -->
+      <Image x:Name="BackdropSlogan" Source="{Binding BackgroundSlogan}" IsVisible="{Binding HasBackgroundSlogan}"
+             Stretch="UniformToFill" Margin="-14">
+        <Image.RenderTransform><TranslateTransform /></Image.RenderTransform>
+      </Image>
+    </Panel>
+    <!-- 首页专属装饰：十字定位标记、右侧竖排小字、金色渐隐短线；切换页面时淡入淡出 -->
+    <c:HomeBackdropDecor x:Name="HomeDecor" IsHitTestVisible="False" Opacity="0" Classes.show="{Binding IsHomePage}"
+                         GoldColor="{DynamicResource GlowColor}">
+      <c:HomeBackdropDecor.Brush>
+        <SolidColorBrush Color="{DynamicResource GridLineColor}" Opacity="0.45" />
+      </c:HomeBackdropDecor.Brush>
+      <c:HomeBackdropDecor.LineBrush>
+        <SolidColorBrush Color="{DynamicResource GridLineColor}" Opacity="0.4" />
+      </c:HomeBackdropDecor.LineBrush>
+      <c:HomeBackdropDecor.Transitions>
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.32" />
+        </Transitions>
+      </c:HomeBackdropDecor.Transitions>
+    </c:HomeBackdropDecor>
+
+    <!-- 窗口四周留白（内容区外圈）可拖动窗口、双击最大化；在内容、悬浮按钮、提示与对话框之下，只接住空白处的点击 -->
+    <Panel x:Name="DragEdges">
+      <Border x:Name="TopDragBand" Background="Transparent" VerticalAlignment="Top" Height="38" PointerPressed="OnHeaderPointerPressed" />
+      <Border Background="Transparent" HorizontalAlignment="Left" Width="40" PointerPressed="OnHeaderPointerPressed" />
+      <Border Background="Transparent" HorizontalAlignment="Right" Width="40" PointerPressed="OnHeaderPointerPressed" />
+      <Border Background="Transparent" VerticalAlignment="Bottom" Height="26" PointerPressed="OnHeaderPointerPressed" />
+    </Panel>
+
+    <Grid x:Name="Frame" RowDefinitions="Auto,*" Margin="40,38,40,0">
+      <!-- 页头：空白处拖动窗口，双击最大化 / 还原；Logo、悬浮岛、账号胶囊不参与拖动 -->
+      <Grid x:Name="Header" Grid.Row="0" Height="56" ColumnDefinitions="*,Auto,*" Background="Transparent"
+            PointerPressed="OnHeaderPointerPressed">
+        <StackPanel x:Name="Brand" Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center"
+                    HorizontalAlignment="Left" Background="Transparent" PointerPressed="OnBrandPointerPressed">
+          <Border Width="44" Height="44" CornerRadius="22" ClipToBounds="True" Background="#EFE7D8"
+                  BoxShadow="{DynamicResource ShadowSoft}">
+            <Image Source="avares://WwTool/Assets/WwTool.ico" Width="44" Height="44" />
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Classes="parent-title" Text="{Binding ParentTitle}" IsVisible="{Binding HasParent}" Margin="0,0,0,2" />
+            <TransitioningContentControl x:Name="TitleHost" Content="{Binding PageTitle}" ClipToBounds="False">
+              <TransitioningContentControl.PageTransition>
+                <shell:TitleSwapTransition />
+              </TransitioningContentControl.PageTransition>
+              <TransitioningContentControl.ContentTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <TextBlock Classes="page-title" Text="{Binding}" AutomationProperties.AutomationId="PageTitle" />
+                </DataTemplate>
+              </TransitioningContentControl.ContentTemplate>
+            </TransitioningContentControl>
+          </StackPanel>
+        </StackPanel>
+
+        <shell:FloatingNavIsland x:Name="Island" Grid.Column="1" VerticalAlignment="Center" ItemsSource="{Binding NavItems}" />
+
+        <Button x:Name="AccountCapsule" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"
+                Classes.on="{Binding IsAccountsPage}" Command="{Binding OpenAccountsCommand}"
+                AutomationProperties.AutomationId="account-capsule" AutomationProperties.Name="{loc:Tr Nav_AccountData}">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <!-- 切换账号：头像三维翻转，昵称上滚换新（动效「账号切换」） -->
+            <Border x:Name="CapsuleAvatar" Width="32" Height="32" CornerRadius="16" Background="#EFE7D8" ClipToBounds="True"
+                    RenderTransformOrigin="50%,50%">
+              <c:CatalogImage Path="{Binding Accounts.Current.IconPath}" DecodeWidth="64" Stretch="UniformToFill"
+                              FallbackPath="avares://WwTool/Assets/Images/Account.png" />
+            </Border>
+            <c:RollingText Text="{Binding Accounts.DisplayName}" IsVisible="{Binding Accounts.HasAccount}" MaxWidth="160" ClipToBounds="True"
+                           FontSize="13" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimaryBrush}" RollDuration="0:0:0.48" />
+            <TextBlock Text="{loc:Tr Account_None}" IsVisible="{Binding !Accounts.HasAccount}" FontSize="13"
+                       VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+            <TextBlock Text="{Binding Accounts.Current.Level, StringFormat='LV.{0}', FallbackValue=''}" IsVisible="{Binding Accounts.HasLevel}"
+                       FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource AccentTextBrush}" />
+            <c:StrokeIcon Data="{StaticResource Icon.ChevronDown}" Width="14" Height="14" StrokeThickness="2.4"
+                          VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+          </StackPanel>
+        </Button>
+      </Grid>
+
+      <!-- 内容区：页面切换（旧页左移淡出、新页从右淡入）；页面自己负责底部 26 与悬浮按钮避让 -->
+      <TransitioningContentControl x:Name="PageHost" Grid.Row="1" Margin="0,18,0,0" Content="{Binding CurrentPage}"
+                                   ClipToBounds="False">
+        <TransitioningContentControl.PageTransition>
+          <shell:PageSlideTransition />
+        </TransitioningContentControl.PageTransition>
+      </TransitioningContentControl>
+    </Grid>
+
+    <!-- 悬浮按钮（含遮罩）与提示栈 -->
+    <shell:FabMenu x:Name="Fab" DataContext="{Binding Fab}" />
+    <fb:ToastHost DataContext="{Binding UiState}" Margin="0,104,40,0" HorizontalAlignment="Right" VerticalAlignment="Top" />
+
+    <!-- 对话框覆盖层盖住整个窗口（含页头） -->
+    <fb:DialogOverlay DataContext="{Binding Dialogs}" />
+
+    <!-- 启动画面：加载形象 + WwTool + 细进度条 + 正在读取本地数据；完成后放大 4% 淡出 -->
+    <Panel x:Name="Splash" Background="{DynamicResource BackgroundBrush}" RenderTransformOrigin="50%,50%">
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+        <c:PixelGif Width="96" Height="96" HorizontalAlignment="Center" />
+        <TextBlock Text="WwTool" FontSize="26" FontWeight="Bold" HorizontalAlignment="Center" />
+        <c:SegmentedBar Classes="thin" Width="220" Maximum="1" Value="{Binding StartupProgress}" />
+        <TextBlock Classes="caption" Text="{loc:Tr Splash_Loading}" HorizontalAlignment="Center" />
+      </StackPanel>
+    </Panel>
+
+    <!-- Windows 窗口按钮：贴窗口右上角，在所有层之上 -->
+    <StackPanel x:Name="CaptionButtons" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+      <Button x:Name="MinimizeButton" Classes="caption" Click="OnMinimizeClick"
+              chrome:WindowDecorationProperties.ElementRole="MinimizeButton"
+              AutomationProperties.AutomationId="caption-minimize">
+        <Path Data="M1,6 L11,6" />
+      </Button>
+      <Button x:Name="MaximizeButton" Classes="caption" Click="OnMaximizeClick"
+              chrome:WindowDecorationProperties.ElementRole="MaximizeButton"
+              AutomationProperties.AutomationId="caption-maximize">
+        <Path x:Name="MaximizeGlyph" Data="M1.5,1.5 L10.5,1.5 L10.5,10.5 L1.5,10.5 Z" />
+      </Button>
+      <Button Classes="caption close" Click="OnCloseClick"
+              chrome:WindowDecorationProperties.ElementRole="CloseButton"
+              AutomationProperties.AutomationId="caption-close">
+        <Path Data="M1.5,1.5 L10.5,10.5 M10.5,1.5 L1.5,10.5" />
+      </Button>
+    </StackPanel>
+
+    <!-- 主题切换（动效「主题切换」）：旧主题截图盖在最上层，新主题从点击处圆形扩散露出 -->
+    <Image x:Name="ThemeSnapshot" IsVisible="False" IsHitTestVisible="False" Stretch="Fill" />
+  </Panel>
+</Window>

@@ -1,0 +1,12 @@
+using WwTool.Core.Models.Domain;
+
+namespace WwTool.Core.Data.Repositories;
+
+public interface IUserRepository
+{
+    Task<AccountSummary?> GetUserAccountAsync(string uid, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<AccountSummary>> GetAllUserAccountAsync(CancellationToken cancellationToken = default);
+    Task DeleteUserAccountAsync(string uid, CancellationToken cancellationToken = default);
+    Task SaveOauthCodeAsync(string uid, string oauthCode, CancellationToken cancellationToken = default);
+    Task<string?> GetOauthCodeAsync(string uid, CancellationToken cancellationToken = default);
+}

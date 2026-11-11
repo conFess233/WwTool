@@ -1,140 +1,142 @@
 <div align="center">
 
-# WwTool
+![Icon](../../src/UI/Assets/Images/Icon.gif)
 
-A Wuthering Waves toolbox · Account details, Resonators and Convene statistics
+## WwTool
 
-![Version 1.2.1](https://img.shields.io/badge/version-1.2.1-blue)
+A Wuthering Waves toolbox · Account data, Resonators and Convene statistics
+
+![Version 2.0.0](https://img.shields.io/badge/version-2.0.0-blue)
 ![Windows x64](https://img.shields.io/badge/platform-Windows%2010%2B%20x64-0078D4)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
 [![MIT License](https://img.shields.io/badge/license-MIT-green)](../../LICENSE.txt)
 
 [简体中文](../../README.md) | English | [日本語](README_ja.md)
 
-[Features](#features) · [Quick start](#quick-start) · [Usage](#usage) · [Settings](#settings) · [Data & privacy](#data) · [Limitations](#limitations) · [Preview](#preview) · [Docs](#docs) · [Changelog](../../CHANGELOG.md)
+[Features](#features) · [Download](#download) · [Quick start](#quick-start) · [Data & privacy](#data) · [Known limitations](#limitations) · [Docs](#docs) · [Changelog](../../CHANGELOG.md)
 
 </div>
 
-WwTool is a Windows desktop tool for viewing Wuthering Waves account details and organizing Convene history. It supports multiple accounts and UIDs, local records, and Simplified Chinese, English and Japanese interfaces.
+A Windows desktop tool for Wuthering Waves: view your account and Resonators, and keep and analyze your Convene history. All data is stored locally. Supports multiple accounts and UIDs, with Simplified Chinese, English and Japanese interfaces.
+
+![Home](Img/home.png)
 
 <a id="features"></a>
 ## Features
 
-| Feature | Details |
+| Page | What it shows |
 | --- | --- |
-| Account overview | Nickname, UID, level, SOL3 Phase, activity, weekly boss rewards and Pioneer Podcast details |
-| Resonator details | Owned Resonators, activated Resonance Chains and equipped weapons; a hover card with artwork and available attributes from the guide service |
-| Convene statistics | Automatic or manual history URL import, pulls by banner, current pity, average pulls per 5-star and overall summaries |
-| Charts | Banner comparisons, rarity distribution, pull timelines and activity heatmaps, with filters |
-| Exploration & motorcycle | Collection counts, chest and Tidal Heritage records returned by the API, plus motorcycle, cosmetic and music unlocks |
-| Game catalog | Separate Resonator, weapon, motorcycle and album catalogs synced from this repository; images cached on demand |
-| Appearance | Multiple themes, accent colors, frosted glass, opacity and reduced motion options |
+| Home | Nickname, UID (one-click copy), level and SOL3 Phase; live progress of Waveplate, Crystal Solvent, Activity, Pioneer Podcast and weekly rewards; quick actions such as launching the game, opening the screenshot / game / log folders and copying the gacha link; game announcements (China / International switch) |
+| Convene Statistics | Finds the Convene link in the game log automatically, then fetches and saves your records. The overview shows pulls, 5-stars, average pulls per 5-star, 50/50 win rate and current pity for each banner, in list or compact view. Each banner also has its own full record list |
+| Detailed charts | 5-star pity distribution, share of pulls by banner, pulls spent on each 5-star, rarity breakdown with 50/50 win rate, and a daily pull heatmap |
+| Account Data | Every locally saved account: switch, refresh, log in again or delete |
+| Character Data | Owned Resonators and weapons, Resonance Chains and current equipment; click a card for half-body art and attributes |
+| Exploration Data | Collected chests and Tidal Remnants by tier |
+| Vehicle Data | Vehicle level, and unlocked skins, stickers, ornaments, frames and in-vehicle music |
+| Settings | Theme and accent color, launcher background / animated background / custom image, glass effect, language, notification level, reduced motion, logging and network options |
 
-Account details currently target the global service and require email/password login. Convene history supports both the Chinese and global services and can be used independently.
-
-<a id="quick-start"></a>
-## Quick start
-
-1. Use Windows 10 or later, x64, and install [.NET Desktop Runtime 10 for Windows x64](https://dotnet.microsoft.com/en-us/download/dotnet/10.0). Select the desktop runtime on the download page.
-2. Download `WwTool.zip` from [Releases](https://github.com/conFess233/WwTool/releases) and extract the entire archive to a writable folder.
-3. Run `WwTool.exe`. Keep the accompanying resources and local data folders with the executable.
-4. Add an account or import Convene history as described below. See the [usage guide](Help_en.md) for detailed steps.
-
-<details>
-<summary>Build from source</summary>
-
-Install the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), then run on Windows:
-
-```powershell
-git clone https://github.com/conFess233/WwTool.git
-cd WwTool
-dotnet build WwTool/WwTool.csproj -c Release
-```
-
-Run `WwTool/bin/Release/net10.0-windows/WwTool.exe`. You can also open `WwTool.slnx` in a development environment that supports .NET 10.
-
-</details>
-
-<a id="usage"></a>
-## Usage
-
-### View accounts and Resonators
-
-1. Add an account on the home page using your email and password. Complete verification in the browser if prompted.
-2. Select the relevant UID and fetch cloud data, then open the account, Resonator, exploration or motorcycle page.
-3. Hover over a Resonator avatar for **0.5 seconds** to fade in its card. Artwork appears on the left with the name below; available attributes and the equipped weapon appear on the right, with the acquisition time in the lower-right corner when known.
-
-Keyboard focus also opens the card; press `Esc` to close it. The card uses the latest locally synced snapshot. Hovering does not fetch fresh character data; fetch cloud data again to update it.
-
-### Import Convene history
-
-1. For automatic import, select the game folder in Settings and open Convene history once in the game.
-2. Read the history URL from the game log on the statistics page, or paste it manually and select the server.
-3. Fetch the records and view the overview and charts. Later, select a UID to load its saved local records.
-
-Repeated imports do not add the same record again. Ten-pulls sharing a timestamp retain their source order, and legitimate duplicate results are preserved. Average pulls per 5-star stops at the latest 5-star; current pity is shown separately. The average is left empty when no 5-star is recorded.
-
-<a id="settings"></a>
-## Settings
-
-| Setting | Purpose |
-| --- | --- |
-| Game path | Read history URLs automatically; select the launcher folder containing `Wuthering Waves Game` or the game folder |
-| Language & appearance | Switch languages, themes, accent colors, frosted glass, opacity and motion |
-| Game catalog sync | Check all four categories, inspect versions, counts, results and last successful sync times, or cancel syncing |
-| Image cache | Clear cached images; they will be downloaded again as needed |
-
-After startup, each catalog category is checked when 24 hours have elapsed since its last successful sync. Syncing uses catalog files from this repository's default branch and retains existing data on failure. Catalog versions such as `3.7.0` are maintained separately from the tool version, `1.2.1`.
-
-<a id="data"></a>
-## Data & privacy
-
-- Configuration, account snapshots and Convene records stay in the application directory. Close the tool and back up local data before updating; avoid overwriting saved data with archive contents.
-- Saved login credentials use Windows DPAPI encryption for the current Windows user. Moving to another computer or Windows user may require logging in again. This does not mean the entire database is encrypted.
-- Login and cloud data retrieval contact the relevant game services. Catalog syncing and missing icon downloads contact GitHub; half-body artwork uses official image URLs saved in the guide snapshot.
-- History URLs may contain authentication information. Remove passwords, tokens, complete history URLs and personal account details before sharing diagnostics.
-- Images are cached in `Local/Cache/Images`; the default log folder is `Local/Logs`. Clearing the image cache does not delete Convene records.
-
-<a id="limitations"></a>
-## Limitations
-
-- **Partial data:** only values returned by the API are displayed. Complete character stats and Echo substats are not guaranteed; unknown values are not treated as zero. Exploration counts are not full map completion percentages.
-- **Unknown acquisition time:** a time inferred from imported pulls is shown only when determinable. Missing history or inapplicable characters are shown as unknown.
-- **Limited history:** only records currently provided by the server can be imported. A local archive cannot recover records that were never imported and are no longer available.
-- **Sync failures:** network issues, login expiry or API changes can prevent retrieval. Failed catalog and image updates retain valid previous data; retry later.
-- **Missing images or names:** cached images, avatars or placeholders provide fallbacks. Unfinished catalog entries without usable names are preserved in the source data and temporarily omitted from display.
-
-See the [usage guide](Help_en.md) for more instructions and troubleshooting.
-
-<a id="preview"></a>
-## Preview
-
-These screenshots are from existing versions. Layout and content may differ from the latest release.
-
-![Home](Img/1.png)
-![Convene statistics](Img/2.png)
+> [!NOTE]
+> Account data (Home, Character, Exploration and Vehicle) currently supports the **International** server only, and requires logging in with email and password. Convene statistics support both the China and International servers and work without logging in.
 
 <details>
 <summary>More screenshots</summary>
 
-![Page preview 3](Img/3.png)
-![Page preview 4](Img/4.png)
-![Page preview 5](Img/5.png)
-![Page preview 6](Img/6.png)
+![Convene Statistics](Img/pulls.png)
+![Detailed charts](Img/charts.png)
+![Character Data](Img/roles.png)
+![Settings](Img/settings.png)
 
 </details>
 
+The screenshots use the Simplified Chinese interface and made-up demo data.
+
+<a id="download"></a>
+## Download
+
+Download one of the archives from [Releases](https://github.com/conFess233/WwTool/releases). If unsure, take the first one.
+
+| Archive | Runtime | Icons | Size | Best for |
+| --- | --- | --- | --- | --- |
+| `WwTool-<version>-win-x64-single-runtime.zip` | Included | Included | ~75 MB | No separate .NET install; unzip and run |
+| `WwTool-<version>-win-x64-single.zip` | Install separately | Included | ~44 MB | .NET 10 Desktop Runtime already installed |
+| `WwTool-<version>-win-x64-single-lite.zip` | Install separately | Downloaded when needed | ~17 MB | Runtime installed, smallest download |
+| `WwTool-<version>-win-x64-multi-runtime.zip` | Included | Included | ~78 MB | Same as the matching single-file build, with libraries next to the exe |
+| `WwTool-<version>-win-x64-multi.zip` | Install separately | Included | ~44 MB | |
+| `WwTool-<version>-win-x64-multi-lite.zip` | Install separately | Downloaded when needed | ~17 MB | |
+
+- **Runtime**: for archives marked "Install separately", install the [.NET Desktop Runtime 10 (Windows x64)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) first. Pick the "Desktop Runtime" on the download page.
+- **Single-file / multi-file**: a single-file build unzips to just `WwTool.exe`, the `Local` folder and the `portable` marker file. A multi-file build keeps its libraries next to the exe. Both work the same.
+- **Lite**: leaves out the Resonator, weapon and other icons (`Local/Icons`). Each icon is downloaded from this repository the first time it is shown, then cached so it also works offline.
+- Each release includes `SHA256SUMS.txt` for checking your download.
+
+Requires 64-bit Windows 10 or later.
+
+<a id="quick-start"></a>
+## Quick start
+
+1. **Unzip the whole archive** into a folder you can write to (not under `C:\Program Files`), then run `WwTool.exe`.
+2. **Convene records only**: in the game, open **Convene → History** once. Back in WwTool, go to Convene Statistics and click **Get records**. WwTool looks for the link in the game log; if it can't find one, it asks you to paste the link. Before your first use, set the game installation directory in Settings.
+3. **Account data (International)**: on Home, click **Add Game Account** and log in with your email and password. If a security check is needed, a web page opens; login continues once you complete it.
+
+For step-by-step instructions and troubleshooting, see the [User guide](Help_en.md).
+
+<details>
+<summary>Build from source</summary>
+
+Install the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), then on Windows run:
+
+```powershell
+git clone https://github.com/conFess233/WwTool.git
+cd WwTool
+dotnet build src/UI/WwTool.UI.csproj -c Release
+```
+
+Run `src/UI/bin/Release/net10.0/WwTool.exe`, or open `WwTool.slnx` in an IDE that supports .NET 10.
+
+To build the six release archives above:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File publish.ps1
+```
+
+The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,single-lite` to build only some of them.
+
+</details>
+
+<a id="data"></a>
+## Data & privacy
+
+- **Data is stored in the program folder.** The `portable` file in the archive turns this on; don't delete it.
+  - `Config/`: settings
+  - `Local/Data/LocalData.db`: account snapshots, Convene records and login credentials
+  - `Local/Cache/`: cached images, launcher background and announcements; safe to delete at any time
+  - `Local/Logs/`: logs
+- **Updating**: close WwTool and unzip the new archive over the old folder. Release archives contain no database or settings, so your data is not overwritten. To be safe, you can copy `Config` and `Local/Data` first. A 1.x program folder can be updated the same way, and its records keep working.
+- **Login credentials** are encrypted with Windows DPAPI for the current Windows user. After moving to another PC or Windows user you need to log in again. The rest of the database is not encrypted.
+- **Network access**:
+  - Login and account data use Kuro Games' services; Convene records use the gacha API of the matching server.
+  - Game data and missing icons are synced from this repository; Resonator art comes from the official guide site.
+  - The background and announcements on Home come from the game launcher's public API.
+- **Your Convene link contains authentication data.** When reporting an issue, remove your password, the full Convene link and other personal details.
+
+<a id="limitations"></a>
+## Known limitations
+
+- **Convene records only go back 6 months.** This is a limit of the official API. Fetch regularly and older records stay in your local data; records older than 6 months that were never fetched cannot be recovered. Fetching again never counts a pull twice.
+- **Account data only shows what the API returns.** There is no full character panel or Echo stats, and exploration counts are not the in-game exploration percentage. Missing values are shown as unknown, never as 0.
+- **Network or API changes can cause fetches to fail.** If game data, images, the background or announcements fail to update, the last successful data is kept; try again later.
+- **The animated background** uses about 150–200 MB of extra memory while playing and is off by default. It pauses when the window is minimized or loses focus.
+
 <a id="docs"></a>
-## Documentation & feedback
+## Docs & feedback
 
-- [Usage guide](Help_en.md)
-- [Changelog (Chinese)](../../CHANGELOG.md)
-- [Game API notes](API/WW_API.md) · [Guide API notes](API/Guide.md)
-- [Resonator resources](Resource/Characters.md) · [Weapon resources](Resource/Weapons.md) · [Motorcycle resources](Resource/Motorcycle.md)
-- [Catalog sync rules](Resource/CatalogSync.md)
+- [User guide](Help_en.md)
+- [Changelog](../../CHANGELOG.md) (Chinese)
+- API notes (Chinese): [Wuthering Waves API](API/WW_API.md) · [Guide site](API/Guide.md) · [Game launcher](API/Launcher.md)
+- Data notes (Chinese): [Resonators](Resource/Characters.md) · [Weapons](Resource/Weapons.md) · [Vehicle](Resource/Motorcycle.md) · [Sync rules](Resource/CatalogSync.md)
 
-Report problems through [Issues](https://github.com/conFess233/WwTool/issues), including the tool version, system environment, steps to reproduce and sanitized error logs. API notes are project reference material and may become outdated as services change. Technical documents are primarily in Chinese.
+Found a problem? Open an [Issue](https://github.com/conFess233/WwTool/issues).
 
 ## License
 
-Project code is licensed under the [MIT License](../../LICENSE.txt). WwTool is an unofficial tool and is not affiliated with the game's publisher. Game names, images and other assets belong to their respective rights holders.
+[MIT License](../../LICENSE.txt)

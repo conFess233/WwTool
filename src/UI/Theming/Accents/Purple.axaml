@@ -1,0 +1,11 @@
+<!-- 强调色联动表：填充与填充上文字固定，文字与淡底按主题深浅取值（ThemeService 选择并派生描边等）。 -->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+  <Color x:Key="AccentColor">#7A5BC4</Color>
+  <Color x:Key="TextOnAccentColor">#FFFFFF</Color>
+  <Color x:Key="AccentTextLightColor">#6346A8</Color>
+  <Color x:Key="AccentTextDarkColor">#B9A3EE</Color>
+  <Color x:Key="AccentContainerLightColor">#ECE6F8</Color>
+  <Color x:Key="AccentContainerDarkColor">#2A2240</Color>
+</ResourceDictionary>

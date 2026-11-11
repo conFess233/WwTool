@@ -1,0 +1,46 @@
+using System.Text.RegularExpressions;
+using WwTool.Core.Enums;
+
+namespace WwTool.Core.Infrastructure
+{
+    public static class GachaServerDetector
+    {
+        public const string ChinaHost = "aki-gm-resources.aki-game.com";
+        public const string InternationalHost = "aki-gm-resources-oversea.aki-game.net";
+
+        private static readonly Regex UrlRegex = new(
+            @"https://[^\s""'\r\n]+",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+        public static bool TryDetect(string? input, out GachaServerRegion region)
+        {
+            region = GachaServerRegion.China;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return false;
+            }
+
+            Match match = UrlRegex.Match(input);
+            if (!match.Success
+                || !Uri.TryCreate(match.Value, UriKind.Absolute, out Uri? uri)
+                || uri.Scheme != Uri.UriSchemeHttps)
+            {
+                return false;
+            }
+
+            if (string.Equals(uri.Host, InternationalHost, StringComparison.OrdinalIgnoreCase))
+            {
+                region = GachaServerRegion.International;
+                return true;
+            }
+
+            if (string.Equals(uri.Host, ChinaHost, StringComparison.OrdinalIgnoreCase))
+            {
+                region = GachaServerRegion.China;
+                return true;
+            }
+
+            return false;
+        }
+    }
+}
