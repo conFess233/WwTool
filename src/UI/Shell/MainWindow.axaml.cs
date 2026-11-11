@@ -283,6 +283,25 @@ public partial class MainWindow : Window
 
     private void OnCloseClick(object? sender, RoutedEventArgs e) => Close();
 
+    private bool _exitConfirmed;
+
+    /// <summary>关闭窗口（窗口按钮、Alt+F4、macOS 红灯）先弹「确认退出」。</summary>
+    protected override async void OnClosing(WindowClosingEventArgs e)
+    {
+        base.OnClosing(e);
+        if (_exitConfirmed || e.IsProgrammatic && e.CloseReason == WindowCloseReason.ApplicationShutdown
+            || DataContext is not ShellViewModel vm || !vm.IsReady)
+        {
+            return;
+        }
+        e.Cancel = true;
+        if (vm.Dialogs.IsOpen) return;
+        bool ok = await vm.Dialogs.ConfirmAsync(vm.Text("Dialog_ExitTitle"), vm.Text("Dialog_ExitMessage"));
+        if (!ok) return;
+        _exitConfirmed = true;
+        Close();
+    }
+
     /// <summary>Logo 与页名不参与拖动。</summary>
     private void OnBrandPointerPressed(object? sender, PointerPressedEventArgs e) => e.Handled = true;
 

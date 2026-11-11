@@ -31,10 +31,15 @@ public partial class DialogOverlay : UserControl
     {
         if (e.PropertyName != nameof(DialogService.Current)) return;
         Card.Classes.Remove("shown");
+        Scrim.Classes.Remove("shown");
         if (_service?.Current is not null)
         {
             // 下一帧再加类名，让过渡从初始状态开始。
-            Dispatcher.UIThread.Post(() => Card.Classes.Add("shown"), DispatcherPriority.Render);
+            Dispatcher.UIThread.Post(() =>
+            {
+                Card.Classes.Add("shown");
+                Scrim.Classes.Add("shown");
+            }, DispatcherPriority.Render);
         }
     }
 

@@ -528,7 +528,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
             await _config.SaveAllAsync();
             _uiState.ShowToast(new NotificationRequest
             {
-                Title = _localization["Action_SaveSettings"],
+                Title = _localization["Toast_Success"],
                 Message = _localization["Toast_SettingsSaved"],
                 Type = NotificationType.Success,
                 Priority = NotificationPriority.Important,

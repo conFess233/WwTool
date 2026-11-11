@@ -108,7 +108,7 @@
   "Toast_Error": "Error",
   "Toast_NoUidSelected": "No UID selected",
   "Dialog_DeleteUser": "Delete User",
-  "Dialog_DeleteUserConfirm": "Are you sure you want to delete all data for user {0}({1})?\nThis action is irreversible!",
+  "Dialog_DeleteUserConfirm": "Delete all data of user {0}({1})?",
   "Toast_UserDeleted": "UID {0} deleted successfully. Refreshing user list...",
   "Index_Home": "Home",
   "Index_AddAccount": "Add Account",
@@ -296,7 +296,7 @@
   "Login_PwdEmpty": "Please enter your password",
   "Login_NoData": "Login request returned no data. Please check network connection.",
   "Login_RiskTitle": "Security Verification",
-  "Login_RiskMsg": "Security verification triggered. Launching webpage for verification...",
+  "Login_RiskMsg": "Risk control triggered, opening a web page for security verification…",
   "Login_GeetestFail": "Security verification failed. Please try logging in again.",
   "Login_GeetestNoData": "Login request returned no data after Geetest verification. Please check network connection.",
   "Login_AuthFail": "Login failed, error code: {0}",
@@ -701,5 +701,7 @@
   "Catalog_Count": "{0} entries",
   "Catalog_StatusLine": "Data version {0}, synced {1}",
   "Catalog_StatusNever": "Game data not synced yet",
-  "Catalog_Today": "today {0}"
+  "Catalog_Today": "today {0}",
+  "Dialog_Irreversible": "This cannot be undone!",
+  "Dialog_DeleteUserNote": "Local pull records and cached data of this account will also be removed"
 }

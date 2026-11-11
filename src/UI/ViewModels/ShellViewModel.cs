@@ -121,6 +121,9 @@ public sealed partial class ShellViewModel : ObservableObject
     /// <summary>窗口内对话框覆盖层。</summary>
     public DialogService Dialogs { get; }
 
+    /// <summary>当前语言的文案（供窗口代码使用）。</summary>
+    public string Text(string key) => _localization[key];
+
     /// <summary>Toast 栈。</summary>
     public IUIStateService UiState { get; }
 

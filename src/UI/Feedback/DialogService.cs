@@ -51,6 +51,15 @@ public sealed partial class ConfirmDialogViewModel : DialogViewModel<bool>
 
     public bool IsDanger { get; init; }
 
+    /// <summary>正文后的 Danger Bold 警示行（如「该操作不可逆！」）。</summary>
+    public string? Warning { get; init; }
+
+    /// <summary>危险说明框文字（如删除账号会一并清除的数据）。</summary>
+    public string? DangerNote { get; init; }
+
+    /// <summary>按钮行上边距：普通确认框为 34，带危险说明框时为 18（定稿）。</summary>
+    public Avalonia.Thickness ActionsMargin => new(0, string.IsNullOrEmpty(DangerNote) ? 34 : 18, 0, 0);
+
     public bool HasCancel => !string.IsNullOrEmpty(CancelText);
 
     protected override bool CancelResult => false;
@@ -78,6 +87,9 @@ public interface IDialogService
 
     /// <summary>确认框；确认返回 true，取消、Escape 或点遮罩返回 false。</summary>
     Task<bool> ConfirmAsync(string title, string message, bool isDanger = false, string? confirmText = null);
+
+    /// <summary>确认框的完整形式，可带警示行与危险说明框。</summary>
+    Task<bool> ConfirmAsync(ConfirmDialogViewModel dialog);
 
     /// <summary>只有“确定”的提示框。</summary>
     Task AlertAsync(string title, string message);
@@ -121,6 +133,8 @@ public sealed partial class DialogService(LocalizationService localization) : Ob
             ConfirmText = confirmText ?? localization["Common_Confirm"],
             CancelText = localization["Common_Cancel"],
         });
+
+    public Task<bool> ConfirmAsync(ConfirmDialogViewModel dialog) => ShowAsync(dialog);
 
     public Task AlertAsync(string title, string message) =>
         ShowAsync(new ConfirmDialogViewModel

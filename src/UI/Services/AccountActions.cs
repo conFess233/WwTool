@@ -48,11 +48,16 @@ public sealed class AccountActions(
     public async Task<bool> DeleteAsync(AccountSummary account)
     {
         string name = string.IsNullOrWhiteSpace(account.Name) ? account.Uid : account.Name;
-        bool confirmed = await dialogs.ConfirmAsync(
-            localization["Dialog_DeleteUser"],
-            string.Format(localization["Dialog_DeleteUserConfirm"], name, account.Uid),
-            isDanger: true,
-            confirmText: localization["Accounts_Delete"]);
+        bool confirmed = await dialogs.ConfirmAsync(new ConfirmDialogViewModel
+        {
+            Title = localization["Dialog_DeleteUser"],
+            Message = string.Format(localization["Dialog_DeleteUserConfirm"], name, account.MaskedUid),
+            Warning = localization["Dialog_Irreversible"],
+            DangerNote = localization["Dialog_DeleteUserNote"],
+            IsDanger = true,
+            ConfirmText = localization["Accounts_Delete"],
+            CancelText = localization["Common_Cancel"],
+        });
         if (!confirmed) return false;
         try
         {

@@ -43,7 +43,7 @@ public sealed partial class UIStateService : ObservableObject, IUIStateService
     private static readonly TimeSpan TickInterval = TimeSpan.FromMilliseconds(50);
 
     /// <summary>关闭动画时长（与 ToastHost 样式中的过渡一致）。</summary>
-    private static readonly TimeSpan CloseAnimation = TimeSpan.FromMilliseconds(180);
+    private static readonly TimeSpan CloseAnimation = TimeSpan.FromMilliseconds(ToastHost.ExitMs + 20);
 
     private readonly IConfigService _config;
     private readonly List<NotificationRequest> _queue = [];

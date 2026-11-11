@@ -2,44 +2,74 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:accounts="using:WwTool.UI.Pages.Accounts"
              xmlns:loc="using:WwTool.UI.Localization"
+             xmlns:c="using:WwTool.UI.Controls"
              x:Class="WwTool.UI.Pages.Accounts.LoginDialogView"
              x:DataType="accounts:LoginDialogViewModel"
-             Width="400">
+             Width="440">
+  <!-- 添加游戏账号（定稿）：说明、邮箱 / 密码（标签 12 Muted、输入框满宽）；
+       触发风控时密码下方出现 Accent Soft 提示条（36 加载形象）；出错时对应输入框轻摆、描边转红加光圈，红色提示从上方 4 落下。 -->
   <UserControl.Styles>
-    <Style Selector="TextBlock.error">
-      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    <Style Selector="TextBlock.field">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Margin" Value="0,14,0,6" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    </Style>
+    <Style Selector="TextBlock#ErrorText">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="translateY(-4px)" />
+    </Style>
+    <Style Selector="TextBlock#ErrorText.shown">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="none" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.24" Easing="0.2,0.8,0.2,1" />
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.24" Easing="0.2,0.8,0.2,1" />
+        </Transitions>
+      </Setter>
     </Style>
   </UserControl.Styles>
-  <StackPanel Spacing="14">
-    <StackPanel Spacing="6">
-      <TextBlock Text="{loc:Tr Dialog_AddAccount}" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" />
-      <TextBlock Classes="caption" Text="{loc:Tr Login_Hint}" TextWrapping="Wrap" />
-    </StackPanel>
+  <StackPanel>
+    <TextBlock Classes="dialog-title" Text="{loc:Tr Dialog_AddAccount}" />
+    <TextBlock Classes="dialog-body" Text="{loc:Tr Login_Hint}" />
 
-    <StackPanel Spacing="6">
-      <TextBlock Classes="caption" Text="{loc:Tr Login_Email}" />
-      <TextBox x:Name="EmailBox" Text="{Binding Email}" IsEnabled="{Binding IsIdle}"
-               AutomationProperties.Name="{loc:Tr Login_Email}" AutomationProperties.AutomationId="login-email" />
-    </StackPanel>
-    <StackPanel Spacing="6">
-      <TextBlock Classes="caption" Text="{loc:Tr Login_Password}" />
-      <TextBox Text="{Binding Password}" PasswordChar="●" RevealPassword="False" IsEnabled="{Binding IsIdle}"
-               AutomationProperties.Name="{loc:Tr Login_Password}" AutomationProperties.AutomationId="login-password" />
-    </StackPanel>
+    <TextBlock Classes="field" Text="{loc:Tr Login_Email}" />
+    <TextBox x:Name="EmailBox" Classes="input" Text="{Binding Email}" IsEnabled="{Binding IsIdle}" PlaceholderText="name@example.com"
+             Classes.error="{Binding ErrorField, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static accounts:LoginField.Email}}"
+             AutomationProperties.Name="{loc:Tr Login_Email}" AutomationProperties.AutomationId="login-email" />
+    <TextBlock Classes="field" Text="{loc:Tr Login_Password}" />
+    <TextBox x:Name="PasswordBox" Classes="input" Text="{Binding Password}" PasswordChar="●" RevealPassword="False" IsEnabled="{Binding IsIdle}"
+             Classes.error="{Binding ErrorField, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static accounts:LoginField.Password}}"
+             AutomationProperties.Name="{loc:Tr Login_Password}" AutomationProperties.AutomationId="login-password" />
 
-    <TextBlock Classes="caption error" Text="{Binding Error}" TextWrapping="Wrap"
-               IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+    <TextBlock x:Name="ErrorText" Margin="0,8,0,0" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource DangerBrush}"
+               Text="{Binding Error}" IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                AutomationProperties.AutomationId="login-error" />
 
-    <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
-      <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsBusy}" VerticalAlignment="Center">
-        <ProgressBar IsIndeterminate="True" Width="60" MinWidth="60" />
-        <TextBlock Classes="caption" Text="{loc:Tr Logging_In}" VerticalAlignment="Center" />
+    <!-- 安全验证提示条 -->
+    <Border Margin="0,16,0,0" Padding="8,6,14,6" CornerRadius="8" Background="{DynamicResource AccentContainerBrush}"
+            IsVisible="{Binding IsVerifying}" AutomationProperties.AutomationId="login-verifying">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <c:PixelGif Width="36" Height="36" />
+        <TextBlock Text="{loc:Tr Login_RiskMsg}" FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource AccentTextBrush}" />
       </StackPanel>
-      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-        <Button Classes="dialog-secondary" Content="{loc:Tr Common_Cancel}" Command="{Binding DismissCommand}"
+    </Border>
+
+    <Grid ColumnDefinitions="*,Auto" Margin="0,18,0,0">
+      <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+        <StackPanel.IsVisible>
+          <MultiBinding Converter="{x:Static BoolConverters.And}">
+            <Binding Path="IsBusy" />
+            <Binding Path="!IsVerifying" />
+          </MultiBinding>
+        </StackPanel.IsVisible>
+        <c:PixelGif Width="24" Height="24" />
+        <TextBlock FontSize="12" Text="{loc:Tr Logging_In}" VerticalAlignment="Center" Foreground="{DynamicResource TextMutedBrush}" />
+      </StackPanel>
+      <StackPanel Grid.Column="1" Classes="dialog-actions" Margin="0">
+        <Button Classes="btn" Content="{loc:Tr Common_Cancel}" Command="{Binding DismissCommand}"
                 AutomationProperties.AutomationId="dialog-cancel" />
-        <Button Classes="dialog-primary" Content="{loc:Tr Common_Login}" Command="{Binding LoginCommand}"
+        <Button Classes="btn primary" Content="{loc:Tr Common_Login}" Command="{Binding LoginCommand}"
                 AutomationProperties.AutomationId="dialog-confirm" />
       </StackPanel>
     </Grid>

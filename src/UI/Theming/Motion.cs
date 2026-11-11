@@ -53,6 +53,31 @@ public static class Motion
     public static event EventHandler? ReducedChanged;
 
     /// <summary>
+    /// 错误抖动（动效「错误抖动」）：左右轻摆 10 / 9 / 6 / 4 / 2，共 400ms。减少动画时不摆动。
+    /// 目标的 RenderTransform 会被临时替换为 TranslateTransform。
+    /// </summary>
+    public static async Task ShakeAsync(Visual target)
+    {
+        if (Reduced) return;
+        double[] peaks = [0, -10, 9, -6, 4, -2, 0];
+        var translate = new Avalonia.Media.TranslateTransform();
+        target.RenderTransform = translate;
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        const double duration = 400;
+        while (clock.Elapsed.TotalMilliseconds < duration)
+        {
+            double t = clock.Elapsed.TotalMilliseconds / duration * (peaks.Length - 1);
+            int i = Math.Min((int)t, peaks.Length - 2);
+            double f = t - i;
+            // 段内用正弦插值，摆动更圆滑。
+            double eased = (1 - Math.Cos(f * Math.PI)) / 2;
+            translate.X = peaks[i] + (peaks[i + 1] - peaks[i]) * eased;
+            await Task.Delay(16);
+        }
+        target.RenderTransform = null;
+    }
+
+    /// <summary>
     /// 入场：从 <paramref name="offsetX"/>/<paramref name="offsetY"/> 位移并淡入。减少动画时只淡入。
     /// 目标的 RenderTransform 会被替换为 TranslateTransform。
     /// </summary>

@@ -185,7 +185,7 @@
 
     <!-- 悬浮按钮（含遮罩）与提示栈 -->
     <shell:FabMenu x:Name="Fab" DataContext="{Binding Fab}" />
-    <fb:ToastHost DataContext="{Binding UiState}" Margin="0,44,24,0" HorizontalAlignment="Right" VerticalAlignment="Top" />
+    <fb:ToastHost DataContext="{Binding UiState}" Margin="0,104,40,0" HorizontalAlignment="Right" VerticalAlignment="Top" />
 
     <!-- 对话框覆盖层盖住整个窗口（含页头） -->
     <fb:DialogOverlay DataContext="{Binding Dialogs}" />

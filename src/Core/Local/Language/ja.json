@@ -108,7 +108,7 @@
   "Toast_Error": "エラー",
   "Toast_NoUidSelected": "UIDが選択されていません",
   "Dialog_DeleteUser": "ユーザーを削除",
-  "Dialog_DeleteUserConfirm": "ユーザー {0}({1}) のすべてのデータを削除してもよろしいですか？\nこの操作は元に戻せません！",
+  "Dialog_DeleteUserConfirm": "ユーザー {0}({1}) のすべてのデータを削除しますか？",
   "Toast_UserDeleted": "UID {0} を正常に削除しました。ユーザーリストを更新しています",
   "Index_Home": "ホーム",
   "Index_AddAccount": "アカウントを追加",
@@ -296,7 +296,7 @@
   "Login_PwdEmpty": "パスワードを入力してください",
   "Login_NoData": "ログインリクエストからデータが返されませんでした。ネットワーク接続を確認してください",
   "Login_RiskTitle": "セキュリティ認証",
-  "Login_RiskMsg": "セキュリティ認証の対象となりました。ウェブページを起動して認証を行います...",
+  "Login_RiskMsg": "リスク制御が作動しました。ブラウザで本人確認を行っています…",
   "Login_GeetestFail": "セキュリティ認証に失敗しました。再度ログインしてください",
   "Login_GeetestNoData": "Geetest認証後、ログインリクエストからデータが返されませんでした。ネットワーク接続を確認してください",
   "Login_AuthFail": "ログイン失敗、エラーコード: {0}",
@@ -701,5 +701,7 @@
   "Catalog_Count": "{0} 件",
   "Catalog_StatusLine": "データバージョン {0}、{1} に同期",
   "Catalog_StatusNever": "ゲームデータは未同期です",
-  "Catalog_Today": "今日 {0}"
+  "Catalog_Today": "今日 {0}",
+  "Dialog_Irreversible": "この操作は元に戻せません！",
+  "Dialog_DeleteUserNote": "このアカウントのローカルのガチャ記録とキャッシュも削除されます"
 }
