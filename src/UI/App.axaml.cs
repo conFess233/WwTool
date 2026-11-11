@@ -140,6 +140,7 @@ public partial class App : Application
         services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<GameLauncherService>();
         services.AddSingleton<ClipboardService>();
+        services.AddSingleton<GamePathPicker>();
         services.AddSingleton<IAnnouncementSource, EmptyAnnouncementSource>();
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<ExploreViewModel>();

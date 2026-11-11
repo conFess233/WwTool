@@ -284,10 +284,23 @@
   </UserControl.Styles>
 
   <ScrollViewer x:Name="Scroller" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-    <Grid x:Name="Root" ColumnDefinitions="*,430" ColumnSpacing="18" Margin="0,0,0,26" MinHeight="620">
+    <Grid x:Name="Root" ColumnDefinitions="*,430" RowDefinitions="Auto,*" ColumnSpacing="18" Margin="0,0,0,26" MinHeight="620">
+
+      <!-- 网络异常（定稿「空状态与异常」）：顶部红色横条，下方照常显示缓存数据 -->
+      <Border Grid.ColumnSpan="2" Margin="0,0,0,14" Padding="12,10" CornerRadius="8" Background="{DynamicResource DangerContainerBrush}"
+              IsVisible="{Binding IsOffline}" AutomationProperties.AutomationId="home-offline">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+          <c:StrokeIcon Width="18" Height="18" StrokeThickness="1.8" Data="{StaticResource Icon.Warning}" Foreground="{DynamicResource DangerBrush}" />
+          <TextBlock Grid.Column="1" FontSize="13" Text="{Binding OfflineText}" VerticalAlignment="Center" Foreground="{DynamicResource DangerBrush}" />
+          <Button Grid.Column="2" Classes="link" FontSize="13" Foreground="{DynamicResource DangerBrush}" Command="{Binding RetrySyncCommand}"
+                  AutomationProperties.AutomationId="home-offline-retry">
+            <TextBlock Text="{loc:Tr Common_Retry}" TextDecorations="Underline" FontWeight="Bold" />
+          </Button>
+        </Grid>
+      </Border>
 
       <!-- ── 左栏 ── -->
-      <Grid RowDefinitions="1.35*,*" RowSpacing="18">
+      <Grid Grid.Row="1" RowDefinitions="1.35*,*" RowSpacing="18">
 
         <!-- 账号总览 -->
         <Border Classes="card" Padding="22,20,22,22" ClipToBounds="True" AutomationProperties.AutomationId="home-profile">
@@ -298,15 +311,35 @@
             <Image Source="avares://WwTool/Assets/WwTool.ico" Width="120" Height="120" HorizontalAlignment="Right" VerticalAlignment="Top"
                    Margin="0,2,4,0" Opacity="0.08" IsHitTestVisible="False" />
 
-            <!-- 没有账号 -->
-            <StackPanel IsVisible="{Binding !Accounts.HasAccount}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10"
-                        AutomationProperties.AutomationId="home-no-account">
-              <c:PixelGif Width="64" Height="64" HorizontalAlignment="Center" />
-              <TextBlock Classes="section-title" Text="{loc:Tr Home_NoAccountTitle}" HorizontalAlignment="Center" />
-              <TextBlock Classes="caption" Text="{loc:Tr Home_NoAccountHint}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="420" />
-            </StackPanel>
+            <!-- 首次启动：欢迎使用 WwTool（84 软件 Logo） -->
+            <c:EmptyState IsVisible="{Binding !Accounts.HasAccount}" Title="{loc:Tr Home_WelcomeTitle}" Description="{loc:Tr Home_WelcomeHint}"
+                          AutomationProperties.AutomationId="home-no-account">
+              <c:EmptyState.Graphic>
+                <Border Width="84" Height="84" CornerRadius="42" ClipToBounds="True" Background="#EFE7D8">
+                  <Image Source="avares://WwTool/Assets/WwTool.ico" />
+                </Border>
+              </c:EmptyState.Graphic>
+              <StackPanel Classes="empty-actions">
+                <Button Classes="btn primary" Content="{loc:Tr Dialog_AddAccount}" Command="{Binding AddAccountCommand}"
+                        AutomationProperties.AutomationId="home-welcome-add" />
+                <Button Classes="btn" Content="{loc:Tr Home_OnlyPulls}" Command="{Binding OnlyPullsCommand}"
+                        AutomationProperties.AutomationId="home-welcome-pulls" />
+              </StackPanel>
+            </c:EmptyState>
 
-            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18" IsVisible="{Binding Accounts.HasAccount}">
+            <!-- 首次同步中：110 加载形象 + 刻度进度条 -->
+            <c:EmptyState IsVisible="{Binding IsFirstSync}" Title="{loc:Tr Home_FirstSyncTitle}" Background="{DynamicResource SurfaceBrush}"
+                          AutomationProperties.AutomationId="home-first-sync">
+              <c:EmptyState.Graphic>
+                <c:PixelGif Width="110" Height="110" />
+              </c:EmptyState.Graphic>
+              <StackPanel Spacing="12" Margin="0,-4,0,0">
+                <c:SegmentedBar Width="260" Height="8" Maximum="1" Value="{Binding FirstSyncProgress}" Shimmer="True" />
+                <TextBlock FontSize="13" HorizontalAlignment="Center" Text="{loc:Tr Home_FirstSyncHint}" Foreground="{DynamicResource TextSecondaryBrush}" />
+              </StackPanel>
+            </c:EmptyState>
+
+            <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18" IsVisible="{Binding ShowProfile}">
               <!-- 身份行 -->
               <StackPanel Orientation="Horizontal" Spacing="16">
                 <Border Width="64" Height="64" CornerRadius="32" ClipToBounds="True" Background="{DynamicResource AccentContainerBrush}">
@@ -460,7 +493,7 @@
       </Grid>
 
       <!-- ── 右栏：游戏公告 ── -->
-      <Border Grid.Column="1" Classes="card" Padding="20,18,20,16" Margin="0,0,0,76" AutomationProperties.AutomationId="home-announcements">
+      <Border Grid.Row="1" Grid.Column="1" Classes="card" Padding="20,18,20,16" Margin="0,0,0,76" AutomationProperties.AutomationId="home-announcements">
         <Panel>
           <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
             <Grid ColumnDefinitions="*,Auto">

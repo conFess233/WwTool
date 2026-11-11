@@ -124,6 +124,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         IUIStateService uiState,
         ErrorReporter errors,
         AccountActions actions,
+        WwTool.UI.Navigation.INavigationService navigation,
         IConfigService config,
         IAppLauncher launcher,
         IAppPaths paths,
@@ -184,12 +185,23 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         _player.SnapshotChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(HasSnapshot));
+            UpdateFirstSync();
+            OnPropertyChanged(nameof(IsOffline));
             OnPropertyChanged(nameof(ShowNoSnapshot));
             Refresh();
         };
+        AddAccountCommand = new AsyncRelayCommand(() => actions.AddAccountAsync());
+        OnlyPullsCommand = new RelayCommand(() => navigation.NavigateTo("pulls"));
+        RetrySyncCommand = new AsyncRelayCommand(_player.SyncAsync);
         _player.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(PlayerData.IsLoading)) OnPropertyChanged(nameof(ShowNoSnapshot));
+            if (e.PropertyName is nameof(PlayerData.IsSyncing) or nameof(PlayerData.IsLoading)) UpdateFirstSync();
+            if (e.PropertyName == nameof(PlayerData.IsOffline))
+            {
+                OnPropertyChanged(nameof(IsOffline));
+                OnPropertyChanged(nameof(OfflineText));
+            }
         };
         _game.PropertyChanged += (_, e) =>
         {
@@ -230,6 +242,53 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
 
     private PlayerSnapshot? Snapshot => _player.Snapshot;
     public bool HasSnapshot => _player.HasSnapshot;
+
+    /// <summary>空状态「首次启动」：添加游戏账号。</summary>
+    public IAsyncRelayCommand AddAccountCommand { get; }
+
+    /// <summary>空状态「首次启动」：只看抽卡记录。</summary>
+    public IRelayCommand OnlyPullsCommand { get; }
+
+    /// <summary>网络异常横条「重试」。</summary>
+    public IAsyncRelayCommand RetrySyncCommand { get; }
+
+    /// <summary>空状态「首次同步中」：有账号、还没有任何本地快照、正在同步。</summary>
+    public bool IsFirstSync => Accounts.HasAccount && !HasSnapshot && _player.IsSyncing;
+
+    /// <summary>账号总览内容（身份行、资源卡、周本）：有账号且不在首次同步中。</summary>
+    public bool ShowProfile => Accounts.HasAccount && !IsFirstSync;
+
+    /// <summary>首次同步的估算进度（按约 10 秒逼近 95%，同步结束即消失）。</summary>
+    [ObservableProperty] private double _firstSyncProgress;
+
+    private DispatcherTimer? _firstSyncTimer;
+
+    private void UpdateFirstSync()
+    {
+        OnPropertyChanged(nameof(IsFirstSync));
+        OnPropertyChanged(nameof(ShowProfile));
+        if (IsFirstSync && _firstSyncTimer is null)
+        {
+            var started = DateTime.UtcNow;
+            FirstSyncProgress = 0;
+            _firstSyncTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+            _firstSyncTimer.Tick += (_, _) =>
+                FirstSyncProgress = 0.95 * (1 - Math.Exp(-(DateTime.UtcNow - started).TotalSeconds / 4));
+            _firstSyncTimer.Start();
+        }
+        else if (!IsFirstSync && _firstSyncTimer is not null)
+        {
+            _firstSyncTimer.Stop();
+            _firstSyncTimer = null;
+        }
+    }
+
+    /// <summary>网络异常：上次同步连不上服务器，仍显示缓存数据。</summary>
+    public bool IsOffline => _player.IsOffline && HasSnapshot;
+
+    public string OfflineText => Accounts.Current?.LastSyncedAtUtc is { } at
+        ? string.Format(_localization["Home_OfflineBanner"], at.ToLocalTime().ToString("MM/dd", System.Globalization.CultureInfo.InvariantCulture))
+        : _localization["Home_OfflineBannerNoDate"];
     public bool ShowNoSnapshot => Accounts.HasAccount && !HasSnapshot && !_player.IsLoading;
 
     [ObservableProperty] private string _uidLine = string.Empty;
@@ -276,6 +335,8 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
 
     private void OnAccountsChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is nameof(AccountContext.HasAccount) or nameof(AccountContext.Current)) UpdateFirstSync();
+        if (e.PropertyName == nameof(AccountContext.Current)) OnPropertyChanged(nameof(OfflineText));
         if (e.PropertyName != nameof(AccountContext.Current)) return;
         OnPropertyChanged(nameof(ShowNoSnapshot));
         Refresh();

@@ -108,6 +108,7 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
     {
         _session = session;
         _localization = localization;
+        SyncCommand = new AsyncRelayCommand(session.SyncAsync);
         _session.SnapshotReplaced += (_, _) => Rebuild();
 
         TimeRanges =
@@ -145,7 +146,14 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
 
     /// <summary>未出金进度卡；卡池没有记录时为 null。</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEmpty))]
     private NotYetCard? _notYet;
+
+    /// <summary>这个卡池还没有记录（没有五星、也没有未出金的抽数）。</summary>
+    public bool IsEmpty => NotYet is null && _all.Count == 0;
+
+    /// <summary>空状态里的「获取记录」：同步云端抽卡记录。</summary>
+    public IAsyncRelayCommand SyncCommand { get; }
 
     /// <summary>已显示的五星卡片（分页追加）。</summary>
     public ObservableCollection<FiveStarCard> Items { get; } = [];
@@ -246,6 +254,7 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
 
     private void ApplyFilter()
     {
+        OnPropertyChanged(nameof(IsEmpty));
         int months = SelectedTimeRange.Value is int m ? m : 0;
         DateTime? since = months > 0 ? DateTime.Now.AddMonths(-months) : null;
         var filter = SelectedFiveStarFilter.Value is FiveStarFilter f ? f : FiveStarFilter.All;

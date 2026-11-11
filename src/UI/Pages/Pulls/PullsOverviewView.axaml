@@ -66,8 +66,9 @@
 
   <Grid RowDefinitions="Auto,*">
     <!-- ── 筛选栏 ── -->
-    <Grid x:Name="FilterBar" Height="40" ColumnDefinitions="*,Auto" ZIndex="2">
-      <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+    <Grid x:Name="FilterBar" Height="40" ColumnDefinitions="*,Auto" ColumnSpacing="12" ZIndex="2">
+      <!-- 左侧标签放不下时裁切，不压到右侧筛选项 -->
+      <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" ClipToBounds="True">
         <ItemsControl ItemsSource="{Binding Tabs}">
           <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
@@ -104,7 +105,8 @@
       </StackPanel>
 
       <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-        <TextBlock Classes="caption" Text="{Binding StoredSummary}" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <!-- 选「其他卡池」时子卡池标签占位，隐藏存储条数 -->
+        <TextBlock Classes="caption" Text="{Binding StoredSummary}" VerticalAlignment="Center" Margin="0,0,8,0" IsVisible="{Binding !IsOtherSelected}" />
         <ComboBox Classes="filter" Tag="{loc:Tr Stat_Filter_DateRange}"
                   ItemsSource="{Binding Records.TimeRanges}" SelectedItem="{Binding Records.SelectedTimeRange}"
                   AutomationProperties.Name="{loc:Tr Stat_Filter_DateRange}" AutomationProperties.AutomationId="pulls-time-range">
@@ -156,17 +158,32 @@
     <Panel Grid.Row="1">
       <!-- 状态：未选账号 / 无记录 / 加载失败 -->
       <StackPanel Margin="0,18,0,0" Spacing="18">
-        <Border Classes="card" Padding="28,24" IsVisible="{Binding ShowNoAccount}" AutomationProperties.AutomationId="pulls-no-account">
-          <StackPanel Spacing="6">
-            <TextBlock Classes="section-title" Text="{loc:Tr Pulls_NoAccountTitle}" />
-            <TextBlock Classes="caption" Text="{loc:Tr Pulls_NoAccountHint}" />
-          </StackPanel>
+        <Border Classes="card" MinHeight="360" IsVisible="{Binding ShowNoAccount}" AutomationProperties.AutomationId="pulls-no-account">
+          <c:EmptyState Title="{loc:Tr Pulls_NoAccountTitle}" Description="{loc:Tr Pulls_NoAccountHint}" Icon="{StaticResource Icon.User}">
+            <StackPanel Classes="empty-actions">
+              <Button Classes="btn primary" Content="{loc:Tr Pulls_PasteLink}" Command="{Binding ImportUrlCommand}" />
+            </StackPanel>
+          </c:EmptyState>
         </Border>
-        <Border Classes="card" Padding="28,24" IsVisible="{Binding ShowEmpty}" AutomationProperties.AutomationId="pulls-empty">
-          <StackPanel Spacing="6">
-            <TextBlock Classes="section-title" Text="{loc:Tr Pulls_EmptyTitle}" />
-            <TextBlock Classes="caption" Text="{loc:Tr Pulls_EmptyHint}" TextWrapping="Wrap" />
-          </StackPanel>
+        <!-- 空状态：找不到游戏目录 / 还没有记录 -->
+        <Border Classes="card" MinHeight="360" IsVisible="{Binding ShowNoGamePath}" AutomationProperties.AutomationId="pulls-no-game-path">
+          <c:EmptyState Title="{loc:Tr Pulls_NoGamePathTitle}" Description="{loc:Tr Pulls_NoGamePathHint}" Icon="{StaticResource Icon.FolderOff}">
+            <StackPanel Classes="empty-actions">
+              <Button Classes="btn primary" Content="{loc:Tr Pulls_PickGamePath}" Command="{Binding PickGamePathCommand}"
+                      AutomationProperties.AutomationId="pulls-pick-game-path" />
+              <Button Classes="btn" Content="{loc:Tr Pulls_PasteLink}" Command="{Binding ImportUrlCommand}"
+                      AutomationProperties.AutomationId="pulls-paste-link" />
+            </StackPanel>
+          </c:EmptyState>
+        </Border>
+        <Border Classes="card" MinHeight="360" IsVisible="{Binding ShowNoRecords}" AutomationProperties.AutomationId="pulls-empty">
+          <c:EmptyState Title="{loc:Tr Pulls_EmptyTitle}" Description="{loc:Tr Pulls_EmptyHint}" Icon="{StaticResource Icon.Document}">
+            <StackPanel Classes="empty-actions">
+              <Button Classes="btn primary" Content="{loc:Tr Fab_GetRecords}" Command="{Binding SyncCommand}"
+                      AutomationProperties.AutomationId="pulls-empty-sync" />
+              <Button Classes="btn" Content="{loc:Tr Pulls_PasteLink}" Command="{Binding ImportUrlCommand}" />
+            </StackPanel>
+          </c:EmptyState>
         </Border>
         <Border Classes="card" Padding="28,24" IsVisible="{Binding Session.LoadError, Converter={x:Static ObjectConverters.IsNotNull}}">
           <Grid ColumnDefinitions="*,Auto">

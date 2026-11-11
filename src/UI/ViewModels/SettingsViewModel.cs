@@ -55,6 +55,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
     private readonly IAppLauncher _launcher;
     private readonly IUserDataService _userData;
     private readonly PullsSession _pullsSession;
+    private readonly GamePathPicker _gamePath;
     private readonly DispatcherTimer _saveDebounce;
     private CancellationTokenSource? _catalogCts;
     private bool _clearingCache;
@@ -69,8 +70,10 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         ICatalogImageCache images,
         IAppLauncher launcher,
         IUserDataService userData,
-        PullsSession pullsSession)
+        PullsSession pullsSession,
+        GamePathPicker gamePath)
     {
+        _gamePath = gamePath;
         _userData = userData;
         _pullsSession = pullsSession;
         _config = config;
@@ -178,28 +181,7 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
     }
 
     [RelayCommand]
-    private async Task SelectGamePathAsync()
-    {
-        IStorageProvider? storage = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow?.StorageProvider;
-        if (storage is null) return;
-        IStorageFolder? start = string.IsNullOrWhiteSpace(_config.User.GamePath) ? null : await storage.TryGetFolderFromPathAsync(_config.User.GamePath);
-        IReadOnlyList<IStorageFolder> picked = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
-        {
-            Title = _localization["SelectFolder_GamePathTitle"],
-            AllowMultiple = false,
-            SuggestedStartLocation = start,
-        });
-        string? folder = picked.FirstOrDefault()?.TryGetLocalPath();
-        if (folder is null) return;
-        if (!File.Exists(Path.Combine(folder, _config.App.GameLauncherFile)))
-        {
-            _uiState.ShowToast(_localization["Toast_Warning"],
-                string.Format(_localization["Toast_GameLauncherNotFound"], _config.App.GameLauncherFile), NotificationType.Warning);
-            return;
-        }
-        _config.User.GamePath = folder;
-        _uiState.ShowToast(_localization["Toast_Success"], _localization["Toast_GamePathUpdated"], NotificationType.Success);
-    }
+    private Task SelectGamePathAsync() => _gamePath.PickAsync();
 
     // ── 界面设置 ──────────────────────────────────────────────
 

@@ -50,6 +50,12 @@ public sealed partial class PlayerData : ObservableObject
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _isSyncing;
 
+    /// <summary>上次同步因网络失败；首页顶部显示红色横条，内容照常显示缓存数据。</summary>
+    [ObservableProperty] private bool _isOffline;
+
+    /// <summary>登录授权已失效的账号 UID（同步时服务器拒绝授权）；重新登录或同步成功后清除。</summary>
+    [ObservableProperty] private string? _authExpiredUid;
+
     public bool HasSnapshot => Snapshot?.Base is not null;
 
     /// <summary>当前账号还没读过时读一次。</summary>
@@ -103,6 +109,8 @@ public sealed partial class PlayerData : ObservableObject
             await _accounts.RefreshAsync();
             if (_accounts.Current?.Uid != uid) return;
             await ReloadAsync();
+            IsOffline = false;
+            if (AuthExpiredUid == uid) AuthExpiredUid = null;
             if (HasSnapshot)
             {
                 _uiState.ShowToast(new NotificationRequest
@@ -122,12 +130,24 @@ public sealed partial class PlayerData : ObservableObject
         }
         catch (Exception ex)
         {
+            if (IsNetworkFailure(ex)) IsOffline = true;
+            if (ex is WwTool.Core.Exceptions.WwToolAuthException) AuthExpiredUid = uid;
             _errors.Report(ex, _localization["Home_Sync"]);
         }
         finally
         {
             IsSyncing = false;
         }
+    }
+
+    /// <summary>网络层失败（连不上、超时），区别于服务器返回的业务错误。</summary>
+    private static bool IsNetworkFailure(Exception ex)
+    {
+        for (Exception? e = ex; e is not null; e = e.InnerException)
+        {
+            if (e is HttpRequestException or System.Net.Sockets.SocketException or TimeoutException or TaskCanceledException) return true;
+        }
+        return false;
     }
 
     private void OnAccountChanged(object? sender, PropertyChangedEventArgs e)
@@ -137,6 +157,7 @@ public sealed partial class PlayerData : ObservableObject
         if (_accounts.Current?.Uid == _loadedUid) return;
         _loadCts?.Cancel();
         _loadedUid = null;
+        IsOffline = false;
         Replace(null);
         if (_accounts.Current is not null) _ = ReloadAsync();
     }

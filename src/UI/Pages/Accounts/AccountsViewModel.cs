@@ -56,6 +56,26 @@ public sealed partial class AccountsViewModel : ObservableObject, INavigationAwa
     private bool _isActive;
     private int _version;
 
+    private readonly PlayerData _player;
+
+    /// <summary>当前账号的登录已失效（同步时授权被拒）。</summary>
+    public bool IsCurrentExpired => _accounts.Current is { } a && _player.AuthExpiredUid == a.Uid;
+
+    public string ExpiredTitle => string.Format(_localization["Accounts_ExpiredTitle"],
+        _accounts.Current is { Name: { Length: > 0 } name } ? name : _accounts.Current?.MaskedUid ?? string.Empty);
+
+    /// <summary>空状态「登录失效」：重新登录后立即同步。</summary>
+    public IAsyncRelayCommand ReloginCommand { get; }
+
+    /// <summary>空状态「登录失效」：移除账号（确认后删除）。</summary>
+    public IAsyncRelayCommand RemoveExpiredCommand { get; }
+
+    private void NotifyExpired()
+    {
+        OnPropertyChanged(nameof(IsCurrentExpired));
+        OnPropertyChanged(nameof(ExpiredTitle));
+    }
+
     public AccountsViewModel(
         AccountContext accounts,
         AccountActions actions,
@@ -63,8 +83,26 @@ public sealed partial class AccountsViewModel : ObservableObject, INavigationAwa
         LocalizationService localization,
         IUIStateService uiState,
         ErrorReporter errors,
-        INavigationService navigation)
+        INavigationService navigation,
+        PlayerData player)
     {
+        _player = player;
+        player.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(PlayerData.AuthExpiredUid)) NotifyExpired();
+        };
+        accounts.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(AccountContext.Current)) NotifyExpired();
+        };
+        ReloginCommand = new AsyncRelayCommand(async () =>
+        {
+            if (await actions.AddAccountAsync()) await player.SyncAsync();
+        });
+        RemoveExpiredCommand = new AsyncRelayCommand(async () =>
+        {
+            if (accounts.Current is { } current) await actions.DeleteAsync(current);
+        });
         // 悬浮按钮：收起态加号，展开为「刷新数据」（主，重读账号列表）与「返回上一页」。
         FabActions =
         [

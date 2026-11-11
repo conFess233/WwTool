@@ -71,7 +71,19 @@
         </Grid>
       </Border>
 
-      <ScrollViewer Grid.Row="2" x:Name="ListScroller" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-8,0" Padding="0,0,8,0">
+      <!-- 卡池暂无记录：空状态 + 底部虚线上慢走的加载形象（停留 3 秒后出现） -->
+      <Panel Grid.Row="1" Grid.RowSpan="2" Margin="-22,0,-22,-20" IsVisible="{Binding IsEmpty}" AutomationProperties.AutomationId="pool-empty">
+        <c:EmptyState Title="{loc:Tr Pulls_PoolEmptyTitle}" Description="{loc:Tr Pulls_PoolEmptyHint}" Icon="{StaticResource Icon.Document}"
+                      Margin="0,0,0,60">
+          <StackPanel Classes="empty-actions">
+            <Button Classes="btn primary" Content="{loc:Tr Fab_GetRecords}" Command="{Binding SyncCommand}"
+                    AutomationProperties.AutomationId="pool-empty-sync" />
+          </StackPanel>
+        </c:EmptyState>
+        <c:EmptyWalker Bubble="{loc:Tr Pulls_EmptyBubble}" />
+      </Panel>
+
+      <ScrollViewer Grid.Row="2" x:Name="ListScroller" IsVisible="{Binding !IsEmpty}" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-8,0" Padding="0,0,8,0">
         <StackPanel>
           <ItemsControl Classes="rec-list" ItemsSource="{Binding Items}" ItemTemplate="{StaticResource FiveStarRow}" />
 

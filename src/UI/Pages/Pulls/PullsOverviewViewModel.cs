@@ -60,6 +60,7 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
 {
     private const int DailyWindowDays = 30;
 
+    private readonly GamePathPicker _gamePath;
     private readonly PullsSession _session;
     private readonly LocalizationService _localization;
     private readonly INavigationService _navigation;
@@ -78,11 +79,13 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         IDialogService dialogs,
         ClipboardService clipboard,
         IUIStateService uiState,
-        ErrorReporter errors)
+        ErrorReporter errors,
+        GamePathPicker gamePath)
     {
         _clipboard = clipboard;
         _uiState = uiState;
         _errors = errors;
+        _gamePath = gamePath;
         _session = session;
         _localization = localization;
         _navigation = navigation;
@@ -103,6 +106,11 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
                 }), localization),
         ];
 
+        PickGamePathCommand = new AsyncRelayCommand(async () =>
+        {
+            if (await _gamePath.PickAsync()) Refresh();
+        });
+
         Tabs.Add(new PoolTab(null, false, string.Empty));
         foreach (CardPoolType pool in PoolNames.MainPools) Tabs.Add(new PoolTab(pool, false, string.Empty));
         _otherTab = new PoolTab(null, true, string.Empty);
@@ -120,6 +128,21 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     }
 
     public PullsSession Session { get; }
+
+    /// <summary>空状态「获取记录」。</summary>
+    public System.Windows.Input.ICommand SyncCommand => FabActions[0].Command;
+
+    /// <summary>空状态「手动粘贴链接」。</summary>
+    public System.Windows.Input.ICommand ImportUrlCommand => FabActions[2].Command;
+
+    /// <summary>空状态「选择游戏目录」。</summary>
+    public IAsyncRelayCommand PickGamePathCommand { get; }
+
+    /// <summary>没有记录且找不到游戏安装目录：先引导选择目录（获取记录要读游戏日志）。</summary>
+    [ObservableProperty] private bool _showNoGamePath;
+
+    /// <summary>没有记录、游戏目录正常：引导获取记录。</summary>
+    [ObservableProperty] private bool _showNoRecords;
 
     public AccountContext Accounts { get; }
 
@@ -233,6 +256,8 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         PullsSnapshot? s = _session.Snapshot;
         ShowNoAccount = _session.Uid is null;
         ShowEmpty = !ShowNoAccount && !_session.IsLoading && (s is null || s.IsEmpty);
+        ShowNoGamePath = ShowEmpty && !_gamePath.HasValidPath;
+        ShowNoRecords = ShowEmpty && !ShowNoGamePath;
         ShowContent = !ShowNoAccount && s is { IsEmpty: false };
 
         UpdateTabs(s);

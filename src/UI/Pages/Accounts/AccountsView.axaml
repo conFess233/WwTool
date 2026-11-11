@@ -94,6 +94,18 @@
         </Button>
       </Grid>
 
+      <!-- 登录失效（定稿「空状态与异常」）：红色锁图标，重新登录 / 移除账号 -->
+      <Border Classes="card" MinHeight="300" IsVisible="{Binding IsCurrentExpired}" AutomationProperties.AutomationId="accounts-expired">
+        <c:EmptyState IsDanger="True" Icon="{StaticResource Icon.Lock}" Title="{Binding ExpiredTitle}" Description="{loc:Tr Accounts_ExpiredHint}">
+          <StackPanel Classes="empty-actions">
+            <Button Classes="btn primary" Content="{loc:Tr Accounts_Relogin}" Command="{Binding ReloginCommand}"
+                    AutomationProperties.AutomationId="accounts-relogin" />
+            <Button Classes="btn" Content="{loc:Tr Accounts_Remove}" Command="{Binding RemoveExpiredCommand}"
+                    AutomationProperties.AutomationId="accounts-remove-expired" />
+          </StackPanel>
+        </c:EmptyState>
+      </Border>
+
       <ItemsControl ItemsSource="{Binding Cards}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate><UniformGrid Columns="4" ColumnSpacing="18" RowSpacing="18" /></ItemsPanelTemplate>

@@ -648,4 +648,43 @@
     <Setter Property="Height" Value="1" />
     <Setter Property="Margin" Value="4,5" />
   </Style>
+
+  <!-- ── 空状态与异常：76 圆形图标底、标题 17 Bold、说明 13（最宽 300）、按钮组 ── -->
+  <Style Selector="c|EmptyState">
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="12" Margin="20">
+          <Panel HorizontalAlignment="Center">
+            <ContentPresenter Content="{TemplateBinding Graphic}"
+                              IsVisible="{TemplateBinding Graphic, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <Border Name="PART_Icon" Width="76" Height="76" CornerRadius="38" Background="{DynamicResource AccentContainerBrush}"
+                    IsVisible="{TemplateBinding Graphic, Converter={x:Static ObjectConverters.IsNull}}">
+              <c:StrokeIcon Name="PART_Glyph" Width="34" Height="34" StrokeThickness="1.8" Data="{TemplateBinding Icon}"
+                            Foreground="{DynamicResource AccentTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+          </Panel>
+          <TextBlock Text="{TemplateBinding Title}" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center"
+                     TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" />
+          <TextBlock Text="{TemplateBinding Description}" FontSize="13" LineHeight="21" MaxWidth="300" HorizontalAlignment="Center"
+                     TextAlignment="Center" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}"
+                     IsVisible="{TemplateBinding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+          <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" Margin="0,4,0,0"
+                            IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="c|EmptyState:danger /template/ Border#PART_Icon">
+    <Setter Property="Background" Value="{DynamicResource DangerSoftBrush}" />
+  </Style>
+  <Style Selector="c|EmptyState:danger /template/ c|StrokeIcon#PART_Glyph">
+    <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+  </Style>
+  <!-- 空状态按钮组：间距 10 -->
+  <Style Selector="StackPanel.empty-actions">
+    <Setter Property="Orientation" Value="Horizontal" />
+    <Setter Property="Spacing" Value="10" />
+  </Style>
 </Styles>
