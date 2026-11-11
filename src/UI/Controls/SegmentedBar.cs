@@ -7,7 +7,7 @@ namespace WwTool.UI.Controls;
 
 /// <summary>
 /// 刻度条（开发文档「通用组件 → 刻度条」）：轨道与填充都是等宽直角刻度，从左端排起；
-/// 填充按宽度比例截断，最后一格可以只亮一部分。整条控件在 <see cref="Render"/> 里自绘。
+/// 只画整格（余下的宽度均分到格间距里，右端不会残留半格）；填充按宽度比例截断，最后亮的一格可以只亮一部分。整条控件在 <see cref="Render"/> 里自绘。
 /// </summary>
 /// <remarks>
 /// <list type="bullet">
@@ -207,15 +207,19 @@ public sealed class SegmentedBar : Control
     public override void Render(DrawingContext context)
     {
         double width = Bounds.Width, height = Bounds.Height;
-        double pitch = SegmentWidth + SegmentGap;
-        if (width <= 0 || height <= 0 || pitch <= 0) return;
+        if (width <= 0 || height <= 0 || SegmentWidth + SegmentGap <= 0) return;
+        // 只放整格：先算能放下几格，再把剩余宽度平均分进间距，最后一格正好贴住右边，不会残留一小截。
+        double segment = Math.Min(SegmentWidth, width);
+        int count = Math.Max(1, (int)Math.Floor((width + SegmentGap) / (segment + SegmentGap)));
+        double pitch = count > 1 ? segment + (width - count * segment) / (count - 1) : width;
 
         double filledWidth = width * Math.Clamp(_shown, 0, 1);
         IBrush? fill = IsHeat ? HeatBrush(width) : Fill;
 
-        for (double x = 0; x < width; x += pitch)
+        for (int i = 0; i < count; i++)
         {
-            double w = Math.Min(SegmentWidth, width - x);
+            double x = i * pitch;
+            double w = count == 1 ? width : segment;
             if (Track is not null) context.DrawRectangle(Track, null, new Rect(x, 0, w, height));
             if (fill is not null && x < filledWidth)
             {
@@ -241,9 +245,10 @@ public sealed class SegmentedBar : Control
                     new GradientStop(ShimmerEdge, 1),
                 },
             };
-            for (double x = 0; x < filledWidth; x += pitch)
+            for (int i = 0; i < count && i * pitch < filledWidth; i++)
             {
-                double l = Math.Max(x, x0), r = Math.Min(Math.Min(x + SegmentWidth, filledWidth), x0 + band);
+                double x = i * pitch;
+                double l = Math.Max(x, x0), r = Math.Min(Math.Min(x + segment, filledWidth), x0 + band);
                 if (r > l) context.DrawRectangle(brush, null, new Rect(l, 0, r - l, height));
             }
         }
