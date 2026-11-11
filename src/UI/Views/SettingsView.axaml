@@ -299,6 +299,17 @@
                 </ComboBox>
               </Grid>
             </Border>
+            <!-- 减少动画（定稿未画；应用内唯一的开关入口） -->
+            <Border Classes="sr">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Classes="name" Text="{loc:Tr Settings_ReducedMotion}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_ReducedMotionHint}" />
+                </StackPanel>
+                <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsReducedMotion}" VerticalAlignment="Center"
+                              AutomationProperties.Name="{loc:Tr Settings_ReducedMotion}" AutomationProperties.AutomationId="settings-reduced-motion" />
+              </Grid>
+            </Border>
           </StackPanel>
         </Border>
 
