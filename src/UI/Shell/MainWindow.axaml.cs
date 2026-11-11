@@ -50,8 +50,9 @@ public partial class MainWindow : Window
             UpdateVideoPlayback();
         };
         Opened += (_, _) => UpdateVideoPlayback();
-        Activated += (_, _) => UpdateVideoPlayback();
-        Deactivated += (_, _) => UpdateVideoPlayback();
+        // 激活事件触发时 IsActive 可能还是旧值，以事件本身为准。
+        Activated += (_, _) => { _foreground = true; UpdateVideoPlayback(); };
+        Deactivated += (_, _) => { _foreground = false; UpdateVideoPlayback(); };
         BackdropVideo.PlaybackFailed += (_, ex) => (DataContext as ShellViewModel)?.ReportVideoFailure(ex);
         AddHandler(PointerMovedEvent, OnParallaxPointerMoved, Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
     }
@@ -287,16 +288,20 @@ public partial class MainWindow : Window
         {
             MaximizeGlyph.Data = Geometry.Parse(WindowState == WindowState.Maximized ? RestoreGlyphData : MaximizeGlyphData);
         }
-        if (change.Property == WindowStateProperty || change.Property == IsVisibleProperty) UpdateVideoPlayback();
+        if (change.Property == IsActiveProperty) _foreground = IsActive;
+        if (change.Property == WindowStateProperty || change.Property == IsVisibleProperty || change.Property == IsActiveProperty) UpdateVideoPlayback();
     }
 
     /// <summary>
     /// 动态背景只在窗口可见、未最小化、处于前台（获得焦点）且未开启「减少动画」时播放，否则暂停在当前画面。
     /// 窗口被其他窗口完全挡住时它通常也已失去焦点，因此同样暂停。
     /// </summary>
+    /// <summary>窗口是否在前台（最近一次激活 / 失活事件）。</summary>
+    private bool _foreground;
+
     private void UpdateVideoPlayback()
     {
-        bool foreground = IsActive;
+        bool foreground = _foreground;
 #if DEBUG
         // 离屏截图验证时窗口不抢焦点，允许忽略焦点条件。
         if (Environment.GetEnvironmentVariable("WWTOOL_VIDEO_IGNORE_FOCUS") == "1") foreground = true;
