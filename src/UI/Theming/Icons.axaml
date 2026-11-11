@@ -29,6 +29,8 @@
   <StreamGeometry x:Key="Icon.Image">M 5 5 H 19 A 2 2 0 0 1 21 7 V 17 A 2 2 0 0 1 19 19 H 5 A 2 2 0 0 1 3 17 V 7 A 2 2 0 0 1 5 5 Z M 7 11 A 2 2 0 1 0 11 11 A 2 2 0 1 0 7 11 Z M 21 17 l -5 -5 -9 7</StreamGeometry>
   <StreamGeometry x:Key="Icon.FolderOpen">M 3 7 a 2 2 0 0 1 2 -2 h 4 l 2 2 h 8 a 2 2 0 0 1 2 2 v 8 a 2 2 0 0 1 -2 2 H 5 a 2 2 0 0 1 -2 -2 z</StreamGeometry>
   <StreamGeometry x:Key="Icon.LinkAlt">M 10 14 a 4 4 0 0 0 5.7 0 l 3 -3 a 4 4 0 0 0 -5.7 -5.7 l -1 1 M 14 10 a 4 4 0 0 0 -5.7 0 l -3 3 a 4 4 0 0 0 5.7 5.7 l 1 -1</StreamGeometry>
+  <StreamGeometry x:Key="Icon.ViewList">M 8 6 h 12 M 8 12 h 12 M 8 18 h 12 M 4 6 h 0.01 M 4 12 h 0.01 M 4 18 h 0.01</StreamGeometry>
+  <StreamGeometry x:Key="Icon.ViewGrid">M 5.5 4 h 3.5 a 1.5 1.5 0 0 1 1.5 1.5 v 3.5 a 1.5 1.5 0 0 1 -1.5 1.5 h -3.5 a 1.5 1.5 0 0 1 -1.5 -1.5 v -3.5 a 1.5 1.5 0 0 1 1.5 -1.5 z M 15 4 h 3.5 a 1.5 1.5 0 0 1 1.5 1.5 v 3.5 a 1.5 1.5 0 0 1 -1.5 1.5 h -3.5 a 1.5 1.5 0 0 1 -1.5 -1.5 v -3.5 a 1.5 1.5 0 0 1 1.5 -1.5 z M 5.5 13.5 h 3.5 a 1.5 1.5 0 0 1 1.5 1.5 v 3.5 a 1.5 1.5 0 0 1 -1.5 1.5 h -3.5 a 1.5 1.5 0 0 1 -1.5 -1.5 v -3.5 a 1.5 1.5 0 0 1 1.5 -1.5 z M 15 13.5 h 3.5 a 1.5 1.5 0 0 1 1.5 1.5 v 3.5 a 1.5 1.5 0 0 1 -1.5 1.5 h -3.5 a 1.5 1.5 0 0 1 -1.5 -1.5 v -3.5 a 1.5 1.5 0 0 1 1.5 -1.5 z</StreamGeometry>
   <StreamGeometry x:Key="Icon.Back">M 15 6 l -6 6 6 6</StreamGeometry>
   <StreamGeometry x:Key="Icon.Save">M 5 4 h 11 l 3 3 v 13 H 5 z M 8 4 v 5 h 7 M 8 20 v -6 h 8 v 6</StreamGeometry>
 </ResourceDictionary>

@@ -217,6 +217,25 @@
             <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
           </ComboBox.ItemTemplate>
         </ComboBox>
+        <!-- 视图切换（定稿 FinalPullsGrid）：列表 / 精简，仅单卡池视图显示 -->
+        <Border Classes="vt" IsVisible="{Binding IsPoolView}">
+          <StackPanel Orientation="Horizontal" Spacing="2">
+            <ToggleButton Classes="vt" IsChecked="{Binding IsListView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="list"
+                          AutomationProperties.AutomationId="pulls-view-list">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.ViewList}" />
+                <TextBlock Text="{loc:Tr Pulls_ViewList}" VerticalAlignment="Center" />
+              </StackPanel>
+            </ToggleButton>
+            <ToggleButton Classes="vt" IsChecked="{Binding IsCompactView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="compact"
+                          AutomationProperties.AutomationId="pulls-view-compact">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.ViewGrid}" />
+                <TextBlock Text="{loc:Tr Pulls_ViewCompact}" VerticalAlignment="Center" />
+              </StackPanel>
+            </ToggleButton>
+          </StackPanel>
+        </Border>
         <Button Classes="btn" Command="{Binding OpenChartsCommand}" AutomationProperties.AutomationId="pulls-open-charts">
           <StackPanel Orientation="Horizontal" Spacing="8">
             <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.Chart}" />
@@ -444,15 +463,146 @@
       </ScrollViewer>
 
       <!-- ── 单卡池：指标卡 + 抽卡记录（列表内部滚动） ── -->
-      <Grid RowDefinitions="Auto,*" RowSpacing="18" Margin="0,18,0,96">
-        <Grid.IsVisible>
-          <MultiBinding Converter="{x:Static BoolConverters.And}">
-            <Binding Path="ShowContent" />
-            <Binding Path="IsPoolView" />
-          </MultiBinding>
-        </Grid.IsVisible>
+      <Grid RowDefinitions="Auto,*" RowSpacing="18" Margin="0,18,0,96" IsVisible="{Binding ShowListPool}">
         <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Metrics}" />
         <pulls:PoolRecordsView Grid.Row="1" x:Name="RecordsView" DataContext="{Binding Records}" />
+      </Grid>
+
+      <!-- ── 单卡池·精简视图（定稿 FinalPullsGrid）：一行统计条 + 五星头像网格（最新在前，底部渐隐） ── -->
+      <Grid RowDefinitions="Auto,*" RowSpacing="18" Margin="0,18,0,96" IsVisible="{Binding ShowCompactPool}"
+            AutomationProperties.AutomationId="pulls-compact">
+        <Border Classes="card gs">
+          <UniformGrid Columns="6">
+            <Border Classes="gs-cell first">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Stat_TotalTides}" />
+                <c:RollingText Classes="gs-value" Text="{Binding TotalPulls}" />
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_FiveStarShort}" />
+                <c:RollingText Classes="gs-value" Text="{Binding FiveStars}" />
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_AvgPerFiveStar}" />
+                <StackPanel Orientation="Horizontal">
+                  <c:RollingText Classes="gs-value" Text="{Binding AveragePerFiveStar}" />
+                  <TextBlock Classes="gs-unit" Text="{loc:Tr Pulls_PullUnit}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_AvgPerUp}" />
+                <StackPanel Orientation="Horizontal">
+                  <c:RollingText Classes="gs-value" Text="{Binding AveragePerUp}" />
+                  <TextBlock Classes="gs-unit" Text="{loc:Tr Pulls_PullUnit}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_WinRate}" />
+                <StackPanel Orientation="Horizontal">
+                  <c:RollingText Classes="gs-value" Text="{Binding WinRate}" />
+                  <TextBlock Classes="gs-unit" Text="{Binding WinRatio}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+            <Border Classes="gs-cell">
+              <StackPanel>
+                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_Astrites}" />
+                <c:RollingText Classes="gs-value" Text="{Binding Astrites}" />
+              </StackPanel>
+            </Border>
+          </UniformGrid>
+        </Border>
+
+        <Border Grid.Row="1" Classes="card" Padding="22,18,22,0">
+          <Grid RowDefinitions="Auto,*" RowSpacing="14">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Text="{loc:Tr Pulls_FiveStarRecords}" />
+              <StackPanel Grid.Column="1" Classes="lgd" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Border Classes="lgd-heat" />
+                  <TextBlock Text="{loc:Tr Pulls_LegendPity}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Border Classes="wai sm"><TextBlock Text="{loc:Tr Pulls_LostMark}" /></Border>
+                  <TextBlock Text="{loc:Tr Pulls_LegendLost}" />
+                </StackPanel>
+                <TextBlock Text="{loc:Tr Pulls_LegendNewest}" />
+              </StackPanel>
+            </Grid>
+            <ScrollViewer Grid.Row="1" x:Name="CompactScroller" HorizontalScrollBarVisibility="Disabled" Margin="-8,0,-14,0">
+              <ItemsControl x:Name="CompactGrid" Margin="8,1,7,36" ItemsSource="{Binding Records.CompactTiles}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate><UniformGrid ColumnSpacing="5" RowSpacing="7" Columns="8" /></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.DataTemplates>
+                  <!-- 未出金：虚线框、暖色斜纹头像区、问号，数字为当前已垫抽数 -->
+                  <DataTemplate DataType="pulls:NotYetCard">
+                    <Panel Classes="gt-host" ToolTip.ShowDelay="200" ToolTip.Placement="Bottom" ToolTip.VerticalOffset="10">
+                      <ToolTip.Tip>
+                        <ToolTip Classes="tile-tip">
+                          <StackPanel>
+                            <TextBlock FontSize="13" FontWeight="Bold" Text="{loc:Tr Pulls_NoFiveStarYet}" />
+                            <TextBlock Text="{Binding ToHardPityText}" />
+                          </StackPanel>
+                        </ToolTip>
+                      </ToolTip.Tip>
+                      <Border Classes="gt cur">
+                        <Grid RowDefinitions="92,30">
+                          <Panel Classes="ga cur">
+                            <c:StripeFill />
+                            <TextBlock Text="?" />
+                          </Panel>
+                          <TextBlock Grid.Row="1" Classes="gn" Text="{Binding Pity}" />
+                          <c:RatioBar Grid.Row="1" Classes="gh" Ratio="{Binding PityRatio}" />
+                        </Grid>
+                      </Border>
+                      <Rectangle Classes="cur-dash" />
+                    </Panel>
+                  </DataTemplate>
+                  <DataTemplate DataType="pulls:FiveStarCard">
+                    <Panel Classes="gt-host" ToolTip.ShowDelay="200" ToolTip.Placement="Bottom" ToolTip.VerticalOffset="10">
+                      <ToolTip.Tip>
+                        <ToolTip Classes="tile-tip">
+                          <StackPanel>
+                            <TextBlock>
+                              <Run FontSize="13" FontWeight="Bold" Text="{Binding Name}" />
+                              <Run Text=" · " />
+                              <Run FontSize="11" Foreground="#C9B892" Text="{Binding TimeText}" />
+                            </TextBlock>
+                            <TextBlock>
+                              <Run Text="{Binding PityLine}" />
+                              <Run FontWeight="Bold" Foreground="#F09A8C" Text="{Binding LostLine}" />
+                            </TextBlock>
+                            <TextBlock Classes="tip-sub" Text="{Binding NextLine}" IsVisible="{Binding HasNextLine}" />
+                          </StackPanel>
+                        </ToolTip>
+                      </ToolTip.Tip>
+                      <Border Classes="gt">
+                        <Grid RowDefinitions="92,30">
+                          <Border Classes="ga">
+                            <c:CatalogImage Width="88" Height="88" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                            Path="{Binding IconPath}" DecodeWidth="176" Stretch="UniformToFill" />
+                          </Border>
+                          <TextBlock Grid.Row="1" Classes="gn" Classes.hot="{Binding IsNearHardPity}" Text="{Binding Pity}" />
+                          <c:RatioBar Grid.Row="1" Classes="gh" Classes.hot="{Binding IsNearHardPity}" Ratio="{Binding PityRatio}" />
+                        </Grid>
+                      </Border>
+                      <Border Classes="wai" IsVisible="{Binding IsLost}"><TextBlock Text="{loc:Tr Pulls_LostMark}" /></Border>
+                    </Panel>
+                  </DataTemplate>
+                </ItemsControl.DataTemplates>
+              </ItemsControl>
+            </ScrollViewer>
+          </Grid>
+        </Border>
       </Grid>
     </Panel>
 

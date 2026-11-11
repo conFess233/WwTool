@@ -728,5 +728,17 @@
   "Pulls_RefreshAdded": "{0} 件の新しい記録",
   "Pulls_DropHint": "ガチャのリンクやログファイルをここにドロップ",
   "Pulls_DropImporting": "インポート中…",
-  "Pulls_DropImported": "{0} 件の記録をインポートしました"
+  "Pulls_DropImported": "{0} 件の記録をインポートしました",
+  "Pulls_ViewList": "リスト",
+  "Pulls_ViewCompact": "コンパクト",
+  "Pulls_FiveStarShort": "★5",
+  "Pulls_AvgPerUp": "ピックアップ平均",
+  "Pulls_FiveStarRecords": "★5 履歴",
+  "Pulls_LegendPity": "回数、赤いほど 80 に近い",
+  "Pulls_LostMark": "外",
+  "Pulls_LegendLost": "すり抜け",
+  "Pulls_LegendNewest": "新しい順",
+  "Pulls_TilePity": "{0} 回で★5",
+  "Pulls_TileLost": "、すり抜け",
+  "Pulls_TileNextUp": "次の★5 はピックアップ確定"
 }

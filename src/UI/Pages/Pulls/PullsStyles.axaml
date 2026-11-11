@@ -248,4 +248,253 @@
     <Setter Property="BaseColor" Value="{DynamicResource SurfaceMutedColor}" />
     <Setter Property="ShineColor" Value="{DynamicResource HighlightStrongColor}" />
   </Style>
+
+  <!-- ── 精简视图（定稿 FinalPullsGrid） ── -->
+  <!-- 视图切换：凹槽底 3 内边距、圆角 9；选中项为卡片底、半粗体、轻投影 -->
+  <Style Selector="Border.vt">
+    <Setter Property="Background" Value="{DynamicResource SurfaceSunkenBrush}" />
+    <Setter Property="CornerRadius" Value="9" />
+    <Setter Property="Padding" Value="3" />
+    <Setter Property="Margin" Value="4,0,0,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="ToggleButton.vt">
+    <Setter Property="Height" Value="30" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Bg" Background="Transparent" CornerRadius="7" Padding="{TemplateBinding Padding}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.15" />
+              <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.15" />
+            </Transitions>
+          </Border.Transitions>
+          <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="ToggleButton.vt:pointerover /template/ Border#PART_Bg">
+    <Setter Property="Background" Value="{DynamicResource HighlightBrush}" />
+  </Style>
+  <Style Selector="ToggleButton.vt:checked">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="ToggleButton.vt:checked /template/ Border#PART_Bg">
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BoxShadow" Value="0 2 6 -2 #593C280A" />
+  </Style>
+
+  <!-- 统计条：高 78、左右内边距 26，六格之间 1px 分隔线 -->
+  <Style Selector="Border.card.gs">
+    <Setter Property="Height" Value="78" />
+    <Setter Property="Padding" Value="26,0" />
+  </Style>
+  <Style Selector="Border.gs-cell">
+    <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
+    <Setter Property="BorderThickness" Value="1,0,0,0" />
+    <Setter Property="Padding" Value="22,0,0,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.gs-cell.first">
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+  <Style Selector="TextBlock.gs-label">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+  </Style>
+  <Style Selector="c|RollingText.gs-value">
+    <Setter Property="FontSize" Value="26" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Margin" Value="0,2,0,0" />
+    <Setter Property="FlashOnChange" Value="True" />
+    <Setter Property="CountUp" Value="True" />
+    <Setter Property="FlashBrush" Value="{DynamicResource GoldLightBrush}" />
+  </Style>
+  <Style Selector="TextBlock.gs-unit">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    <Setter Property="Margin" Value="4,0,0,5" />
+    <Setter Property="VerticalAlignment" Value="Bottom" />
+  </Style>
+
+  <!-- 图例 -->
+  <Style Selector="StackPanel.lgd TextBlock">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.lgd-heat">
+    <Setter Property="Width" Value="46" />
+    <Setter Property="Height" Value="3" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Background">
+      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+        <GradientStop Color="{DynamicResource AccentColor}" Offset="0" />
+        <GradientStop Color="{DynamicResource AccentColor}" Offset="0.8" />
+        <GradientStop Color="{DynamicResource DangerColor}" Offset="0.88" />
+        <GradientStop Color="{DynamicResource DangerColor}" Offset="1" />
+      </LinearGradientBrush>
+    </Setter>
+  </Style>
+
+  <!-- 「歪」角标：28 圆、2px 红框、逆时针 14°，压在头像区右上角外 7 -->
+  <Style Selector="Border.wai">
+    <Setter Property="Width" Value="28" />
+    <Setter Property="Height" Value="28" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DangerBrush}" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+    <Setter Property="BoxShadow" Value="0 2 6 -2 #80A8482A" />
+    <Setter Property="HorizontalAlignment" Value="Right" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="RenderTransform" Value="rotate(-14deg)" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+  </Style>
+  <Style Selector="Border.wai TextBlock">
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.wai.sm">
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="BoxShadow" Value="0 0 0 0 Transparent" />
+    <Setter Property="RenderTransform" Value="rotate(-14deg)" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.wai.sm TextBlock">
+    <Setter Property="FontSize" Value="10" />
+  </Style>
+
+  <!-- 磁贴：圆角 12、浅底细框；头像区高 92（顶角 11、金色渐变，88 头像贴底）；数字行 30；底部 3px 抽数线；悬停上浮 3 -->
+  <!-- 宿主上、右各留 7 给「歪」角标（网格列距 / 行距相应减 7，视觉间距仍为 12 / 14） -->
+  <Style Selector="Panel.gt-host > Border.gt, Panel.gt-host > Rectangle.cur-dash">
+    <Setter Property="Margin" Value="0,7,7,0" />
+  </Style>
+  <Style Selector="Panel.gt-host">
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="RenderTransform" Value="translateY(0px)" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="0.2,0.8,0.2,1" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Panel.gt-host:pointerover">
+    <Setter Property="RenderTransform" Value="translateY(-3px)" />
+  </Style>
+  <Style Selector="Window.reduced Panel.gt-host">
+    <Setter Property="Transitions">
+      <Transitions />
+    </Setter>
+  </Style>
+  <Style Selector="Window.reduced Panel.gt-host:pointerover">
+    <Setter Property="RenderTransform" Value="translateY(0px)" />
+  </Style>
+  <Style Selector="Border.gt">
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.15" />
+        <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Panel.gt-host:pointerover Border.gt">
+    <Setter Property="BoxShadow" Value="0 12 20 -12 #8C46321A" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
+  </Style>
+  <Style Selector="Border.ga">
+    <Setter Property="CornerRadius" Value="11,11,0,0" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Background">
+      <LinearGradientBrush StartPoint="40%,0%" EndPoint="60%,100%">
+        <GradientStop Color="{DynamicResource AccentContainerColor}" Offset="0" />
+        <GradientStop Color="{DynamicResource AccentLineColor}" Offset="1" />
+      </LinearGradientBrush>
+    </Setter>
+  </Style>
+  <Style Selector="TextBlock.gn">
+    <Setter Property="FontSize" Value="18" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="TextBlock.gn.hot">
+    <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+  </Style>
+  <Style Selector="c|RatioBar.gh">
+    <Setter Property="Height" Value="3" />
+    <Setter Property="VerticalAlignment" Value="Bottom" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Fill" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Track" Value="{x:Null}" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+  </Style>
+  <Style Selector="c|RatioBar.gh.hot">
+    <Setter Property="Fill" Value="{DynamicResource DangerBrush}" />
+  </Style>
+
+  <!-- 未出金磁贴：虚线金框、暖底、135° 斜纹，问号与数字为强调字色 -->
+  <Style Selector="Border.gt.cur">
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource HighlightBrush}" />
+  </Style>
+  <Style Selector="Rectangle.cur-dash">
+    <Setter Property="RadiusX" Value="12" />
+    <Setter Property="RadiusY" Value="12" />
+    <Setter Property="Stroke" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="StrokeThickness" Value="1" />
+    <Setter Property="StrokeDashArray" Value="4,3" />
+    <Setter Property="Opacity" Value="0.6" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+  </Style>
+  <Style Selector="Panel.ga.cur c|StripeFill">
+    <Setter Property="Background" Value="{DynamicResource HighlightBrush}" />
+    <Setter Property="Stripe" Value="{DynamicResource AccentContainerBrush}" />
+    <Setter Property="Period" Value="12" />
+  </Style>
+  <Style Selector="Panel.ga.cur TextBlock">
+    <Setter Property="FontSize" Value="34" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.gt.cur TextBlock.gn">
+    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+  </Style>
+
+  <!-- 磁贴悬停提示：Ink 底、圆角 9、内边距 12 / 9、12 号字；时间与补充行为浅金，「小保底歪」为浅红 -->
+  <Style Selector="ToolTip.tile-tip">
+    <Setter Property="CornerRadius" Value="9" />
+    <Setter Property="Padding" Value="12,9" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+  <Style Selector="ToolTip.tile-tip TextBlock">
+    <Setter Property="LineHeight" Value="19" />
+  </Style>
+  <Style Selector="ToolTip.tile-tip TextBlock.tip-sub">
+    <Setter Property="Foreground" Value="#C9B892" />
+    <Setter Property="FontSize" Value="11" />
+  </Style>
 </Styles>

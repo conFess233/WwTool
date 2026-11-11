@@ -1,8 +1,10 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
@@ -19,6 +21,11 @@ public partial class PullsOverviewView : UserControl
     {
         InitializeComponent();
         OverviewScroller.ScrollChanged += (_, _) => BarShadow.Opacity = Math.Clamp(OverviewScroller.Offset.Y / 24, 0, 1);
+
+        // 精简视图：磁贴最小宽 96、列距 12（宿主右侧含角标留白 7，故按 103 / 5 计算），按可用宽度自适应列数（auto-fill）；底部 36 渐隐。
+        CompactGrid.SizeChanged += (_, e) => UpdateCompactColumns(e.NewSize.Width);
+        CompactGrid.LayoutUpdated += (_, _) => UpdateCompactColumns(CompactGrid.Bounds.Width);
+        CompactScroller.SizeChanged += (_, e) => UpdateCompactFade(e.NewSize.Height);
         AddHandler(TappedEvent, OnTapped);
         AddHandler(ContextRequestedEvent, OnContextRequested);
 
@@ -28,6 +35,27 @@ public partial class PullsOverviewView : UserControl
         AddHandler(DragDrop.DragOverEvent, OnDragOverPage);
         AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
         AddHandler(DragDrop.DropEvent, OnDrop);
+    }
+
+    private const double TileMinWidth = 96 + 7, TileGap = 5, FadeHeight = 36;
+
+    private void UpdateCompactColumns(double width)
+    {
+        if (width <= 0 || CompactGrid.ItemsPanelRoot is not UniformGrid grid) return;
+        int columns = Math.Max(1, (int)Math.Floor((width + TileGap) / (TileMinWidth + TileGap)));
+        if (grid.Columns != columns) grid.Columns = columns;
+    }
+
+    private void UpdateCompactFade(double height)
+    {
+        if (height <= FadeHeight) { CompactScroller.OpacityMask = null; return; }
+        double start = 1 - FadeHeight / height;
+        CompactScroller.OpacityMask = new LinearGradientBrush
+        {
+            StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+            EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
+            GradientStops = { new GradientStop(Colors.Black, 0), new GradientStop(Colors.Black, start), new GradientStop(Colors.Transparent, 1) },
+        };
     }
 
     private static bool CanImport(DragEventArgs e) =>

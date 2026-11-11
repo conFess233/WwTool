@@ -60,6 +60,7 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
 {
     private const int DailyWindowDays = 30;
 
+    private readonly WwTool.Core.Abstractions.IConfigService _config;
     private readonly GamePathPicker _gamePath;
     private readonly PullsSession _session;
     private readonly LocalizationService _localization;
@@ -80,12 +81,14 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         ClipboardService clipboard,
         IUIStateService uiState,
         ErrorReporter errors,
-        GamePathPicker gamePath)
+        GamePathPicker gamePath,
+        WwTool.Core.Abstractions.IConfigService config)
     {
         _clipboard = clipboard;
         _uiState = uiState;
         _errors = errors;
         _gamePath = gamePath;
+        _config = config;
         _session = session;
         _localization = localization;
         _navigation = navigation;
@@ -237,11 +240,41 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     public ObservableCollection<PoolTab> OtherPools { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsOverview), nameof(IsPoolView), nameof(IsOtherSelected))]
+    [NotifyPropertyChangedFor(nameof(IsOverview), nameof(IsPoolView), nameof(IsOtherSelected), nameof(ShowListPool), nameof(ShowCompactPool))]
     private PoolTab? _selectedTab;
 
     public bool IsOverview => SelectedTab?.Pool is null && SelectedTab?.IsOther != true;
     public bool IsPoolView => !IsOverview;
+
+    // —— 单卡池视图切换：列表 / 精简（头像格子），记住上次选择 ——
+
+    public bool IsCompactView
+    {
+        get => _config.User.PullsCompactView;
+        set
+        {
+            if (_config.User.PullsCompactView == value) return;
+            _config.User.PullsCompactView = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsListView));
+            OnPropertyChanged(nameof(ShowListPool));
+            OnPropertyChanged(nameof(ShowCompactPool));
+        }
+    }
+
+    public bool IsListView => !IsCompactView;
+
+    public bool ShowListPool => ShowContent && IsPoolView && !IsCompactView;
+    public bool ShowCompactPool => ShowContent && IsPoolView && IsCompactView;
+
+    [RelayCommand]
+    private void SetViewMode(string mode) => IsCompactView = mode == "compact";
+
+    partial void OnShowContentChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowListPool));
+        OnPropertyChanged(nameof(ShowCompactPool));
+    }
     public bool IsOtherSelected => SelectedTab?.IsOther == true;
 
     // —— 状态 ——
@@ -259,6 +292,8 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     [ObservableProperty] private string _averagePerLimitedCaption = string.Empty;
     [ObservableProperty] private string _winRate = "—";
     [ObservableProperty] private string _winRateCaption = string.Empty;
+    [ObservableProperty] private string _averagePerUp = "—";
+    [ObservableProperty] private string _winRatio = string.Empty;
     [ObservableProperty] private string _astrites = "0";
     [ObservableProperty] private string _astritesCaption = string.Empty;
 
@@ -423,6 +458,8 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
             : string.Format(_localization["Pulls_WinMiss"], summary.Wins, summary.Misses);
         Astrites = N(summary.Astrites);
         AstritesCaption = string.Empty;
+        AveragePerUp = summary.AveragePerLimited is { } up ? up.ToString("0.0", CultureInfo.InvariantCulture) : "—";
+        WinRatio = summary.WinRate is null ? string.Empty : $"{summary.Wins} / {summary.Wins + summary.Misses}";
     }
 
     private void UpdateOverview(PullsSnapshot s)

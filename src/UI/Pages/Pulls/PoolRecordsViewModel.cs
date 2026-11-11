@@ -64,6 +64,20 @@ public sealed partial class FiveStarCard : ObservableObject
     public string IconPath => $"Local/Icons/{ResourceId}.png";
 
     public bool IsHardPity => Pity >= PullsSummaryCalculator.HardPity;
+
+    /// <summary>已垫 70 抽及以上（精简视图的抽数与底线转红）。</summary>
+    public bool IsNearHardPity => Pity >= 70;
+
+    /// <summary>精简视图悬停提示第二行：「N 抽出金」，歪了另起红字。</summary>
+    public string PityLine { get; set; } = string.Empty;
+
+    /// <summary>精简视图悬停提示第三行（歪了时为「下一金必为 UP」）。</summary>
+    public string? NextLine { get; set; }
+
+    /// <summary>歪了时接在第二行后的红字「，小保底歪」。</summary>
+    public string LostLine { get; set; } = string.Empty;
+
+    public bool HasNextLine => NextLine is not null;
     public bool IsLimitedTag => IsLimited == true;
     public bool IsPermanentTag => IsLimited == false;
     public bool IsGuaranteed => Kind == PityKind.Guaranteed;
@@ -89,6 +103,9 @@ public sealed class NotYetCard
     public bool HasFourStars => FourStars.Count > 0;
     public bool IsNextGuaranteed => NextIsGuaranteed == true;
     public bool IsNextSoftPity => NextIsGuaranteed == false;
+
+    /// <summary>抽数刻度比例（满格 80 抽）。</summary>
+    public double PityRatio => Math.Min(1, Pity / (double)PullsSummaryCalculator.HardPity);
 }
 
 /// <summary>
@@ -157,6 +174,10 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
 
     /// <summary>已显示的五星卡片（分页追加）。</summary>
     public ObservableCollection<FiveStarCard> Items { get; } = [];
+
+    /// <summary>精简视图的全部格子：首格为未出金（有时），其后为筛选后的全部五星，最新在前。</summary>
+    [ObservableProperty]
+    private IReadOnlyList<object> _compactTiles = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(LoadedText))]
@@ -268,6 +289,13 @@ public sealed partial class PoolRecordsViewModel : ObservableObject
                     _ => true,
                 })
             .ToList();
+        foreach (FiveStarCard c in _filtered)
+        {
+            c.PityLine = string.Format(_localization["Pulls_TilePity"], c.Pity);
+            c.NextLine = c.IsLost ? _localization["Pulls_TileNextUp"] : null;
+            c.LostLine = c.IsLost ? _localization["Pulls_TileLost"] : string.Empty;
+        }
+        CompactTiles = NotYet is { } notYet ? [notYet, .. _filtered] : [.. _filtered];
         Items.Clear();
         LoadMore();
     }
