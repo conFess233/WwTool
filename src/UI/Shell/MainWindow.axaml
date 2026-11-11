@@ -95,9 +95,10 @@
     <c:BackdropTexture GridColor="{DynamicResource GridLineColor}" GridOpacity="{DynamicResource GridLineOpacity}"
                        GlowColor="{DynamicResource GlowColor}" GlowOpacity="{DynamicResource GlowOpacity}"
                        IsVisible="{Binding !HasBackgroundImage}" />
-    <!-- 背景图（自定义图片，或未设定时取游戏启动器背景）：铺满并四周多留 14 供视差移动；上叠从左 70% 到右 5% 的背景色遮罩 -->
+    <!-- 背景图（自定义图片，或未设定时取游戏启动器背景）：铺满并四周多留 14 供视差移动；左侧叠一层背景色遮罩（45% 渐隐到 0，止于 45% 宽处），保证页名可读、其余部分保持清晰 -->
     <Panel IsVisible="{Binding HasBackgroundImage}" IsHitTestVisible="False" ClipToBounds="True">
-      <Image x:Name="BackdropImage" Source="{Binding BackgroundImage}" Stretch="UniformToFill" Margin="-14">
+      <Image x:Name="BackdropImage" Source="{Binding BackgroundImage}" Stretch="UniformToFill" Margin="-14"
+             IsVisible="{Binding !#BackdropVideo.HasFrame}">
         <Image.RenderTransform><TranslateTransform /></Image.RenderTransform>
       </Image>
       <!-- 动态背景（仅 Windows，设置开启时）：启动器背景视频叠在首帧图上，第一帧出来前透明；是否播放由窗口状态决定 -->
@@ -108,8 +109,8 @@
       <Border Background="{DynamicResource BackgroundBrush}">
         <Border.OpacityMask>
           <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
-            <GradientStop Offset="0" Color="#B3000000" />
-            <GradientStop Offset="1" Color="#0D000000" />
+            <GradientStop Offset="0" Color="#73000000" />
+            <GradientStop Offset="0.45" Color="#00000000" />
           </LinearGradientBrush>
         </Border.OpacityMask>
       </Border>

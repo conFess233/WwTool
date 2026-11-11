@@ -6,7 +6,7 @@ using Vortice.MediaFoundation;
 
 namespace WwTool.UI.Services.Video;
 
-/// <summary>解码出的一帧：BGRX（每像素 4 字节），<paramref name="Pitch"/> 可能大于宽度 × 4。仅在回调期间有效。</summary>
+/// <summary>解码出的一帧：BGRA（每像素 4 字节，透明度恒为 255），<paramref name="Pitch"/> 可能大于宽度 × 4。仅在回调期间有效。</summary>
 public delegate void VideoFrameCallback(IntPtr scan0, int pitch, int width, int height);
 
 /// <summary>
@@ -181,7 +181,7 @@ public sealed class MfVideoLoop : IDisposable
 
     private int _outWidth, _outHeight;
 
-    /// <summary>输出 RGB32：按「盖住请求区域」缩放（UniformToFill 所需的最小尺寸），保持宽高比，不放大。</summary>
+    /// <summary>输出 ARGB32：按「盖住请求区域」缩放（UniformToFill 所需的最小尺寸），保持宽高比，不放大。</summary>
     private void ConfigureOutput(IMFSourceReader reader)
     {
         _sizeChanged = false;
@@ -192,7 +192,8 @@ public sealed class MfVideoLoop : IDisposable
         if (width == _outWidth && height == _outHeight) return;
         using IMFMediaType type = MediaFactory.MFCreateMediaType();
         type.Set(MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Video);
-        type.Set(MediaTypeAttributeKeys.Subtype, VideoFormatGuids.Rgb32);
+        // ARGB32 而不是 RGB32：RGB32 的第四字节为 0，界面按预乘透明度合成时视频会和下层叠加成重影、整体发灰。
+        type.Set(MediaTypeAttributeKeys.Subtype, VideoFormatGuids.Argb32);
         type.Set(MediaTypeAttributeKeys.FrameSize, ((ulong)(uint)width << 32) | (uint)height);
         reader.SetCurrentMediaType(SourceReaderIndex.FirstVideoStream, type);
         _outWidth = width;
