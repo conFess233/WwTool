@@ -646,12 +646,10 @@
   "Home_Announcements": "Announcements",
   "Home_AnnAll": "All",
   "Home_AnnEvent": "Event",
-  "Home_AnnVersion": "Version",
-  "Home_AnnMaintenance": "Maintenance",
   "Home_AnnNotice": "Notice",
   "Home_AnnViewAll": "View all on the official site",
   "Home_AnnEmptyTitle": "No announcements",
-  "Home_AnnEmptyHint": "Announcements will be listed here by type.",
+  "Home_AnnEmptyHint": "The game launcher has no announcements right now.",
   "Pulls_StoredCount": "{0} records stored locally",
   "Pulls_RecordsNote": "Only the last 6 months can be fetched",
   "Pulls_HavePrefix": "",
@@ -740,5 +738,12 @@
   "Pulls_TileNextUp": "Next 5★ is guaranteed featured",
   "Settings_DynamicBackground": "Animated background",
   "Settings_DynamicBackgroundHint": "Plays the game launcher's background video; pauses when the window is minimized or loses focus. Uses about 150–200 MB more memory while playing",
-  "Settings_DynamicBackgroundCustomHint": "Only available with the default background"
+  "Settings_DynamicBackgroundCustomHint": "Only available with the default background",
+  "Home_AnnNews": "News",
+  "Home_RegionCN": "China",
+  "Home_RegionGlobal": "Global",
+  "Home_AnnLoading": "Loading announcements…",
+  "Home_AnnFailedTitle": "Couldn't load announcements",
+  "Home_AnnFailedHint": "Check your network, or try the other region.",
+  "Home_AnnRetry": "Retry"
 }

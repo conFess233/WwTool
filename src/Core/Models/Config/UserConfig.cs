@@ -25,6 +25,7 @@ namespace WwTool.Core.Models.Config
         private bool _useCustomBackground;
         private string? _customBackgroundPath;
         private bool _useDynamicBackground;
+        private string? _announcementRegion;
         private bool _pullsCompactView;
 
         public string? GamePath { get => _gamePath; set => SetProperty(ref _gamePath, value); }
@@ -64,6 +65,9 @@ namespace WwTool.Core.Models.Config
 
         /// <summary>动态背景：使用启动器背景时播放其背景视频（仅 Windows），默认关闭。</summary>
         public bool UseDynamicBackground { get => _useDynamicBackground; set => SetProperty(ref _useDynamicBackground, value); }
+
+        /// <summary>首页游戏公告的区服：「CN」国服、「Global」国际服；为空时按当前账号自动选择。</summary>
+        public string? AnnouncementRegion { get => _announcementRegion; set => SetProperty(ref _announcementRegion, value); }
         /// <summary>抽卡统计单卡池记录用「精简」（头像格子）视图，否则为「列表」。</summary>
         public bool PullsCompactView { get => _pullsCompactView; set => SetProperty(ref _pullsCompactView, value); }
         public bool IsReducedMotionEnabled

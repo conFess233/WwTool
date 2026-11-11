@@ -8,6 +8,7 @@ using WwTool.Core.Abstractions;
 using WwTool.Core.Enums;
 using WwTool.Core.Abstractions.Platform;
 using WwTool.Core.Exceptions;
+using WwTool.Core.Extensions;
 using WwTool.Core.Localization;
 using WwTool.Core.Models.Domain;
 using WwTool.Core.Services;
@@ -83,8 +84,7 @@ public sealed partial class QuickAction(string automationId, string icon, IRelay
 public sealed record AnnouncementRow(string KindText, AnnouncementKind Kind, string Title, string DateText, Uri? Link)
 {
     public bool IsEvent => Kind == AnnouncementKind.Event;
-    public bool IsVersion => Kind == AnnouncementKind.Version;
-    public bool IsMaintenance => Kind == AnnouncementKind.Maintenance;
+    public bool IsNews => Kind == AnnouncementKind.News;
     public bool IsNotice => Kind == AnnouncementKind.Notice;
 }
 
@@ -115,6 +115,11 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     private AnnouncementFeed _feed = AnnouncementFeed.Empty;
     private CancellationTokenSource? _copyReset;
     private bool _announcementsLoaded;
+
+    /// <summary>本次运行已从接口刷新过的「区服 + 语言」，不重复请求。</summary>
+    private readonly HashSet<string> _announcementsRefreshed = [];
+    private int _announcementVersion;
+    private LauncherRegion _shownRegion;
 
     public HomeViewModel(
         AccountContext accounts,
@@ -172,8 +177,8 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         [
             new AnnouncementFilter(null, "Home_AnnAll") { IsSelected = true },
             new AnnouncementFilter(AnnouncementKind.Event, "Home_AnnEvent"),
-            new AnnouncementFilter(AnnouncementKind.Version, "Home_AnnVersion"),
-            new AnnouncementFilter(AnnouncementKind.Maintenance, "Home_AnnMaintenance"),
+            new AnnouncementFilter(AnnouncementKind.Notice, "Home_AnnNotice"),
+            new AnnouncementFilter(AnnouncementKind.News, "Home_AnnNews"),
         ];
         foreach (AnnouncementFilter filter in Filters) filter.PropertyChanged += OnFilterChanged;
 
@@ -209,6 +214,12 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         };
         _localization.PropertyChanged += (_, e) =>
         {
+            // 国际服资讯按界面语言获取，换语言后重新加载。
+            if (e.PropertyName == nameof(LocalizationService.CurrentLanguage) && _announcementsLoaded && Region == LauncherRegion.Global)
+            {
+                LoadAnnouncements();
+                return;
+            }
             if (e.PropertyName != LocalizationService.IndexerName) return;
             Refresh();
             UpdateQuickTitles();
@@ -304,7 +315,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         _game.Refresh();
         UpdateLive();
         _ = _player.EnsureLoadedAsync();
-        if (!_announcementsLoaded) _ = LoadAnnouncementsAsync();
+        if (!_announcementsLoaded) LoadAnnouncements();
     }
 
     public void OnNavigatedFrom() => _clock.Stop();
@@ -340,6 +351,8 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         if (e.PropertyName != nameof(AccountContext.Current)) return;
         OnPropertyChanged(nameof(ShowNoSnapshot));
         Refresh();
+        // 公告区服未手动选择时跟随账号，换到另一区服的账号后切换。
+        if (_announcementsLoaded && Region != _shownRegion) OnRegionChanged();
     }
 
     private void Refresh()
@@ -622,19 +635,122 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
 
     // ── 游戏公告 ────────────────────────────────────────────
 
-    private async Task LoadAnnouncementsAsync()
+    /// <summary>
+    /// 公告区服：设置里记住了就用记住的；否则按当前账号（UID 小于 2 亿为国服），没有账号时简体中文界面用国服、其他用国际服。
+    /// </summary>
+    public LauncherRegion Region
+    {
+        get
+        {
+            string? saved = _config.User.AnnouncementRegion;
+            if (saved == "CN") return LauncherRegion.China;
+            if (saved == "Global") return LauncherRegion.Global;
+            if (Accounts.Current?.Uid is { } uid && long.TryParse(uid, out long id))
+                return id < 200_000_000 ? LauncherRegion.China : LauncherRegion.Global;
+            return _localization.CurrentLanguage == LanguageType.ZhHans ? LauncherRegion.China : LauncherRegion.Global;
+        }
+    }
+
+    /// <summary>区服滑块：国服。</summary>
+    public bool IsChinaRegion
+    {
+        get => Region == LauncherRegion.China;
+        set { if (value) SetRegion(LauncherRegion.China); }
+    }
+
+    /// <summary>区服滑块：国际服。</summary>
+    public bool IsGlobalRegion
+    {
+        get => Region == LauncherRegion.Global;
+        set { if (value) SetRegion(LauncherRegion.Global); }
+    }
+
+    private void SetRegion(LauncherRegion region)
+    {
+        if (_config.User.AnnouncementRegion is not null && Region == region) return;
+        bool changed = Region != region;
+        _config.User.AnnouncementRegion = region == LauncherRegion.China ? "CN" : "Global";
+        if (!changed) return;
+        OnRegionChanged();
+    }
+
+    private void OnRegionChanged()
+    {
+        OnPropertyChanged(nameof(Region));
+        OnPropertyChanged(nameof(IsChinaRegion));
+        OnPropertyChanged(nameof(IsGlobalRegion));
+        if (_announcementsLoaded) LoadAnnouncements();
+    }
+
+    [ObservableProperty] private bool _isAnnouncementsLoading;
+    [ObservableProperty] private bool _announcementsFailed;
+
+    /// <summary>先显示该区服的缓存，再在后台从接口刷新（同一区服与语言本次运行只刷新一次）。</summary>
+    private void LoadAnnouncements()
     {
         _announcementsLoaded = true;
+        int version = ++_announcementVersion;
+        LauncherRegion region = Region;
+        _shownRegion = region;
+        string language = _localization.CurrentLanguage.GetCode();
+        AnnouncementFeed? cached = null;
         try
         {
-            _feed = await _announcementSource.LoadAsync(_localization.CurrentLanguage.ToString());
+            cached = _announcementSource.LoadCached(region, language);
         }
         catch (Exception ex)
         {
             _errors.Report(ex, _localization["Home_Announcements"], notifyUser: false);
-            _feed = AnnouncementFeed.Empty;
         }
-        Banners = _feed.Banners;
+        ApplyFeed(cached ?? AnnouncementFeed.Empty);
+        AnnouncementsFailed = false;
+
+        string key = $"{region}|{LauncherNewsService.RequestLanguage(region, language)}";
+        if (cached is not null && _announcementsRefreshed.Contains(key)) return;
+        _ = RefreshAnnouncementsAsync(region, language, key, version, hasCache: cached is not null);
+    }
+
+    private async Task RefreshAnnouncementsAsync(LauncherRegion region, string language, string key, int version, bool hasCache)
+    {
+        IsAnnouncementsLoading = !hasCache;
+        AnnouncementFeed? fresh = null;
+        try
+        {
+            fresh = await Task.Run(() => _announcementSource.RefreshAsync(region, language));
+        }
+        catch (Exception ex)
+        {
+            _errors.Report(ex, _localization["Home_Announcements"], notifyUser: false);
+        }
+        if (version != _announcementVersion) return;
+        IsAnnouncementsLoading = false;
+        if (fresh is not null)
+        {
+            _announcementsRefreshed.Add(key);
+            ApplyFeed(fresh);
+            // 轮播图在后台下载，下好后补上横幅。
+            AnnouncementFeed? withImages = null;
+            try
+            {
+                withImages = await Task.Run(() => _announcementSource.DownloadImagesAsync(region, language));
+            }
+            catch (Exception ex)
+            {
+                _errors.Report(ex, _localization["Home_Announcements"], notifyUser: false);
+            }
+            if (withImages is not null && version == _announcementVersion) ApplyFeed(withImages);
+        }
+        else if (!hasCache)
+        {
+            AnnouncementsFailed = true;
+            OnPropertyChanged(nameof(ShowAnnouncementsEmpty));
+        }
+    }
+
+    private void ApplyFeed(AnnouncementFeed feed)
+    {
+        _feed = feed;
+        Banners = feed.Banners;
         HasBanners = Banners.Count > 0;
         UpdateAnnouncements();
     }
@@ -654,22 +770,41 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         foreach (AnnouncementFilter filter in Filters) filter.Title = _localization[filter.TitleKey];
         AnnouncementKind? kind = Filters.FirstOrDefault(f => f.IsSelected)?.Kind;
         AnnouncementRows.Clear();
-        foreach (Announcement item in _feed.Items.Where(i => kind is null || i.Kind == kind))
+        // 「全部」按日期从新到旧合并三个栏目；单个栏目保持接口顺序。
+        IEnumerable<Announcement> items = _feed.Items.Where(i => kind is null || i.Kind == kind);
+        if (kind is null) items = items.OrderByDescending(i => i.Date ?? DateTime.MinValue);
+        foreach (Announcement item in items)
         {
             AnnouncementRows.Add(new AnnouncementRow(KindText(item.Kind), item.Kind, item.Title,
-                item.Date.ToString("MM/dd", CultureInfo.InvariantCulture), item.Link));
+                item.Date?.ToString("MM/dd", CultureInfo.InvariantCulture) ?? item.DateText ?? string.Empty, item.Link));
         }
-        HasAnnouncements = _feed.Items.Count > 0 || _feed.Banners.Count > 0;
+        HasAnnouncements = !_feed.IsEmpty;
         OnPropertyChanged(nameof(ShowAnnouncementsEmpty));
+        OnPropertyChanged(nameof(ShowAnnouncementsLoading));
+        OnPropertyChanged(nameof(ShowAnnouncementsFailed));
     }
 
-    public bool ShowAnnouncementsEmpty => !HasAnnouncements;
+    /// <summary>空状态：没有内容、不在加载、也没有失败（失败另有提示）。</summary>
+    public bool ShowAnnouncementsEmpty => !HasAnnouncements && !IsAnnouncementsLoading && !AnnouncementsFailed;
+    public bool ShowAnnouncementsLoading => !HasAnnouncements && IsAnnouncementsLoading;
+    public bool ShowAnnouncementsFailed => !HasAnnouncements && !IsAnnouncementsLoading && AnnouncementsFailed;
+
+    partial void OnIsAnnouncementsLoadingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowAnnouncementsEmpty));
+        OnPropertyChanged(nameof(ShowAnnouncementsLoading));
+        OnPropertyChanged(nameof(ShowAnnouncementsFailed));
+    }
+
+    partial void OnAnnouncementsFailedChanged(bool value) => OnIsAnnouncementsLoadingChanged(value);
+
+    [RelayCommand]
+    private void RetryAnnouncements() => LoadAnnouncements();
 
     private string KindText(AnnouncementKind kind) => _localization[kind switch
     {
         AnnouncementKind.Event => "Home_AnnEvent",
-        AnnouncementKind.Version => "Home_AnnVersion",
-        AnnouncementKind.Maintenance => "Home_AnnMaintenance",
+        AnnouncementKind.News => "Home_AnnNews",
         _ => "Home_AnnNotice",
     }];
 
@@ -680,10 +815,27 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     }
 
     [RelayCommand]
+    private void OpenBanner(AnnouncementBanner? banner)
+    {
+        if (banner?.Link is { } link) _launcher.OpenUrl(link);
+    }
+
+    /// <summary>官网新闻页：国服；国际服按界面语言（简体中文界面用繁中页）。</summary>
+    [RelayCommand]
     private void OpenAllAnnouncements()
     {
-        if (_feed.MoreLink is { } link) _launcher.OpenUrl(link);
-        else OpenUrl(_config.Api.Urls.OfficialSiteUrl);
+        if (Region == LauncherRegion.China)
+        {
+            OpenUrl(_config.Api.Urls.NewsPageUrlCN);
+            return;
+        }
+        string site = _localization.CurrentLanguage switch
+        {
+            LanguageType.En => "en",
+            LanguageType.Ja => "ja",
+            _ => "zh-tw",
+        };
+        OpenUrl(string.Format(CultureInfo.InvariantCulture, _config.Api.Urls.NewsPageUrlNET, site));
     }
 
     // ── 格式 ────────────────────────────────────────────────

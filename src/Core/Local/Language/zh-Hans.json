@@ -646,12 +646,10 @@
   "Home_Announcements": "游戏公告",
   "Home_AnnAll": "全部",
   "Home_AnnEvent": "活动",
-  "Home_AnnVersion": "版本",
-  "Home_AnnMaintenance": "维护",
   "Home_AnnNotice": "公告",
   "Home_AnnViewAll": "前往官网查看全部公告",
   "Home_AnnEmptyTitle": "暂无公告",
-  "Home_AnnEmptyHint": "公告会在这里按类型列出。",
+  "Home_AnnEmptyHint": "游戏启动器当前没有发布公告。",
   "Pulls_StoredCount": "本地已存储 {0} 条",
   "Pulls_RecordsNote": "仅能获取近半年数据",
   "Pulls_HavePrefix": "已有",
@@ -740,5 +738,12 @@
   "Pulls_TileNextUp": "下一金必为 UP",
   "Settings_DynamicBackground": "动态背景",
   "Settings_DynamicBackgroundHint": "播放游戏启动器的背景视频，窗口最小化或失去焦点时暂停；播放时约多占用 150～200MB 内存",
-  "Settings_DynamicBackgroundCustomHint": "仅在使用默认背景时可用"
+  "Settings_DynamicBackgroundCustomHint": "仅在使用默认背景时可用",
+  "Home_AnnNews": "新闻",
+  "Home_RegionCN": "国服",
+  "Home_RegionGlobal": "国际服",
+  "Home_AnnLoading": "正在获取公告…",
+  "Home_AnnFailedTitle": "暂时无法获取公告",
+  "Home_AnnFailedHint": "请检查网络，或切换到另一个区服试试。",
+  "Home_AnnRetry": "重试"
 }

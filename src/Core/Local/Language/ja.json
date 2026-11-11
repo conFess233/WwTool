@@ -646,12 +646,10 @@
   "Home_Announcements": "お知らせ",
   "Home_AnnAll": "すべて",
   "Home_AnnEvent": "イベント",
-  "Home_AnnVersion": "バージョン",
-  "Home_AnnMaintenance": "メンテナンス",
   "Home_AnnNotice": "お知らせ",
   "Home_AnnViewAll": "公式サイトですべて見る",
   "Home_AnnEmptyTitle": "お知らせはありません",
-  "Home_AnnEmptyHint": "お知らせは種類ごとにここに表示されます。",
+  "Home_AnnEmptyHint": "ゲームランチャーには現在お知らせがありません。",
   "Pulls_StoredCount": "ローカルに {0} 件保存済み",
   "Pulls_RecordsNote": "取得できるのは直近半年分のみ",
   "Pulls_HavePrefix": "",
@@ -740,5 +738,12 @@
   "Pulls_TileNextUp": "次の★5 はピックアップ確定",
   "Settings_DynamicBackground": "動く背景",
   "Settings_DynamicBackgroundHint": "ゲームランチャーの背景動画を再生します。最小化時やフォーカスを失ったときは一時停止します。再生中はメモリを約 150～200MB 多く使います",
-  "Settings_DynamicBackgroundCustomHint": "既定の背景を使用しているときのみ利用できます"
+  "Settings_DynamicBackgroundCustomHint": "既定の背景を使用しているときのみ利用できます",
+  "Home_AnnNews": "ニュース",
+  "Home_RegionCN": "中国版",
+  "Home_RegionGlobal": "グローバル版",
+  "Home_AnnLoading": "お知らせを取得しています…",
+  "Home_AnnFailedTitle": "お知らせを取得できません",
+  "Home_AnnFailedHint": "ネットワークを確認するか、もう一方のサーバーをお試しください。",
+  "Home_AnnRetry": "再試行"
 }

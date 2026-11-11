@@ -61,6 +61,7 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<CatalogRepositorySource>();
         services.AddSingleton<CatalogSyncService>();
         services.AddSingleton<LauncherBackgroundService>();
+        services.AddSingleton<LauncherNewsService>();
 
         // 业务服务
         services.AddSingleton<IUserDataService, UserDataService>();

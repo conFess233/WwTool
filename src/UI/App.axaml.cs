@@ -141,7 +141,7 @@ public partial class App : Application
         services.AddSingleton<GameLauncherService>();
         services.AddSingleton<ClipboardService>();
         services.AddSingleton<GamePathPicker>();
-        services.AddSingleton<IAnnouncementSource, EmptyAnnouncementSource>();
+        services.AddSingleton<IAnnouncementSource, LauncherAnnouncementSource>();
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<ExploreViewModel>();
         services.AddSingleton<MotorViewModel>();
