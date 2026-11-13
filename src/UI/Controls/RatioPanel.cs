@@ -25,6 +25,28 @@ public sealed class RatioPanel : Panel
     public static readonly StyledProperty<double> MinChildWidthProperty =
         AvaloniaProperty.Register<RatioPanel, double>(nameof(MinChildWidth), 0);
 
+    /// <summary>Left 与 Right 相等（一个点）的子元素以该点为中心摆放（按自身宽度，不超出面板）。用于刻度文字和「现在」标记。</summary>
+    public static readonly StyledProperty<bool> CenterPointsProperty =
+        AvaloniaProperty.Register<RatioPanel, bool>(nameof(CenterPoints));
+
+    public bool CenterPoints
+    {
+        get => GetValue(CenterPointsProperty);
+        set => SetValue(CenterPointsProperty, value);
+    }
+
+    /// <summary>
+    /// 按点居中的子元素放不下时均匀抽稀（每隔 k 个显示一个，其余移出可视区并裁掉）。用于窄窗口下的刻度文字。
+    /// </summary>
+    public static readonly StyledProperty<bool> ThinOverlappingProperty =
+        AvaloniaProperty.Register<RatioPanel, bool>(nameof(ThinOverlapping));
+
+    public bool ThinOverlapping
+    {
+        get => GetValue(ThinOverlappingProperty);
+        set => SetValue(ThinOverlappingProperty, value);
+    }
+
     static RatioPanel()
     {
         AffectsParentArrange<RatioPanel>(LeftProperty, RightProperty, TopProperty, BottomProperty);
@@ -50,7 +72,9 @@ public sealed class RatioPanel : Panel
         double height = 0;
         foreach (Control child in Children)
         {
-            double width = double.IsInfinity(availableSize.Width) ? availableSize.Width : Width(child, availableSize.Width).Width;
+            double width = double.IsInfinity(availableSize.Width) || (CenterPoints && GetLeft(child) == GetRight(child))
+                ? double.PositiveInfinity
+                : Width(child, availableSize.Width).Width;
             child.Measure(new Size(width, availableSize.Height));
             if (double.IsNaN(GetTop(child))) height = Math.Max(height, child.DesiredSize.Height);
         }
@@ -59,8 +83,15 @@ public sealed class RatioPanel : Panel
 
     protected override Size ArrangeOverride(Size finalSize)
     {
+        int step = ThinOverlapping ? ThinStep(finalSize.Width) : 1;
+        int index = 0;
         foreach (Control child in Children)
         {
+            if (step > 1 && index++ % step != 0)
+            {
+                child.Arrange(new Rect(-100000, 0, child.DesiredSize.Width, child.DesiredSize.Height));
+                continue;
+            }
             (double x, double width) = Width(child, finalSize.Width);
             double top = GetTop(child), bottom = GetBottom(child);
             double y = 0, height = finalSize.Height;
@@ -75,10 +106,26 @@ public sealed class RatioPanel : Panel
         return finalSize;
     }
 
+    /// <summary>相邻子元素的最小间距比最宽的子元素（加 8 像素间隙）还小时，每隔几个显示一个。</summary>
+    private int ThinStep(double total)
+    {
+        var points = Children.Where(c => c.IsVisible).Select(c => Math.Clamp(GetLeft(c), 0, 1) * total).ToList();
+        if (points.Count < 2) return 1;
+        double widest = Children.Max(c => c.DesiredSize.Width) + 8;
+        double gap = double.MaxValue;
+        for (int i = 1; i < points.Count; i++) gap = Math.Min(gap, Math.Abs(points[i] - points[i - 1]));
+        return gap <= 0 ? 1 : Math.Max(1, (int)Math.Ceiling(widest / gap));
+    }
+
     private (double X, double Width) Width(Control child, double total)
     {
         double left = Math.Clamp(GetLeft(child), 0, 1), right = Math.Clamp(GetRight(child), 0, 1);
         double x = left * total;
+        if (CenterPoints && left == right)
+        {
+            double w = Math.Min(child.DesiredSize.Width, total);
+            return (Math.Clamp(x - w / 2, 0, Math.Max(0, total - w)), w);
+        }
         double width = Math.Max(0, (right - left) * total);
         if (width < MinChildWidth)
         {

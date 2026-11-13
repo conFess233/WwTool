@@ -843,5 +843,18 @@
   "Events_OpenPost": "View post",
   "Events_Preview": "Version {0} livestream: {1}",
   "Events_ListSeparator": ", ",
-  "Home_AnnOpenEvents": "Event calendar & notices"
+  "Home_AnnOpenEvents": "Event calendar & notices",
+  "Events_Count": "{0} items",
+  "Events_ColName": "Name",
+  "Events_ColRemaining": "Time left",
+  "Events_StartsAt": "Starts {0}",
+  "Events_GroupRecurring": "Recurring",
+  "Events_Recur_tower": "Tower of Adversity",
+  "Events_Recur_wastes": "Whimpering Wastes",
+  "Events_Recur_weekly": "Weekly bosses",
+  "Events_Recur_shop": "Shop exchange",
+  "Events_RuleWeekly": "Resets every Monday 04:00",
+  "Events_RuleEvery": "Resets every {0} days at 04:00",
+  "Events_RuleVersion": "Resets when the version ends",
+  "Events_RecurHint": "Estimated from a fixed schedule (server time 04:00, counted as UTC+8)."
 }

@@ -38,42 +38,62 @@ public sealed partial class NoticeItem(GameNotice notice) : ObservableObject
 /// <summary>「全部公告」视图的一组。</summary>
 public sealed record NoticeGroup(string Title, IReadOnlyList<NoticeItem> Items);
 
-/// <summary>时间线的一行：分组标题行，或一条横条。</summary>
+/// <summary>时间线的一行：分组标题行（带数量），或一项卡池 / 活动 / 循环玩法的横条。</summary>
 public sealed partial class TimelineRow : ObservableObject
 {
-    public TimelineRow(string header)
+    public TimelineRow(string header, int count)
     {
         IsHeader = true;
         Header = header;
+        Count = count;
     }
 
-    public TimelineRow(NoticeItem item, string lane, double left, double right)
+    /// <param name="item">关联的公告；循环玩法没有公告，为 null。</param>
+    public TimelineRow(NoticeItem? item, string title, string? subtitle, string lane, DateTimeOffset start, DateTimeOffset? end,
+        double left, double right, string? tip = null)
     {
         Item = item;
+        Title = title;
+        Subtitle = subtitle;
         Lane = lane;
+        Start = start;
+        End = end;
         Left = left;
         Right = right;
+        Tip = tip ?? title;
     }
 
     public bool IsHeader { get; }
     public bool IsBar => !IsHeader;
     public string? Header { get; }
+    public int Count { get; }
     public NoticeItem? Item { get; }
-    public string AutomationId => "events-bar-" + Item?.Id;
+    public string AutomationId => "events-bar-" + (Item?.Id ?? Lane);
 
-    /// <summary>横条颜色分组：character / weapon / reverb / event。</summary>
-    public string? Lane { get; }
+    public string Title { get; } = string.Empty;
+    public string? Subtitle { get; }
+    public bool HasSubtitle => !string.IsNullOrEmpty(Subtitle);
+    public string Tip { get; } = string.Empty;
+    public DateTimeOffset Start { get; }
+    public DateTimeOffset? End { get; }
 
-    public bool IsCharacterLane => Lane == "character";
+    /// <summary>可点击打开公告（循环玩法不能）。</summary>
+    public bool IsClickable => Item is not null;
+
+    /// <summary>横条颜色：character / weapon / reverb / event / recurring。</summary>
+    public string Lane { get; } = string.Empty;
     public bool IsWeaponLane => Lane == "weapon";
     public bool IsReverbLane => Lane == "reverb";
     public bool IsEventLane => Lane == "event";
+    public bool IsRecurringLane => Lane == "recurring";
 
     public double Left { get; }
     public double Right { get; }
 
-    /// <summary>结束时间超出版本周期（横条右端没有收口）。</summary>
-    public bool RunsPastEnd { get; init; }
+    [ObservableProperty] private string _remainingText = string.Empty;
+    [ObservableProperty] private string _dateText = string.Empty;
+    [ObservableProperty] private bool _isEnded;
+    [ObservableProperty] private bool _isUpcoming;
 }
 
 /// <summary>时间线顶部的日期刻度。</summary>

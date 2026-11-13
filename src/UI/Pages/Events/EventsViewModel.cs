@@ -194,8 +194,16 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
     [ObservableProperty] private string _unpublishedText = string.Empty;
     [ObservableProperty] private bool _hasUnpublished;
     [ObservableProperty] private bool _hasTimeline;
+    [ObservableProperty] private string _timelineCountText = string.Empty;
+    [ObservableProperty] private string _nowText = string.Empty;
+    [ObservableProperty] private bool _hasVersionBand;
+    [ObservableProperty] private double _versionBandLeft;
+    [ObservableProperty] private double _versionBandRight;
 
     private DateTimeOffset _windowStart, _windowEnd;
+
+    /// <summary>最早结束的循环玩法这一轮的结束时间：过了就重建时间线（换到下一轮）。</summary>
+    private DateTimeOffset? _recurringRollover;
 
     // ── 版本日历 ──────────────────────────────────────────
 
@@ -435,50 +443,109 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
                ?? _items.FirstOrDefault();
     }
 
+    /// <summary>
+    /// 时间线：唤取、活动（取自公告）与循环玩法（按规则推算当前这一轮）三组。
+    /// 时间范围覆盖版本周期，并向前延伸到正在进行的循环玩法的开始（最多 4 周）；刻度为每周一，版本周期画底色。
+    /// </summary>
     private void BuildTimeline(GameNoticeFeed feed)
     {
         TimelineRows.Clear();
-        var bars = _items.Where(i => (i.IsGacha || i.IsEvent) && i.Notice.End is not null).ToList();
-        DateTimeOffset start = feed.VersionStart ?? (bars.Count > 0 ? bars.Min(b => b.Notice.Start) : DateTimeOffset.UtcNow);
-        DateTimeOffset end = feed.VersionEnd ?? (bars.Count > 0 ? bars.Max(b => b.Notice.End!.Value) : start.AddDays(42));
-        if (end <= start) end = start.AddDays(42);
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        var notices = _items.Where(i => (i.IsGacha || i.IsEvent) && i.Notice.End is not null).ToList();
+        DateTimeOffset versionStart = feed.VersionStart ?? (notices.Count > 0 ? notices.Min(b => b.Notice.Start) : now);
+        DateTimeOffset versionEnd = feed.VersionEnd ?? (notices.Count > 0 ? notices.Max(b => b.Notice.End!.Value) : versionStart.AddDays(42));
+        if (versionEnd <= versionStart) versionEnd = versionStart.AddDays(42);
+
+        var recurring = RecurringActivities.WutheringWaves
+            .Select(a => RecurringActivities.Current(a, now, feed.VersionStart, feed.VersionEnd))
+            .OfType<RecurringWindow>()
+            .ToList();
+        _recurringRollover = recurring.Count > 0 ? recurring.Min(w => w.End) : null;
+
+        DateTimeOffset start = versionStart;
+        foreach (RecurringWindow w in recurring)
+        {
+            if (w.Start < start) start = w.Start;
+        }
+        if (start < versionStart.AddDays(-28)) start = versionStart.AddDays(-28);
+        // 左边留出 2 天，第一个刻度文字不贴边。
+        DateTimeOffset localStart = start.ToLocalTime().AddDays(-2);
+        start = new DateTimeOffset(localStart.Date, localStart.Offset);
+        DateTimeOffset end = versionEnd;
         _windowStart = start;
         _windowEnd = end;
         double total = (end - start).TotalSeconds;
         double Ratio(DateTimeOffset t) => Math.Clamp((t - start).TotalSeconds / total, 0, 1);
 
-        // 只放与版本周期有交集的条目；常驻玩法（没有结束时间）不画。
-        bars = bars.Where(b => b.Notice.End!.Value > start && b.Notice.Start < end).ToList();
-        (string Lane, string Title, Func<NoticeItem, bool> Match)[] lanes =
-        [
-            ("character", _localization["Events_PoolCharacter"], i => i.Notice.Pool == GachaPoolType.Character),
-            ("weapon", _localization["Events_PoolWeapon"], i => i.Notice.Pool == GachaPoolType.Weapon),
-            ("reverb", _localization["Events_PoolReverb"], i => i.Notice.Pool is GachaPoolType.CharacterReverb or GachaPoolType.WeaponReverb),
-            ("event", _localization["Events_GroupEvent"], i => i.IsEvent),
-        ];
-        foreach (var lane in lanes)
+        // 只放与时间范围有交集的条目；常驻玩法（没有结束时间）不画。
+        notices = notices.Where(b => b.Notice.End!.Value > start && b.Notice.Start < end).ToList();
+        string separator = _localization["Events_ListSeparator"];
+        string Lane(NoticeItem i) => i.IsEvent ? "event" : i.Notice.Pool switch
         {
-            var rows = bars.Where(lane.Match).OrderBy(b => b.Notice.Start).ThenBy(b => b.Notice.End).ToList();
-            if (rows.Count == 0) continue;
-            TimelineRows.Add(new TimelineRow(lane.Title));
-            foreach (NoticeItem item in rows)
-            {
-                TimelineRows.Add(new TimelineRow(item, lane.Lane, Ratio(item.Notice.Start), Ratio(item.Notice.End!.Value))
-                {
-                    RunsPastEnd = item.Notice.End!.Value > end.AddHours(1),
-                });
-            }
+            GachaPoolType.Weapon => "weapon",
+            GachaPoolType.CharacterReverb or GachaPoolType.WeaponReverb => "reverb",
+            _ => "character",
+        };
+        TimelineRow Row(NoticeItem i)
+        {
+            string? subtitle = i.Notice.Featured.Count > 0 ? string.Join(separator, i.Notice.Featured) : null;
+            // 卡池行只写卡池名（日文、英文的完整标题太长），类型由横条颜色区分。
+            string title = i.IsGacha && i.Notice.PoolName is { Length: > 0 } pool ? pool : i.Title;
+            // 武器池的 UP 就是卡池名，不重复写。
+            if (subtitle == title) subtitle = null;
+            return new TimelineRow(i, title, subtitle, Lane(i), i.Notice.Start, i.Notice.End, Ratio(i.Notice.Start), Ratio(i.Notice.End!.Value),
+                i.Title + Environment.NewLine + Range(i.Notice.Start, i.Notice.End));
         }
-        HasTimeline = TimelineRows.Count > 0;
 
-        // 刻度：起点、每 7 天、终点。
+        var gacha = notices.Where(i => i.IsGacha)
+            .OrderBy(i => i.Notice.Pool switch { GachaPoolType.Character => 0, GachaPoolType.Weapon => 1, GachaPoolType.CharacterReverb => 2, _ => 3 })
+            .ThenBy(i => i.Notice.Start).ToList();
+        var events = notices.Where(i => i.IsEvent).OrderBy(i => i.Notice.Start).ThenBy(i => i.Notice.End).ToList();
+        int bars = 0;
+        if (gacha.Count > 0)
+        {
+            TimelineRows.Add(new TimelineRow(_localization["Events_GroupGacha"], gacha.Count));
+            foreach (NoticeItem i in gacha) TimelineRows.Add(Row(i));
+            bars += gacha.Count;
+        }
+        if (events.Count > 0)
+        {
+            TimelineRows.Add(new TimelineRow(_localization["Events_GroupEvent"], events.Count));
+            foreach (NoticeItem i in events) TimelineRows.Add(Row(i));
+            bars += events.Count;
+        }
+        if (recurring.Count > 0)
+        {
+            TimelineRows.Add(new TimelineRow(_localization["Events_GroupRecurring"], recurring.Count));
+            foreach (RecurringWindow w in recurring)
+            {
+                string rule = w.Activity.Kind switch
+                {
+                    RecurringKind.Weekly => _localization["Events_RuleWeekly"],
+                    RecurringKind.Interval => string.Format(_localization["Events_RuleEvery"], w.Activity.EveryDays),
+                    _ => _localization["Events_RuleVersion"],
+                };
+                string title = _localization["Events_Recur_" + w.Activity.Key];
+                TimelineRows.Add(new TimelineRow(null, title, rule, "recurring", w.Start, w.End, Ratio(w.Start), Ratio(w.End),
+                    title + Environment.NewLine + Range(w.Start, w.End) + Environment.NewLine + _localization["Events_RecurHint"]));
+            }
+            bars += recurring.Count;
+        }
+        HasTimeline = bars > 0;
+        TimelineCountText = string.Format(_localization["Events_Count"], bars);
+
+        HasVersionBand = feed.VersionStart is not null && feed.VersionEnd is not null;
+        VersionBandLeft = Ratio(versionStart);
+        VersionBandRight = Ratio(versionEnd);
+
+        // 刻度：时间范围内的每个周一（本地日期）。
         var ticks = new List<TimelineTick>();
-        DateTime localStart = start.ToLocalTime().Date;
-        for (DateTime day = localStart.AddDays(7); new DateTimeOffset(day) < end.AddDays(-2); day = day.AddDays(7))
-            ticks.Add(new TimelineTick(Ratio(new DateTimeOffset(day)), day.ToString("MM/dd", CultureInfo.InvariantCulture), false));
-        ticks.Insert(0, new TimelineTick(0, start.ToLocalTime().ToString("MM/dd", CultureInfo.InvariantCulture), true));
-        ticks.Add(new TimelineTick(1, end.ToLocalTime().ToString("MM/dd", CultureInfo.InvariantCulture), true));
+        DateTime day = start.ToLocalTime().Date;
+        while (day.DayOfWeek != DayOfWeek.Monday) day = day.AddDays(1);
+        for (; new DateTimeOffset(day) < end; day = day.AddDays(7))
+            ticks.Add(new TimelineTick(Ratio(new DateTimeOffset(day)), day.ToString("M/d", CultureInfo.InvariantCulture), false));
         TimelineTicks = ticks;
+        UpdateTimelineRows(now);
 
         int unpublished = feed.UnpublishedCount;
         HasUnpublished = unpublished > 0;
@@ -732,12 +799,33 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
             VersionRemaining = string.Empty;
         }
 
+        if (_recurringRollover is { } rollover && now >= rollover && _feed is not null) BuildTimeline(_feed);
+        else UpdateTimelineRows(now);
         if (_windowEnd > _windowStart)
         {
             ShowToday = now >= _windowStart && now <= _windowEnd;
             TodayRatio = Math.Clamp((now - _windowStart).TotalSeconds / (_windowEnd - _windowStart).TotalSeconds, 0, 1);
+            NowText = now.ToLocalTime().ToString("HH:mm", CultureInfo.InvariantCulture);
         }
         if (Selected is { } selected) UpdateTimeHint(selected);
+    }
+
+    /// <summary>时间线右侧：剩余时间（或「X 后开始」「已结束」）与结束时间（未开始时为开始时间）。</summary>
+    private void UpdateTimelineRows(DateTimeOffset now)
+    {
+        foreach (TimelineRow row in TimelineRows)
+        {
+            if (row.IsHeader) continue;
+            row.IsUpcoming = row.Start > now;
+            row.IsEnded = row.End is { } e && e <= now;
+            row.RemainingText = row.IsUpcoming ? string.Format(_localization["Events_StartsIn"], Duration(row.Start - now))
+                : row.IsEnded ? _localization["Events_Ended"]
+                : row.End is { } end ? Duration(end - now)
+                : _localization["Events_Ongoing"];
+            row.DateText = row.IsUpcoming
+                ? string.Format(_localization["Events_StartsAt"], row.Start.ToLocalTime().ToString("MM/dd HH:mm", CultureInfo.InvariantCulture))
+                : row.End?.ToLocalTime().ToString("MM/dd HH:mm", CultureInfo.InvariantCulture) ?? string.Empty;
+        }
     }
 
     private static string Range(DateTimeOffset start, DateTimeOffset? end)

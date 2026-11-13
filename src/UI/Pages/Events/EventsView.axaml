@@ -10,7 +10,7 @@
     主体左侧为当前视图，右侧 440 宽为公告详情（横幅、标签、时间、UP、正文）。左右各自滚动，整页铺满可视区域。
   -->
   <UserControl.Styles>
-    <!-- 时间线 -->
+    <!-- 时间线：刻度与竖线按点居中；横条 10 高圆角，按分组取色；整行可点（循环玩法不可点） -->
     <Style Selector="ItemsControl.tl-ticks > ContentPresenter" x:DataType="events:TimelineTick">
       <Setter Property="c:RatioPanel.Left" Value="{Binding Ratio}" />
       <Setter Property="c:RatioPanel.Right" Value="{Binding Ratio}" />
@@ -19,63 +19,92 @@
       <Setter Property="c:RatioPanel.Left" Value="{Binding Ratio}" />
       <Setter Property="c:RatioPanel.Right" Value="{Binding Ratio}" />
     </Style>
-    <Style Selector="Button.tl-bar">
-      <Setter Property="Height" Value="34" />
-      <Setter Property="Padding" Value="10,0" />
-      <Setter Property="Cursor" Value="Hand" />
-      <Setter Property="HorizontalAlignment" Value="Stretch" />
-      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-      <Setter Property="Template">
-        <ControlTemplate>
-          <Border Name="PART_Body" CornerRadius="7" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                  BorderThickness="3,0,0,0" Padding="{TemplateBinding Padding}" ClipToBounds="True">
-            <Border.Transitions>
-              <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.15" />
-              </Transitions>
-            </Border.Transitions>
-            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
-          </Border>
-        </ControlTemplate>
-      </Setter>
-      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Style Selector="Border.tl-bar">
+      <Setter Property="Height" Value="10" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
     </Style>
-    <Style Selector="Button.tl-bar.weapon">
-      <Setter Property="Background" Value="{DynamicResource InfoContainerBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}" />
+    <Style Selector="Border.tl-bar.weapon">
+      <Setter Property="Background" Value="{DynamicResource InfoBrush}" />
     </Style>
-    <Style Selector="Button.tl-bar.reverb">
-      <Setter Property="Background" Value="{DynamicResource FourStarContainerBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FourStarBrush}" />
+    <Style Selector="Border.tl-bar.reverb">
+      <Setter Property="Background" Value="{DynamicResource FourStarBrush}" />
     </Style>
-    <Style Selector="Button.tl-bar.event">
-      <Setter Property="Background" Value="{DynamicResource SuccessContainerBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}" />
+    <Style Selector="Border.tl-bar.event">
+      <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
     </Style>
-    <Style Selector="Button.tl-bar.ended">
-      <Setter Property="Opacity" Value="0.5" />
+    <Style Selector="Border.tl-bar.recurring">
+      <Setter Property="Background" Value="{DynamicResource TextMutedBrush}" />
     </Style>
-    <Style Selector="Button.tl-bar:pointerover /template/ Border#PART_Body">
-      <Setter Property="BoxShadow" Value="{DynamicResource ShadowSoft}" />
+    <Style Selector="Border.tl-bar.upcoming">
+      <Setter Property="Opacity" Value="0.55" />
     </Style>
-    <Style Selector="Button.tl-bar.selected /template/ Border#PART_Body">
-      <Setter Property="BoxShadow" Value="0 0 0 2 #66B08A3C" />
+    <Style Selector="Border.tl-bar.ended">
+      <Setter Property="Opacity" Value="0.3" />
     </Style>
-    <Style Selector="Button.tl-label">
-      <Setter Property="Background" Value="Transparent" />
+    <Style Selector="Button.tl-row">
       <Setter Property="Padding" Value="0" />
       <Setter Property="Cursor" Value="Hand" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
       <Setter Property="Template">
         <ControlTemplate>
-          <ContentPresenter Background="Transparent" Content="{TemplateBinding Content}" />
+          <Panel Background="Transparent">
+            <!-- 悬停 / 选中只叠一层半透明底，不挡住下面的版本底色与刻度线 -->
+            <Border Name="PART_Hover" Background="{DynamicResource SurfaceHoverBrush}" Opacity="0">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+            <Border Name="PART_Selected" Background="{DynamicResource AccentContainerBrush}" Opacity="0" />
+            <Border Name="PART_Mark" Width="3" HorizontalAlignment="Left" Background="{DynamicResource AccentBrush}" Opacity="0" />
+            <ContentPresenter Content="{TemplateBinding Content}" />
+          </Panel>
         </ControlTemplate>
       </Setter>
     </Style>
-    <Style Selector="Button.tl-label:pointerover TextBlock.tl-title">
+    <Style Selector="Button.tl-row:pointerover /template/ Border#PART_Hover">
+      <Setter Property="Opacity" Value="0.6" />
+    </Style>
+    <Style Selector="Button.tl-row.static">
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="Button.tl-row.static:pointerover /template/ Border#PART_Hover">
+      <Setter Property="Opacity" Value="0.3" />
+    </Style>
+    <Style Selector="Button.tl-row.selected /template/ Border#PART_Selected">
+      <Setter Property="Opacity" Value="0.55" />
+    </Style>
+    <Style Selector="Button.tl-row.selected /template/ Border#PART_Mark">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="Button.tl-row:pointerover TextBlock.tl-title">
       <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="Button.tl-row.static:pointerover TextBlock.tl-title">
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="Border.count-badge">
+      <Setter Property="MinWidth" Value="20" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="Padding" Value="6,0" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.count-badge > TextBlock">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    </Style>
+    <Style Selector="TextBlock.mono">
+      <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
     </Style>
 
     <!-- 公告行 -->
@@ -289,69 +318,93 @@
               </StackPanel>
             </Border>
 
-            <Border Classes="card" Padding="20,16" IsVisible="{Binding HasTimeline}" AutomationProperties.AutomationId="events-timeline">
-              <Grid RowDefinitions="Auto,*" RowSpacing="8">
-                <!-- 刻度 -->
-                <Grid ColumnDefinitions="210,*">
-                    <ItemsControl Grid.Column="1" Height="18" Classes="tl-ticks" ItemsSource="{Binding TimelineTicks}">
-                      <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:RatioPanel MinChildWidth="40" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                      <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="events:TimelineTick">
-                          <TextBlock Classes="caption" Text="{Binding Text}" Classes.secondary="{Binding IsMajor}" />
-                        </DataTemplate>
-                      </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Grid>
-                <Grid Grid.Row="1">
-                  <!-- 刻度竖线与「今天」 -->
-                  <Grid ColumnDefinitions="210,*" IsHitTestVisible="False">
-                    <ItemsControl Grid.Column="1" Classes="tl-grid" ItemsSource="{Binding TimelineTicks}">
-                      <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:RatioPanel MinChildWidth="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                      <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="events:TimelineTick">
-                          <Border Width="1" HorizontalAlignment="Left" Background="{DynamicResource DividerBrush}" />
-                        </DataTemplate>
-                      </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <c:RatioPanel Grid.Column="1" MinChildWidth="2" IsVisible="{Binding ShowToday}">
-                      <Border Width="2" HorizontalAlignment="Left" Background="{DynamicResource DangerBrush}" CornerRadius="1"
-                              c:RatioPanel.Left="{Binding TodayRatio}" c:RatioPanel.Right="{Binding TodayRatio}" />
-                    </c:RatioPanel>
-                  </Grid>
-                  <ItemsControl ItemsSource="{Binding TimelineRows}">
+            <Border Classes="card" Padding="0" ClipToBounds="True" IsVisible="{Binding HasTimeline}" AutomationProperties.AutomationId="events-timeline">
+              <StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="10" Margin="22,16,22,14">
+                  <TextBlock Classes="card-title" Text="{loc:Tr Events_ViewTimeline}" VerticalAlignment="Center" />
+                  <TextBlock Classes="caption" Text="{Binding TimelineCountText}" VerticalAlignment="Center" />
+                </StackPanel>
+                <Separator Classes="divider" />
+                <Grid ColumnDefinitions="232,*,132" RowDefinitions="58,Auto">
+                  <!-- 版本周期底色：贯穿表头与所有行 -->
+                  <c:RatioPanel Grid.Column="1" Grid.RowSpan="2" IsVisible="{Binding HasVersionBand}" IsHitTestVisible="False">
+                    <Border Background="{DynamicResource AccentContainerBrush}" Opacity="0.5"
+                            c:RatioPanel.Left="{Binding VersionBandLeft}" c:RatioPanel.Right="{Binding VersionBandRight}" />
+                  </c:RatioPanel>
+                  <!-- 每周一的竖线 -->
+                  <ItemsControl Grid.Column="1" Grid.RowSpan="2" Classes="tl-grid" ItemsSource="{Binding TimelineTicks}" IsHitTestVisible="False">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:RatioPanel CenterPoints="True" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="events:TimelineTick">
+                        <Border Width="1" Background="{DynamicResource DividerBrush}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+
+                  <!-- 表头 -->
+                  <TextBlock Classes="caption" Text="{loc:Tr Events_ColName}" Margin="22,0,0,0" VerticalAlignment="Center" />
+                  <ItemsControl Grid.Column="1" Classes="tl-ticks" ItemsSource="{Binding TimelineTicks}" VerticalAlignment="Top" Margin="0,22,0,0">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:RatioPanel CenterPoints="True" ThinOverlapping="True" ClipToBounds="True" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="events:TimelineTick">
+                        <TextBlock Classes="mono" Text="{Binding Text}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="4,0" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <c:RatioPanel Grid.Column="1" IsVisible="{Binding HasVersionBand}" IsHitTestVisible="False">
+                    <TextBlock c:RatioPanel.Left="{Binding VersionBandLeft}" c:RatioPanel.Right="{Binding VersionBandRight}"
+                               Text="{Binding VersionLabel}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AccentTextBrush}"
+                               VerticalAlignment="Top" Margin="6,5,0,0" TextTrimming="CharacterEllipsis" />
+                  </c:RatioPanel>
+                  <TextBlock Grid.Column="2" Classes="caption" Text="{loc:Tr Events_ColRemaining}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,22,0" />
+                  <Border Grid.ColumnSpan="3" Height="1" VerticalAlignment="Bottom" Background="{DynamicResource DividerBrush}" />
+
+                  <!-- 行 -->
+                  <ItemsControl Grid.Row="1" Grid.ColumnSpan="3" ItemsSource="{Binding TimelineRows}" Margin="0,2,0,10">
                     <ItemsControl.ItemTemplate>
                       <DataTemplate x:DataType="events:TimelineRow">
                         <Panel>
-                          <TextBlock Classes="label" Text="{Binding Header}" FontWeight="SemiBold" Margin="0,12,0,6" IsVisible="{Binding IsHeader}" />
-                          <Grid ColumnDefinitions="210,*" Margin="0,3" IsVisible="{Binding IsBar}">
-                            <Button Classes="tl-label" Margin="0,0,12,0" Command="{Binding $parent[ItemsControl].((events:EventsViewModel)DataContext).SelectRowCommand}"
-                                    CommandParameter="{Binding}" ToolTip.Tip="{Binding Item.Title}">
-                              <StackPanel VerticalAlignment="Center" Spacing="1">
-                                <TextBlock Classes="aux tl-title" Text="{Binding Item.Title}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
-                                <TextBlock Classes="caption" Text="{Binding Item.Featured}" TextTrimming="CharacterEllipsis" IsVisible="{Binding Item.HasFeatured}" />
+                          <StackPanel Orientation="Horizontal" Spacing="8" Margin="22,14,0,4" IsVisible="{Binding IsHeader}">
+                            <TextBlock Text="{Binding Header}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                            <Border Classes="count-badge"><TextBlock Text="{Binding Count}" /></Border>
+                          </StackPanel>
+                          <Button Classes="tl-row" Classes.static="{Binding !IsClickable}" Classes.selected="{Binding Item.IsSelected}"
+                                  IsVisible="{Binding IsBar}" ToolTip.Tip="{Binding Tip}" AutomationProperties.AutomationId="{Binding AutomationId}"
+                                  Command="{Binding $parent[ItemsControl].((events:EventsViewModel)DataContext).SelectRowCommand}" CommandParameter="{Binding}">
+                            <Grid ColumnDefinitions="232,*,132" Height="50">
+                              <StackPanel Margin="22,0,14,0" VerticalAlignment="Center" Spacing="1">
+                                <TextBlock Classes="tl-title" Text="{Binding Title}" FontSize="13.5" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                                           Classes.muted="{Binding IsEnded}" />
+                                <TextBlock Classes="caption" Text="{Binding Subtitle}" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasSubtitle}" />
                               </StackPanel>
-                            </Button>
-                            <c:RatioPanel Grid.Column="1" MinChildWidth="28">
-                              <Button Classes="tl-bar" Classes.weapon="{Binding IsWeaponLane}" Classes.reverb="{Binding IsReverbLane}"
-                                      Classes.event="{Binding IsEventLane}" Classes.ended="{Binding Item.IsEnded}" Classes.selected="{Binding Item.IsSelected}"
-                                      c:RatioPanel.Left="{Binding Left}" c:RatioPanel.Right="{Binding Right}" AutomationProperties.AutomationId="{Binding AutomationId}"
-                                      Command="{Binding $parent[ItemsControl].((events:EventsViewModel)DataContext).SelectRowCommand}" CommandParameter="{Binding}"
-                                      ToolTip.Tip="{Binding Item.DateText}">
-                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                  <TextBlock Classes="caption" Text="{Binding Item.DateText}" Foreground="{DynamicResource TextSecondaryBrush}"
-                                             TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                                  <TextBlock Grid.Column="1" FontSize="12" Text="{Binding Item.StatusText}" VerticalAlignment="Center"
-                                             Classes.status-active="{Binding Item.IsActive}" Classes.muted="{Binding !Item.IsActive}" />
-                                </Grid>
-                              </Button>
-                            </c:RatioPanel>
-                          </Grid>
+                              <c:RatioPanel Grid.Column="1" MinChildWidth="10" Margin="0,0,1,0">
+                                <Border Classes="tl-bar" Classes.weapon="{Binding IsWeaponLane}" Classes.reverb="{Binding IsReverbLane}"
+                                        Classes.event="{Binding IsEventLane}" Classes.recurring="{Binding IsRecurringLane}"
+                                        Classes.upcoming="{Binding IsUpcoming}" Classes.ended="{Binding IsEnded}"
+                                        c:RatioPanel.Left="{Binding Left}" c:RatioPanel.Right="{Binding Right}" />
+                              </c:RatioPanel>
+                              <StackPanel Grid.Column="2" Margin="0,0,22,0" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="1">
+                                <TextBlock Text="{Binding RemainingText}" FontSize="13" FontWeight="Bold" HorizontalAlignment="Right" Classes.muted="{Binding IsEnded}" />
+                                <TextBlock Classes="caption mono" Text="{Binding DateText}" FontSize="11" HorizontalAlignment="Right" />
+                              </StackPanel>
+                            </Grid>
+                          </Button>
                         </Panel>
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
+
+                  <!-- 现在：竖线与时间胶囊，压在最上层 -->
+                  <c:RatioPanel Grid.Column="1" Grid.RowSpan="2" CenterPoints="True" IsHitTestVisible="False" IsVisible="{Binding ShowToday}">
+                    <Border Width="2" Margin="0,52,0,0" Background="{DynamicResource AccentBrush}"
+                            c:RatioPanel.Left="{Binding TodayRatio}" c:RatioPanel.Right="{Binding TodayRatio}" />
+                    <Border VerticalAlignment="Top" Margin="0,46,0,0" Padding="7,1" CornerRadius="999" Background="{DynamicResource AccentBrush}"
+                            c:RatioPanel.Left="{Binding TodayRatio}" c:RatioPanel.Right="{Binding TodayRatio}">
+                      <TextBlock Classes="mono" Text="{Binding NowText}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextOnAccentBrush}" />
+                    </Border>
+                  </c:RatioPanel>
                 </Grid>
-              </Grid>
+              </StackPanel>
             </Border>
 
             <Border Classes="mini" IsVisible="{Binding HasUnpublished}" AutomationProperties.AutomationId="events-unpublished">

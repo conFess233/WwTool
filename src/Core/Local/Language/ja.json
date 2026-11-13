@@ -843,5 +843,18 @@
   "Events_OpenPost": "投稿を見る",
   "Events_Preview": "Ver.{0} 生放送：{1}",
   "Events_ListSeparator": "、",
-  "Home_AnnOpenEvents": "イベントカレンダーとお知らせ"
+  "Home_AnnOpenEvents": "イベントカレンダーとお知らせ",
+  "Events_Count": "{0} 件",
+  "Events_ColName": "名称",
+  "Events_ColRemaining": "残り",
+  "Events_StartsAt": "{0} 開始",
+  "Events_GroupRecurring": "定期",
+  "Events_Recur_tower": "逆境深塔",
+  "Events_Recur_wastes": "冥歌海墟",
+  "Events_Recur_weekly": "週ボス",
+  "Events_Recur_shop": "ショップ交換",
+  "Events_RuleWeekly": "毎週月曜 04:00 にリセット",
+  "Events_RuleEvery": "{0} 日ごと 04:00 にリセット",
+  "Events_RuleVersion": "バージョン終了時にリセット",
+  "Events_RecurHint": "固定のスケジュールから推定しています（サーバー時間 04:00、UTC+8 として計算）。"
 }

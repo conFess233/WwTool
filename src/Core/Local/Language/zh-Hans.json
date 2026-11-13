@@ -843,5 +843,18 @@
   "Events_OpenPost": "查看帖子",
   "Events_Preview": "{0} 版本前瞻直播：{1}",
   "Events_ListSeparator": "、",
-  "Home_AnnOpenEvents": "活动日历与全部公告"
+  "Home_AnnOpenEvents": "活动日历与全部公告",
+  "Events_Count": "{0} 项",
+  "Events_ColName": "名称",
+  "Events_ColRemaining": "剩余",
+  "Events_StartsAt": "{0} 开始",
+  "Events_GroupRecurring": "循环",
+  "Events_Recur_tower": "逆境深塔",
+  "Events_Recur_wastes": "冥歌海墟",
+  "Events_Recur_weekly": "周本",
+  "Events_Recur_shop": "商店兑换",
+  "Events_RuleWeekly": "每周一 04:00 刷新",
+  "Events_RuleEvery": "每 {0} 天 04:00 刷新",
+  "Events_RuleVersion": "随版本结束刷新",
+  "Events_RecurHint": "按固定规则推算（服务器时间 04:00，按 UTC+8 计）。"
 }
