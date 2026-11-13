@@ -66,6 +66,10 @@ public sealed partial class ShellViewModel : ObservableObject
         _navigation = navigation;
         _localization = localization;
         LoadBackground();
+        // 运行中定期检查启动器背景是否过期（游戏更新版本后不必重启程序）。
+        _launcherClock = new Avalonia.Threading.DispatcherTimer { Interval = TimeSpan.FromMinutes(5) };
+        _launcherClock.Tick += (_, _) => RefreshLauncherIfStale();
+        _launcherClock.Start();
         Fab = fab;
         Dialogs = dialogs;
         UiState = uiState;
@@ -188,8 +192,27 @@ public sealed partial class ShellViewModel : ObservableObject
     /// <summary>每次重新选择背景时递增，丢弃过期的异步结果。</summary>
     private int _backgroundVersion;
 
-    /// <summary>本次运行已成功刷新过启动器背景的语言；同一语言不重复请求。</summary>
-    private string? _launcherRefreshedLanguage;
+    /// <summary>上次开始从接口获取启动器背景的语言与时间；同一语言在 <see cref="LauncherRefreshInterval"/> 内不重复请求。</summary>
+    private string? _launcherAttemptedLanguage;
+    private DateTime _launcherAttemptedAt;
+
+    private static readonly TimeSpan LauncherRefreshInterval = TimeSpan.FromMinutes(30);
+
+    private readonly Avalonia.Threading.DispatcherTimer _launcherClock;
+
+    private bool IsLauncherStale(string language) =>
+        _launcherAttemptedLanguage != language || DateTime.UtcNow - _launcherAttemptedAt >= LauncherRefreshInterval;
+
+    /// <summary>使用启动器背景且上次获取已超过间隔时，在后台重新获取；背景没变时不会重新解码。</summary>
+    private void RefreshLauncherIfStale()
+    {
+        if (!UsesLauncherBackground) return;
+        string language = _localization.CurrentLanguage.GetCode();
+        if (!IsLauncherStale(language)) return;
+        _launcherAttemptedLanguage = language;
+        _launcherAttemptedAt = DateTime.UtcNow;
+        _ = RefreshLauncherAsync(language, _backgroundVersion);
+    }
 
     private string? _shownLauncherImage;
     private string? _shownLauncherSlogan;
@@ -221,7 +244,9 @@ public sealed partial class ShellViewModel : ObservableObject
         UpdateVideo();
 
         string language = _localization.CurrentLanguage.GetCode();
-        if (_launcherRefreshedLanguage == language) return;
+        if (!IsLauncherStale(language)) return;
+        _launcherAttemptedLanguage = language;
+        _launcherAttemptedAt = DateTime.UtcNow;
         _ = RefreshLauncherAsync(language, version);
     }
 
@@ -237,7 +262,6 @@ public sealed partial class ShellViewModel : ObservableObject
             files = null;
         }
         if (files is null) return;
-        _launcherRefreshedLanguage = language;
         if (version != _backgroundVersion) return;
         await ApplyLauncherAsync(files, version);
         // 背景换了（如新版本）时视频地址也随之变化，重新确认视频。

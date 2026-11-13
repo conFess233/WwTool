@@ -117,7 +117,11 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     private bool _announcementsLoaded;
 
     /// <summary>本次运行已从接口刷新过的「区服 + 语言」，不重复请求。</summary>
-    private readonly HashSet<string> _announcementsRefreshed = [];
+    /// <summary>各区服与语言上次开始从接口获取公告的时间；超过 <see cref="AnnouncementRefreshInterval"/> 再获取一次。</summary>
+    private readonly Dictionary<string, DateTime> _announcementsAttempted = [];
+
+    /// <summary>运行中公告的重新获取间隔：游戏更新版本后不必重启程序也能看到新公告。</summary>
+    private static readonly TimeSpan AnnouncementRefreshInterval = TimeSpan.FromMinutes(30);
     private int _announcementVersion;
     private LauncherRegion _shownRegion;
 
@@ -154,7 +158,9 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
 
         FabActions =
         [
-            new FabAction("refresh", "Index_RefreshAccountList", Icons + "Refresh.png", new AsyncRelayCommand(RefreshAccountsAsync), localization),
+            // 主动从服务器刷新当前账号的资料（与账号、探索、摩托页的「刷新数据」相同）。
+            new FabAction("refresh-data", "Fab_RefreshData", Icons + "Refresh.png", new AsyncRelayCommand(() => player.SyncAsync()), localization),
+            new FabAction("refresh", "Index_RefreshAccountList", "Icon.Sync", new AsyncRelayCommand(RefreshAccountsAsync), localization),
             new FabAction("add-account", "Index_AddAccount", "Icon.Plus", new AsyncRelayCommand(() => actions.AddAccountAsync()), localization),
         ];
 
@@ -355,6 +361,26 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         UpdateLive();
         _ = _player.EnsureLoadedAsync();
         if (!_announcementsLoaded) LoadAnnouncements();
+        else RefreshAnnouncementsIfStale();
+    }
+
+    private static string AnnouncementKey(LauncherRegion region, string language) =>
+        $"{region}|{LauncherNewsService.RequestLanguage(region, language)}";
+
+    private bool IsAnnouncementStale(string key) =>
+        !_announcementsAttempted.TryGetValue(key, out DateTime at) || DateTime.UtcNow - at >= AnnouncementRefreshInterval;
+
+    /// <summary>首页显示中、上次获取已超过间隔时，在后台重新获取（不重读缓存，列表不闪动）。</summary>
+    private void RefreshAnnouncementsIfStale()
+    {
+        if (!_announcementsLoaded || IsAnnouncementsLoading) return;
+        LauncherRegion region = Region;
+        if (region != _shownRegion) return;
+        string language = _localization.CurrentLanguage.GetCode();
+        string key = AnnouncementKey(region, language);
+        if (!IsAnnouncementStale(key)) return;
+        _announcementsAttempted[key] = DateTime.UtcNow;
+        _ = RefreshAnnouncementsAsync(region, language, key, _announcementVersion, hasCache: true);
     }
 
     public void OnNavigatedFrom() => _clock.Stop();
@@ -418,6 +444,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     /// <summary>结晶波片与结晶单质：按回满时间戳实时推算当前值与倒计时。</summary>
     private void UpdateLive()
     {
+        RefreshAnnouncementsIfStale();
         PlayerBaseSnapshot? b = Snapshot?.Base;
         string none = _localization["Common_Unavailable"];
         if (b is null)
@@ -744,8 +771,9 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         ApplyFeed(cached ?? AnnouncementFeed.Empty);
         AnnouncementsFailed = false;
 
-        string key = $"{region}|{LauncherNewsService.RequestLanguage(region, language)}";
-        if (cached is not null && _announcementsRefreshed.Contains(key)) return;
+        string key = AnnouncementKey(region, language);
+        if (cached is not null && !IsAnnouncementStale(key)) return;
+        _announcementsAttempted[key] = DateTime.UtcNow;
         _ = RefreshAnnouncementsAsync(region, language, key, version, hasCache: cached is not null);
     }
 
@@ -765,7 +793,6 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         IsAnnouncementsLoading = false;
         if (fresh is not null)
         {
-            _announcementsRefreshed.Add(key);
             ApplyFeed(fresh);
             // 轮播图在后台下载，下好后补上横幅。
             AnnouncementFeed? withImages = null;
