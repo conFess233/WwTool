@@ -111,7 +111,7 @@ The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,s
   - `Local/Data/LocalData.db`: account snapshots, Convene records and login credentials
   - `Local/Cache/`: cached images, launcher background and announcements; safe to delete at any time
   - `Local/Logs/`: logs
-- **Updating**: close WwTool and unzip the new archive to the place that holds your existing `WwTool` folder, overwriting files with the same name. Release archives contain no database or settings, so your data is not overwritten. To be safe, you can copy `Config` and `Local/Data` first. A 1.x program folder can be updated the same way, and its records keep working.
+- **Updating**: WwTool tells you when a new version is out and can download and install it for you (see the [User guide](Help_en.md#data)). To update by hand, close WwTool and unzip the new archive to the place that holds your existing `WwTool` folder, overwriting files with the same name. Release archives contain no database or settings, so your data is not overwritten. To be safe, you can copy `Config` and `Local/Data` first. A 1.x program folder can be updated the same way, and its records keep working.
 - **Login credentials** are encrypted with Windows DPAPI for the current Windows user. After moving to another PC or Windows user you need to log in again. The rest of the database is not encrypted.
 - **Network access**:
   - Login and account data use Kuro Games' services; Convene records use the gacha API of the matching server.

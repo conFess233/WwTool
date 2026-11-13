@@ -199,6 +199,7 @@ Tabs at the top switch between **Overview**, each banner and **Other banners**.
 | Network & verification | Log API Match Keyword | Keyword used to find the Convene link in `Client.log`; usually leave as is |
 | | Geetest Service Port | Local port for the login security check (default 5000; moves to the next free port if taken) |
 | | Retries / delay | Retries failed requests automatically |
+| About WwTool | Check for updates automatically / Check for updates | Checks for a new version in the background after startup (at most once a day); check by hand any time |
 
 ---
 
@@ -223,6 +224,18 @@ With the `portable` file present, all data is in the program folder (the **Data 
 Close WwTool and copy `Config` and `Local\Data\LocalData.db`.
 
 ### 7.3 Update to a new version
+
+**In-app update (recommended)**
+
+1. When a new version is out, WwTool shows a notification after startup, and **Settings → About WwTool** shows an update badge. You can also click **Check for updates** at any time.
+2. In the update dialog, click **Download and update**. WwTool downloads the archive of the same type as your copy (single-file / multi-file, with or without runtime, Lite or not), verifies its checksum and replaces the program files. Settings, database, cache and logs are left alone. You can cancel while it downloads.
+3. When it's done, choose **Restart now**, or restart later yourself.
+
+Only **Go to download** is offered, and you update manually, when: you built WwTool yourself, the program sits in a folder you can't write to (such as `C:\Program Files`), or the new release has no matching archive or checksum. If an automatic update fails, the previous version is restored and the reason is shown.
+
+To stop the automatic check, turn off **Check for updates automatically** under **Settings → About WwTool**. **Skip this version** in the dialog only stops notifications for that version.
+
+**Manual update**
 
 1. Close WwTool.
 2. Unzip the new archive to the place that holds your existing `WwTool` folder (for `D:\Tools\WwTool`, unzip to `D:\Tools`) and overwrite files with the same name. Release archives contain no database or settings, so your data is kept. If your existing folder has a different name (such as a 1.x folder), copy everything inside the new `WwTool` folder into it and overwrite.
