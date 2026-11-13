@@ -46,6 +46,7 @@ All under **Settings → UI Settings**:
 - **Theme / Accent color**: light and dark themes, plus an accent color.
 - **Window background**: by default, the game launcher's background image (a pattern is shown if it can't be fetched). You can use your own image instead.
 - **Animated background**: with the default background, plays the launcher's background video. It pauses when the window is minimized or loses focus, uses about 150–200 MB of extra memory while playing, and is off by default.
+- **Peek at background**: rest the pointer on an empty area (the window margins or a gap between cards) and everything except the background gradually fades so you can see it; move onto any component and it comes back right away. The transparency is adjustable, 80% by default; 0% turns it off.
 - **Window glass effect**: needs a restart to take effect. When off, WwTool uses software rendering and less memory.
 
 ---
@@ -188,6 +189,7 @@ Tabs at the top switch between **Overview**, each banner and **Other banners**.
 | UI Settings | Theme / Accent color | Color scheme |
 | | Window background | Default launcher background or a custom image |
 | | Animated background | Plays the launcher's background video (default background only) |
+| | Peek at background | How transparent the interface becomes when the pointer rests on an empty area; 80% by default, 0% turns it off |
 | | Window glass effect / Background opacity | Translucent blurred background; needs a restart after switching |
 | | Software Language | Simplified Chinese / English / Japanese |
 | | Notification level | How often non-essential notifications appear; background refreshes are always silent |
