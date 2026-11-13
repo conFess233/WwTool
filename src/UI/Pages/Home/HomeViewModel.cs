@@ -204,10 +204,16 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         AddAccountCommand = new AsyncRelayCommand(() => actions.AddAccountAsync());
         OnlyPullsCommand = new RelayCommand(() => navigation.NavigateTo("pulls"));
         RetrySyncCommand = new AsyncRelayCommand(_player.SyncAsync);
+        RefreshDataCommand = new AsyncRelayCommand(_player.SyncAsync, () => !_player.IsSyncing && Accounts.HasAccount);
         _player.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(PlayerData.IsLoading)) OnPropertyChanged(nameof(ShowNoSnapshot));
             if (e.PropertyName is nameof(PlayerData.IsSyncing) or nameof(PlayerData.IsLoading)) UpdateFirstSync();
+            if (e.PropertyName == nameof(PlayerData.IsSyncing))
+            {
+                OnPropertyChanged(nameof(IsSyncing));
+                RefreshDataCommand.NotifyCanExecuteChanged();
+            }
             if (e.PropertyName == nameof(PlayerData.IsOffline))
             {
                 OnPropertyChanged(nameof(IsOffline));
@@ -268,6 +274,12 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
 
     /// <summary>网络异常横条「重试」。</summary>
     public IAsyncRelayCommand RetrySyncCommand { get; }
+
+    /// <summary>账号卡右上角的刷新按钮：从服务器刷新当前账号资料（与悬浮按钮里的「刷新数据」相同）。</summary>
+    public IAsyncRelayCommand RefreshDataCommand { get; }
+
+    /// <summary>正在从服务器同步当前账号资料（刷新按钮图标旋转）。</summary>
+    public bool IsSyncing => _player.IsSyncing;
 
     /// <summary>空状态「首次同步中」：有账号、还没有任何本地快照、正在同步。</summary>
     public bool IsFirstSync => Accounts.HasAccount && !HasSnapshot && _player.IsSyncing;

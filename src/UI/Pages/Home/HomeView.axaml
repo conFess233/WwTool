@@ -158,6 +158,54 @@
       </Setter>
     </Style>
     <!-- UID 后的复制按钮：22 方形透明底，悬停浅底；复制成功后图标换绿色对勾 2 秒 -->
+    <!-- 账号卡右上角的刷新按钮：40 圆形，Surface 底与描边，悬停强调描边；同步中图标持续旋转、按钮不可点 -->
+    <Style Selector="Button.refresh-data">
+      <Setter Property="Width" Value="40" />
+      <Setter Property="Height" Value="40" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="20" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="RenderTransform" Value="scale(1)" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="0.2,0.8,0.2,1" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.refresh-data:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="Button.refresh-data:pressed">
+      <Setter Property="RenderTransform" Value="scale(0.94)" />
+    </Style>
+    <Style Selector="Button.refresh-data:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="Button.refresh-data c|StrokeIcon">
+      <Setter Property="Width" Value="18" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="StrokeThickness" Value="1.8" />
+      <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+    </Style>
+    <Style Selector="Button.refresh-data.spinning c|StrokeIcon">
+      <Style.Animations>
+        <Animation Duration="0:0:0.9" IterationCount="Infinite">
+          <KeyFrame Cue="0%"><Setter Property="RotateTransform.Angle" Value="0" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="RotateTransform.Angle" Value="360" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
     <Style Selector="Button.copy-uid">
       <Setter Property="Width" Value="22" />
       <Setter Property="Height" Value="22" />
@@ -441,7 +489,8 @@
             </c:EmptyState>
 
             <Grid RowDefinitions="Auto,Auto,*" RowSpacing="18" IsVisible="{Binding ShowProfile}">
-              <!-- 身份行 -->
+              <!-- 身份行；右侧为快速刷新账号数据的按钮 -->
+              <Grid ColumnDefinitions="*,Auto">
               <StackPanel Orientation="Horizontal" Spacing="16">
                 <Border Width="64" Height="64" CornerRadius="32" ClipToBounds="True" Background="{DynamicResource AccentContainerBrush}">
                   <Panel>
@@ -470,6 +519,12 @@
                   </StackPanel>
                 </StackPanel>
               </StackPanel>
+                <Button Grid.Column="1" Classes="refresh-data" Classes.spinning="{Binding IsSyncing}" VerticalAlignment="Center"
+                        Command="{Binding RefreshDataCommand}" ToolTip.Tip="{loc:Tr Fab_RefreshData}"
+                        AutomationProperties.Name="{loc:Tr Fab_RefreshData}" AutomationProperties.AutomationId="home-refresh-data">
+                  <c:StrokeIcon Data="{StaticResource Icon.Sync}" />
+                </Button>
+              </Grid>
 
               <!-- 统计行 -->
               <Border Grid.Row="1" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1" Padding="0,14">
