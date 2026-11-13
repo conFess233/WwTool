@@ -69,6 +69,7 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<LauncherBackgroundService>();
         services.AddSingleton<LauncherNewsService>();
         services.AddSingleton<WwTool.Core.Services.Update.UpdateService>();
+        services.AddSingleton<WwTool.Core.Services.Update.UpdateInstaller>();
 
         // 业务服务
         services.AddSingleton<IUserDataService, UserDataService>();

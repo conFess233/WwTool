@@ -62,7 +62,7 @@ foreach ($build in $needed) {
     $dir = Join-Path $work "build-$build"
     Write-Host "== 发布 $build" -ForegroundColor Cyan
     $publishArgs = @('publish', $project, '-c', 'Release', '-r', 'win-x64', '-o', $dir, '-nologo', '-v', 'q',
-        '-p:DebugType=none', "-p:InformationalVersion=v$version") + $builds[$build]
+        '-p:DebugType=none', "-p:InformationalVersion=v$version", "-p:WwToolPackage=$build") + $builds[$build]
     & dotnet @publishArgs
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish 失败：$build" }
 }

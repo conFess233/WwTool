@@ -137,12 +137,21 @@ public sealed class UpdateService(IHttpClientFactory factory, IConfigService con
     {
         if (!AppVersion.TryParse(dto.TagName, out AppVersion version)) return null;
         var assets = (dto.Assets ?? [])
-            .Where(a => !string.IsNullOrWhiteSpace(a.Name) && Uri.TryCreate(a.BrowserDownloadUrl, UriKind.Absolute, out Uri? u) && u.Scheme == Uri.UriSchemeHttps)
+            .Where(a => !string.IsNullOrWhiteSpace(a.Name) && Uri.TryCreate(a.BrowserDownloadUrl, UriKind.Absolute, out Uri? u) && IsAllowedDownload(u))
             .Select(a => new ReleaseAsset(a.Name!, a.Size, ParseDigest(a.Digest), a.BrowserDownloadUrl!))
             .ToList();
         string page = Uri.TryCreate(dto.HtmlUrl, UriKind.Absolute, out Uri? p) && p.Scheme == Uri.UriSchemeHttps ? dto.HtmlUrl! : string.Empty;
         return new ReleaseInfo(dto.TagName!, version, string.IsNullOrWhiteSpace(dto.Name) ? dto.TagName! : dto.Name!,
             (dto.Body ?? string.Empty).Replace("\r\n", "\n"), page, dto.PublishedAt, assets);
+    }
+
+    /// <summary>只接受 https 下载地址；调试版另外允许本机 http（本地验证更新流程用的假发布服务）。</summary>
+    private static bool IsAllowedDownload(Uri url)
+    {
+#if DEBUG
+        if (url.Scheme == Uri.UriSchemeHttp && url.IsLoopback) return true;
+#endif
+        return url.Scheme == Uri.UriSchemeHttps;
     }
 
     /// <summary>GitHub 的 <c>digest</c> 形如 <c>sha256:abcd…</c>；只认 64 位十六进制。</summary>

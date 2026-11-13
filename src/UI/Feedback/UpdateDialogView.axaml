@@ -26,8 +26,10 @@
       <StackPanel Grid.Column="2" Classes="dialog-actions" Margin="0">
         <Button Classes="btn" Content="{loc:Tr Update_Later}" Command="{Binding LaterCommand}"
                 AutomationProperties.AutomationId="dialog-cancel" />
-        <Button Classes="btn primary" Content="{loc:Tr Update_OpenPage}" Command="{Binding OpenPageCommand}"
-                AutomationProperties.AutomationId="dialog-confirm" />
+        <Button Classes="btn" Classes.primary="{Binding !CanInstall}" Content="{loc:Tr Update_OpenPage}" Command="{Binding OpenPageCommand}"
+                AutomationProperties.AutomationId="update-open-page" />
+        <Button Classes="btn primary" Content="{loc:Tr Update_Install}" Command="{Binding InstallCommand}" IsVisible="{Binding CanInstall}"
+                AutomationProperties.AutomationId="update-install" />
       </StackPanel>
     </Grid>
   </StackPanel>

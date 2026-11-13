@@ -191,6 +191,8 @@ public partial class App : Application
         var logger = services.GetRequiredService<ILoggerService>();
         try
         {
+            // 上次程序内更新留下的旧文件。
+            services.GetRequiredService<UpdateCoordinator>().CleanupPreviousUpdate();
             // 4. 数据库（识别旧库、备份、迁移）；5. 静态游戏资料。
             shell.StartupProgress = 0.15;
             await services.GetRequiredService<GameDataService>().InitializeAsync();
