@@ -13,6 +13,9 @@
 - [攻略站](Guide.md) `https://wuwaguide.kurogames.com`
 - [启动器资讯](Launcher.md#启动器资讯) `https://prod-alicdn-gamestarter.kurogame.com/launcher/app/{gameId}_{launcherKey}/{appCode}/official/information/{language}.json`
 - [启动器背景](Launcher.md#启动器背景) `https://prod-alicdn-gamestarter.kurogame.com/launcher/game/{gameId}_{launcherKey}/{appCode}/official/background/{backgroundId}/{language}.json`
+- [游戏内公告](GameNotice.md)（活动 / 唤取 / 版本日历） `https://aki-gm-resources-back.aki-game.com/gamenotice/{appCode}/{服务器ID}/{language}.json`（国际服域名为 `.net`）
+- [库街区帖子搜索](KuroBBS_Post.md#帖子搜索) `https://api.kurobbs.com/forum/search/v2/post`
+- [库街区帖子详情](KuroBBS_Post.md#帖子详情)（前瞻兑换码） `https://api.kurobbs.com/forum/getPostDetail`
 
 #### 服务器ID
 
