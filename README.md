@@ -27,7 +27,7 @@
 | 页面 | 内容 |
 | --- | --- |
 | 首页 | 昵称、UID（可一键复制）、等级与索拉等级；结晶波片、结晶单质、活跃度、先约电台和周本奖励的实时进度；启动游戏、打开截图 / 游戏 / 日志目录、复制抽卡链接等便捷操作；游戏公告（国服 / 国际服切换） |
-| 活动 | 当前版本与剩余时间；卡池与活动时间线、游戏内版本日历图、全部游戏内公告与正文；5 星 UP；国服前瞻兑换码一键复制 |
+| 活动 | 当前版本与剩余时间；卡池与活动时间线、游戏内版本日历图、全部游戏内公告与正文；5 星 UP；国服前瞻兑换码一键复制；逆境深塔、冥歌海墟、终焉矩阵当期的敌人、增益与评分规则 |
 | 抽卡统计 | 自动从游戏日志找到抽卡链接，获取并保存记录；总览看各卡池抽数、出金、平均每金、不歪率和已垫抽数，可切换列表或精简视图；每个卡池单独查看全部记录 |
 | 详细图表 | 五星出货抽数分布、各卡池抽数占比、每个五星的花费、稀有度构成与不歪率、每日抽卡热力图 |
 | 账号数据 | 本地保存的所有账号，切换、刷新、重新登录或删除 |
@@ -115,7 +115,7 @@ powershell -ExecutionPolicy Bypass -File publish.ps1
 - **联网**：
   - 登录和账号资料访问库洛的游戏服务；抽卡记录访问对应区服的抽卡接口。
   - 游戏资料和缺失的图标从本仓库同步；角色立绘来自官方攻略站。
-  - 首页背景和公告来自游戏启动器的公开接口；活动页的游戏内公告和版本日历来自游戏的公告接口，前瞻兑换码来自库街区官方帖子。
+  - 首页背景和公告来自游戏启动器的公开接口；活动页的游戏内公告和版本日历来自游戏的公告接口，前瞻兑换码来自库街区官方帖子，深塔 / 海墟 / 矩阵数据来自第三方网站 encore.moe（游戏解包数据）。
 - **抽卡链接里带有你的认证信息**。反馈问题时，请隐去密码、完整的抽卡链接和其他个人信息。
 
 <a id="limitations"></a>
@@ -131,7 +131,7 @@ powershell -ExecutionPolicy Bypass -File publish.ps1
 
 - [使用帮助](WwTool/docs/Help.md)
 - [更新日志](CHANGELOG.md)
-- 接口整理：[鸣潮 API](WwTool/docs/API/WW_API.md) · [攻略站](WwTool/docs/API/Guide.md) · [游戏启动器](WwTool/docs/API/Launcher.md) · [游戏内公告](WwTool/docs/API/GameNotice.md) · [库街区帖子](WwTool/docs/API/KuroBBS_Post.md)
+- 接口整理：[鸣潮 API](WwTool/docs/API/WW_API.md) · [攻略站](WwTool/docs/API/Guide.md) · [游戏启动器](WwTool/docs/API/Launcher.md) · [游戏内公告](WwTool/docs/API/GameNotice.md) · [库街区帖子](WwTool/docs/API/KuroBBS_Post.md) · [encore.moe](WwTool/docs/API/Encore.md)
 - 资料说明：[角色](WwTool/docs/Resource/Characters.md) · [武器](WwTool/docs/Resource/Weapons.md) · [摩托](WwTool/docs/Resource/Motorcycle.md) · [同步规则](WwTool/docs/Resource/CatalogSync.md)
 
 遇到问题请提交 [Issue](https://github.com/conFess233/WwTool/issues)。

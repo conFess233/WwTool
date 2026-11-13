@@ -130,6 +130,13 @@ The **Events** page, right after Home on the floating island, collects the in-ga
 - **All notices**: grouped into update notices, Convenes, events, shop and other.
 - Click any item to see the details on the right: banner, type, time left, start and end, featured 5-star items and the body. Links in the body open in your browser, and the text can be selected and copied.
 - For China, the **livestream codes** from the official Kuro BBS post are shown (hidden once expired); click a code to copy it. A preview appears before the livestream starts.
+- **Tower · Wastes · Matrix**: this season of the three recurring challenges, using the full width (no details panel). Switch modes with the chips at the top left and step to the previous / next season with the arrows at the top right.
+  - **Tower of Adversity**: one card per tower with its 4 floors side by side, each showing the Fatigue cost, enemies and star conditions; effects shared by every floor are listed once at the top of the tower.
+  - **Whimpering Wastes**: this season's tokens first, then each area with every stage's rules, grade scores and the enemies of both parts.
+  - **Endstate Matrix**: Stability Accords and Singularity Expansion side by side with the team limit, grade scores, selectable buffs and each enemy's mechanics, followed by this phase's boosted Resonators.
+  - The dot at the bottom right of an enemy portrait is its attribute, and an unusually high resistance is noted below it. Hover a portrait for its level, HP and all resistances.
+  - Tower and Wastes show the start, end and time left. The next season may already be listed before it starts (marked "datamined preview") and can change before release. The Matrix has no published dates, so the latest phase is shown by default.
+  - The data comes from the third-party site [encore.moe](https://encore.moe) (datamined, unofficial) and may differ slightly from the game; **View on encore.moe** at the top right opens the matching page. The site can't tell WwTool whether anything changed, so the data is fetched again each time you open it and compared with the cache (the same season is not fetched again within 30 minutes while the program is open). **+ → Refresh notices** refreshes it right away.
 
 The last cached notices are shown first, then WwTool asks the server whether anything changed. While the program is open it checks every 30 minutes; you can also click **+ → Refresh notices** at the bottom right. The calendar image and banners are checked with the server the same way and downloaded again when they change.
 
