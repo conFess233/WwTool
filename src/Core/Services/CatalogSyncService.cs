@@ -68,7 +68,7 @@ public sealed class CatalogSyncService(GameDataService data,
                 {
                     try
                     {
-                        string url = CatalogRepositorySource.FileUrl(branch, $"WwTool/Local/Data/{category}.json");
+                        string url = CatalogRepositorySource.FileUrl(branch, $"catalog/Data/{category}.json");
                         var remote = CatalogJson.Validate(JsonNode.Parse(await client.GetStringAsync(url, token)) as JsonObject
                             ?? throw new InvalidDataException("Invalid repository catalog root."), category);
                         if (CatalogJson.ReadVersion(remote) > localVersion)

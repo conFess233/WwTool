@@ -1,6 +1,6 @@
 ﻿# 本地打包脚本：生成 Windows x64 发布包到 publish/（已被 .gitignore 忽略）。
 #
-#   powershell -ExecutionPolicy Bypass -File publish.ps1
+#   powershell -ExecutionPolicy Bypass -File scripts/publish.ps1
 #
 # 生成 6 个 zip，每个解压后是一个 WwTool 目录（单文件版目录里只有 WwTool.exe、Local 与 portable 标记文件）：
 #   WwTool-<版本>-win-x64-single.zip               单文件，不带运行时（需安装 .NET 10 桌面运行时）
@@ -21,9 +21,9 @@ Set-StrictMode -Version Latest
 Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-$root = $PSScriptRoot
+$root = Split-Path $PSScriptRoot -Parent
 $project = Join-Path $root 'src\UI\WwTool.UI.csproj'
-$icons = Join-Path $root 'WwTool\Local\Icons'
+$icons = Join-Path $root 'catalog\Icons'
 $out = Join-Path $root 'publish'
 $work = Join-Path $out 'work'
 

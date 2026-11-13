@@ -1,6 +1,6 @@
 # WwTool 使用帮助
 
-简体中文 | [English](Help_en.md) | [日本語](Help_ja.md) · [返回 README](../../README.md)
+简体中文 | [English](Help_en.md) | [日本語](Help_ja.md) · [返回 README](../README.md)
 
 本文按「想做什么」组织，每节先写操作步骤，再写遇到问题怎么办。界面文字以简体中文为准。
 
@@ -24,7 +24,7 @@
 
 ### 1.1 选择压缩包并解压
 
-在 [Releases](https://github.com/conFess233/WwTool/releases) 选一个压缩包。各个包的区别见 [README · 下载](../../README.md#download)。不确定就选 `single-runtime`，解压就能用。
+在 [Releases](https://github.com/conFess233/WwTool/releases) 选一个压缩包。各个包的区别见 [README · 下载](../README.md#download)。不确定就选 `single-runtime`，解压就能用。
 
 1. 把压缩包解压到一个你有写入权限的位置，例如 `D:\Tools`，会得到 `D:\Tools\WwTool` 文件夹。不要放在 `C:\Program Files` 下，也不要只拿出 `WwTool.exe`。
 2. 保留解压出来的 `portable` 文件。有它，设置和数据都保存在这个目录里；删掉它，程序会改用 `%LocalAppData%\WwTool`，之前的数据就「看不见」了。

@@ -1,6 +1,6 @@
 <div align="center">
 
-![Icon](../../src/UI/Assets/Images/Icon.gif)
+![Icon](../src/UI/Assets/Images/Icon.gif)
 
 ## WwTool
 
@@ -9,11 +9,11 @@ A Wuthering Waves toolbox · Account data, Resonators and Convene statistics
 ![Version 2.0.0](https://img.shields.io/badge/version-2.0.0-blue)
 ![Windows x64](https://img.shields.io/badge/platform-Windows%2010%2B%20x64-0078D4)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
-[![MIT License](https://img.shields.io/badge/license-MIT-green)](../../LICENSE.txt)
+[![MIT License](https://img.shields.io/badge/license-MIT-green)](../LICENSE.txt)
 
-[简体中文](../../README.md) | English | [日本語](README_ja.md)
+[简体中文](../README.md) | English | [日本語](README_ja.md)
 
-[Features](#features) · [Download](#download) · [Quick start](#quick-start) · [Data & privacy](#data) · [Known limitations](#limitations) · [Docs](#docs) · [Changelog](../../CHANGELOG.md)
+[Features](#features) · [Download](#download) · [Quick start](#quick-start) · [Data & privacy](#data) · [Known limitations](#limitations) · [Docs](#docs) · [Changelog](../CHANGELOG.md)
 
 </div>
 
@@ -97,7 +97,7 @@ Run `src/UI/bin/Release/net10.0/WwTool.exe`, or open `WwTool.slnx` in an IDE tha
 To build the six release archives above:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File publish.ps1
+powershell -ExecutionPolicy Bypass -File scripts/publish.ps1
 ```
 
 The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,single-lite` to build only some of them.
@@ -132,7 +132,7 @@ The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,s
 ## Docs & feedback
 
 - [User guide](Help_en.md)
-- [Changelog](../../CHANGELOG.md) (Chinese)
+- [Changelog](../CHANGELOG.md) (Chinese)
 - API notes (Chinese): [Wuthering Waves API](API/WW_API.md) · [Guide site](API/Guide.md) · [Game launcher](API/Launcher.md) · [In-game notices](API/GameNotice.md) · [Kuro BBS posts](API/KuroBBS_Post.md) · [encore.moe](API/Encore.md)
 - Data notes (Chinese): [Resonators](Resource/Characters.md) · [Weapons](Resource/Weapons.md) · [Vehicle](Resource/Motorcycle.md) · [Sync rules](Resource/CatalogSync.md)
 
@@ -140,4 +140,4 @@ Found a problem? Open an [Issue](https://github.com/conFess233/WwTool/issues).
 
 ## License
 
-[MIT License](../../LICENSE.txt)
+[MIT License](../LICENSE.txt)

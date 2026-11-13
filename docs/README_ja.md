@@ -1,6 +1,6 @@
 <div align="center">
 
-![Icon](../../src/UI/Assets/Images/Icon.gif)
+![Icon](../src/UI/Assets/Images/Icon.gif)
 
 ## WwTool
 
@@ -9,11 +9,11 @@
 ![Version 2.0.0](https://img.shields.io/badge/version-2.0.0-blue)
 ![Windows x64](https://img.shields.io/badge/platform-Windows%2010%2B%20x64-0078D4)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
-[![MIT License](https://img.shields.io/badge/license-MIT-green)](../../LICENSE.txt)
+[![MIT License](https://img.shields.io/badge/license-MIT-green)](../LICENSE.txt)
 
-[简体中文](../../README.md) | [English](README_en.md) | 日本語
+[简体中文](../README.md) | [English](README_en.md) | 日本語
 
-[機能](#features) · [ダウンロード](#download) · [クイックスタート](#quick-start) · [データとプライバシー](#data) · [既知の制限](#limitations) · [ドキュメント](#docs) · [更新履歴](../../CHANGELOG.md)
+[機能](#features) · [ダウンロード](#download) · [クイックスタート](#quick-start) · [データとプライバシー](#data) · [既知の制限](#limitations) · [ドキュメント](#docs) · [更新履歴](../CHANGELOG.md)
 
 </div>
 
@@ -97,7 +97,7 @@ dotnet build src/UI/WwTool.UI.csproj -c Release
 上の 6 種類のリリースアーカイブを作るには：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File publish.ps1
+powershell -ExecutionPolicy Bypass -File scripts/publish.ps1
 ```
 
 アーカイブと `SHA256SUMS.txt` は `publish/` に出力されます。一部だけ作る場合は `-Only single,single-lite` を付けます。
@@ -132,7 +132,7 @@ powershell -ExecutionPolicy Bypass -File publish.ps1
 ## ドキュメントとフィードバック
 
 - [使い方ガイド](Help_ja.md)
-- [更新履歴](../../CHANGELOG.md)（中国語）
+- [更新履歴](../CHANGELOG.md)（中国語）
 - API メモ（中国語）：[鳴潮 API](API/WW_API.md) · [攻略サイト](API/Guide.md) · [ゲームランチャー](API/Launcher.md) · [ゲーム内お知らせ](API/GameNotice.md) · [庫街区の投稿](API/KuroBBS_Post.md) · [encore.moe](API/Encore.md)
 - 資料メモ（中国語）：[キャラクター](Resource/Characters.md) · [武器](Resource/Weapons.md) · [バイク](Resource/Motorcycle.md) · [同期ルール](Resource/CatalogSync.md)
 
@@ -140,4 +140,4 @@ powershell -ExecutionPolicy Bypass -File publish.ps1
 
 ## ライセンス
 
-[MIT License](../../LICENSE.txt)
+[MIT License](../LICENSE.txt)
