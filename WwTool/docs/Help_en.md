@@ -9,11 +9,12 @@ This guide is organized by task. Each section gives the steps first, then what t
 1. [First run](#first-run)
 2. [Accounts](#accounts)
 3. [Home](#home)
-4. [Character, Exploration and Vehicle data](#data-pages)
-5. [Convene records](#pulls)
-6. [Settings reference](#settings)
-7. [Data, backups and updates](#data)
-8. [FAQ](#faq)
+4. [Events](#events)
+5. [Character, Exploration and Vehicle data](#data-pages)
+6. [Convene records](#pulls)
+7. [Settings reference](#settings)
+8. [Data, backups and updates](#data)
+9. [FAQ](#faq)
 
 ---
 
@@ -110,13 +111,32 @@ This data is a snapshot from the last sync. To update it, click the refresh butt
 
 - The right side shows events, notices and news from the game launcher, with a carousel on top. Click any item to open it in your browser.
 - The **China / International** slider next to the title switches the source and is remembered. Until you choose, it follows the current account's server.
-- **All / Event / Notice / News** filter the list. **View all on the official site** at the bottom opens the news page for the selected server.
+- **All / Event / Notice / News** filter the list. At the bottom, **Event calendar & notices** opens the [Events](#events) page and **Official site** opens the news page for the selected server.
 - The last cached announcements are shown first and refreshed in the background. If fetching fails, the old ones stay.
 
 ---
 
+<a id="events"></a>
+## 4. Events
+
+The **Events** page, right after Home on the floating island, collects the in-game notices: the current version, banner and event times, the official version calendar and all notices. **Event calendar & notices** at the bottom of the Home announcements card opens it too.
+
+- **Current version** at the top shows the version name, number, period and time left. The **China / Global** slider on the right is shared with the Home announcements card.
+- **Timeline**: grouped into Resonator, Weapon and Reverb Convenes and events. Each bar runs from start to end; the red line is now. Times come from the "event time" in the notice body (when it says "after the version update", the end of maintenance is used) and are shown in your PC's local time. Banners and events of the second half that have no notice yet are only counted.
+- **Version calendar**: the version event calendar image from the game. Hover a banner or event to highlight it and click to open its notice; unpublished ones say "Not published yet".
+- **All notices**: grouped into update notices, Convenes, events, shop and other.
+- Click any item to see the details on the right: banner, type, time left, start and end, featured 5-star items and the body. Links in the body open in your browser, and the text can be selected and copied.
+- For China, the **livestream codes** from the official Kuro BBS post are shown (hidden once expired); click a code to copy it. A preview appears before the livestream starts.
+
+The last cached notices are shown first, then WwTool asks the server whether anything changed. While the program is open it checks every 30 minutes; you can also click **+ → Refresh notices** at the bottom right. The calendar image and banners are checked with the server the same way and downloaded again when they change.
+
+> [!NOTE]
+> On global servers the notices say "server time". WwTool converts from UTC+8; the in-game time of each server is what counts. When a notice has no event time in its body, the time it is posted is shown instead, and the details say so.
+
+---
+
 <a id="data-pages"></a>
-## 4. Character, Exploration and Vehicle data
+## 5. Character, Exploration and Vehicle data
 
 These pages show the data **last synced to your PC**. To update, click **+ → Refresh data** at the bottom right of the page.
 
@@ -127,11 +147,11 @@ These pages show the data **last synced to your PC**. To update, click **+ → R
 ---
 
 <a id="pulls"></a>
-## 5. Convene records
+## 6. Convene records
 
 Convene statistics support both the China and International servers and **do not require logging in**.
 
-### 5.1 Get records
+### 6.1 Get records
 
 1. Start the game, open **Convene**, click **History** and view at least one page. This writes the Convene link to the game log.
 2. In WwTool, open **Convene Statistics** and click **Get records**.
@@ -142,7 +162,7 @@ Convene statistics support both the China and International servers and **do not
 
 Later fetches only add new records. Existing records are never counted twice.
 
-### 5.2 Import the Convene link
+### 6.2 Import the Convene link
 
 In the **Import pull history URL** window (also available via **+ → Import URL** at the bottom right):
 
@@ -157,7 +177,7 @@ To find the link by hand: open `Client\Saved\Logs\Client.log` in the game folder
 > [!WARNING]
 > The Convene link contains your account's authentication data. Don't share it or post it publicly.
 
-### 5.3 Read the statistics
+### 6.3 Read the statistics
 
 Tabs at the top switch between **Overview**, each banner and **Other banners**.
 
@@ -167,19 +187,19 @@ Tabs at the top switch between **Overview**, each banner and **Other banners**.
 - **Right-click a 5-star record**: Copy this record, View resonator details, Show in detailed charts, or Export as share image.
 - **Detailed charts**: 5-star pity distribution, share of pulls by banner, pulls spent on each 5-star, rarity breakdown with 50/50 win rate, and a daily pull heatmap.
 
-### 5.4 Use local data only
+### 6.4 Use local data only
 
 - To view saved records without going online: **+ → Load Local Data** at the bottom right.
 - With **Settings → Load local data automatically** on, local records are loaded the first time you open Convene Statistics.
 
-### 5.5 Clear Convene records
+### 6.5 Clear Convene records
 
 **Hold to clear pull data** at the bottom of **Settings**: hold the button until it finishes to delete all Convene records of the **current account**. Other accounts are not affected. This cannot be undone, and records older than 6 months can't be fetched from the official API again.
 
 ---
 
 <a id="settings"></a>
-## 6. Settings reference
+## 7. Settings reference
 
 | Group | Setting | What it does |
 | --- | --- | --- |
@@ -204,9 +224,9 @@ Tabs at the top switch between **Overview**, each banner and **Other banners**.
 ---
 
 <a id="data"></a>
-## 7. Data, backups and updates
+## 8. Data, backups and updates
 
-### 7.1 Where your data is
+### 8.1 Where your data is
 
 With the `portable` file present, all data is in the program folder (the **Data folder** button on Home opens it):
 
@@ -219,11 +239,11 @@ With the `portable` file present, all data is in the program folder (the **Data 
 | `Local\Logs\` | Logs | Yes |
 | `Local\Backups\` | Automatic backups made before database upgrades | Yes, once everything works |
 
-### 7.2 Back up
+### 8.2 Back up
 
 Close WwTool and copy `Config` and `Local\Data\LocalData.db`.
 
-### 7.3 Update to a new version
+### 8.3 Update to a new version
 
 **In-app update (recommended)**
 
@@ -243,20 +263,20 @@ To stop the automatic check, turn off **Check for updates automatically** under 
 
 Updating from 1.x works the same way: 2.0 reads the 1.2.1 database and login credentials directly.
 
-### 7.4 Move to another PC or Windows user
+### 8.4 Move to another PC or Windows user
 
 Copy the whole program folder. Login credentials can only be decrypted by the original Windows user, so you need to **Log in again** for each account afterwards. Convene records and other data are unaffected.
 
 ---
 
 <a id="faq"></a>
-## 8. FAQ
+## 9. FAQ
 
 **After clicking "Get records", the import window keeps appearing**
 
 - Check that the game installation directory in Settings is correct.
 - Make sure you opened **Convene → History** in the game and viewed a page. After restarting the game, open it again.
-- If it still fails, copy the link from `Client.log` by hand as described in [5.2](#pulls).
+- If it still fails, copy the link from `Client.log` by hand as described in [6.2](#pulls).
 
 **Getting records fails**
 

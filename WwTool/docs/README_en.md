@@ -27,6 +27,7 @@ A Windows desktop tool for Wuthering Waves: view your account and Resonators, an
 | Page | What it shows |
 | --- | --- |
 | Home | Nickname, UID (one-click copy), level and SOL3 Phase; live progress of Waveplate, Crystal Solvent, Activity, Pioneer Podcast and weekly rewards; quick actions such as launching the game, opening the screenshot / game / log folders and copying the gacha link; game announcements (China / International switch) |
+| Events | Current version and time left; a timeline of banners and events, the in-game version calendar, and every in-game notice with its full text; featured 5-stars; one-click copy of China livestream codes |
 | Convene Statistics | Finds the Convene link in the game log automatically, then fetches and saves your records. The overview shows pulls, 5-stars, average pulls per 5-star, 50/50 win rate and current pity for each banner, in list or compact view. Each banner also has its own full record list |
 | Detailed charts | 5-star pity distribution, share of pulls by banner, pulls spent on each 5-star, rarity breakdown with 50/50 win rate, and a daily pull heatmap |
 | Account Data | Every locally saved account: switch, refresh, log in again or delete |
@@ -116,7 +117,7 @@ The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,s
 - **Network access**:
   - Login and account data use Kuro Games' services; Convene records use the gacha API of the matching server.
   - Game data and missing icons are synced from this repository; Resonator art comes from the official guide site.
-  - The background and announcements on Home come from the game launcher's public API.
+  - The background and announcements on Home come from the game launcher's public API. The in-game notices and version calendar on Events come from the game's notice API, and livestream codes come from the official Kuro BBS post.
 - **Your Convene link contains authentication data.** When reporting an issue, remove your password, the full Convene link and other personal details.
 
 <a id="limitations"></a>
@@ -132,7 +133,7 @@ The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,s
 
 - [User guide](Help_en.md)
 - [Changelog](../../CHANGELOG.md) (Chinese)
-- API notes (Chinese): [Wuthering Waves API](API/WW_API.md) · [Guide site](API/Guide.md) · [Game launcher](API/Launcher.md)
+- API notes (Chinese): [Wuthering Waves API](API/WW_API.md) · [Guide site](API/Guide.md) · [Game launcher](API/Launcher.md) · [In-game notices](API/GameNotice.md) · [Kuro BBS posts](API/KuroBBS_Post.md)
 - Data notes (Chinese): [Resonators](Resource/Characters.md) · [Weapons](Resource/Weapons.md) · [Vehicle](Resource/Motorcycle.md) · [Sync rules](Resource/CatalogSync.md)
 
 Found a problem? Open an [Issue](https://github.com/conFess233/WwTool/issues).
