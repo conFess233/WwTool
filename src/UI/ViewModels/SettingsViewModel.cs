@@ -229,6 +229,22 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         }
     }
 
+    /// <summary>空白处查看背景：界面组件变透明的程度（%）。</summary>
+    public double BackgroundPeekTransparency
+    {
+        get => _config.User.BackgroundPeekTransparency;
+        set
+        {
+            int rounded = (int)Math.Round(value);
+            if (_config.User.BackgroundPeekTransparency == rounded) return;
+            _config.User.BackgroundPeekTransparency = rounded;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(BackgroundPeekText));
+        }
+    }
+
+    public string BackgroundPeekText => _config.User.BackgroundPeekTransparency.ToString(CultureInfo.InvariantCulture) + "%";
+
     [RelayCommand(CanExecute = nameof(UseCustomBackground))]
     private async Task PickBackgroundImageAsync()
     {

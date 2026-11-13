@@ -9,6 +9,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Rendering.Composition;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using WwTool.UI.Theming;
 using WwTool.UI.ViewModels;
 
@@ -55,6 +56,94 @@ public partial class MainWindow : Window
         Deactivated += (_, _) => { _foreground = false; UpdateVideoPlayback(); };
         BackdropVideo.PlaybackFailed += (_, ex) => (DataContext as ShellViewModel)?.ReportVideoFailure(ex);
         AddHandler(PointerMovedEvent, OnParallaxPointerMoved, Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
+        AddHandler(PointerMovedEvent, OnPeekPointerMoved, Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
+        PointerExited += (_, _) =>
+        {
+#if DEBUG
+            // 离屏截图验证时只发送窗口消息、真实鼠标不在窗口上，系统会立刻补发「离开」；忽略它才能看到淡出效果。
+            if (Environment.GetEnvironmentVariable("WWTOOL_QUIET_VERIFY") == "1") return;
+#endif
+            SetPeeking(false);
+        };
+        Deactivated += (_, _) => SetPeeking(false);
+        _peekDelay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(350) };
+        _peekDelay.Tick += (_, _) => { _peekDelay.Stop(); SetPeeking(true); };
+    }
+
+    // ── 空白处查看背景：鼠标在空白处停留片刻后，内容层淡出到设置的透明度；移到任何组件上立即恢复 ──
+
+    private readonly DispatcherTimer _peekDelay;
+    private bool _peeking;
+
+    private void OnPeekPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (DataContext is not ShellViewModel { BackgroundPeekOpacity: < 1 })
+        {
+            SetPeeking(false);
+            return;
+        }
+        bool empty = IsOverEmptyArea(e.GetPosition(this));
+        if (!empty)
+        {
+            _peekDelay.Stop();
+            SetPeeking(false);
+        }
+        else if (!_peeking && !_peekDelay.IsEnabled)
+        {
+            // 稍作停留再淡出，从一张卡片移到另一张时不会闪动。
+            _peekDelay.Start();
+        }
+    }
+
+    private void SetPeeking(bool peeking)
+    {
+        if (!peeking) _peekDelay.Stop();
+        double opacity = peeking && DataContext is ShellViewModel vm ? vm.BackgroundPeekOpacity : 1;
+        _peeking = peeking && opacity < 1;
+        ContentLayer.Opacity = opacity;
+    }
+
+    /// <summary>
+    /// 指针下是否为空白：命中背景层、四周拖动留白，或内容区里只有透明的布局容器（页面滚动区、网格间隙等）。
+    /// 落在卡片、按钮、文字、图片等任何可见组件上，或落在悬浮按钮、提示、对话框、启动画面上，都不算空白。
+    /// </summary>
+    private bool IsOverEmptyArea(Point point)
+    {
+        if (this.InputHitTest(point) is not Visual hit || ReferenceEquals(hit, this)) return true;
+        bool inFrame = false;
+        for (Visual? v = hit; v is not null; v = v.GetVisualParent())
+        {
+            if (ReferenceEquals(v, DragEdges)) return true;
+            if (ReferenceEquals(v, Frame))
+            {
+                inFrame = true;
+                break;
+            }
+        }
+        // 悬浮按钮、提示、对话框、启动画面、窗口按钮等其他层：不算空白。
+        if (!inFrame) return false;
+        for (Visual? v = hit; v is not null && !ReferenceEquals(v, Frame); v = v.GetVisualParent())
+        {
+            if (!IsTransparentContainer(v)) return false;
+        }
+        return true;
+    }
+
+    /// <summary>没有可见底色的布局容器（面板、边框、内容呈现器、滚动区、页面）；其他控件（文字、图片、按钮、自绘控件等）都算组件。</summary>
+    private static bool IsTransparentContainer(Visual v)
+    {
+        IBrush? background;
+        switch (v)
+        {
+            case Border b: background = b.Background; break;
+            case Panel p: background = p.Background; break;
+            case Avalonia.Controls.Presenters.ContentPresenter cp: background = cp.Background; break;
+            case Avalonia.Controls.Presenters.ItemsPresenter: background = null; break;
+            case Button or Avalonia.Controls.Primitives.ToggleButton: return false;
+            case ScrollViewer or ItemsControl or ContentControl when v is Avalonia.Controls.Primitives.TemplatedControl t: background = t.Background; break;
+            default: return false;
+        }
+        return background is null || background is ISolidColorBrush { Color.A: 0 } || background.Opacity <= 0;
     }
 
     // ── 主题切换：旧主题截图 + 圆形扩散 ─────────────────────────

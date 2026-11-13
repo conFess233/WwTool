@@ -746,5 +746,8 @@
   "Home_AnnFailedTitle": "Couldn't load announcements",
   "Home_AnnFailedHint": "Check your network, or try the other region.",
   "Home_AnnRetry": "Retry",
-  "Home_CopyUid": "Copy UID"
+  "Home_CopyUid": "Copy UID",
+  "Settings_BackgroundPeek": "Peek at background",
+  "Settings_BackgroundPeekHint": "When the pointer rests on an empty area, everything except the background fades so you can see it; 0% turns this off",
+  "Settings_BackgroundPeekLevel": "Transparency"
 }

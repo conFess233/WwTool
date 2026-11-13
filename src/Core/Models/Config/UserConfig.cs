@@ -25,6 +25,7 @@ namespace WwTool.Core.Models.Config
         private bool _useCustomBackground;
         private string? _customBackgroundPath;
         private bool _useDynamicBackground;
+        private int _backgroundPeekTransparency = 80;
         private string? _announcementRegion;
         private bool _pullsCompactView;
 
@@ -65,6 +66,13 @@ namespace WwTool.Core.Models.Config
 
         /// <summary>动态背景：使用启动器背景时播放其背景视频（仅 Windows），默认关闭。</summary>
         public bool UseDynamicBackground { get => _useDynamicBackground; set => SetProperty(ref _useDynamicBackground, value); }
+
+        /// <summary>鼠标停在空白处时，背景以外的界面变透明以便查看背景；值为透明度百分比（0 关闭，默认 80）。</summary>
+        public int BackgroundPeekTransparency
+        {
+            get => _backgroundPeekTransparency;
+            set => SetProperty(ref _backgroundPeekTransparency, Math.Clamp(value, 0, 100));
+        }
 
         /// <summary>首页游戏公告的区服：「CN」国服、「Global」国际服；为空时按当前账号自动选择。</summary>
         public string? AnnouncementRegion { get => _announcementRegion; set => SetProperty(ref _announcementRegion, value); }

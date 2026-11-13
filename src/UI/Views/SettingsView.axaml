@@ -262,6 +262,21 @@
                               AutomationProperties.AutomationId="settings-dynamic-bg" />
               </Grid>
             </Border>
+            <!-- 空白处查看背景：鼠标停在空白处时界面组件变透明（0% 关闭） -->
+            <Border Classes="sr">
+              <StackPanel Spacing="8" VerticalAlignment="Center">
+                <StackPanel>
+                  <TextBlock Classes="name" Text="{loc:Tr Settings_BackgroundPeek}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Settings_BackgroundPeekHint}" />
+                </StackPanel>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                  <TextBlock Classes="cp" Text="{loc:Tr Settings_BackgroundPeekLevel}" VerticalAlignment="Center" />
+                  <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding BackgroundPeekTransparency}" TickFrequency="5" IsSnapToTickEnabled="True"
+                          AutomationProperties.Name="{loc:Tr Settings_BackgroundPeek}" AutomationProperties.AutomationId="settings-background-peek" />
+                  <TextBlock Grid.Column="2" Classes="cp" Text="{Binding BackgroundPeekText}" VerticalAlignment="Center" MinWidth="36" />
+                </Grid>
+              </StackPanel>
+            </Border>
             <!-- 窗口毛玻璃效果；开启时下方显示背景不透明度 -->
             <Border Classes="sr">
               <StackPanel Spacing="8" VerticalAlignment="Center">

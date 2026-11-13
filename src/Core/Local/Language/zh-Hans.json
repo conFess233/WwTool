@@ -746,5 +746,8 @@
   "Home_AnnFailedTitle": "暂时无法获取公告",
   "Home_AnnFailedHint": "请检查网络，或切换到另一个区服试试。",
   "Home_AnnRetry": "重试",
-  "Home_CopyUid": "复制 UID"
+  "Home_CopyUid": "复制 UID",
+  "Settings_BackgroundPeek": "空白处查看背景",
+  "Settings_BackgroundPeekHint": "鼠标停在空白处时，背景以外的界面渐变为透明，便于查看背景；设为 0% 关闭",
+  "Settings_BackgroundPeekLevel": "透明度"
 }

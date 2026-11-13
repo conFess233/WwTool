@@ -57,6 +57,10 @@ public sealed partial class ShellViewModel : ObservableObject
             {
                 Avalonia.Threading.Dispatcher.UIThread.Post(LoadBackground);
             }
+            if (e.PropertyName is nameof(UserConfig.BackgroundPeekTransparency))
+            {
+                OnPropertyChanged(nameof(BackgroundPeekOpacity));
+            }
             if (e.PropertyName is nameof(UserConfig.UseDynamicBackground))
             {
                 Avalonia.Threading.Dispatcher.UIThread.Post(UpdateVideo);
@@ -114,6 +118,9 @@ public sealed partial class ShellViewModel : ObservableObject
     private Avalonia.Media.Imaging.Bitmap? _backgroundImage;
 
     public bool HasBackgroundImage => _backgroundImage is not null;
+
+    /// <summary>鼠标停在空白处查看背景时界面组件的不透明度；设置为 0% 时为 1（不变）。</summary>
+    public double BackgroundPeekOpacity => 1 - _config.User.BackgroundPeekTransparency / 100.0;
 
     /// <summary>启动器标语图：与背景同比例的透明整幅叠加层，只随启动器背景显示。</summary>
     public Avalonia.Media.Imaging.Bitmap? BackgroundSlogan

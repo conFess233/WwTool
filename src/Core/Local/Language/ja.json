@@ -746,5 +746,8 @@
   "Home_AnnFailedTitle": "お知らせを取得できません",
   "Home_AnnFailedHint": "ネットワークを確認するか、もう一方のサーバーをお試しください。",
   "Home_AnnRetry": "再試行",
-  "Home_CopyUid": "UID をコピー"
+  "Home_CopyUid": "UID をコピー",
+  "Settings_BackgroundPeek": "余白で背景を見る",
+  "Settings_BackgroundPeekHint": "マウスを余白に置くと、背景以外の表示が透明になり背景を確認できます。0% でオフ",
+  "Settings_BackgroundPeekLevel": "透明度"
 }
