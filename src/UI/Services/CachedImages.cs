@@ -1,15 +1,22 @@
 using Avalonia.Media.Imaging;
+using WwTool.Core.Services;
+using WwTool.Core.Services.Challenges;
 using WwTool.Core.Services.Notices;
 
 namespace WwTool.UI.Services;
 
+/// <summary>游戏内公告的图片（横幅、日历图、正文配图）。</summary>
+public sealed class NoticeImages(GameNoticeService notices) : CachedImages(notices.Images, 96);
+
+/// <summary>encore.moe 的图片（敌人、信物、角色头像），数量多但都很小。</summary>
+public sealed class EncoreImages(EncoreService encore) : CachedImages(encore.Images, 256);
+
 /// <summary>
-/// 游戏内公告图片的界面侧加载：先给出本地缓存（立即显示），再交给 <see cref="GameNoticeService"/> 向服务器校验，
+/// 网络图片的界面侧加载：先给出本地缓存（立即显示），再交给 <see cref="RemoteImageCache"/> 向服务器校验，
 /// 图片有变化或原来没有缓存时再解码一次。解码结果按「文件 + 宽度 + 修改时间」复用。
 /// </summary>
-public sealed class NoticeImages(GameNoticeService notices)
+public abstract class CachedImages(RemoteImageCache cache, int maxEntries)
 {
-    private const int MaxEntries = 96;
     private readonly Dictionary<string, (Bitmap Bitmap, DateTime Stamp, long Used)> _decoded = new(StringComparer.Ordinal);
     private readonly Lock _lock = new();
     private long _clock;
@@ -21,11 +28,11 @@ public sealed class NoticeImages(GameNoticeService notices)
     public async Task LoadAsync(string? url, int decodeWidth, Action<Bitmap> onImage, bool force = false, CancellationToken token = default)
     {
         if (string.IsNullOrWhiteSpace(url)) return;
-        string? cached = notices.CachedImage(url);
+        string? cached = cache.Cached(url);
         Bitmap? shown = cached is null ? null : await Task.Run(() => Decode(cached, decodeWidth), token).ConfigureAwait(true);
         if (shown is not null) onImage(shown);
 
-        (string? path, bool changed) = await notices.GetImageAsync(url, force, token).ConfigureAwait(true);
+        (string? path, bool changed) = await cache.GetAsync(url, force, token).ConfigureAwait(true);
         if (path is null || (!changed && shown is not null)) return;
         Bitmap? fresh = await Task.Run(() => Decode(path, decodeWidth), token).ConfigureAwait(true);
         if (fresh is not null && !ReferenceEquals(fresh, shown)) onImage(fresh);
@@ -70,7 +77,7 @@ public sealed class NoticeImages(GameNoticeService notices)
         {
             _decoded[key] = (bitmap, stamp, ++_clock);
             // 只丢弃引用，不主动 Dispose：界面可能仍在显示，交给 GC。
-            while (_decoded.Count > MaxEntries)
+            while (_decoded.Count > maxEntries)
                 _decoded.Remove(_decoded.MinBy(kv => kv.Value.Used).Key);
         }
         return bitmap;

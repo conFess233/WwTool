@@ -55,6 +55,7 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
         GameNoticeService notices,
         KuroBbsCodeService codes,
         NoticeImages images,
+        ChallengesViewModel challenges,
         LocalizationService localization,
         IConfigService config,
         AccountContext accounts,
@@ -66,6 +67,7 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
         _notices = notices;
         _codes = codes;
         Images = images;
+        Challenges = challenges;
         _localization = localization;
         _config = config;
         _accounts = accounts;
@@ -75,7 +77,7 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
 
         FabActions =
         [
-            new FabAction("refresh", "Events_Refresh", Icons + "Refresh.png", new AsyncRelayCommand(() => RefreshAsync(force: true)), localization),
+            new FabAction("refresh", "Events_Refresh", Icons + "Refresh.png", new AsyncRelayCommand(() => IsChallengesView ? Challenges.RefreshAsync() : RefreshAsync(force: true)), localization),
             new FabAction("back", "Fab_Back", "Icon.Back", new RelayCommand(() => navigation.GoBack()), localization),
         ];
 
@@ -85,6 +87,7 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
         _clock.Tick += (_, _) =>
         {
             UpdateLive();
+            if (IsChallengesView) Challenges.UpdateLive();
             if (++ticks % 10 == 0) RefreshIfStale();
         };
 
@@ -105,6 +108,9 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
 
     public IReadOnlyList<FabAction> FabActions { get; }
     public NoticeImages Images { get; }
+
+    /// <summary>「挑战」栏：深塔 / 海墟 / 矩阵（encore.moe）。</summary>
+    public ChallengesViewModel Challenges { get; }
 
     // ── 区服 ──────────────────────────────────────────────
 
@@ -142,6 +148,17 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
     [ObservableProperty] private bool _isTimelineView = true;
     [ObservableProperty] private bool _isCalendarView;
     [ObservableProperty] private bool _isNoticesView;
+    [ObservableProperty] private bool _isChallengesView;
+
+    /// <summary>挑战栏占满整行，不显示右侧的公告详情。</summary>
+    public bool ShowNoticeViews => !IsChallengesView;
+
+    partial void OnIsChallengesViewChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowNoticeViews));
+        if (value && _visible) Challenges.Activate();
+        else if (!value) Challenges.Deactivate();
+    }
 
     partial void OnIsCalendarViewChanged(bool value)
     {
@@ -275,11 +292,13 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
             RefreshIfStale();
         }
         if (IsCalendarView) EnsureCalendarImage();
+        if (IsChallengesView) Challenges.Activate();
     }
 
     public void OnNavigatedFrom()
     {
         _visible = false;
+        Challenges.Deactivate();
         _clock.Stop();
     }
 
@@ -835,14 +854,5 @@ public sealed partial class EventsViewModel : ObservableObject, INavigationAware
     }
 
     /// <summary>「3 天 5 小时」「5 小时」「12 分钟」。</summary>
-    private string Duration(TimeSpan span)
-    {
-        if (span < TimeSpan.Zero) span = TimeSpan.Zero;
-        if (span.TotalDays >= 1)
-            return span.Hours > 0
-                ? string.Format(_localization["Events_DaysHours"], (int)span.TotalDays, span.Hours)
-                : string.Format(_localization["Events_Days"], (int)span.TotalDays);
-        if (span.TotalHours >= 1) return string.Format(_localization["Events_Hours"], (int)span.TotalHours);
-        return string.Format(_localization["Events_Minutes"], Math.Max(1, (int)Math.Ceiling(span.TotalMinutes)));
-    }
+    private string Duration(TimeSpan span) => EventsText.Duration(_localization, span);
 }

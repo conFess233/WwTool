@@ -27,11 +27,21 @@ public sealed class NoticeContent : StackPanel
     public static readonly StyledProperty<NoticeImages?> ImagesProperty =
         AvaloniaProperty.Register<NoticeContent, NoticeImages?>(nameof(Images));
 
+    /// <summary>正文字号（默认 13.5）；用于卡片里的短说明时可调小。</summary>
+    public static readonly StyledProperty<double> TextSizeProperty =
+        AvaloniaProperty.Register<NoticeContent, double>(nameof(TextSize), 13.5);
+
+    /// <summary>行高倍数（默认 1.65，公告正文较疏）。</summary>
+    public static readonly StyledProperty<double> LineSpacingProperty =
+        AvaloniaProperty.Register<NoticeContent, double>(nameof(LineSpacing), 1.65);
+
     private CancellationTokenSource? _loads;
 
     static NoticeContent()
     {
         BlocksProperty.Changed.AddClassHandler<NoticeContent>((c, _) => c.Rebuild());
+        TextSizeProperty.Changed.AddClassHandler<NoticeContent>((c, _) => c.Rebuild());
+        LineSpacingProperty.Changed.AddClassHandler<NoticeContent>((c, _) => c.Rebuild());
     }
 
     public NoticeContent() => Spacing = 4;
@@ -40,6 +50,18 @@ public sealed class NoticeContent : StackPanel
     {
         get => GetValue(BlocksProperty);
         set => SetValue(BlocksProperty, value);
+    }
+
+    public double TextSize
+    {
+        get => GetValue(TextSizeProperty);
+        set => SetValue(TextSizeProperty, value);
+    }
+
+    public double LineSpacing
+    {
+        get => GetValue(LineSpacingProperty);
+        set => SetValue(LineSpacingProperty, value);
     }
 
     public ICommand? LinkCommand
@@ -70,7 +92,7 @@ public sealed class NoticeContent : StackPanel
 
     private Control Build(NoticeBlock block, CancellationToken token) => block switch
     {
-        NoticeParagraph p => Paragraph(p),
+        NoticeParagraph p => Paragraph(p, TextSize),
         NoticeSpacer => new Border { Height = 8 },
         NoticeImage image => Image(image, token),
         NoticeTable table => Table(table),
@@ -78,14 +100,14 @@ public sealed class NoticeContent : StackPanel
         _ => new Border(),
     };
 
-    private Control Paragraph(NoticeParagraph p, double fontSize = 13.5)
+    private Control Paragraph(NoticeParagraph p, double fontSize)
     {
         bool hasLink = p.Runs.Any(r => r.Link is not null);
         // 有链接的段落用普通 TextBlock（链接是内嵌的可点文字）；其他段落可选中复制。
         TextBlock text = hasLink ? new TextBlock() : new SelectableTextBlock();
         text.TextWrapping = TextWrapping.Wrap;
         text.FontSize = fontSize;
-        text.LineHeight = fontSize * 1.65;
+        text.LineHeight = fontSize * LineSpacing;
         text.TextAlignment = p.Align switch
         {
             NoticeAlign.Center => TextAlignment.Center,
@@ -118,7 +140,7 @@ public sealed class NoticeContent : StackPanel
         }
         if (p.Bullet is null) return text;
         var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*"), ColumnSpacing = 6, Margin = new Thickness(6, 0, 0, 0) };
-        var bullet = new TextBlock { Text = p.Bullet, FontSize = fontSize, LineHeight = fontSize * 1.65, MinWidth = 12 };
+        var bullet = new TextBlock { Text = p.Bullet, FontSize = fontSize, LineHeight = fontSize * LineSpacing, MinWidth = 12 };
         bullet.Bind(TextBlock.ForegroundProperty, this.GetResourceObservable("TextMutedBrush"));
         grid.Children.Add(bullet);
         Grid.SetColumn(text, 1);
@@ -186,7 +208,7 @@ public sealed class NoticeContent : StackPanel
             for (int c = 0; c < row.Count; c++)
             {
                 var stack = new StackPanel { Spacing = 2 };
-                foreach (NoticeParagraph p in row[c]) stack.Children.Add(Paragraph(p, 12.5));
+                foreach (NoticeParagraph p in row[c]) stack.Children.Add(Paragraph(p, TextSize - 1));
                 var cell = new Border
                 {
                     Padding = new Thickness(8, 5),

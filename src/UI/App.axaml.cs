@@ -147,6 +147,8 @@ public partial class App : Application
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<ExploreViewModel>();
         services.AddSingleton<NoticeImages>();
+        services.AddSingleton<EncoreImages>();
+        services.AddSingleton<ChallengesViewModel>();
         services.AddSingleton<EventsViewModel>();
         services.AddSingleton<MotorViewModel>();
         services.AddSingleton<RolesViewModel>();

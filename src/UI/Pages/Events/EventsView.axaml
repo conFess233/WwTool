@@ -6,8 +6,9 @@
              x:Class="WwTool.UI.Pages.Events.EventsView"
              x:DataType="events:EventsViewModel">
   <!--
-    活动页：顶部版本卡（版本名、版本号、周期、剩余时间与进度、区服滑块）；下面一行视图胶囊（时间线 / 版本日历 / 全部公告）与更新时间；
+    活动页：顶部版本卡（版本名、版本号、周期、剩余时间与进度、区服滑块）；下面一行视图胶囊（时间线 / 版本日历 / 全部公告 / 挑战）与更新时间；
     主体左侧为当前视图，右侧 440 宽为公告详情（横幅、标签、时间、UP、正文）。左右各自滚动，整页铺满可视区域。
+    「挑战」栏（ChallengesView）占满主体整行，不显示公告详情。
   -->
   <UserControl.Styles>
     <!-- 时间线：刻度与竖线按点居中；横条 10 高圆角，按分组取色；整行可点（循环玩法不可点） -->
@@ -250,10 +251,17 @@
                        AutomationProperties.AutomationId="events-view-calendar" />
           <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewNotices}" IsChecked="{Binding IsNoticesView}"
                        AutomationProperties.AutomationId="events-view-notices" />
+          <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewChallenges}" IsChecked="{Binding IsChallengesView}"
+                       AutomationProperties.AutomationId="events-view-challenges" />
         </StackPanel>
         <!-- 更新时间压在背景图上，垫一块胶囊底保证看得清 -->
-        <Border Grid.Column="2" CornerRadius="999" Padding="12,4" VerticalAlignment="Center" Background="{DynamicResource SurfaceBrush}"
-                IsVisible="{Binding UpdatedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+        <Border Grid.Column="2" CornerRadius="999" Padding="12,4" VerticalAlignment="Center" Background="{DynamicResource SurfaceBrush}">
+          <Border.IsVisible>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="ShowNoticeViews" />
+              <Binding Path="UpdatedText" Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
+            </MultiBinding>
+          </Border.IsVisible>
           <Panel>
             <TextBlock Classes="caption" Text="{loc:Tr Events_Refreshing}" IsVisible="{Binding IsRefreshing}" />
             <TextBlock Classes="caption" Text="{Binding UpdatedText}" IsVisible="{Binding !IsRefreshing}" AutomationProperties.AutomationId="events-updated" />
@@ -264,6 +272,8 @@
       <!-- ── 主体 ── -->
       <Grid Grid.Row="2" ColumnDefinitions="*,440" ColumnSpacing="18">
 
+        <!-- 公告相关的视图（挑战栏不显示） -->
+        <Panel IsVisible="{Binding ShowNoticeViews}">
         <!-- 加载中 / 失败 / 没有内容 -->
         <Border Classes="card" VerticalAlignment="Top" IsVisible="{Binding ShowLoading}" AutomationProperties.AutomationId="events-loading">
           <TextBlock Classes="caption" Text="{loc:Tr Events_Loading}" />
@@ -475,9 +485,16 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </ScrollViewer>
+        </Panel>
+
+        <!-- 挑战：深塔 / 海墟 / 矩阵，占满整行 -->
+        <Panel Grid.ColumnSpan="2" IsVisible="{Binding IsChallengesView}">
+          <events:ChallengesView DataContext="{Binding Challenges}" />
+        </Panel>
 
         <!-- ── 详情 ── -->
-        <Border Grid.Column="1" Classes="card" Padding="0" ClipToBounds="True" Margin="0,0,0,76" AutomationProperties.AutomationId="events-detail">
+        <Border Grid.Column="1" Classes="card" Padding="0" ClipToBounds="True" Margin="0,0,0,76" AutomationProperties.AutomationId="events-detail"
+                IsVisible="{Binding ShowNoticeViews}">
           <Panel>
             <TextBlock Classes="caption" Text="{loc:Tr Events_SelectHint}" HorizontalAlignment="Center" VerticalAlignment="Center"
                        IsVisible="{Binding !HasSelection}" />
