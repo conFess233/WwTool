@@ -92,7 +92,7 @@ When authorization expires, the page shows "…'s login has expired":
 - The row below shows active days, creation date, SOL3 Phase, server and number of Resonators.
 - Five resource cards: **Waveplate** (with time until full), **Crystal Solvent**, **Activity**, **Pioneer Podcast** and **Weekly rewards** (reset Monday 04:00). Countdowns update every second.
 
-This data is a snapshot from the last sync. To update it, open **Account Data**, **Exploration Data** or **Vehicle Data** and click **+ → Refresh data** at the bottom right. The **+** button on Home holds **Refresh Account List** and **Add Account**.
+This data is a snapshot from the last sync. To update it, click **+ → Refresh data** at the bottom right of Home (Account Data, Exploration Data and Vehicle Data have the same button). The **+** button on Home also holds **Refresh Account List** and **Add Account**.
 
 ### 3.2 Quick actions
 
