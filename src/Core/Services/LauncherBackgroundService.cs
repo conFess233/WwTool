@@ -1,6 +1,8 @@
 using System.Globalization;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using WwTool.Core.Abstractions;
 using WwTool.Core.Abstractions.Platform;
 
@@ -56,17 +58,18 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
         await _gate.WaitAsync(token).ConfigureAwait(false);
         try
         {
-            var sources = new (string Region, string Url, string Language)[]
+            var sources = new (string Region, string Template, string Language)[]
             {
-                ("NET", Format(config.Api.Urls.LauncherBackgroundUrlNET, language), language),
-                ("CN", Format(config.Api.Urls.LauncherBackgroundUrlCN, CnLanguage), CnLanguage),
+                ("NET", config.Api.Urls.LauncherBackgroundUrlNET, language),
+                ("CN", config.Api.Urls.LauncherBackgroundUrlCN, CnLanguage),
             };
-            foreach (var (region, url, lang) in sources)
+            foreach (var (region, template, lang) in sources)
             {
                 token.ThrowIfCancellationRequested();
-                if (string.IsNullOrWhiteSpace(url)) continue;
+                if (string.IsNullOrWhiteSpace(template)) continue;
                 try
                 {
+                    string url = Format(await ResolveTemplateAsync(region, template, token).ConfigureAwait(false), lang);
                     LauncherBackgroundFiles? files = await TryFetchAsync(region, url, lang, token).ConfigureAwait(false);
                     if (files is not null) return files;
                 }
@@ -82,6 +85,57 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
         {
             _gate.Release();
         }
+    }
+
+    /// <summary>背景配置地址：<c>…/official/background/{backgroundId}/{0}.json</c>。</summary>
+    private static readonly Regex BackgroundTemplate = new(@"^(?<root>https?://.+/official/)background/(?<id>[0-9A-Za-z]+)/(?<file>[^/]+)$", RegexOptions.CultureInvariant);
+
+    private static readonly Regex BackgroundId = new("^[0-9A-Za-z]{8,64}$", RegexOptions.CultureInvariant);
+
+    /// <summary>
+    /// backgroundId 随游戏版本更换，配置里写死的会过期（旧 ID 仍能请求到上个版本的背景）。
+    /// 先读同一目录下的游戏索引 <c>…/official/index.json</c> 的 <c>config.functionCode.background</c>，换成当前的 ID；
+    /// 索引取不到或格式不对时沿用配置地址。
+    /// </summary>
+    internal async Task<string> ResolveTemplateAsync(string region, string template, CancellationToken token)
+    {
+        Match match = BackgroundTemplate.Match(template);
+        if (!match.Success) return template;
+        string indexUrl = match.Groups["root"].Value + "index.json";
+        try
+        {
+            HttpClient client = factory.CreateClient("WwToolClient");
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+            cts.CancelAfter(RequestTimeout);
+            using var request = new HttpRequestMessage(HttpMethod.Get, indexUrl);
+            AddHeaders(request);
+            using HttpResponseMessage response = await client.SendAsync(request, cts.Token).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            byte[] body = await response.Content.ReadAsByteArrayAsync(cts.Token).ConfigureAwait(false);
+            // 索引固定以 gzip 返回；没走自动解压时自己解。
+            if (body.Length > 2 && body[0] == 0x1F && body[1] == 0x8B)
+            {
+                using var gzip = new GZipStream(new MemoryStream(body), CompressionMode.Decompress);
+                using var plain = new MemoryStream();
+                await gzip.CopyToAsync(plain, cts.Token).ConfigureAwait(false);
+                body = plain.ToArray();
+            }
+            using JsonDocument document = JsonDocument.Parse(body);
+            if (document.RootElement.TryGetProperty("config", out JsonElement cfg)
+                && cfg.TryGetProperty("functionCode", out JsonElement codes)
+                && codes.TryGetProperty("background", out JsonElement id)
+                && id.ValueKind == JsonValueKind.String
+                && id.GetString() is { } value && BackgroundId.IsMatch(value))
+            {
+                return match.Groups["root"].Value + "background/" + value + "/" + match.Groups["file"].Value;
+            }
+            logger.Warn($"启动器索引（{region}）没有背景 ID，沿用配置地址");
+        }
+        catch (Exception ex) when (IsRecoverable(ex, token))
+        {
+            logger.Warn($"启动器索引（{region}）获取失败，沿用配置地址：{ex.GetType().Name} {ex.Message}");
+        }
+        return template;
     }
 
     private async Task<LauncherBackgroundFiles?> TryFetchAsync(string region, string url, string language, CancellationToken token)

@@ -38,8 +38,8 @@
 | ---------------------- | ---------------------------- | ---------------------------------- |
 | launcherKey（国服）    | 国服启动器 Key               | 32 位字母数字                      |
 | launcherKey（国际服）  | 国际服启动器 Key             | 32 位字母数字                      |
-| backgroundId（国服）   | 国服背景配置 ID              | 32 位十六进制；与国际服不同；来源未确认，可能随版本更换 |
-| backgroundId（国际服） | 国际服背景配置 ID            | 32 位十六进制；来源未确认，可能随版本更换 |
+| backgroundId（国服）   | 国服背景配置 ID              | 32 位十六进制；与国际服不同；**随版本更换**，取自[游戏索引](#游戏索引) |
+| backgroundId（国际服） | 国际服背景配置 ID            | 32 位十六进制；**随版本更换**，取自[游戏索引](#游戏索引) |
 
 ---
 
@@ -188,6 +188,22 @@ Accept-Language: zh-CN,zh;q=0.9,en;q=0.8
 | 国际服 | `https://prod-alicdn-gamestarter.kurogame.com/launcher/game/50004_<launcherKey>/G153/official/background/<backgroundId>/zh-Hans.json` |
 
 > 注意资讯接口路径是 `/launcher/app/`，背景接口是 `/launcher/game/`，且多一级 `backgroundId`。
+
+> [!IMPORTANT]
+> `backgroundId` 每个游戏版本都会换。旧 ID 仍能请求成功，但返回的是旧版本的背景，所以不能写死，每次都要先从[游戏索引](#游戏索引)读当前 ID。
+
+### 游戏索引
+
+`{域名}/launcher/game/{gameId}_{launcherKey}/{appCode}/official/index.json`
+
+启动器用来获取游戏版本、下载资源和功能配置的索引。响应固定以 `gzip` 压缩（`Content-Encoding: gzip`），体积约 5 KB（压缩后）。这里只用到：
+
+| 字段                               | 类型   | 示例值                             | 说明                         |
+| ---------------------------------- | ------ | ---------------------------------- | ---------------------------- |
+| config.functionCode.background     | string | d5f20901184c427d97817dfa289b4cbd   | 当前版本的 `backgroundId`    |
+| resourcePacks.common.version       | string | 3.8.0                              | 当前游戏版本（参考）          |
+
+其余字段（`cdnList`、`resourcePacks`、`bundles` 等）是游戏下载与校验配置，WwTool 不使用。
 
 ### 请求方式
 

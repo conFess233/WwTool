@@ -87,7 +87,7 @@ namespace WwTool.Core.Models.Config
         public string OfficialSiteUrl { get; set; } = "https://mc.kurogame.com/";
 
         /// <summary>国际服启动器背景配置，<c>{0}</c> 为语言代码（zh-Hans / en / ja 等均有）。</summary>
-        public string LauncherBackgroundUrlNET { get; set; } = "https://prod-alicdn-gamestarter.kurogame.com/launcher/game/50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e/G153/official/background/51684874bd1f48e3ab98fb8b06b96ceb/{0}.json";
+        public string LauncherBackgroundUrlNET { get; set; } = "https://prod-alicdn-gamestarter.kurogame.com/launcher/game/50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e/G153/official/background/d5f20901184c427d97817dfa289b4cbd/{0}.json";
 
         /// <summary>国际服启动器资讯（活动 / 公告 / 新闻、轮播图），<c>{0}</c> 为语言代码。</summary>
         public string LauncherNewsUrlNET { get; set; } = "https://prod-alicdn-gamestarter.kurogame.com/launcher/app/50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e/G153/official/information/{0}.json";
@@ -102,6 +102,6 @@ namespace WwTool.Core.Models.Config
         public string NewsPageUrlNET { get; set; } = "https://wutheringwaves.kurogames.com/{0}/main/news/";
 
         /// <summary>国服启动器背景配置，<c>{0}</c> 为语言代码（只有 zh-Hans）。</summary>
-        public string LauncherBackgroundUrlCN { get; set; } = "https://prod-cn-alicdn-gamestarter.kurogame.com/launcher/game/10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ/G152/official/background/e4ea009e702a4961be86c815d87dbe68/{0}.json";
+        public string LauncherBackgroundUrlCN { get; set; } = "https://prod-cn-alicdn-gamestarter.kurogame.com/launcher/game/10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ/G152/official/background/5b3a2442a9fb4927a531069f602d304b/{0}.json";
     }
 }
