@@ -104,6 +104,21 @@ namespace WwTool.Core.Models.Config
         /// <summary>官网新闻页：国际服，<c>{0}</c> 为官网语言路径（en / ja / zh-tw）。</summary>
         public string NewsPageUrlNET { get; set; } = "https://wutheringwaves.kurogames.com/{0}/main/news/";
 
+        /// <summary>国服游戏内公告（活动 / 唤取 / 版本日历），<c>{0}</c> 为语言代码；路径中为国服服务器 ID。</summary>
+        public string GameNoticeUrlCN { get; set; } = "https://aki-gm-resources-back.aki-game.com/gamenotice/G152/76402e5b20be2c39f095a152090afddc/{0}.json";
+
+        /// <summary>国际服游戏内公告，<c>{0}</c> 为语言代码；5 个国际服服务器内容相同，路径中取亚服 ID。</summary>
+        public string GameNoticeUrlNET { get; set; } = "https://aki-gm-resources-back.aki-game.net/gamenotice/G153/86d52186155b148b5c138ceb41be9650/{0}.json";
+
+        /// <summary>库街区帖子搜索（找官方「前瞻通讯」帖）。</summary>
+        public string KuroBbsSearchUrl { get; set; } = "https://api.kurobbs.com/forum/search/v2/post";
+
+        /// <summary>库街区帖子详情（取楼主评论里的兑换码）。</summary>
+        public string KuroBbsPostDetailUrl { get; set; } = "https://api.kurobbs.com/forum/getPostDetail";
+
+        /// <summary>库街区帖子网页，<c>{0}</c> 为帖子 ID。</summary>
+        public string KuroBbsPostPageUrl { get; set; } = "https://www.kurobbs.com/mc/post/{0}";
+
         /// <summary>国服启动器背景配置，<c>{0}</c> 为语言代码（只有 zh-Hans）。</summary>
         public string LauncherBackgroundUrlCN { get; set; } = "https://prod-cn-alicdn-gamestarter.kurogame.com/launcher/game/10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ/G152/official/background/5b3a2442a9fb4927a531069f602d304b/{0}.json";
     }
