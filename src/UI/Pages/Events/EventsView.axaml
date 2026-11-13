@@ -1,0 +1,468 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:events="using:WwTool.UI.Pages.Events"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Events.EventsView"
+             x:DataType="events:EventsViewModel">
+  <!--
+    活动页：顶部版本卡（版本名、版本号、周期、剩余时间与进度、区服滑块）；下面一行视图胶囊（时间线 / 版本日历 / 全部公告）与更新时间；
+    主体左侧为当前视图，右侧 440 宽为公告详情（横幅、标签、时间、UP、正文）。左右各自滚动，整页铺满可视区域。
+  -->
+  <UserControl.Styles>
+    <!-- 时间线 -->
+    <Style Selector="ItemsControl.tl-ticks > ContentPresenter" x:DataType="events:TimelineTick">
+      <Setter Property="c:RatioPanel.Left" Value="{Binding Ratio}" />
+      <Setter Property="c:RatioPanel.Right" Value="{Binding Ratio}" />
+    </Style>
+    <Style Selector="ItemsControl.tl-grid > ContentPresenter" x:DataType="events:TimelineTick">
+      <Setter Property="c:RatioPanel.Left" Value="{Binding Ratio}" />
+      <Setter Property="c:RatioPanel.Right" Value="{Binding Ratio}" />
+    </Style>
+    <Style Selector="Button.tl-bar">
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Padding" Value="10,0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Body" CornerRadius="7" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="3,0,0,0" Padding="{TemplateBinding Padding}" ClipToBounds="True">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+              </Transitions>
+            </Border.Transitions>
+            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Button.tl-bar.weapon">
+      <Setter Property="Background" Value="{DynamicResource InfoContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}" />
+    </Style>
+    <Style Selector="Button.tl-bar.reverb">
+      <Setter Property="Background" Value="{DynamicResource FourStarContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FourStarBrush}" />
+    </Style>
+    <Style Selector="Button.tl-bar.event">
+      <Setter Property="Background" Value="{DynamicResource SuccessContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style Selector="Button.tl-bar.ended">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="Button.tl-bar:pointerover /template/ Border#PART_Body">
+      <Setter Property="BoxShadow" Value="{DynamicResource ShadowSoft}" />
+    </Style>
+    <Style Selector="Button.tl-bar.selected /template/ Border#PART_Body">
+      <Setter Property="BoxShadow" Value="0 0 0 2 #66B08A3C" />
+    </Style>
+    <Style Selector="Button.tl-label">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <ContentPresenter Background="Transparent" Content="{TemplateBinding Content}" />
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.tl-label:pointerover TextBlock.tl-title">
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+
+    <!-- 公告行 -->
+    <Style Selector="Button.notice-row">
+      <Setter Property="Padding" Value="10,9" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Body" CornerRadius="9" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.15" />
+              </Transitions>
+            </Border.Transitions>
+            <ContentPresenter Content="{TemplateBinding Content}" />
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.notice-row:pointerover">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+    </Style>
+    <Style Selector="Button.notice-row.selected">
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+    </Style>
+
+    <!-- 版本日历图上的可点区域 -->
+    <Style Selector="ItemsControl.hotspots > ContentPresenter" x:DataType="events:CalendarHotspot">
+      <Setter Property="c:RatioPanel.Left" Value="{Binding Left}" />
+      <Setter Property="c:RatioPanel.Right" Value="{Binding Right}" />
+      <Setter Property="c:RatioPanel.Top" Value="{Binding Top}" />
+      <Setter Property="c:RatioPanel.Bottom" Value="{Binding Bottom}" />
+    </Style>
+    <Style Selector="Button.hotspot">
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Name="PART_Body" CornerRadius="6" Background="Transparent" BorderBrush="Transparent" BorderThickness="2">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.12" />
+                <BrushTransition Property="Background" Duration="0:0:0.12" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="Button.hotspot:pointerover /template/ Border#PART_Body">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Background" Value="#22FFFFFF" />
+    </Style>
+    <Style Selector="Button.hotspot.pending">
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="Button.hotspot.pending:pointerover /template/ Border#PART_Body">
+      <Setter Property="BorderBrush" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="Background" Value="#33000000" />
+    </Style>
+
+    <!-- 公告类型标签 -->
+    <Style Selector="Border.ntag.update">
+      <Setter Property="Background" Value="{DynamicResource InfoContainerBrush}" />
+    </Style>
+    <Style Selector="Border.ntag.update > TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource InfoBrush}" />
+    </Style>
+    <Style Selector="Border.ntag.event">
+      <Setter Property="Background" Value="{DynamicResource SuccessContainerBrush}" />
+    </Style>
+    <Style Selector="Border.ntag.event > TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}" />
+    </Style>
+    <Style Selector="Border.ntag.muted-tag">
+      <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
+    </Style>
+    <Style Selector="Border.ntag.muted-tag > TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.status-active">
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- 兑换码 -->
+    <Style Selector="Button.code">
+      <Setter Property="Height" Value="34" />
+      <Setter Property="Padding" Value="12,0" />
+      <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer x:Name="Scroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
+    <Grid x:Name="Root" RowDefinitions="Auto,Auto,*" RowSpacing="14" Margin="0,0,0,26" MinHeight="640">
+
+      <!-- ── 版本卡 ── -->
+      <Border Classes="card" Padding="24,18" AutomationProperties.AutomationId="events-version">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="28">
+          <StackPanel Spacing="4" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Classes="parent-title" Text="{loc:Tr Events_CurrentVersion}" VerticalAlignment="Center" />
+              <Border Classes="ntag" IsVisible="{Binding VersionLabel, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Text="{Binding VersionLabel}" />
+              </Border>
+            </StackPanel>
+            <TextBlock Classes="page-title" Text="{Binding VersionTitle}" TextTrimming="CharacterEllipsis" AutomationProperties.AutomationId="events-version-title" />
+            <TextBlock Classes="caption" Text="{Binding VersionRange}" IsVisible="{Binding HasVersionRange}" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Width="300" Spacing="10" VerticalAlignment="Center">
+            <Border Classes="region" HorizontalAlignment="Right" AutomationProperties.AutomationId="events-region">
+              <Panel>
+                <Border Classes="region-thumb" Classes.right="{Binding IsGlobalRegion}" />
+                <UniformGrid Columns="2">
+                  <RadioButton Classes="region-opt" GroupName="events-region" Content="{loc:Tr Home_RegionCN}"
+                               IsChecked="{Binding IsChinaRegion}" AutomationProperties.AutomationId="events-region-cn" />
+                  <RadioButton Classes="region-opt" GroupName="events-region" Content="{loc:Tr Home_RegionGlobal}"
+                               IsChecked="{Binding IsGlobalRegion}" AutomationProperties.AutomationId="events-region-global" />
+                </UniformGrid>
+              </Panel>
+            </Border>
+            <StackPanel Spacing="6" IsVisible="{Binding HasVersionRange}">
+              <TextBlock Text="{Binding VersionRemaining}" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Right"
+                         AutomationProperties.AutomationId="events-version-remaining" />
+              <c:SegmentedBar Height="8" Value="{Binding VersionProgress}" Maximum="1" />
+            </StackPanel>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- ── 视图胶囊与更新时间 ── -->
+      <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewTimeline}" IsChecked="{Binding IsTimelineView}"
+                       AutomationProperties.AutomationId="events-view-timeline" />
+          <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewCalendar}" IsChecked="{Binding IsCalendarView}"
+                       AutomationProperties.AutomationId="events-view-calendar" />
+          <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewNotices}" IsChecked="{Binding IsNoticesView}"
+                       AutomationProperties.AutomationId="events-view-notices" />
+        </StackPanel>
+        <!-- 更新时间压在背景图上，垫一块胶囊底保证看得清 -->
+        <Border Grid.Column="2" CornerRadius="999" Padding="12,4" VerticalAlignment="Center" Background="{DynamicResource SurfaceBrush}"
+                IsVisible="{Binding UpdatedText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <Panel>
+            <TextBlock Classes="caption" Text="{loc:Tr Events_Refreshing}" IsVisible="{Binding IsRefreshing}" />
+            <TextBlock Classes="caption" Text="{Binding UpdatedText}" IsVisible="{Binding !IsRefreshing}" AutomationProperties.AutomationId="events-updated" />
+          </Panel>
+        </Border>
+      </Grid>
+
+      <!-- ── 主体 ── -->
+      <Grid Grid.Row="2" ColumnDefinitions="*,440" ColumnSpacing="18">
+
+        <!-- 加载中 / 失败 / 没有内容 -->
+        <Border Classes="card" VerticalAlignment="Top" IsVisible="{Binding ShowLoading}" AutomationProperties.AutomationId="events-loading">
+          <TextBlock Classes="caption" Text="{loc:Tr Events_Loading}" />
+        </Border>
+        <Border Classes="card" VerticalAlignment="Top" IsVisible="{Binding ShowFailed}" AutomationProperties.AutomationId="events-failed">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="card-title" Text="{loc:Tr Events_FailedTitle}" />
+            <TextBlock Classes="caption" Text="{loc:Tr Events_FailedHint}" TextWrapping="Wrap" />
+            <Button Classes="btn" HorizontalAlignment="Left" Content="{loc:Tr Events_Retry}" Command="{Binding RetryCommand}"
+                    AutomationProperties.AutomationId="events-retry" />
+          </StackPanel>
+        </Border>
+        <Border Classes="card" VerticalAlignment="Top" IsVisible="{Binding ShowEmpty}">
+          <TextBlock Classes="caption" Text="{loc:Tr Events_Empty}" />
+        </Border>
+
+        <!-- 时间线 -->
+        <ScrollViewer IsVisible="{Binding IsTimelineView}" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="14" IsVisible="{Binding HasData}" Margin="0,0,4,0">
+            <!-- 前瞻直播与兑换码（国服） -->
+            <Border Classes="card" Padding="20,14" IsVisible="{Binding HasLivestream}" AutomationProperties.AutomationId="events-codes">
+              <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasPreview}">
+                  <TextBlock Text="{Binding PreviewText}" FontWeight="SemiBold" TextWrapping="Wrap" VerticalAlignment="Center" />
+                  <Button Grid.Column="1" Classes="btn" Content="{loc:Tr Events_OpenPost}" Command="{Binding OpenPreviewPostCommand}" />
+                </Grid>
+                <StackPanel Spacing="10" IsVisible="{Binding HasCodes}">
+                  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="card-title" Text="{Binding CodesTitle}" />
+                      <TextBlock Classes="caption" Text="{Binding CodesExpiry}" Classes.danger-text="{Binding CodesExpired}" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="btn" Content="{loc:Tr Events_OpenPost}" Command="{Binding OpenCodesPostCommand}" VerticalAlignment="Center" />
+                  </Grid>
+                  <ItemsControl ItemsSource="{Binding CodesList}">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemSpacing="8" LineSpacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="events:RedeemCode">
+                        <Button Classes="btn code" Command="{Binding $parent[ItemsControl].((events:EventsViewModel)DataContext).CopyCodeCommand}"
+                                CommandParameter="{Binding}" ToolTip.Tip="{loc:Tr Events_Copy}">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{Binding Code}" VerticalAlignment="Center" />
+                            <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.Copy}" IsVisible="{Binding !IsCopied}" />
+                            <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.Check}" Foreground="{DynamicResource SuccessBrush}" IsVisible="{Binding IsCopied}" />
+                          </StackPanel>
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Classes="caption" Text="{loc:Tr Events_CodesSource}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card" Padding="20,16" IsVisible="{Binding HasTimeline}" AutomationProperties.AutomationId="events-timeline">
+              <Grid RowDefinitions="Auto,*" RowSpacing="8">
+                <!-- 刻度 -->
+                <Grid ColumnDefinitions="210,*">
+                    <ItemsControl Grid.Column="1" Height="18" Classes="tl-ticks" ItemsSource="{Binding TimelineTicks}">
+                      <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:RatioPanel MinChildWidth="40" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="events:TimelineTick">
+                          <TextBlock Classes="caption" Text="{Binding Text}" Classes.secondary="{Binding IsMajor}" />
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+                <Grid Grid.Row="1">
+                  <!-- 刻度竖线与「今天」 -->
+                  <Grid ColumnDefinitions="210,*" IsHitTestVisible="False">
+                    <ItemsControl Grid.Column="1" Classes="tl-grid" ItemsSource="{Binding TimelineTicks}">
+                      <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:RatioPanel MinChildWidth="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="events:TimelineTick">
+                          <Border Width="1" HorizontalAlignment="Left" Background="{DynamicResource DividerBrush}" />
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <c:RatioPanel Grid.Column="1" MinChildWidth="2" IsVisible="{Binding ShowToday}">
+                      <Border Width="2" HorizontalAlignment="Left" Background="{DynamicResource DangerBrush}" CornerRadius="1"
+                              c:RatioPanel.Left="{Binding TodayRatio}" c:RatioPanel.Right="{Binding TodayRatio}" />
+                    </c:RatioPanel>
+                  </Grid>
+                  <ItemsControl ItemsSource="{Binding TimelineRows}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="events:TimelineRow">
+                        <Panel>
+                          <TextBlock Classes="label" Text="{Binding Header}" FontWeight="SemiBold" Margin="0,12,0,6" IsVisible="{Binding IsHeader}" />
+                          <Grid ColumnDefinitions="210,*" Margin="0,3" IsVisible="{Binding IsBar}">
+                            <Button Classes="tl-label" Margin="0,0,12,0" Command="{Binding $parent[ItemsControl].((events:EventsViewModel)DataContext).SelectRowCommand}"
+                                    CommandParameter="{Binding}" ToolTip.Tip="{Binding Item.Title}">
+                              <StackPanel VerticalAlignment="Center" Spacing="1">
+                                <TextBlock Classes="aux tl-title" Text="{Binding Item.Title}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" />
+                                <TextBlock Classes="caption" Text="{Binding Item.Featured}" TextTrimming="CharacterEllipsis" IsVisible="{Binding Item.HasFeatured}" />
+                              </StackPanel>
+                            </Button>
+                            <c:RatioPanel Grid.Column="1" MinChildWidth="28">
+                              <Button Classes="tl-bar" Classes.weapon="{Binding IsWeaponLane}" Classes.reverb="{Binding IsReverbLane}"
+                                      Classes.event="{Binding IsEventLane}" Classes.ended="{Binding Item.IsEnded}" Classes.selected="{Binding Item.IsSelected}"
+                                      c:RatioPanel.Left="{Binding Left}" c:RatioPanel.Right="{Binding Right}" AutomationProperties.AutomationId="{Binding AutomationId}"
+                                      Command="{Binding $parent[ItemsControl].((events:EventsViewModel)DataContext).SelectRowCommand}" CommandParameter="{Binding}"
+                                      ToolTip.Tip="{Binding Item.DateText}">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                  <TextBlock Classes="caption" Text="{Binding Item.DateText}" Foreground="{DynamicResource TextSecondaryBrush}"
+                                             TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                  <TextBlock Grid.Column="1" FontSize="12" Text="{Binding Item.StatusText}" VerticalAlignment="Center"
+                                             Classes.status-active="{Binding Item.IsActive}" Classes.muted="{Binding !Item.IsActive}" />
+                                </Grid>
+                              </Button>
+                            </c:RatioPanel>
+                          </Grid>
+                        </Panel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Grid>
+              </Grid>
+            </Border>
+
+            <Border Classes="mini" IsVisible="{Binding HasUnpublished}" AutomationProperties.AutomationId="events-unpublished">
+              <TextBlock Classes="caption" Text="{Binding UnpublishedText}" TextWrapping="Wrap" />
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+
+        <!-- 版本日历 -->
+        <ScrollViewer IsVisible="{Binding IsCalendarView}" HorizontalScrollBarVisibility="Disabled">
+          <Panel IsVisible="{Binding HasData}" Margin="0,0,4,0">
+            <Border Classes="card" Padding="10" IsVisible="{Binding CalendarImage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    AutomationProperties.AutomationId="events-calendar">
+              <Grid>
+                <Image Source="{Binding CalendarImage}" Stretch="Uniform" StretchDirection="Both" />
+                <ItemsControl Classes="hotspots" ItemsSource="{Binding CalendarHotspots}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><c:RatioPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="events:CalendarHotspot">
+                      <Button Classes="hotspot" Classes.pending="{Binding !IsPublished}" ToolTip.Tip="{Binding Tip}" AutomationProperties.AutomationId="{Binding AutomationId}"
+                              Command="{Binding $parent[ItemsControl].((events:EventsViewModel)DataContext).SelectHotspotCommand}" CommandParameter="{Binding}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Grid>
+            </Border>
+            <Border Classes="card" VerticalAlignment="Top" IsVisible="{Binding ShowCalendarLoading}">
+              <TextBlock Classes="caption" Text="{loc:Tr Events_CalendarLoading}" />
+            </Border>
+            <Border Classes="card" VerticalAlignment="Top" IsVisible="{Binding ShowCalendarMissing}">
+              <TextBlock Classes="caption" Text="{loc:Tr Events_CalendarMissing}" />
+            </Border>
+          </Panel>
+        </ScrollViewer>
+
+        <!-- 全部公告 -->
+        <ScrollViewer IsVisible="{Binding IsNoticesView}" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding NoticeGroups}" IsVisible="{Binding HasData}" Margin="0,0,4,0" AutomationProperties.AutomationId="events-notices">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="14" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="events:NoticeGroup">
+                <Border Classes="card" Padding="12,12">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="card-title" Text="{Binding Title}" Margin="10,2,0,6" />
+                    <ItemsControl ItemsSource="{Binding Items}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="events:NoticeItem">
+                          <Button Classes="notice-row" Classes.selected="{Binding IsSelected}" AutomationProperties.AutomationId="{Binding AutomationId}"
+                                  Command="{Binding $parent[UserControl].((events:EventsViewModel)DataContext).SelectCommand}" CommandParameter="{Binding}">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                              <Border Width="104" Height="44" CornerRadius="7" ClipToBounds="True" Background="{DynamicResource SurfaceSunkenBrush}">
+                                <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" />
+                              </Border>
+                              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                <TextBlock Classes="aux" Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Classes="caption" Text="{Binding DateText}" TextTrimming="CharacterEllipsis" />
+                              </StackPanel>
+                              <TextBlock Grid.Column="2" FontSize="12" Text="{Binding StatusText}" VerticalAlignment="Center"
+                                         Classes.status-active="{Binding IsActive}" Classes.muted="{Binding !IsActive}" />
+                            </Grid>
+                          </Button>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ── 详情 ── -->
+        <Border Grid.Column="1" Classes="card" Padding="0" ClipToBounds="True" Margin="0,0,0,76" AutomationProperties.AutomationId="events-detail">
+          <Panel>
+            <TextBlock Classes="caption" Text="{loc:Tr Events_SelectHint}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       IsVisible="{Binding !HasSelection}" />
+            <ScrollViewer x:Name="DetailScroller" IsVisible="{Binding HasSelection}" HorizontalScrollBarVisibility="Disabled">
+              <StackPanel>
+                <Image Source="{Binding SelectedBanner}" Stretch="UniformToFill" MaxHeight="230"
+                       IsVisible="{Binding SelectedBanner, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <StackPanel Margin="22,16,22,24" Spacing="10">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Border Classes="ntag" Classes.update="{Binding Selected.IsUpdate}" Classes.event="{Binding Selected.IsEvent}"
+                            Classes.muted-tag="{Binding Selected.IsInfo}">
+                      <TextBlock Text="{Binding Selected.KindText}" />
+                    </Border>
+                    <TextBlock FontSize="12" Text="{Binding Selected.StatusText}" VerticalAlignment="Center"
+                               Classes.status-active="{Binding Selected.IsActive}" Classes.muted="{Binding !Selected.IsActive}" />
+                  </StackPanel>
+                  <SelectableTextBlock Text="{Binding Selected.Title}" FontSize="18" FontWeight="Bold" TextWrapping="Wrap"
+                                       AutomationProperties.AutomationId="events-detail-title" />
+                  <StackPanel Spacing="3">
+                    <TextBlock Classes="aux secondary" Text="{Binding Selected.DateText}" />
+                    <TextBlock Classes="caption" Text="{Binding SelectedTimeHint}" TextWrapping="Wrap" IsVisible="{Binding HasSelectedTimeHint}" />
+                  </StackPanel>
+                  <Border Classes="mini" Padding="12,8" IsVisible="{Binding Selected.HasFeatured}">
+                    <TextBlock TextWrapping="Wrap">
+                      <Run Classes="unit" Text="{loc:Tr Events_Featured}" />
+                      <Run Text=" " />
+                      <Run Text="{Binding Selected.Featured}" FontWeight="SemiBold" Foreground="{DynamicResource AccentTextBrush}" />
+                    </TextBlock>
+                  </Border>
+                  <Separator Classes="divider" />
+                  <c:NoticeContent Blocks="{Binding SelectedBlocks}" Images="{Binding Images}" LinkCommand="{Binding OpenLinkCommand}"
+                                   AutomationProperties.AutomationId="events-detail-body" />
+                </StackPanel>
+              </StackPanel>
+            </ScrollViewer>
+          </Panel>
+        </Border>
+      </Grid>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

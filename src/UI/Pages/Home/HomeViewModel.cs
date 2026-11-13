@@ -373,6 +373,8 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         UpdateLive();
         _ = _player.EnsureLoadedAsync();
         if (!_announcementsLoaded) LoadAnnouncements();
+        // 区服可能在活动页换过。
+        else if (Region != _shownRegion) OnRegionChanged();
         else RefreshAnnouncementsIfStale();
     }
 
@@ -716,18 +718,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     /// <summary>
     /// 公告区服：设置里记住了就用记住的；否则按当前账号（UID 小于 2 亿为国服），没有账号时简体中文界面用国服、其他用国际服。
     /// </summary>
-    public LauncherRegion Region
-    {
-        get
-        {
-            string? saved = _config.User.AnnouncementRegion;
-            if (saved == "CN") return LauncherRegion.China;
-            if (saved == "Global") return LauncherRegion.Global;
-            if (Accounts.Current?.Uid is { } uid && long.TryParse(uid, out long id))
-                return id < 200_000_000 ? LauncherRegion.China : LauncherRegion.Global;
-            return _localization.CurrentLanguage == LanguageType.ZhHans ? LauncherRegion.China : LauncherRegion.Global;
-        }
-    }
+    public LauncherRegion Region => AnnouncementRegions.Resolve(_config, Accounts, _localization);
 
     /// <summary>区服滑块：国服。</summary>
     public bool IsChinaRegion
@@ -746,9 +737,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     private void SetRegion(LauncherRegion region)
     {
         if (_config.User.AnnouncementRegion is not null && Region == region) return;
-        bool changed = Region != region;
-        _config.User.AnnouncementRegion = region == LauncherRegion.China ? "CN" : "Global";
-        if (!changed) return;
+        if (!AnnouncementRegions.Save(_config, Accounts, _localization, region)) return;
         OnRegionChanged();
     }
 

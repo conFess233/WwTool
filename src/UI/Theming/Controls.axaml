@@ -696,4 +696,88 @@
     <Setter Property="Orientation" Value="Horizontal" />
     <Setter Property="Spacing" Value="10" />
   </Style>
+  <!-- ── 胶囊筛选与国服 / 国际服滑块（首页公告卡、活动页共用） ── -->
+  <!-- 公告筛选胶囊：高 28、12 号；选中 Ink 底白字，未选 Surface Muted 底 -->
+  <Style Selector="RadioButton.ann-chip">
+    <Setter Property="Height" Value="28" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Foreground" Value="{DynamicResource LabelBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Body" CornerRadius="999" Padding="{TemplateBinding Padding}" Background="{DynamicResource SurfaceMutedBrush}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.15" />
+            </Transitions>
+          </Border.Transitions>
+          <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="RadioButton.ann-chip:pointerover /template/ Border#PART_Body">
+    <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+  </Style>
+  <Style Selector="RadioButton.ann-chip:checked">
+    <Setter Property="Foreground" Value="{DynamicResource TextOnNavIslandBrush}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="RadioButton.ann-chip:checked /template/ Border#PART_Body">
+    <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
+  </Style>
+
+  <!-- 国服 / 国际服滑块：凹槽底、圆角 999；选中段为卡片底的滑块，切换时 200ms 平移 -->
+  <Style Selector="Border.region">
+    <Setter Property="Background" Value="{DynamicResource SurfaceSunkenBrush}" />
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Padding" Value="3" />
+    <Setter Property="Width" Value="132" />
+    <Setter Property="Height" Value="30" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="Border.region-thumb">
+    <Setter Property="Width" Value="63" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    <Setter Property="BoxShadow" Value="0 2 6 -2 #593C280A" />
+    <Setter Property="RenderTransform" Value="translateX(0px)" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="0.2,0.8,0.2,1" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="Border.region-thumb.right">
+    <Setter Property="RenderTransform" Value="translateX(63px)" />
+  </Style>
+  <Style Selector="Window.reduced Border.region-thumb">
+    <Setter Property="Transitions">
+      <Transitions />
+    </Setter>
+  </Style>
+  <Style Selector="RadioButton.region-opt">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="Transparent">
+          <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="RadioButton.region-opt:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+  <Style Selector="RadioButton.region-opt:checked">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
 </Styles>

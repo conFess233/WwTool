@@ -19,6 +19,7 @@ using WwTool.UI.Feedback;
 using WwTool.UI.Localization;
 using WwTool.UI.Navigation;
 using WwTool.UI.Pages.Accounts;
+using WwTool.UI.Pages.Events;
 using WwTool.UI.Pages.Explore;
 using WwTool.UI.Pages.Home;
 using WwTool.UI.Pages.Motor;
@@ -145,6 +146,8 @@ public partial class App : Application
         services.AddSingleton<IAnnouncementSource, LauncherAnnouncementSource>();
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<ExploreViewModel>();
+        services.AddSingleton<NoticeImages>();
+        services.AddSingleton<EventsViewModel>();
         services.AddSingleton<MotorViewModel>();
         services.AddSingleton<RolesViewModel>();
 
@@ -152,6 +155,8 @@ public partial class App : Application
         const string icons = "avares://WwTool/Assets/Images/";
         services.AddSingleton(new PageDescriptor("home", "Nav_Home", icons + "Home.png",
             sp => sp.GetRequiredService<HomeViewModel>()));
+        services.AddSingleton(new PageDescriptor("events", "Nav_Events", icons + "Calendar.png",
+            sp => sp.GetRequiredService<EventsViewModel>()));
         services.AddSingleton(new PageDescriptor("pulls", "Nav_Statistics", icons + "Statistics.png",
             sp => sp.GetRequiredService<PullsOverviewViewModel>()));
         services.AddSingleton(new PageDescriptor("roles", "Nav_RoleData", icons + "Role.png",
@@ -175,6 +180,7 @@ public partial class App : Application
             .Map<HomeViewModel, HomeView>()
             .Map<RolesViewModel, RolesView>()
             .Map<ExploreViewModel, ExploreView>()
+            .Map<EventsViewModel, EventsView>()
             .Map<MotorViewModel, MotorView>()
             .Map<AccountsViewModel, AccountsView>()
             .Map<LoginDialogViewModel, LoginDialogView>()
