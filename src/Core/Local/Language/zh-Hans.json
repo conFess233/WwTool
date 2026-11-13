@@ -749,5 +749,22 @@
   "Home_CopyUid": "复制 UID",
   "Settings_BackgroundPeek": "空白处查看背景",
   "Settings_BackgroundPeekHint": "鼠标停在空白处时，背景以外的界面渐变为透明，便于查看背景；设为 0% 关闭",
-  "Settings_BackgroundPeekLevel": "透明度"
+  "Settings_BackgroundPeekLevel": "透明度",
+  "Update_ToastTitle": "发现新版本",
+  "Update_ToastMessage": "WwTool {0} 已发布",
+  "Update_View": "查看",
+  "Update_DialogTitle": "发现新版本 {0}",
+  "Update_VersionLine": "当前 {0} → 新版本 {1}",
+  "Update_Published": "发布于 {0}",
+  "Update_NoNotes": "这个版本没有附更新说明。",
+  "Update_Skip": "跳过此版本",
+  "Update_Later": "稍后",
+  "Update_OpenPage": "前往下载",
+  "Update_Check": "检查更新",
+  "Update_UpToDate": "已是最新版本（{0}）",
+  "Update_Failed": "检查更新失败，请检查网络后再试",
+  "Update_DevBuild": "当前是开发版，不检查更新",
+  "Update_Auto": "自动检查更新",
+  "Update_AutoHint": "启动后在后台检查新版本，每天最多一次",
+  "Update_Badge": "有新版本 {0}"
 }

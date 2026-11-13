@@ -71,8 +71,10 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         IAppLauncher launcher,
         IUserDataService userData,
         PullsSession pullsSession,
-        GamePathPicker gamePath)
+        GamePathPicker gamePath,
+        UpdateCoordinator updates)
     {
+        Updates = updates;
         _gamePath = gamePath;
         _userData = userData;
         _pullsSession = pullsSession;
@@ -514,8 +516,28 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
 
     public string AboutLine => string.Format(_localization["Settings_AboutVersion"], Version.TrimStart('v'), _config.App.AppAuther);
 
-    public static string Version { get; } =
-        typeof(SettingsViewModel).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? "v2.0.0";
+    public static string Version => UpdateCoordinator.CurrentVersion;
+
+    /// <summary>检查更新（关于卡）。</summary>
+    public UpdateCoordinator Updates { get; }
+
+    /// <summary>启动后自动检查新版本。</summary>
+    public bool AutoCheckUpdates
+    {
+        get => _config.User.AutoCheckUpdates;
+        set
+        {
+            if (_config.User.AutoCheckUpdates == value) return;
+            _config.User.AutoCheckUpdates = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [RelayCommand]
+    private Task CheckUpdates() => Updates.CheckNowAsync();
+
+    [RelayCommand]
+    private Task ShowUpdate() => Updates.ShowDialogAsync();
 
     [RelayCommand]
     private void OpenRepository() => _launcher.OpenUrl(new Uri(RepositoryUrl));

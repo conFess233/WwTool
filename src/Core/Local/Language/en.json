@@ -749,5 +749,22 @@
   "Home_CopyUid": "Copy UID",
   "Settings_BackgroundPeek": "Peek at background",
   "Settings_BackgroundPeekHint": "When the pointer rests on an empty area, everything except the background fades so you can see it; 0% turns this off",
-  "Settings_BackgroundPeekLevel": "Transparency"
+  "Settings_BackgroundPeekLevel": "Transparency",
+  "Update_ToastTitle": "Update available",
+  "Update_ToastMessage": "WwTool {0} is out",
+  "Update_View": "View",
+  "Update_DialogTitle": "New version {0}",
+  "Update_VersionLine": "Current {0} → new {1}",
+  "Update_Published": "Released {0}",
+  "Update_NoNotes": "This release has no notes.",
+  "Update_Skip": "Skip this version",
+  "Update_Later": "Later",
+  "Update_OpenPage": "Go to download",
+  "Update_Check": "Check for updates",
+  "Update_UpToDate": "You're up to date ({0})",
+  "Update_Failed": "Couldn't check for updates. Check your connection and try again.",
+  "Update_DevBuild": "This is a development build; updates are not checked",
+  "Update_Auto": "Check for updates automatically",
+  "Update_AutoHint": "Checks for a new version in the background after startup, at most once a day",
+  "Update_Badge": "Update {0}"
 }

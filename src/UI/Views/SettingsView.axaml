@@ -26,6 +26,24 @@
       <Setter Property="Padding" Value="0,7" />
       <Setter Property="MinHeight" Value="44" />
     </Style>
+    <!-- 关于卡「有新版本」：强调色浅底胶囊，悬停加深 -->
+    <Style Selector="Button.update-badge">
+      <Setter Property="Padding" Value="10,3" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="CornerRadius" Value="11" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.update-badge:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentTextBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
     <Style Selector="Border.sr.first">
       <Setter Property="BorderThickness" Value="0" />
     </Style>
@@ -469,6 +487,13 @@
               <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Bottom">
                 <TextBlock Classes="cp" Text="{Binding AboutLine}" VerticalAlignment="Center"
                            AutomationProperties.AutomationId="settings-about" />
+                <!-- 有新版本：强调色胶囊，点击打开更新对话框 -->
+                <Button Classes="update-badge" Content="{Binding Updates.BadgeText}" IsVisible="{Binding Updates.HasUpdate}"
+                        Command="{Binding ShowUpdateCommand}" VerticalAlignment="Center"
+                        AutomationProperties.AutomationId="settings-update-badge" />
+                <Button Classes="link" FontSize="12" Content="{loc:Tr Update_Check}" Command="{Binding CheckUpdatesCommand}"
+                        IsEnabled="{Binding !Updates.IsChecking}" VerticalAlignment="Center"
+                        AutomationProperties.AutomationId="settings-check-update" />
                 <!-- 开源地址（定稿未画，保留旧版入口） -->
                 <Button Classes="link" FontSize="12" Content="{loc:Tr About_Github}" Command="{Binding OpenRepositoryCommand}"
                         ToolTip.Tip="github.com/conFess233/WwTool" VerticalAlignment="Center"
@@ -476,6 +501,16 @@
               </StackPanel>
             </Grid>
             <TextBlock Classes="cp" Margin="0,10,0,0" LineHeight="20.4" TextWrapping="Wrap" Text="{loc:Tr About_DisclaimerText}" />
+            <Border Classes="sr" Margin="0,8,0,0">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Classes="name" Text="{loc:Tr Update_Auto}" />
+                  <TextBlock Classes="hint" Text="{loc:Tr Update_AutoHint}" />
+                </StackPanel>
+                <ToggleSwitch Grid.Column="1" IsChecked="{Binding AutoCheckUpdates}" VerticalAlignment="Center"
+                              AutomationProperties.Name="{loc:Tr Update_Auto}" AutomationProperties.AutomationId="settings-auto-update" />
+              </Grid>
+            </Border>
           </StackPanel>
         </Border>
       </StackPanel>

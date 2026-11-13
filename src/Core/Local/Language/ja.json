@@ -749,5 +749,22 @@
   "Home_CopyUid": "UID をコピー",
   "Settings_BackgroundPeek": "余白で背景を見る",
   "Settings_BackgroundPeekHint": "マウスを余白に置くと、背景以外の表示が透明になり背景を確認できます。0% でオフ",
-  "Settings_BackgroundPeekLevel": "透明度"
+  "Settings_BackgroundPeekLevel": "透明度",
+  "Update_ToastTitle": "新しいバージョンがあります",
+  "Update_ToastMessage": "WwTool {0} が公開されました",
+  "Update_View": "表示",
+  "Update_DialogTitle": "新しいバージョン {0}",
+  "Update_VersionLine": "現在 {0} → 新バージョン {1}",
+  "Update_Published": "{0} 公開",
+  "Update_NoNotes": "このバージョンには更新内容の説明がありません。",
+  "Update_Skip": "このバージョンをスキップ",
+  "Update_Later": "後で",
+  "Update_OpenPage": "ダウンロードページへ",
+  "Update_Check": "更新を確認",
+  "Update_UpToDate": "最新バージョンです（{0}）",
+  "Update_Failed": "更新を確認できませんでした。接続を確認して再試行してください",
+  "Update_DevBuild": "開発版のため更新は確認しません",
+  "Update_Auto": "更新を自動で確認",
+  "Update_AutoHint": "起動後にバックグラウンドで新しいバージョンを確認します（1 日 1 回まで）",
+  "Update_Badge": "新バージョン {0}"
 }

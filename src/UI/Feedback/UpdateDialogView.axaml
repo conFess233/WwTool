@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fb="using:WwTool.UI.Feedback"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Feedback.UpdateDialogView"
+             x:DataType="fb:UpdateDialogViewModel"
+             Width="520">
+  <!-- 发现新版本：标题、版本对比与发布日期、更新说明（Surface 底的可滚动原文框，最高 300）、按钮行 -->
+  <StackPanel>
+    <TextBlock Classes="dialog-title" Text="{Binding Title}" AutomationProperties.AutomationId="update-title" />
+    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,2,0,0">
+      <TextBlock Classes="caption" Text="{Binding VersionLine}" />
+      <TextBlock Classes="caption" Text="·" IsVisible="{Binding HasPublished}" />
+      <TextBlock Classes="caption" Text="{Binding PublishedLine}" IsVisible="{Binding HasPublished}" />
+    </StackPanel>
+    <Border Margin="0,14,0,0" Padding="14,12" CornerRadius="10" BorderThickness="1"
+            BorderBrush="{DynamicResource BorderStrongBrush}" Background="{DynamicResource SurfaceRaisedBrush}">
+      <ScrollViewer MaxHeight="300" HorizontalScrollBarVisibility="Disabled">
+        <SelectableTextBlock Text="{Binding Notes}" FontSize="13" LineHeight="21" TextWrapping="Wrap"
+                             AutomationProperties.AutomationId="update-notes" />
+      </ScrollViewer>
+    </Border>
+    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,22,0,0">
+      <Button Classes="btn" Content="{loc:Tr Update_Skip}" Command="{Binding SkipCommand}"
+              AutomationProperties.AutomationId="update-skip" />
+      <StackPanel Grid.Column="2" Classes="dialog-actions" Margin="0">
+        <Button Classes="btn" Content="{loc:Tr Update_Later}" Command="{Binding LaterCommand}"
+                AutomationProperties.AutomationId="dialog-cancel" />
+        <Button Classes="btn primary" Content="{loc:Tr Update_OpenPage}" Command="{Binding OpenPageCommand}"
+                AutomationProperties.AutomationId="dialog-confirm" />
+      </StackPanel>
+    </Grid>
+  </StackPanel>
+</UserControl>

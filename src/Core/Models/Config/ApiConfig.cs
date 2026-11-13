@@ -86,6 +86,9 @@ namespace WwTool.Core.Models.Config
         /// <summary>首页公告卡「前往官网查看全部公告」的默认网页。</summary>
         public string OfficialSiteUrl { get; set; } = "https://mc.kurogame.com/";
 
+        /// <summary>检查更新：GitHub 最新正式发布接口（不含预发布与草稿）。</summary>
+        public string LatestReleaseUrl { get; set; } = "https://api.github.com/repos/conFess233/WwTool/releases/latest";
+
         /// <summary>国际服启动器背景配置，<c>{0}</c> 为语言代码（zh-Hans / en / ja 等均有）。</summary>
         public string LauncherBackgroundUrlNET { get; set; } = "https://prod-alicdn-gamestarter.kurogame.com/launcher/game/50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e/G153/official/background/d5f20901184c427d97817dfa289b4cbd/{0}.json";
 

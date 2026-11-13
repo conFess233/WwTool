@@ -137,6 +137,7 @@ public partial class App : Application
         services.AddSingleton<PullsChartsViewModel>();
         services.AddSingleton<PlayerData>();
         services.AddSingleton<AccountActions>();
+        services.AddSingleton<UpdateCoordinator>();
         services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<GameLauncherService>();
         services.AddSingleton<ClipboardService>();
@@ -168,6 +169,7 @@ public partial class App : Application
             sp => sp.GetRequiredService<PullsChartsViewModel>(), ParentKey: "pulls"));
         services.AddSingleton(new ViewLocator()
             .Map<ConfirmDialogViewModel, ConfirmDialogView>()
+            .Map<UpdateDialogViewModel, UpdateDialogView>()
             .Map<ImportUrlDialogViewModel, ImportUrlDialogView>()
             .Map<SettingsViewModel, SettingsView>()
             .Map<HomeViewModel, HomeView>()
@@ -223,6 +225,7 @@ public partial class App : Application
         shell.IsReady = true;
         logger.Info("WwTool 2.0 初始化完成");
         _ = services.GetRequiredService<CatalogSyncService>().SyncAsync(false, _shutdown.Token);
+        _ = services.GetRequiredService<UpdateCoordinator>().RunAutomaticCheckAsync(_shutdown.Token);
     }
 
     private static void ShowStartupError(IClassicDesktopStyleApplicationLifetime desktop, LocalizationService localization, string message)
