@@ -71,8 +71,10 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         IAppLauncher launcher,
         IUserDataService userData,
         PullsSession pullsSession,
-        GamePathPicker gamePath)
+        GamePathPicker gamePath,
+        UpdateCoordinator updates)
     {
+        Updates = updates;
         _gamePath = gamePath;
         _userData = userData;
         _pullsSession = pullsSession;
@@ -228,6 +230,22 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
             OnPropertyChanged();
         }
     }
+
+    /// <summary>空白处查看背景：界面组件变透明的程度（%）。</summary>
+    public double BackgroundPeekTransparency
+    {
+        get => _config.User.BackgroundPeekTransparency;
+        set
+        {
+            int rounded = (int)Math.Round(value);
+            if (_config.User.BackgroundPeekTransparency == rounded) return;
+            _config.User.BackgroundPeekTransparency = rounded;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(BackgroundPeekText));
+        }
+    }
+
+    public string BackgroundPeekText => _config.User.BackgroundPeekTransparency.ToString(CultureInfo.InvariantCulture) + "%";
 
     [RelayCommand(CanExecute = nameof(UseCustomBackground))]
     private async Task PickBackgroundImageAsync()
@@ -498,8 +516,28 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
 
     public string AboutLine => string.Format(_localization["Settings_AboutVersion"], Version.TrimStart('v'), _config.App.AppAuther);
 
-    public static string Version { get; } =
-        typeof(SettingsViewModel).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? "v2.0.0";
+    public static string Version => UpdateCoordinator.CurrentVersion;
+
+    /// <summary>检查更新（关于卡）。</summary>
+    public UpdateCoordinator Updates { get; }
+
+    /// <summary>启动后自动检查新版本。</summary>
+    public bool AutoCheckUpdates
+    {
+        get => _config.User.AutoCheckUpdates;
+        set
+        {
+            if (_config.User.AutoCheckUpdates == value) return;
+            _config.User.AutoCheckUpdates = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [RelayCommand]
+    private Task CheckUpdates() => Updates.CheckNowAsync();
+
+    [RelayCommand]
+    private Task ShowUpdate() => Updates.ShowDialogAsync();
 
     [RelayCommand]
     private void OpenRepository() => _launcher.OpenUrl(new Uri(RepositoryUrl));

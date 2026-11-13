@@ -40,6 +40,12 @@ public static class CoreServiceCollectionExtensions
             client.DefaultRequestHeaders.Add("x-language", "zh-Hans");
         });
         services.AddHttpClient(CatalogImageClient, client => client.Timeout = TimeSpan.FromSeconds(10));
+        // 检查与下载更新：GitHub 接口要求 User-Agent；下载大文件时由各请求自己控制超时。
+        services.AddHttpClient(WwTool.Core.Services.Update.UpdateService.ClientName, client =>
+        {
+            client.Timeout = Timeout.InfiniteTimeSpan;
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("WwTool-Updater/2.0");
+        });
 
         // 数据库
         DatabaseOptions databaseOptions = DatabaseOptions.FromPaths(paths);
@@ -62,6 +68,11 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<CatalogSyncService>();
         services.AddSingleton<LauncherBackgroundService>();
         services.AddSingleton<LauncherNewsService>();
+        services.AddSingleton<WwTool.Core.Services.Notices.GameNoticeService>();
+        services.AddSingleton<WwTool.Core.Services.Notices.KuroBbsCodeService>();
+        services.AddSingleton<WwTool.Core.Services.Challenges.EncoreService>();
+        services.AddSingleton<WwTool.Core.Services.Update.UpdateService>();
+        services.AddSingleton<WwTool.Core.Services.Update.UpdateInstaller>();
 
         // 业务服务
         services.AddSingleton<IUserDataService, UserDataService>();

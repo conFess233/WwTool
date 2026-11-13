@@ -185,7 +185,7 @@ public class CatalogImageService<TImage> : ICatalogImageCache where TImage : cla
         if (match.Success)
         {
             string? branch = await _repository.GetDefaultBranchAsync(false, token);
-            return branch is null ? null : CatalogRepositorySource.FileUrl(branch, $"WwTool/Local/Icons/{match.Groups[1].Value}.png");
+            return branch is null ? null : CatalogRepositorySource.FileUrl(branch, $"catalog/Icons/{match.Groups[1].Value}.png");
         }
         return CatalogJson.IsImageUrl(path) ? path : null;
     }

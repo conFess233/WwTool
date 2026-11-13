@@ -86,8 +86,11 @@ namespace WwTool.Core.Models.Config
         /// <summary>首页公告卡「前往官网查看全部公告」的默认网页。</summary>
         public string OfficialSiteUrl { get; set; } = "https://mc.kurogame.com/";
 
+        /// <summary>检查更新：GitHub 最新正式发布接口（不含预发布与草稿）。</summary>
+        public string LatestReleaseUrl { get; set; } = "https://api.github.com/repos/conFess233/WwTool/releases/latest";
+
         /// <summary>国际服启动器背景配置，<c>{0}</c> 为语言代码（zh-Hans / en / ja 等均有）。</summary>
-        public string LauncherBackgroundUrlNET { get; set; } = "https://prod-alicdn-gamestarter.kurogame.com/launcher/game/50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e/G153/official/background/51684874bd1f48e3ab98fb8b06b96ceb/{0}.json";
+        public string LauncherBackgroundUrlNET { get; set; } = "https://prod-alicdn-gamestarter.kurogame.com/launcher/game/50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e/G153/official/background/d5f20901184c427d97817dfa289b4cbd/{0}.json";
 
         /// <summary>国际服启动器资讯（活动 / 公告 / 新闻、轮播图），<c>{0}</c> 为语言代码。</summary>
         public string LauncherNewsUrlNET { get; set; } = "https://prod-alicdn-gamestarter.kurogame.com/launcher/app/50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e/G153/official/information/{0}.json";
@@ -101,7 +104,31 @@ namespace WwTool.Core.Models.Config
         /// <summary>官网新闻页：国际服，<c>{0}</c> 为官网语言路径（en / ja / zh-tw）。</summary>
         public string NewsPageUrlNET { get; set; } = "https://wutheringwaves.kurogames.com/{0}/main/news/";
 
+        /// <summary>国服游戏内公告（活动 / 唤取 / 版本日历），<c>{0}</c> 为语言代码；路径中为国服服务器 ID。</summary>
+        public string GameNoticeUrlCN { get; set; } = "https://aki-gm-resources-back.aki-game.com/gamenotice/G152/76402e5b20be2c39f095a152090afddc/{0}.json";
+
+        /// <summary>国际服游戏内公告，<c>{0}</c> 为语言代码；5 个国际服服务器内容相同，路径中取亚服 ID。</summary>
+        public string GameNoticeUrlNET { get; set; } = "https://aki-gm-resources-back.aki-game.net/gamenotice/G153/86d52186155b148b5c138ceb41be9650/{0}.json";
+
+        /// <summary>库街区帖子搜索（找官方「前瞻通讯」帖）。</summary>
+        public string KuroBbsSearchUrl { get; set; } = "https://api.kurobbs.com/forum/search/v2/post";
+
+        /// <summary>库街区帖子详情（取楼主评论里的兑换码）。</summary>
+        public string KuroBbsPostDetailUrl { get; set; } = "https://api.kurobbs.com/forum/getPostDetail";
+
+        /// <summary>库街区帖子网页，<c>{0}</c> 为帖子 ID。</summary>
+        public string KuroBbsPostPageUrl { get; set; } = "https://www.kurobbs.com/mc/post/{0}";
+
+        /// <summary>encore.moe 接口（深塔 / 海墟 / 矩阵，第三方解包数据），其后接 <c>/{lang}/toa</c> 等路径。</summary>
+        public string EncoreApiUrl { get; set; } = "https://api-v2.encore.moe/api";
+
+        /// <summary>encore.moe 备用接口（旧后端，路径没有 <c>/api</c>）：主接口失败时使用。</summary>
+        public string EncoreApiFallbackUrl { get; set; } = "https://api.encore.moe";
+
+        /// <summary>encore.moe 网页（「在 encore.moe 查看」），<c>{0}</c> 为 toa / whiwa / dpmatrix，<c>{1}</c> 为语言。</summary>
+        public string EncorePageUrl { get; set; } = "https://encore.moe/{0}?lang={1}";
+
         /// <summary>国服启动器背景配置，<c>{0}</c> 为语言代码（只有 zh-Hans）。</summary>
-        public string LauncherBackgroundUrlCN { get; set; } = "https://prod-cn-alicdn-gamestarter.kurogame.com/launcher/game/10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ/G152/official/background/e4ea009e702a4961be86c815d87dbe68/{0}.json";
+        public string LauncherBackgroundUrlCN { get; set; } = "https://prod-cn-alicdn-gamestarter.kurogame.com/launcher/game/10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ/G152/official/background/5b3a2442a9fb4927a531069f602d304b/{0}.json";
     }
 }

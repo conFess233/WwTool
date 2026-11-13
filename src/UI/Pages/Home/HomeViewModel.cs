@@ -117,7 +117,11 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     private bool _announcementsLoaded;
 
     /// <summary>本次运行已从接口刷新过的「区服 + 语言」，不重复请求。</summary>
-    private readonly HashSet<string> _announcementsRefreshed = [];
+    /// <summary>各区服与语言上次开始从接口获取公告的时间；超过 <see cref="AnnouncementRefreshInterval"/> 再获取一次。</summary>
+    private readonly Dictionary<string, DateTime> _announcementsAttempted = [];
+
+    /// <summary>运行中公告的重新获取间隔：游戏更新版本后不必重启程序也能看到新公告。</summary>
+    private static readonly TimeSpan AnnouncementRefreshInterval = TimeSpan.FromMinutes(30);
     private int _announcementVersion;
     private LauncherRegion _shownRegion;
 
@@ -154,7 +158,9 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
 
         FabActions =
         [
-            new FabAction("refresh", "Index_RefreshAccountList", Icons + "Refresh.png", new AsyncRelayCommand(RefreshAccountsAsync), localization),
+            // 主动从服务器刷新当前账号的资料（与账号、探索、摩托页的「刷新数据」相同）。
+            new FabAction("refresh-data", "Fab_RefreshData", Icons + "Refresh.png", new AsyncRelayCommand(() => player.SyncAsync()), localization),
+            new FabAction("refresh", "Index_RefreshAccountList", "Icon.Sync", new AsyncRelayCommand(RefreshAccountsAsync), localization),
             new FabAction("add-account", "Index_AddAccount", "Icon.Plus", new AsyncRelayCommand(() => actions.AddAccountAsync()), localization),
         ];
 
@@ -197,11 +203,18 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         };
         AddAccountCommand = new AsyncRelayCommand(() => actions.AddAccountAsync());
         OnlyPullsCommand = new RelayCommand(() => navigation.NavigateTo("pulls"));
+        OpenEventsCommand = new RelayCommand(() => navigation.NavigateTo("events"));
         RetrySyncCommand = new AsyncRelayCommand(_player.SyncAsync);
+        RefreshDataCommand = new AsyncRelayCommand(_player.SyncAsync, () => !_player.IsSyncing && Accounts.HasAccount);
         _player.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(PlayerData.IsLoading)) OnPropertyChanged(nameof(ShowNoSnapshot));
             if (e.PropertyName is nameof(PlayerData.IsSyncing) or nameof(PlayerData.IsLoading)) UpdateFirstSync();
+            if (e.PropertyName == nameof(PlayerData.IsSyncing))
+            {
+                OnPropertyChanged(nameof(IsSyncing));
+                RefreshDataCommand.NotifyCanExecuteChanged();
+            }
             if (e.PropertyName == nameof(PlayerData.IsOffline))
             {
                 OnPropertyChanged(nameof(IsOffline));
@@ -260,8 +273,17 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     /// <summary>空状态「首次启动」：只看抽卡记录。</summary>
     public IRelayCommand OnlyPullsCommand { get; }
 
+    /// <summary>公告卡底部「活动日历与全部公告」：打开活动页。</summary>
+    public IRelayCommand OpenEventsCommand { get; }
+
     /// <summary>网络异常横条「重试」。</summary>
     public IAsyncRelayCommand RetrySyncCommand { get; }
+
+    /// <summary>账号卡右上角的刷新按钮：从服务器刷新当前账号资料（与悬浮按钮里的「刷新数据」相同）。</summary>
+    public IAsyncRelayCommand RefreshDataCommand { get; }
+
+    /// <summary>正在从服务器同步当前账号资料（刷新按钮图标旋转）。</summary>
+    public bool IsSyncing => _player.IsSyncing;
 
     /// <summary>空状态「首次同步中」：有账号、还没有任何本地快照、正在同步。</summary>
     public bool IsFirstSync => Accounts.HasAccount && !HasSnapshot && _player.IsSyncing;
@@ -355,6 +377,28 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         UpdateLive();
         _ = _player.EnsureLoadedAsync();
         if (!_announcementsLoaded) LoadAnnouncements();
+        // 区服可能在活动页换过。
+        else if (Region != _shownRegion) OnRegionChanged();
+        else RefreshAnnouncementsIfStale();
+    }
+
+    private static string AnnouncementKey(LauncherRegion region, string language) =>
+        $"{region}|{LauncherNewsService.RequestLanguage(region, language)}";
+
+    private bool IsAnnouncementStale(string key) =>
+        !_announcementsAttempted.TryGetValue(key, out DateTime at) || DateTime.UtcNow - at >= AnnouncementRefreshInterval;
+
+    /// <summary>首页显示中、上次获取已超过间隔时，在后台重新获取（不重读缓存，列表不闪动）。</summary>
+    private void RefreshAnnouncementsIfStale()
+    {
+        if (!_announcementsLoaded || IsAnnouncementsLoading) return;
+        LauncherRegion region = Region;
+        if (region != _shownRegion) return;
+        string language = _localization.CurrentLanguage.GetCode();
+        string key = AnnouncementKey(region, language);
+        if (!IsAnnouncementStale(key)) return;
+        _announcementsAttempted[key] = DateTime.UtcNow;
+        _ = RefreshAnnouncementsAsync(region, language, key, _announcementVersion, hasCache: true);
     }
 
     public void OnNavigatedFrom() => _clock.Stop();
@@ -418,6 +462,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     /// <summary>结晶波片与结晶单质：按回满时间戳实时推算当前值与倒计时。</summary>
     private void UpdateLive()
     {
+        RefreshAnnouncementsIfStale();
         PlayerBaseSnapshot? b = Snapshot?.Base;
         string none = _localization["Common_Unavailable"];
         if (b is null)
@@ -677,18 +722,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     /// <summary>
     /// 公告区服：设置里记住了就用记住的；否则按当前账号（UID 小于 2 亿为国服），没有账号时简体中文界面用国服、其他用国际服。
     /// </summary>
-    public LauncherRegion Region
-    {
-        get
-        {
-            string? saved = _config.User.AnnouncementRegion;
-            if (saved == "CN") return LauncherRegion.China;
-            if (saved == "Global") return LauncherRegion.Global;
-            if (Accounts.Current?.Uid is { } uid && long.TryParse(uid, out long id))
-                return id < 200_000_000 ? LauncherRegion.China : LauncherRegion.Global;
-            return _localization.CurrentLanguage == LanguageType.ZhHans ? LauncherRegion.China : LauncherRegion.Global;
-        }
-    }
+    public LauncherRegion Region => AnnouncementRegions.Resolve(_config, Accounts, _localization);
 
     /// <summary>区服滑块：国服。</summary>
     public bool IsChinaRegion
@@ -707,9 +741,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
     private void SetRegion(LauncherRegion region)
     {
         if (_config.User.AnnouncementRegion is not null && Region == region) return;
-        bool changed = Region != region;
-        _config.User.AnnouncementRegion = region == LauncherRegion.China ? "CN" : "Global";
-        if (!changed) return;
+        if (!AnnouncementRegions.Save(_config, Accounts, _localization, region)) return;
         OnRegionChanged();
     }
 
@@ -744,8 +776,9 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         ApplyFeed(cached ?? AnnouncementFeed.Empty);
         AnnouncementsFailed = false;
 
-        string key = $"{region}|{LauncherNewsService.RequestLanguage(region, language)}";
-        if (cached is not null && _announcementsRefreshed.Contains(key)) return;
+        string key = AnnouncementKey(region, language);
+        if (cached is not null && !IsAnnouncementStale(key)) return;
+        _announcementsAttempted[key] = DateTime.UtcNow;
         _ = RefreshAnnouncementsAsync(region, language, key, version, hasCache: cached is not null);
     }
 
@@ -765,7 +798,6 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         IsAnnouncementsLoading = false;
         if (fresh is not null)
         {
-            _announcementsRefreshed.Add(key);
             ApplyFeed(fresh);
             // 轮播图在后台下载，下好后补上横幅。
             AnnouncementFeed? withImages = null;

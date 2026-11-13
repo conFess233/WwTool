@@ -19,6 +19,7 @@ using WwTool.UI.Feedback;
 using WwTool.UI.Localization;
 using WwTool.UI.Navigation;
 using WwTool.UI.Pages.Accounts;
+using WwTool.UI.Pages.Events;
 using WwTool.UI.Pages.Explore;
 using WwTool.UI.Pages.Home;
 using WwTool.UI.Pages.Motor;
@@ -137,6 +138,7 @@ public partial class App : Application
         services.AddSingleton<PullsChartsViewModel>();
         services.AddSingleton<PlayerData>();
         services.AddSingleton<AccountActions>();
+        services.AddSingleton<UpdateCoordinator>();
         services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<GameLauncherService>();
         services.AddSingleton<ClipboardService>();
@@ -144,6 +146,10 @@ public partial class App : Application
         services.AddSingleton<IAnnouncementSource, LauncherAnnouncementSource>();
         services.AddSingleton<HomeViewModel>();
         services.AddSingleton<ExploreViewModel>();
+        services.AddSingleton<NoticeImages>();
+        services.AddSingleton<EncoreImages>();
+        services.AddSingleton<ChallengesViewModel>();
+        services.AddSingleton<EventsViewModel>();
         services.AddSingleton<MotorViewModel>();
         services.AddSingleton<RolesViewModel>();
 
@@ -151,6 +157,8 @@ public partial class App : Application
         const string icons = "avares://WwTool/Assets/Images/";
         services.AddSingleton(new PageDescriptor("home", "Nav_Home", icons + "Home.png",
             sp => sp.GetRequiredService<HomeViewModel>()));
+        services.AddSingleton(new PageDescriptor("events", "Nav_Events", icons + "Calendar.png",
+            sp => sp.GetRequiredService<EventsViewModel>()));
         services.AddSingleton(new PageDescriptor("pulls", "Nav_Statistics", icons + "Statistics.png",
             sp => sp.GetRequiredService<PullsOverviewViewModel>()));
         services.AddSingleton(new PageDescriptor("roles", "Nav_RoleData", icons + "Role.png",
@@ -168,11 +176,13 @@ public partial class App : Application
             sp => sp.GetRequiredService<PullsChartsViewModel>(), ParentKey: "pulls"));
         services.AddSingleton(new ViewLocator()
             .Map<ConfirmDialogViewModel, ConfirmDialogView>()
+            .Map<UpdateDialogViewModel, UpdateDialogView>()
             .Map<ImportUrlDialogViewModel, ImportUrlDialogView>()
             .Map<SettingsViewModel, SettingsView>()
             .Map<HomeViewModel, HomeView>()
             .Map<RolesViewModel, RolesView>()
             .Map<ExploreViewModel, ExploreView>()
+            .Map<EventsViewModel, EventsView>()
             .Map<MotorViewModel, MotorView>()
             .Map<AccountsViewModel, AccountsView>()
             .Map<LoginDialogViewModel, LoginDialogView>()
@@ -189,6 +199,8 @@ public partial class App : Application
         var logger = services.GetRequiredService<ILoggerService>();
         try
         {
+            // 上次程序内更新留下的旧文件。
+            services.GetRequiredService<UpdateCoordinator>().CleanupPreviousUpdate();
             // 4. 数据库（识别旧库、备份、迁移）；5. 静态游戏资料。
             shell.StartupProgress = 0.15;
             await services.GetRequiredService<GameDataService>().InitializeAsync();
@@ -223,6 +235,7 @@ public partial class App : Application
         shell.IsReady = true;
         logger.Info("WwTool 2.0 初始化完成");
         _ = services.GetRequiredService<CatalogSyncService>().SyncAsync(false, _shutdown.Token);
+        _ = services.GetRequiredService<UpdateCoordinator>().RunAutomaticCheckAsync(_shutdown.Token);
     }
 
     private static void ShowStartupError(IClassicDesktopStyleApplicationLifetime desktop, LocalizationService localization, string message)

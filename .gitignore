@@ -13,3 +13,6 @@ publish/
 # 所有项目的编译产物
 [Bb]in/
 [Oo]bj/
+
+# DecryptLog.bat 的输出
+/scripts/Decrypt/
