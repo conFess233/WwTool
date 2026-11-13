@@ -203,6 +203,7 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
         };
         AddAccountCommand = new AsyncRelayCommand(() => actions.AddAccountAsync());
         OnlyPullsCommand = new RelayCommand(() => navigation.NavigateTo("pulls"));
+        OpenEventsCommand = new RelayCommand(() => navigation.NavigateTo("events"));
         RetrySyncCommand = new AsyncRelayCommand(_player.SyncAsync);
         RefreshDataCommand = new AsyncRelayCommand(_player.SyncAsync, () => !_player.IsSyncing && Accounts.HasAccount);
         _player.PropertyChanged += (_, e) =>
@@ -271,6 +272,9 @@ public sealed partial class HomeViewModel : ObservableObject, INavigationAware, 
 
     /// <summary>空状态「首次启动」：只看抽卡记录。</summary>
     public IRelayCommand OnlyPullsCommand { get; }
+
+    /// <summary>公告卡底部「活动日历与全部公告」：打开活动页。</summary>
+    public IRelayCommand OpenEventsCommand { get; }
 
     /// <summary>网络异常横条「重试」。</summary>
     public IAsyncRelayCommand RetrySyncCommand { get; }

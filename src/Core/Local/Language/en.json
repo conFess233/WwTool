@@ -647,7 +647,7 @@
   "Home_AnnAll": "All",
   "Home_AnnEvent": "Event",
   "Home_AnnNotice": "Notice",
-  "Home_AnnViewAll": "View all on the official site",
+  "Home_AnnViewAll": "Official site",
   "Home_AnnEmptyTitle": "No announcements",
   "Home_AnnEmptyHint": "The game launcher has no announcements right now.",
   "Pulls_StoredCount": "{0} records stored locally",
@@ -842,5 +842,6 @@
   "Events_Copy": "Copy code",
   "Events_OpenPost": "View post",
   "Events_Preview": "Version {0} livestream: {1}",
-  "Events_ListSeparator": ", "
+  "Events_ListSeparator": ", ",
+  "Home_AnnOpenEvents": "Event calendar & notices"
 }

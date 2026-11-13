@@ -647,8 +647,13 @@
                       Command="{Binding RetryAnnouncementsCommand}" AutomationProperties.AutomationId="home-ann-retry" />
             </StackPanel>
 
-            <Button Grid.Row="4" Classes="link" HorizontalAlignment="Center" Content="{loc:Tr Home_AnnViewAll}"
-                    Command="{Binding OpenAllAnnouncementsCommand}" AutomationProperties.AutomationId="home-ann-all" />
+            <!-- 活动页（游戏内公告、卡池时间线、版本日历）与官网新闻页 -->
+            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+              <Button Classes="link" Content="{loc:Tr Home_AnnOpenEvents}" Command="{Binding OpenEventsCommand}"
+                      AutomationProperties.AutomationId="home-ann-events" />
+              <Button Classes="link" Content="{loc:Tr Home_AnnViewAll}"
+                      Command="{Binding OpenAllAnnouncementsCommand}" AutomationProperties.AutomationId="home-ann-all" />
+            </StackPanel>
           </Grid>
           <c:CornerMarks Margin="-20,-18,-20,-16" />
         </Panel>

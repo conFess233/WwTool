@@ -647,7 +647,7 @@
   "Home_AnnAll": "すべて",
   "Home_AnnEvent": "イベント",
   "Home_AnnNotice": "お知らせ",
-  "Home_AnnViewAll": "公式サイトですべて見る",
+  "Home_AnnViewAll": "公式サイト",
   "Home_AnnEmptyTitle": "お知らせはありません",
   "Home_AnnEmptyHint": "ゲームランチャーには現在お知らせがありません。",
   "Pulls_StoredCount": "ローカルに {0} 件保存済み",
@@ -842,5 +842,6 @@
   "Events_Copy": "コードをコピー",
   "Events_OpenPost": "投稿を見る",
   "Events_Preview": "Ver.{0} 生放送：{1}",
-  "Events_ListSeparator": "、"
+  "Events_ListSeparator": "、",
+  "Home_AnnOpenEvents": "イベントカレンダーとお知らせ"
 }

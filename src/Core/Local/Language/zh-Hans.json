@@ -647,7 +647,7 @@
   "Home_AnnAll": "全部",
   "Home_AnnEvent": "活动",
   "Home_AnnNotice": "公告",
-  "Home_AnnViewAll": "前往官网查看全部公告",
+  "Home_AnnViewAll": "前往官网",
   "Home_AnnEmptyTitle": "暂无公告",
   "Home_AnnEmptyHint": "游戏启动器当前没有发布公告。",
   "Pulls_StoredCount": "本地已存储 {0} 条",
@@ -842,5 +842,6 @@
   "Events_Copy": "复制兑换码",
   "Events_OpenPost": "查看帖子",
   "Events_Preview": "{0} 版本前瞻直播：{1}",
-  "Events_ListSeparator": "、"
+  "Events_ListSeparator": "、",
+  "Home_AnnOpenEvents": "活动日历与全部公告"
 }
