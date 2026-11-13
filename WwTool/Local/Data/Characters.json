@@ -1,5 +1,5 @@
 {
-  "version": "3.7.0",
+  "version": "3.8.0",
   "items": {
     "1102": {
       "type": "Character",
@@ -701,6 +701,17 @@
         "en": "Suoming",
         "ja": "鎖暝",
         "ko": "쇄명"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    },
+    "1512": {
+      "type": "Character",
+      "names": {
+        "zh-Hans": "莉莉",
+        "en": "Lily",
+        "ja": "リリー",
+        "ko": "릴리"
       },
       "qualityLevel": 5,
       "isLimited": true

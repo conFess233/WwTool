@@ -1,5 +1,5 @@
 {
-  "version": "3.7.0",
+  "version": "3.8.0",
   "items": {
     "21010074": {
       "type": "Weapon",
@@ -1361,6 +1361,17 @@
         "en": "Blooming Jadehaven",
         "ja": "玉殿に咲き満ちる玄華",
         "ko": "옥궐에 피는 꽃"
+      },
+      "qualityLevel": 5,
+      "isLimited": true
+    },
+    "21030076": {
+      "type": "Weapon",
+      "names": {
+        "zh-Hans": "安魂",
+        "en": "Lullaby",
+        "ja": "ララバイ",
+        "ko": "럴러바이"
       },
       "qualityLevel": 5,
       "isLimited": true

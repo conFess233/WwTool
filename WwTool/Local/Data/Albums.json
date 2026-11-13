@@ -1,5 +1,5 @@
 {
-  "version": "3.7.0",
+  "version": "3.8.0",
   "items": {
     "1": {
       "names": {
@@ -260,6 +260,15 @@
         "en": "Echoes of Melodies Vol. 4",
         "ja": "Echoes of Melodies Vol. 4",
         "ko": "Echoes of Melodies Vol. 4"
+      }
+    },
+    "30": {
+      "type": "Album",
+      "names": {
+        "zh-Hans": "梦中花",
+        "en": "Flowers in a Dream",
+        "ja": "夢に咲く花",
+        "ko": "몽중화"
       }
     }
   }
