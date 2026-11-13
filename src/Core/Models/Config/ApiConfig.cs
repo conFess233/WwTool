@@ -119,6 +119,15 @@ namespace WwTool.Core.Models.Config
         /// <summary>库街区帖子网页，<c>{0}</c> 为帖子 ID。</summary>
         public string KuroBbsPostPageUrl { get; set; } = "https://www.kurobbs.com/mc/post/{0}";
 
+        /// <summary>encore.moe 接口（深塔 / 海墟 / 矩阵，第三方解包数据），其后接 <c>/{lang}/toa</c> 等路径。</summary>
+        public string EncoreApiUrl { get; set; } = "https://api-v2.encore.moe/api";
+
+        /// <summary>encore.moe 备用接口（旧后端，路径没有 <c>/api</c>）：主接口失败时使用。</summary>
+        public string EncoreApiFallbackUrl { get; set; } = "https://api.encore.moe";
+
+        /// <summary>encore.moe 网页（「在 encore.moe 查看」），<c>{0}</c> 为 toa / whiwa / dpmatrix，<c>{1}</c> 为语言。</summary>
+        public string EncorePageUrl { get; set; } = "https://encore.moe/{0}?lang={1}";
+
         /// <summary>国服启动器背景配置，<c>{0}</c> 为语言代码（只有 zh-Hans）。</summary>
         public string LauncherBackgroundUrlCN { get; set; } = "https://prod-cn-alicdn-gamestarter.kurogame.com/launcher/game/10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ/G152/official/background/5b3a2442a9fb4927a531069f602d304b/{0}.json";
     }

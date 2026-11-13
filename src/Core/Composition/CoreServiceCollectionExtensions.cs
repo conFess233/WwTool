@@ -70,6 +70,7 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<LauncherNewsService>();
         services.AddSingleton<WwTool.Core.Services.Notices.GameNoticeService>();
         services.AddSingleton<WwTool.Core.Services.Notices.KuroBbsCodeService>();
+        services.AddSingleton<WwTool.Core.Services.Challenges.EncoreService>();
         services.AddSingleton<WwTool.Core.Services.Update.UpdateService>();
         services.AddSingleton<WwTool.Core.Services.Update.UpdateInstaller>();
 

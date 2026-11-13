@@ -1,10 +1,7 @@
-using System.Collections.Concurrent;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using WwTool.Core.Abstractions;
 using WwTool.Core.Abstractions.Platform;
@@ -26,7 +23,6 @@ public sealed class GameNoticeService(IHttpClientFactory factory, IConfigService
 
     private const string ChineseLanguage = "zh-Hans";
     private const long MaxJsonBytes = 16L * 1024 * 1024;
-    private const long MaxImageBytes = 16L * 1024 * 1024;
 
     public TimeSpan RequestTimeout { get; init; } = TimeSpan.FromSeconds(10);
     public int Attempts { get; init; } = 2;
@@ -41,8 +37,6 @@ public sealed class GameNoticeService(IHttpClientFactory factory, IConfigService
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     private readonly SemaphoreSlim _gate = new(1, 1);
-    private readonly ConcurrentDictionary<string, SemaphoreSlim> _imageLocks = new(StringComparer.Ordinal);
-    private readonly ConcurrentDictionary<string, DateTimeOffset> _imageValidated = new(StringComparer.Ordinal);
 
     public string CacheDirectory => Path.Combine(paths.CacheDirectory, "GameNotice");
     public string ImageDirectory => Path.Combine(CacheDirectory, "Images");
@@ -155,127 +149,46 @@ public sealed class GameNoticeService(IHttpClientFactory factory, IConfigService
 
     // ── 图片 ──────────────────────────────────────────────
 
+    private RemoteImageCache? _images;
+
+    /// <summary>公告图片（版本日历图、横幅、正文配图）的缓存，目录为 <see cref="ImageDirectory"/>。</summary>
+    public RemoteImageCache Images => _images ??= new RemoteImageCache(factory, config, logger, ImageDirectory, "公告")
+    {
+        Timeout = ImageTimeout,
+        RevalidateInterval = ImageRevalidateInterval,
+        Now = Now,
+    };
+
     /// <summary>已缓存的图片路径（不校验）；没有时返回 null。</summary>
-    public string? CachedImage(string? url)
-    {
-        if (ImagePath(url) is not { } path) return null;
-        return File.Exists(path) ? path : null;
-    }
+    public string? CachedImage(string? url) => Images.Cached(url);
 
-    /// <summary>
-    /// 取图片：没有缓存时下载；有缓存时向服务器做条件请求校验（本次运行在 <see cref="ImageRevalidateInterval"/> 内校验过的跳过，
-    /// <paramref name="force"/> 为 true 时总是校验），图片变了就替换。
-    /// 返回本地路径（网络失败时为旧缓存，没有缓存时为 null）与内容是否有变化。
-    /// </summary>
-    public async Task<(string? Path, bool Changed)> GetImageAsync(string? url, bool force = false, CancellationToken token = default)
-    {
-        if (ImagePath(url) is not { } path) return (null, false);
-        SemaphoreSlim gate = _imageLocks.GetOrAdd(path, _ => new SemaphoreSlim(1, 1));
-        await gate.WaitAsync(token).ConfigureAwait(false);
-        try
-        {
-            bool exists = File.Exists(path);
-            if (exists && !force && _imageValidated.TryGetValue(url!, out DateTimeOffset at) && Now() - at < ImageRevalidateInterval)
-                return (path, false);
-
-            ImageMeta? meta = exists ? ReadMeta(path) : null;
-            HttpClient client = factory.CreateClient(CoreServiceCollectionExtensions.ApiClient);
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-            cts.CancelAfter(ImageTimeout);
-            try
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Get, url);
-                AddHeaders(request);
-                request.Headers.Accept.Clear();
-                request.Headers.TryAddWithoutValidation("Accept", "image/avif,image/webp,image/png,image/jpeg,*/*");
-                if (exists) AddValidators(request, meta?.ETag, meta?.LastModified);
-                using HttpResponseMessage response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token).ConfigureAwait(false);
-                if (response.StatusCode == HttpStatusCode.NotModified && exists)
-                {
-                    _imageValidated[url!] = Now();
-                    return (path, false);
-                }
-                response.EnsureSuccessStatusCode();
-                if (response.Content.Headers.ContentLength > MaxImageBytes) throw new InvalidDataException("图片过大");
-                byte[] data = await response.Content.ReadAsByteArrayAsync(cts.Token).ConfigureAwait(false);
-                if (data.Length == 0 || data.Length > MaxImageBytes) throw new InvalidDataException("图片大小异常");
-                bool changed = !exists || !SameContent(path, data);
-                Directory.CreateDirectory(ImageDirectory);
-                string temp = path + ".part";
-                await File.WriteAllBytesAsync(temp, data, cts.Token).ConfigureAwait(false);
-                File.Move(temp, path, overwrite: true);
-                WriteMeta(path, new ImageMeta
-                {
-                    Url = url,
-                    ETag = response.Headers.ETag?.ToString(),
-                    LastModified = response.Content.Headers.LastModified,
-                });
-                _imageValidated[url!] = Now();
-                return (path, changed);
-            }
-            catch (Exception ex) when (IsRecoverable(ex, token))
-            {
-                logger.Debug($"公告图片获取失败：{ex.GetType().Name} {ex.Message}");
-                TryDelete(path + ".part");
-                return (exists ? path : null, false);
-            }
-        }
-        finally
-        {
-            gate.Release();
-        }
-    }
-
-    private string? ImagePath(string? url)
-    {
-        if (!Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) || (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp)) return null;
-        string ext = Path.GetExtension(uri.AbsolutePath).ToLowerInvariant();
-        if (ext is not (".jpg" or ".jpeg" or ".png" or ".webp" or ".gif")) ext = ".img";
-        string key = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(uri.AbsoluteUri)), 0, 16).ToLowerInvariant();
-        return Path.Combine(ImageDirectory, key + ext);
-    }
-
-    private static bool SameContent(string path, byte[] data)
-    {
-        try
-        {
-            var info = new FileInfo(path);
-            return info.Exists && info.Length == data.Length && File.ReadAllBytes(path).AsSpan().SequenceEqual(data);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            return false;
-        }
-    }
+    /// <inheritdoc cref="RemoteImageCache.GetAsync"/>
+    public Task<(string? Path, bool Changed)> GetImageAsync(string? url, bool force = false, CancellationToken token = default) =>
+        Images.GetAsync(url, force, token);
 
     /// <summary>删除所有缓存公告都不再引用的图片（横幅、日历图、正文配图）。</summary>
     public void CleanUpImages()
     {
+        var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         try
         {
             if (!Directory.Exists(ImageDirectory)) return;
-            var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (string json in Directory.EnumerateFiles(CacheDirectory, "*.json"))
             {
                 CacheEntry? entry = JsonSerializer.Deserialize<CacheEntry>(File.ReadAllText(json), JsonOptions);
                 if (entry?.Body is null) continue;
                 foreach (string url in ReferencedImages(entry.Body))
                 {
-                    if (ImagePath(url) is { } path) keep.Add(Path.GetFileNameWithoutExtension(path));
+                    if (Images.KeyOfUrl(url) is { } key) keep.Add(key);
                 }
-            }
-            foreach (string file in Directory.EnumerateFiles(ImageDirectory))
-            {
-                string name = Path.GetFileName(file);
-                int dot = name.IndexOf('.');
-                string key = dot > 0 ? name[..dot] : name;
-                if (!keep.Contains(key)) File.Delete(file);
             }
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
         {
             logger.Debug($"游戏公告图片清理失败：{ex.GetType().Name}");
+            return;
         }
+        Images.CleanUp(keep.Contains);
     }
 
     private static IEnumerable<string> ReferencedImages(string body)
@@ -337,44 +250,8 @@ public sealed class GameNoticeService(IHttpClientFactory factory, IConfigService
         }
     }
 
-    private static ImageMeta? ReadMeta(string imagePath)
-    {
-        try
-        {
-            string path = imagePath + ".meta";
-            return File.Exists(path) ? JsonSerializer.Deserialize<ImageMeta>(File.ReadAllText(path), JsonOptions) : null;
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
-        {
-            return null;
-        }
-    }
-
-    private void WriteMeta(string imagePath, ImageMeta meta)
-    {
-        try
-        {
-            File.WriteAllText(imagePath + ".meta", JsonSerializer.Serialize(meta, JsonOptions));
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            logger.Debug($"公告图片校验信息写入失败：{ex.GetType().Name}");
-        }
-    }
-
-    private static void TryDelete(string path)
-    {
-        try { if (File.Exists(path)) File.Delete(path); }
-        catch (IOException) { }
-        catch (UnauthorizedAccessException) { }
-    }
-
-    private static void AddValidators(HttpRequestMessage request, string? etag, DateTimeOffset? lastModified)
-    {
-        if (!string.IsNullOrWhiteSpace(etag) && EntityTagHeaderValue.TryParse(etag, out EntityTagHeaderValue? tag))
-            request.Headers.IfNoneMatch.Add(tag);
-        if (lastModified is { } modified) request.Headers.IfModifiedSince = modified;
-    }
+    private static void AddValidators(HttpRequestMessage request, string? etag, DateTimeOffset? lastModified) =>
+        RemoteImageCache.AddValidators(request, etag, lastModified);
 
     private void AddHeaders(HttpRequestMessage request)
     {
@@ -393,12 +270,5 @@ public sealed class GameNoticeService(IHttpClientFactory factory, IConfigService
         public string? ETag { get; set; }
         public DateTimeOffset? LastModified { get; set; }
         public string? Body { get; set; }
-    }
-
-    private sealed class ImageMeta
-    {
-        public string? Url { get; set; }
-        public string? ETag { get; set; }
-        public DateTimeOffset? LastModified { get; set; }
     }
 }
