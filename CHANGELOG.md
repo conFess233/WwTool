@@ -1,6 +1,8 @@
 # 更新日志
 
-## [未发布]
+## [2.1.0] - 2026-11-14
+
+新增活动页（游戏内公告、卡池与活动时间线、深塔 / 海墟 / 矩阵）和程序内更新。从这个版本起，有新版本时程序会提示，可以直接在程序里下载并更新。
 
 ### 新增
 
@@ -23,8 +25,14 @@
   - 更新对话框显示版本对比、发布日期和更新说明，可跳过此版本。
   - 「下载并更新」：下载与当前同类型的压缩包，核对 GitHub 提供的 SHA256 后替换程序文件（设置与数据不动），失败自动还原；完成后可立即重启。
 
+### 调整
+
+- 游戏资料更新到 3.8：新增角色莉莉、武器安魂及对应图标，专辑与摩托资料同步更新。
+- 仓库结构调整：游戏资料与图标在仓库中的位置改为 `catalog/`。程序从仓库同步资料和图标时使用新位置，**2.0.0 及更早的版本以后无法再从仓库同步新的资料和图标**，请更新到 2.1.0。
+
 ### 修复
 
+- 日文界面里「国服 / 国际服」滑块的「国際版」显示不全。
 - 游戏更新版本后，窗口背景不再停留在旧版本：启动器背景的配置 ID 随版本更换，现在每次先从游戏索引读取当前 ID。
 - 程序一直开着时，启动器背景和游戏公告每 30 分钟重新获取一次，不再只在启动时获取。
 
@@ -160,9 +168,10 @@
 - 提供先约电台、探索计数、摩托与音乐专辑资料展示。
 - 支持自动读取游戏日志或手动导入抽卡历史链接，并保存本地记录。
 
-[1.0.0]: https://github.com/conFess233/WwTool/tree/v1.0.0
-[1.0.1]: https://github.com/conFess233/WwTool/tree/v1.0.1
-[1.1.1]: https://github.com/conFess233/WwTool/tree/v1.1.1
-[1.2.0]: https://github.com/conFess233/WwTool/tree/v1.2.0
-[1.2.1]: https://github.com/conFess233/WwTool/tree/v1.2.1
-[2.0.0]: https://github.com/conFess233/WwTool/tree/v2.0.0
+[1.0.0]: https://github.com/conFess233/WwTool/releases/tag/v1.0.0
+[1.0.1]: https://github.com/conFess233/WwTool/releases/tag/v1.0.1
+[1.1.1]: https://github.com/conFess233/WwTool/releases/tag/v1.1.1
+[1.2.0]: https://github.com/conFess233/WwTool/releases/tag/v1.2.0
+[1.2.1]: https://github.com/conFess233/WwTool/releases/tag/v1.2.1
+[2.0.0]: https://github.com/conFess233/WwTool/releases/tag/v2.0.0
+[2.1.0]: https://github.com/conFess233/WwTool/releases/tag/v2.1.0

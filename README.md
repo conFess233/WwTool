@@ -6,7 +6,7 @@
 
 鸣潮工具箱 · 账号资料、角色详情与抽卡统计
 
-![Version 2.0.0](https://img.shields.io/badge/version-2.0.0-blue)
+![Version 2.1.0](https://img.shields.io/badge/version-2.1.0-blue)
 ![Windows x64](https://img.shields.io/badge/platform-Windows%2010%2B%20x64-0078D4)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
 [![MIT License](https://img.shields.io/badge/license-MIT-green)](LICENSE.txt)
