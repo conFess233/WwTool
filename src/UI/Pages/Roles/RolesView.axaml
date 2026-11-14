@@ -98,26 +98,8 @@
     <Style Selector="Border.seq.full > TextBlock">
       <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
     </Style>
-    <!-- 详情浮层：宽 620、圆角 14、对话框阴影 -->
-    <Style Selector="Border.pop">
-      <Setter Property="Width" Value="620" />
-      <Setter Property="Padding" Value="20,20,22,16" />
-      <Setter Property="CornerRadius" Value="14" />
-      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource BorderStrongBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="BoxShadow" Value="0 24 50 -18 #8C3C280A" />
-    </Style>
     <Style Selector="Border.weapon-tip">
       <Setter Property="Padding" Value="14,10" />
-    </Style>
-    <Style Selector="Grid.kv">
-      <Setter Property="Margin" Value="0,7" />
-    </Style>
-    <Style Selector="TextBlock.section-head">
-      <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="FontSize" Value="14" />
-      <Setter Property="Margin" Value="0,0,0,6" />
     </Style>
   </UserControl.Styles>
 
@@ -187,26 +169,14 @@
       </StackPanel>
     </ScrollViewer>
 
-    <!-- 详情浮层：点击空白处或 Esc 关闭 -->
-    <Panel x:Name="DetailLayer" IsVisible="False" Background="Transparent" Margin="-40,0" PointerPressed="OnDetailLayerPressed">
-      <Canvas x:Name="DetailCanvas">
-        <Border x:Name="Popover" Classes="pop" PointerPressed="OnPopoverPressed" AutomationProperties.AutomationId="roles-detail">
-          <ContentControl x:Name="PopoverContent" />
-        </Border>
-        <Border x:Name="Arrow" Width="12" Height="12" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderStrongBrush}"
-                BorderThickness="1,0,0,1" RenderTransformOrigin="50%,50%" RenderTransform="rotate(45deg)" IsHitTestVisible="False" />
-        <Border x:Name="Flyer" ClipToBounds="True" IsHitTestVisible="False" IsVisible="False" Background="{DynamicResource SurfaceMutedBrush}">
-          <c:CatalogImage x:Name="FlyerImage" DecodeWidth="192" Stretch="UniformToFill" />
-        </Border>
-      </Canvas>
-    </Panel>
   </Panel>
 
   <UserControl.DataTemplates>
-    <!-- 角色格：头像、名称、共鸣链、星级；悬停倾斜并扫光，点击打开详情浮层 -->
+    <!-- 角色格：头像、名称、共鸣链、星级；悬停倾斜并扫光，点击打开角色详情弹窗 -->
     <DataTemplate DataType="roles:RoleTile">
       <c:TiltHost>
-        <Button Classes="tile-button" Click="OnRoleClicked" AutomationProperties.AutomationId="{Binding AutomationId}"
+        <Button Classes="tile-button" Command="{Binding $parent[roles:RolesView].((roles:RolesViewModel)DataContext).OpenDetailCommand}" CommandParameter="{Binding}"
+                AutomationProperties.AutomationId="{Binding AutomationId}"
                 AutomationProperties.Name="{Binding Name}">
         <Panel>
           <Border Classes="tile-ring" IsVisible="{Binding IsSelected}" />
@@ -255,80 +225,6 @@
       </c:TiltHost>
     </DataTemplate>
 
-    <!-- 详情浮层内容：只在打开时由模板创建 -->
-    <DataTemplate DataType="roles:RoleHover">
-      <Grid DataContext="{Binding Tile}" x:DataType="roles:RoleTile" ColumnDefinitions="2*,3*" RowDefinitions="*,Auto" ColumnSpacing="22">
-        <StackPanel>
-          <Border Name="PortraitFrame" Height="290" CornerRadius="10" ClipToBounds="True">
-            <Border.Background>
-              <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                <GradientStop Color="#F1E8D4" Offset="0" />
-                <GradientStop Color="#E4D6B6" Offset="1" />
-              </LinearGradientBrush>
-            </Border.Background>
-            <c:CatalogImage Path="{Binding PortraitPath}" FallbackPath="{Binding IconPath}" CacheOnly="True" DecodeWidth="360"
-                            Stretch="UniformToFill" VerticalAlignment="Top">
-              <c:CatalogImage.OpacityMask>
-                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                  <GradientStop Color="Black" Offset="0.8" />
-                  <GradientStop Color="Transparent" Offset="1" />
-                </LinearGradientBrush>
-              </c:CatalogImage.OpacityMask>
-            </c:CatalogImage>
-          </Border>
-          <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,12,0,0" />
-          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,6,0,0">
-            <TextBlock Classes="stars" Classes.five="{Binding IsFiveStar}" Text="{Binding StarsText}" VerticalAlignment="Center" />
-            <Border Classes="seq" Classes.mid="{Binding IsMidSequence}" Classes.full="{Binding IsFullSequence}">
-              <TextBlock Text="{Binding SequenceText}" />
-            </Border>
-          </StackPanel>
-        </StackPanel>
-        <StackPanel Grid.Column="1">
-          <TextBlock Classes="section-head" Text="{loc:Tr Guide_HoverAttributes}" />
-          <TextBlock Classes="caption" Text="{loc:Tr Guide_NoAttributeData}" IsVisible="{Binding !HasAttributes}" />
-          <ItemsControl ItemsSource="{Binding Attributes}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="domain:GuideHoverAttribute">
-                <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0">
-                  <Grid Classes="kv" ColumnDefinitions="*,Auto">
-                    <TextBlock Classes="aux muted" Text="{Binding Name}" />
-                    <TextBlock Grid.Column="1" Classes="aux" FontWeight="Bold" Text="{Binding Value}" />
-                  </Grid>
-                </Border>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-          <Border Height="1" Background="{DynamicResource BorderBrush}" Margin="0,12" />
-          <TextBlock Classes="section-head" Text="{loc:Tr Guide_HoverWeapon}" />
-          <TextBlock Classes="caption" Text="{loc:Tr Guide_NoEquippedWeaponData}" IsVisible="{Binding !HasWeapon}" />
-          <StackPanel IsVisible="{Binding HasWeapon}">
-            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,2,0,6">
-              <Border Classes="avatar" Width="56" Height="56" CornerRadius="10">
-                <c:CatalogImage Path="{Binding Weapon.ImagePath}" CacheOnly="True" DecodeWidth="112" Stretch="UniformToFill" />
-              </Border>
-              <StackPanel VerticalAlignment="Center" Spacing="3">
-                <TextBlock Text="{Binding Weapon.Name}" FontWeight="SemiBold" />
-                <TextBlock Classes="caption" Text="{Binding WeaponStarsText}" />
-              </StackPanel>
-            </StackPanel>
-            <ItemsControl ItemsSource="{Binding Weapon.Fields}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="domain:GuideHoverAttribute">
-                  <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0">
-                    <Grid Classes="kv" ColumnDefinitions="*,Auto">
-                      <TextBlock Classes="aux muted" Text="{Binding Name}" />
-                      <TextBlock Grid.Column="1" Classes="aux" FontWeight="Bold" Text="{Binding Value}" />
-                    </Grid>
-                  </Border>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </StackPanel>
-        </StackPanel>
-        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Classes="caption" Text="{Binding AcquiredText}" HorizontalAlignment="Right" Margin="0,8,0,0" />
-      </Grid>
-    </DataTemplate>
     <DataTemplate DataType="roles:WeaponHover">
       <Border Classes="weapon-tip">
         <TextBlock Classes="caption" Text="{Binding Text}" />

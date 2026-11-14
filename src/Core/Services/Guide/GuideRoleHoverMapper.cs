@@ -63,6 +63,61 @@ public static class GuideRoleHoverMapper
     }
 
     /// <summary>
+    /// 「我的养成」用的技能等级与当前声骸：只读 <c>roleSkill.addPointTarget[].currentLevel</c> 与
+    /// <c>echo.current</c>，不读推荐方案（<c>main</c> / <c>spare</c> / <c>recommendLevel</c>）。
+    /// </summary>
+    public static GuideRoleBuild MapBuild(string? json, Action<JsonException> onInvalidJson)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return GuideRoleBuild.Empty;
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            JsonElement root = document.RootElement;
+            var skills = new List<GuideSkillLevel>();
+            JsonElement targets = Child(Child(root, "roleSkill"), "addPointTarget");
+            if (targets.ValueKind == JsonValueKind.Array)
+            {
+                foreach (JsonElement item in targets.EnumerateArray())
+                {
+                    if (Child(item, "currentLevel") is { ValueKind: JsonValueKind.Number } level && level.TryGetInt32(out int value))
+                        skills.Add(new(HttpUrl(Scalar(Child(item, "pictureUrl"))), value));
+                }
+            }
+
+            var echoes = new List<GuideEchoSlot>();
+            var sets = new List<string>();
+            JsonElement current = Child(Child(root, "echo"), "current");
+            JsonElement slots = Child(current, "echoAttributes");
+            if (slots.ValueKind == JsonValueKind.Array)
+            {
+                foreach (JsonElement slot in slots.EnumerateArray())
+                {
+                    if (Child(slot, "cost") is not { ValueKind: JsonValueKind.Number } cost || !cost.TryGetInt32(out int c)) continue;
+                    int? level = Child(slot, "currentLevel") is { ValueKind: JsonValueKind.Number } l && l.TryGetInt32(out int lv) ? lv : null;
+                    echoes.Add(new(c, level));
+                }
+            }
+            JsonElement effects = Child(current, "echoSetEffects");
+            if (effects.ValueKind == JsonValueKind.Array)
+            {
+                foreach (JsonElement effect in effects.EnumerateArray())
+                {
+                    if (HttpUrl(Scalar(Child(effect, "pictureUrl"))) is { } url && !sets.Contains(url)) sets.Add(url);
+                }
+            }
+            return new(skills, echoes, sets);
+        }
+        catch (JsonException ex)
+        {
+            onInvalidJson(ex);
+            return GuideRoleBuild.Empty;
+        }
+    }
+
+    private static string? HttpUrl(string? url) =>
+        url is not null && Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp) ? url : null;
+
+    /// <summary>
     /// 共鸣链数：优先用快照字段，缺失时由详情中已获得的共鸣链条目推算，都没有时按 0。
     /// </summary>
     public static int ResolveSequence(GuideRoleData role, Action<string, Exception?> warn)
