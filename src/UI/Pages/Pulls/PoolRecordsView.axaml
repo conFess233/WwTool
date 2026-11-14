@@ -6,7 +6,7 @@
              x:Class="WwTool.UI.Pages.Pulls.PoolRecordsView"
              x:DataType="pulls:PoolRecordsViewModel">
   <!--
-    单卡池「抽卡记录」卡（定稿 FinalPulls）：右上「仅能获取近半年数据」；首行固定为「未出金」（吸顶、Highlight 底、轻阴影），
+    单卡池「抽卡记录」卡（定稿 FinalPulls）：右上为本地已存储条数与「仅能获取近半年数据」；首行固定为「未出金」（吸顶、Highlight 底、轻阴影），
     其后五星记录由新到旧，列表内部滚动，滚到底自动加载更早记录（骨架行 + 加载形象）。
   -->
   <UserControl.Resources>
@@ -17,15 +17,19 @@
     </ResourceDictionary>
   </UserControl.Resources>
 
-  <Border Classes="card" Padding="22,20">
+  <Border Classes="card" Padding="22,16,22,0">
     <Grid RowDefinitions="Auto,Auto,*">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock Classes="section-title" Text="{loc:Tr Pulls_Records}" VerticalAlignment="Bottom" />
-        <TextBlock Grid.Column="1" Classes="aux" Foreground="{DynamicResource LabelBrush}" Text="{loc:Tr Pulls_RecordsNote}" VerticalAlignment="Bottom" />
+        <TextBlock Grid.Column="1" Classes="aux" Foreground="{DynamicResource LabelBrush}" VerticalAlignment="Bottom">
+          <Run Text="{Binding $parent[pulls:PullsOverviewView].((pulls:PullsOverviewViewModel)DataContext).StoredSummary, FallbackValue=''}" />
+          <Run Text=" · " />
+          <Run Text="{loc:Tr Pulls_RecordsNote}" />
+        </TextBlock>
       </Grid>
 
       <!-- 未出金（吸顶）：列表滚动时下方阴影渐显 -->
-      <Border Grid.Row="1" x:Name="NotYetRow" Margin="-8,10,-8,4" Height="104" Padding="12,0" CornerRadius="10"
+      <Border Grid.Row="1" x:Name="NotYetRow" Margin="-8,10,-8,4" Height="80" Padding="12,0" CornerRadius="10"
               Background="{DynamicResource HighlightStrongBrush}" BorderBrush="{DynamicResource AccentLineBrush}" BorderThickness="1"
               BoxShadow="0 8 10 -8 #59281C0A" ZIndex="1"
               IsVisible="{Binding NotYet, Converter={x:Static ObjectConverters.IsNotNull}}" AutomationProperties.AutomationId="pulls-not-yet">
@@ -84,12 +88,13 @@
       </Panel>
 
       <ScrollViewer Grid.Row="2" x:Name="ListScroller" IsVisible="{Binding !IsEmpty}" HorizontalScrollBarVisibility="Disabled" Margin="0,0,-8,0" Padding="0,0,8,0">
-        <StackPanel>
-          <ItemsControl Classes="rec-list" ItemsSource="{Binding Items}" ItemTemplate="{StaticResource FiveStarRow}" />
+        <!-- 卡片延伸到页面底部：列表末尾留 84，最后一条能滚到悬浮按钮上方 -->
+        <StackPanel Margin="0,0,0,84">
+          <ItemsControl Classes="rec-list pool" ItemsSource="{Binding Items}" ItemTemplate="{StaticResource FiveStarRow}" />
 
           <!-- 更早的记录：骨架行 + 加载形象 -->
           <StackPanel IsVisible="{Binding HasMore}">
-            <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Height="92" Padding="4,0">
+            <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Height="76" Padding="4,0">
               <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="16">
                 <c:Skeleton Width="56" Height="56" Radius="14" />
                 <StackPanel Grid.Column="1" Classes="c1" VerticalAlignment="Center" Spacing="9">

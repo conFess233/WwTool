@@ -172,7 +172,7 @@ public partial class PullsOverviewView : UserControl
             using var bitmap = new RenderTargetBitmap(size, new Vector(192, 192));
             bitmap.Render(row);
             await using Stream stream = await file.OpenWriteAsync();
-            bitmap.Save(stream);
+            bitmap.Save(stream, Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
             vm.ReportExported(file.Name);
         }
         catch (Exception ex)

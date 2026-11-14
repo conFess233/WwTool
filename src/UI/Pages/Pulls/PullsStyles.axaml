@@ -103,6 +103,10 @@
   <Style Selector="ItemsControl.rec-list Grid.rec-main">
     <Setter Property="Height" Value="92" />
   </Style>
+  <!-- 单卡池列表收紧到 76，一屏能看到更多记录 -->
+  <Style Selector="ItemsControl.rec-list.pool Grid.rec-main">
+    <Setter Property="Height" Value="76" />
+  </Style>
   <Style Selector="ItemsControl.compact Border.rec-body > StackPanel">
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
