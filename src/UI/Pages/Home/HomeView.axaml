@@ -587,9 +587,9 @@
                 <Panel>
                   <Border Classes="region-thumb" Classes.right="{Binding IsGlobalRegion}" />
                   <UniformGrid Columns="2">
-                    <RadioButton Classes="region-opt" GroupName="home-ann-region" Content="{loc:Tr Home_RegionCN}"
+                    <RadioButton Classes="region-opt" Content="{loc:Tr Home_RegionCN}"
                                  IsChecked="{Binding IsChinaRegion}" AutomationProperties.AutomationId="home-ann-region-cn" />
-                    <RadioButton Classes="region-opt" GroupName="home-ann-region" Content="{loc:Tr Home_RegionGlobal}"
+                    <RadioButton Classes="region-opt" Content="{loc:Tr Home_RegionGlobal}"
                                  IsChecked="{Binding IsGlobalRegion}" AutomationProperties.AutomationId="home-ann-region-global" />
                   </UniformGrid>
                 </Panel>
@@ -601,7 +601,7 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="home:AnnouncementFilter">
-                  <RadioButton Classes="ann-chip" GroupName="home-ann" Content="{Binding Title}" IsChecked="{Binding IsSelected}" />
+                  <RadioButton Classes="ann-chip" Content="{Binding Title}" IsChecked="{Binding IsSelected}" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
