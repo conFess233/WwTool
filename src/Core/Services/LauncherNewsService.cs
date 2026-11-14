@@ -28,8 +28,8 @@ public enum LauncherNewsCategory
 /// <summary>一条资讯。<see cref="Date"/> 由接口的「MM-dd」推断年份得到。</summary>
 public sealed record LauncherNewsItem(LauncherNewsCategory Category, string Title, Uri? Link, DateTime? Date, string DateText);
 
-/// <summary>一张轮播图：本地缓存的图片与点击跳转地址。</summary>
-public sealed record LauncherNewsSlide(string ImagePath, Uri? Link);
+/// <summary>一张轮播图：本地缓存的图片、点击跳转地址与图片原始地址（只取链接时 <see cref="ImagePath"/> 为空）。</summary>
+public sealed record LauncherNewsSlide(string ImagePath, Uri? Link, Uri? ImageUrl = null);
 
 /// <summary>一次获取的资讯。</summary>
 public sealed record LauncherNews(
@@ -66,8 +66,15 @@ public sealed class LauncherNewsService(IHttpClientFactory factory, IConfigServi
     public static string RequestLanguage(LauncherRegion region, string uiLanguage) =>
         region == LauncherRegion.China || string.IsNullOrWhiteSpace(uiLanguage) ? "zh-Hans" : uiLanguage;
 
+    /// <summary>
+    /// 上次缓存的资讯，轮播图只给原始地址、不要求已下载（Web 端由浏览器直接加载图片）；没有或损坏时返回 null。
+    /// </summary>
+    public LauncherNews? LoadCachedLinks(LauncherRegion region, string uiLanguage) => LoadCachedCore(region, uiLanguage, linksOnly: true);
+
     /// <summary>上次缓存的资讯；没有或损坏时返回 null。</summary>
-    public LauncherNews? LoadCached(LauncherRegion region, string uiLanguage)
+    public LauncherNews? LoadCached(LauncherRegion region, string uiLanguage) => LoadCachedCore(region, uiLanguage, linksOnly: false);
+
+    private LauncherNews? LoadCachedCore(LauncherRegion region, string uiLanguage, bool linksOnly)
     {
         string language = RequestLanguage(region, uiLanguage);
         try
@@ -76,7 +83,8 @@ public sealed class LauncherNewsService(IHttpClientFactory factory, IConfigServi
             if (!File.Exists(path)) return null;
             CacheEntry? entry = JsonSerializer.Deserialize<CacheEntry>(File.ReadAllText(path), JsonOptions);
             if (entry?.Response is null) return null;
-            return Build(region, language, entry.Response, entry.FetchedAtUtc, onlyExistingImages: true);
+            return linksOnly ? BuildLinks(region, language, entry.Response, entry.FetchedAtUtc)
+                : Build(region, language, entry.Response, entry.FetchedAtUtc, onlyExistingImages: true);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
         {
@@ -214,9 +222,20 @@ public sealed class LauncherNewsService(IHttpClientFactory factory, IConfigServi
             if (ImageFileName(slide) is not { } name) continue;
             string file = Path.Combine(CacheDirectory, name);
             if (onlyExistingImages && !File.Exists(file)) continue;
-            slides.Add(new LauncherNewsSlide(file, ToUri(slide.JumpUrl)));
+            slides.Add(new LauncherNewsSlide(file, ToUri(slide.JumpUrl), ToUri(slide.Url)));
         }
         return new LauncherNews(region, language, items, slides, fetchedAt);
+    }
+
+    /// <summary>同 <see cref="Build"/>，但轮播图只带原始地址，不看本地是否已下载。</summary>
+    private LauncherNews BuildLinks(LauncherRegion region, string language, InformationDto response, DateTimeOffset fetchedAt)
+    {
+        LauncherNews news = Build(region, language, response, fetchedAt, onlyExistingImages: false);
+        var slides = (response.Slideshow ?? [])
+            .Where(slide => ImageFileName(slide) is not null)
+            .Select(slide => new LauncherNewsSlide(string.Empty, ToUri(slide.JumpUrl), ToUri(slide.Url)))
+            .ToList();
+        return news with { Slides = slides };
     }
 
     /// <summary>

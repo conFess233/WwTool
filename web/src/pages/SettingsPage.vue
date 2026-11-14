@@ -5,6 +5,7 @@ import { t, language, languages, setLanguage, type Language } from '../i18n';
 import { preset, accent, presets, accents, presetSwatch, accentSwatch, reducedMotion, setReducedMotion, applyTheme } from '../theme';
 import { backdropMode, backdropVideo, peekTransparency, customImageName, setCustomImage } from '../shell/backdrop';
 import { toastError } from '../components/toast';
+import { fetchCatalog } from '../format';
 import { ref, onMounted } from 'vue';
 
 // 界面设置卡（SettingsView.axaml「界面设置」）：主题色块、强调色点、显示语言、减少动画。
@@ -47,7 +48,7 @@ onMounted(async () => {
   const files = [['Characters', 'Catalog_Characters'], ['Weapons', 'Catalog_Weapons'], ['Albums', 'Catalog_Albums'], ['Motors', 'Catalog_Motors']];
   catalog.value = await Promise.all(files.map(async ([f, key]) => {
     try {
-      const d = await (await fetch(`/catalog/data/${f}.json`)).json();
+      const d = await fetchCatalog<{ version?: string; items?: Record<string, unknown> }>(f);
       if (!catalogVersion.value && d.version) catalogVersion.value = d.version;
       return { key, count: Object.keys(d.items ?? {}).length };
     } catch {

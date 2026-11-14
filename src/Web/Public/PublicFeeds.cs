@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Microsoft.AspNetCore.StaticFiles;
 using WwTool.Core.Abstractions;
 using WwTool.Core.Services;
 using WwTool.Core.Services.Challenges;
@@ -140,44 +139,27 @@ public static class PublicFeedEndpoints
     private static readonly TimeSpan CharacterTtl = TimeSpan.FromHours(12);
 
     private static readonly TimeSpan BackgroundTtl = TimeSpan.FromMinutes(30);
-    private static readonly FileExtensionContentTypeProvider ContentTypes = new();
 
     /// <summary>
-    /// 启动器背景（与桌面端「默认背景」相同）：后端下载并缓存，所有访客共用；只提供当前缓存里的图片、标语与视频，
-    /// 不按文件名任意读取缓存目录。
+    /// 启动器背景（与桌面端「默认背景」相同）：后端只读取启动器的背景配置，返回图片、标语图与视频的原始地址，
+    /// 由浏览器直接从启动器 CDN 加载，服务器不下载、不转发这些文件。
     /// </summary>
     public static void MapBackground(this IEndpointRouteBuilder pub)
     {
         pub.MapGet("/background", async (string? lang, LauncherBackgroundService background, PublicFeedCache cache, CancellationToken token) =>
         {
-            LauncherBackgroundFiles? files = await cache.GetAsync("background", BackgroundTtl,
-                background.LoadCached, () => background.RefreshAsync(lang is "en" or "ja" ? lang : "zh-Hans", CancellationToken.None), token);
-            if (files is null) return Results.NotFound();
-            string Url(string path) => "/api/public/background/file/" + Uri.EscapeDataString(Path.GetFileName(path));
-            return Results.Ok(new { image = Url(files.ImagePath), slogan = files.SloganPath is { } s ? Url(s) : null, region = files.Region });
-        });
-
-        pub.MapGet("/background/file/{name}", (string name, LauncherBackgroundService background) =>
-        {
-            LauncherBackgroundFiles? files = background.LoadCached();
-            string? path = new[] { files?.ImagePath, files?.SloganPath, background.LoadCachedVideo() }
-                .FirstOrDefault(p => p is not null && string.Equals(Path.GetFileName(p), name, StringComparison.Ordinal));
-            if (path is null || !File.Exists(path)) return Results.NotFound();
-            string type = ContentTypes.TryGetContentType(path, out string? t) ? t : "application/octet-stream";
-            return Results.File(path, type, enableRangeProcessing: true, lastModified: File.GetLastWriteTimeUtc(path));
-        });
-
-        // 动态背景：第一次请求时后端下载视频（可能较慢），之后直接返回缓存文件
-        pub.MapGet("/background/video", async (LauncherBackgroundService background, CancellationToken token) =>
-        {
-            string? path = background.LoadCachedVideo() ?? await background.EnsureVideoAsync(CancellationToken.None).WaitAsync(token);
-            return path is null ? Results.NotFound() : Results.Ok(new { video = "/api/public/background/file/" + Uri.EscapeDataString(Path.GetFileName(path)) });
+            string language = lang is "en" or "ja" ? lang : "zh-Hans";
+            LauncherBackgroundLinks? links = await cache.GetAsync($"background|{language}", BackgroundTtl,
+                () => null, () => background.ResolveLinksAsync(language, CancellationToken.None), token);
+            return links is null
+                ? Results.NotFound()
+                : Results.Ok(new { image = links.ImageUrl, slogan = links.SloganUrl, video = links.VideoUrl, region = links.Region });
         });
     }
 
     private static readonly TimeSpan NewsTtl = TimeSpan.FromMinutes(10);
 
-    /// <summary>首页「游戏公告」：启动器资讯（活动 / 公告 / 新闻）与轮播图，国服、国际服分别缓存。</summary>
+    /// <summary>首页「游戏公告」：启动器资讯（活动 / 公告 / 新闻）与轮播图，国服、国际服分别缓存；轮播图只给原始地址。</summary>
     public static void MapLauncherNews(this IEndpointRouteBuilder pub)
     {
         pub.MapGet("/launcher-news", async (string? region, string? lang, LauncherNewsService news, PublicFeedCache cache, CancellationToken token) =>
@@ -185,35 +167,17 @@ public static class PublicFeedEndpoints
             LauncherRegion r = string.Equals(region, "china", StringComparison.OrdinalIgnoreCase) ? LauncherRegion.China : LauncherRegion.Global;
             string language = lang is "en" or "ja" ? lang : "zh-Hans";
             LauncherNews? feed = await cache.GetAsync($"news|{r}|{LauncherNewsService.RequestLanguage(r, language)}", NewsTtl,
-                () => news.LoadCached(r, language),
-                async () => await news.RefreshAsync(r, language, CancellationToken.None) is null ? null : await news.DownloadSlidesAsync(r, language, CancellationToken.None),
+                () => news.LoadCachedLinks(r, language),
+                async () => await news.RefreshAsync(r, language, CancellationToken.None) is null ? null : news.LoadCachedLinks(r, language),
                 token);
             if (feed is null) return Results.Problem("资讯暂时无法获取", statusCode: StatusCodes.Status503ServiceUnavailable);
             return Results.Ok(new
             {
                 region = NoticeMapper.RegionKey(feed.Region),
                 items = feed.Items.Select(i => new { category = i.Category.ToString(), i.Title, link = i.Link?.ToString(), i.Date, i.DateText }),
-                slides = feed.Slides.Select(sl => new
-                {
-                    image = $"/api/public/launcher-news/file/{NoticeMapper.RegionKey(feed.Region)}/{Uri.EscapeDataString(Path.GetFileName(sl.ImagePath))}",
-                    link = sl.Link?.ToString(),
-                }),
+                slides = feed.Slides.Where(sl => sl.ImageUrl is not null).Select(sl => new { image = sl.ImageUrl!.ToString(), link = sl.Link?.ToString() }),
                 fetchedAt = feed.FetchedAtUtc,
             });
-        });
-
-        pub.MapGet("/launcher-news/file/{region}/{name}", (string region, string name, string? lang, LauncherNewsService news) =>
-        {
-            LauncherRegion r = region == "china" ? LauncherRegion.China : LauncherRegion.Global;
-            // 只提供当前缓存资讯里的轮播图
-            string? path = new[] { "zh-Hans", "en", "ja" }
-                .Select(l => news.LoadCached(r, l))
-                .SelectMany(f => f?.Slides ?? [])
-                .Select(sl => sl.ImagePath)
-                .FirstOrDefault(p => string.Equals(Path.GetFileName(p), name, StringComparison.Ordinal));
-            if (path is null || !File.Exists(path)) return Results.NotFound();
-            string type = ContentTypes.TryGetContentType(path, out string? t) ? t : "application/octet-stream";
-            return Results.File(path, type, lastModified: File.GetLastWriteTimeUtc(path));
         });
     }
 

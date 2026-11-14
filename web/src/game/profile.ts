@@ -2,6 +2,7 @@ import { ref, watch } from 'vue';
 import { get } from '../http';
 import { currentUid } from '../account/session';
 import { language } from '../i18n';
+import { fetchCatalog } from '../format';
 
 // 当前 UID 的账号资料（后端保存的、由浏览器转交的快照，见 src/Web/Uids/UidEndpoints.cs 的 ProfileMapper）。
 export interface ProfileBase {
@@ -60,7 +61,7 @@ const loaded: Record<string, Record<string, CatalogItem>> = {};
 export function useCatalog(...files: string[]) {
   for (const f of files) {
     if (catalogs.has(f)) continue;
-    const p = fetch(`/catalog/data/${f}.json`).then(r => r.json()).then(j => (j.items ?? {}) as Record<string, CatalogItem>);
+    const p = fetchCatalog<{ items?: Record<string, CatalogItem> }>(f).then(j => j.items ?? {});
     catalogs.set(f, p);
     p.then(items => { loaded[f] = items; catalogVersion.value++; }).catch(() => catalogs.delete(f));
   }

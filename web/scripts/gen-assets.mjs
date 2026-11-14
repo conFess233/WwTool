@@ -2,9 +2,10 @@
 //   src/UI/Theming/Presets/*.axaml、Accents/*.axaml → src/generated/themes.css（预设 × 强调色）
 //   src/UI/Theming/Motion.cs                         → src/generated/motion.css（时长与缓动）
 //   src/Core/Local/Language/*.json + src/i18n/*.json  → src/generated/i18n/*.json
-//   src/UI/Assets/Images 中的导航图标                 → public/icons/
-//   catalog/Icons（物品、角色、头像图标）              → public/catalog/icons/
-//   src/Core/Models/Config/ApiConfig.cs 的协议参数     → src/generated/protocol.json（游戏登录只在浏览器里用，06 §17.3）
+//   src/UI/Theming/Icons.axaml 的线条图标             → src/generated/icons.json
+//   src/UI/Assets/Images 中的界面图片                 → public/icons/
+// 资料图标与资料数据（catalog/）不再复制：浏览器直接从 GitHub 上的资料仓库加载。
+//   src/Core/Models/Config/ApiConfig.cs 的协议参数     → src/generated/protocol.json（游戏登录只在浏览器里用）
 // 强调色派生规则与 src/UI/Services/ThemeService.cs 的 ApplyAccent / Mix 完全一致。
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, copyFileSync, existsSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
@@ -153,22 +154,6 @@ for (const file of readdirSync(assetImages).filter(f => /\.(png|gif)$/i.test(f))
 }
 copyFileSync(join(repo, 'src', 'UI', 'Assets', 'WwTool.ico'), join(webRoot, 'public', 'favicon.ico'));
 
-// ---------- 资料图标 ----------
-const catalogIcons = join(repo, 'catalog', 'Icons');
-const catalogOut = join(webRoot, 'public', 'catalog', 'icons');
-mkdirSync(catalogOut, { recursive: true });
-let iconCount = 0;
-for (const f of readdirSync(catalogIcons)) {
-  if (f.endsWith('.png')) { copyFileSync(join(catalogIcons, f), join(catalogOut, f)); iconCount++; }
-}
-
-// 资料目录（物品名称、品质）：按需由浏览器读取
-const catalogDataOut = join(webRoot, 'public', 'catalog', 'data');
-mkdirSync(catalogDataOut, { recursive: true });
-for (const f of readdirSync(join(repo, 'catalog', 'Data'))) {
-  if (f.endsWith('.json')) copyFileSync(join(repo, 'catalog', 'Data', f), join(catalogDataOut, f));
-}
-
 // ---------- 协议参数 ----------
 const apiConfig = readFileSync(join(repo, 'src', 'Core', 'Models', 'Config', 'ApiConfig.cs'), 'utf8');
 function classBlock(name) {
@@ -200,4 +185,4 @@ if (!geetest) throw new Error('GeetestServer.cs 中找不到 CAPTCHA_ID');
 protocol.captchaId = geetest[1];
 writeFileSync(join(outDir, 'protocol.json'), JSON.stringify(protocol, null, 2));
 
-console.log(`生成完成：${presets.length} 套预设 × ${accents.length} 种强调色，${languages.length} 种语言，${iconCount} 个资料图标`);
+console.log(`生成完成：${presets.length} 套预设 × ${accents.length} 种强调色，${languages.length} 种语言`);

@@ -11,6 +11,9 @@ namespace WwTool.Core.Services;
 /// <summary>已下载到本地的启动器背景：背景图（视频背景取首帧图）与可选的标语图（与背景同尺寸比例的透明叠加层）。</summary>
 public sealed record LauncherBackgroundFiles(string ImagePath, string? SloganPath, string Region, string Language);
 
+/// <summary>启动器背景的原始地址（不下载）：背景图、标语图与视频背景。</summary>
+public sealed record LauncherBackgroundLinks(string ImageUrl, string? SloganUrl, string? VideoUrl, string Region, string Language);
+
 /// <summary>
 /// 窗口默认背景取自游戏启动器（接口文档 <c>docs/API/Launcher.md</c>「启动器背景」）：
 /// 先请求国际服（按界面语言），失败（网络、开关关闭、图片下载失败）再请求国服（只有 zh-Hans），都失败返回 null，由界面退回默认底纹。
@@ -138,7 +141,37 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
         return template;
     }
 
-    private async Task<LauncherBackgroundFiles?> TryFetchAsync(string region, string url, string language, CancellationToken token)
+    /// <summary>
+    /// 只解析背景配置、不下载文件：返回图片、标语图与视频的原始地址，供浏览器直接加载（Web 端用）。
+    /// 区服顺序与 <see cref="RefreshAsync"/> 相同；全部失败返回 null。
+    /// </summary>
+    public async Task<LauncherBackgroundLinks?> ResolveLinksAsync(string language, CancellationToken token = default)
+    {
+        var sources = new (string Region, string Template, string Language)[]
+        {
+            ("NET", config.Api.Urls.LauncherBackgroundUrlNET, language),
+            ("CN", config.Api.Urls.LauncherBackgroundUrlCN, CnLanguage),
+        };
+        foreach (var (region, template, lang) in sources)
+        {
+            token.ThrowIfCancellationRequested();
+            if (string.IsNullOrWhiteSpace(template)) continue;
+            try
+            {
+                string url = Format(await ResolveTemplateAsync(region, template, token).ConfigureAwait(false), lang);
+                (string Image, string? Slogan, string? Video)? links = await FetchLinksAsync(region, url, token).ConfigureAwait(false);
+                if (links is { } l) return new LauncherBackgroundLinks(l.Image, l.Slogan, l.Video, region, lang);
+            }
+            catch (Exception ex) when (IsRecoverable(ex, token))
+            {
+                logger.Warn($"启动器背景（{region}）获取失败：{ex.GetType().Name} {ex.Message}");
+            }
+        }
+        return null;
+    }
+
+    /// <summary>读取背景配置并取出图片、标语图与视频地址；未启用或缺少图片地址时返回 null。</summary>
+    private async Task<(string Image, string? Slogan, string? Video)?> FetchLinksAsync(string region, string url, CancellationToken token)
     {
         HttpClient client = factory.CreateClient("WwToolClient");
         string json;
@@ -151,7 +184,6 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
             response.EnsureSuccessStatusCode();
             json = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
         }
-
         BackgroundDto? dto = JsonSerializer.Deserialize<BackgroundDto>(json, JsonOptions);
         if (dto is null || dto.FunctionSwitch != 1)
         {
@@ -165,13 +197,20 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
             logger.Info($"启动器背景（{region}）缺少可用的背景图片地址");
             return null;
         }
-        string? sloganUrl = IsHttpUrl(dto.Slogan) ? dto.Slogan : null;
+        return (imageUrl!, IsHttpUrl(dto.Slogan) ? dto.Slogan : null,
+            dto.BackgroundFileType == 2 && IsHttpUrl(dto.BackgroundFile) ? dto.BackgroundFile : null);
+    }
+
+    private async Task<LauncherBackgroundFiles?> TryFetchAsync(string region, string url, string language, CancellationToken token)
+    {
+        if (await FetchLinksAsync(region, url, token).ConfigureAwait(false) is not { } links) return null;
+        (string imageUrl, string? sloganUrl, string? videoUrl) = links;
         // 视频只记下地址，开启「动态背景」时才由 EnsureVideoAsync 下载。
-        string? videoUrl = dto.BackgroundFileType == 2 && IsHttpUrl(dto.BackgroundFile) ? dto.BackgroundFile : null;
+        HttpClient client = factory.CreateClient("WwToolClient");
 
         Directory.CreateDirectory(CacheDirectory);
         Manifest? old = ReadManifest();
-        string imageFile = await EnsureFileAsync(client, imageUrl!, "bg-", old is not null && old.ImageUrl == imageUrl ? old.ImageFile : null, token).ConfigureAwait(false);
+        string imageFile = await EnsureFileAsync(client, imageUrl, "bg-", old is not null && old.ImageUrl == imageUrl ? old.ImageFile : null, token).ConfigureAwait(false);
         string? sloganFile = null;
         if (sloganUrl is not null)
         {
@@ -191,7 +230,7 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
         {
             Region = region,
             Language = language,
-            ImageUrl = imageUrl!,
+            ImageUrl = imageUrl,
             ImageFile = imageFile,
             SloganUrl = sloganUrl,
             SloganFile = sloganFile,
