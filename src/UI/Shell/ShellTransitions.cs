@@ -34,11 +34,11 @@ public sealed class PageSlideTransition : IPageTransition
         if (from is not null && !cancellationToken.IsCancellationRequested) from.IsVisible = false;
     }
 
-    /// <summary>按视觉树顺序让 <c>Border.card</c> 依次浮入。</summary>
+    /// <summary>按视觉树顺序让可见的 <c>Border.card</c> 依次浮入（隐藏的卡片不参与，免得停在透明状态）。</summary>
     public static void StaggerCards(Visual root, CancellationToken token = default)
     {
         int index = 0;
-        foreach (Border card in root.GetVisualDescendants().OfType<Border>().Where(b => b.Classes.Contains("card")))
+        foreach (Border card in root.GetVisualDescendants().OfType<Border>().Where(b => b.Classes.Contains("card") && b.IsEffectivelyVisible))
         {
             if (index >= MaxStaggered) break;
             _ = Motion.EnterAsync(card, 0, 16, Motion.Relaxed, TimeSpan.FromMilliseconds(70 * index), Motion.StandardEasing, token);
