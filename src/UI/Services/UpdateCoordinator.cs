@@ -143,24 +143,39 @@ public sealed partial class UpdateCoordinator : ObservableObject
         {
             result = await Task.Run(() => _updates.CheckAsync(CurrentVersion, force: true));
         }
+        catch (Exception ex)
+        {
+            _logger.Warn($"手动检查更新失败：{ex.GetType().Name} {ex.Message}");
+            result = new UpdateCheckResult(UpdateCheckStatus.Failed, null, null);
+        }
         finally
         {
             IsChecking = false;
         }
-        Apply(result);
+        if (result.Status != UpdateCheckStatus.Failed) Apply(result);
+        // 用户点了按钮在等结果：提示设为重要，「简洁」通知模式下也显示。
+        void Notify(string title, string message, NotificationType type) => _uiState.ShowToast(new NotificationRequest
+        {
+            Title = title,
+            Message = message,
+            Type = type,
+            Priority = NotificationPriority.Important,
+            Source = "Update",
+            DedupeKey = "update-check",
+        });
         switch (result.Status)
         {
             case UpdateCheckStatus.UpdateAvailable:
                 await ShowDialogAsync();
                 break;
             case UpdateCheckStatus.UpToDate:
-                _uiState.ShowToast(_localization["Toast_Success"], string.Format(_localization["Update_UpToDate"], CurrentVersion), NotificationType.Success);
+                Notify(_localization["Toast_Success"], string.Format(_localization["Update_UpToDate"], CurrentVersion), NotificationType.Success);
                 break;
             case UpdateCheckStatus.DevelopmentBuild:
-                _uiState.ShowToast(_localization["Toast_Info"], _localization["Update_DevBuild"]);
+                Notify(_localization["Toast_Info"], _localization["Update_DevBuild"], NotificationType.Info);
                 break;
             default:
-                _uiState.ShowToast(_localization["Toast_Warning"], _localization["Update_Failed"], NotificationType.Warning);
+                Notify(_localization["Toast_Warning"], _localization["Update_Failed"], NotificationType.Warning);
                 break;
         }
     }
