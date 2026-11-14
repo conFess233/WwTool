@@ -6,9 +6,9 @@ using WwTool.Core.Models.Domain;
 
 namespace WwTool.Core.Services;
 
-internal static class PlayerSnapshotMapper
+public static class PlayerSnapshotMapper
 {
-    internal static PlayerRegionSummary? Map(Api.PlayerRegionInfo? value) => value is null ? null : new()
+    public static PlayerRegionSummary? Map(Api.PlayerRegionInfo? value) => value is null ? null : new()
     {
         RoleId = value.RoleId,
         RoleName = value.RoleName,
@@ -16,7 +16,7 @@ internal static class PlayerSnapshotMapper
         Sex = value.Sex,
         HeadPhoto = value.HeadPhoto,
     };
-    internal static PlayerSnapshot? Map(Api.RoleDetailInfo? value) => value is null ? null : new()
+    public static PlayerSnapshot? Map(Api.RoleDetailInfo? value) => value is null ? null : new()
     {
         Base = Map(value.Base),
         MotorData = Map(value.MotorData),

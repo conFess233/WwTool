@@ -1,0 +1,143 @@
+/* 对应 src/UI/Theming/Controls.axaml 的公共样式；颜色、圆角、阴影来自 generated/themes.css，动效来自 generated/motion.css。 */
+@import '../generated/themes.css';
+@import '../generated/motion.css';
+
+:root {
+  --font-ui: 'Segoe UI Variable Text', 'Microsoft YaHei UI', 'PingFang SC', 'Noto Sans SC', 'Noto Sans CJK SC', sans-serif;
+  --font-mono: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  --page-padding-x: 40px;
+  --page-padding-top: 38px;
+  --card-gap: 18px;
+  --card-padding: 18px 22px;
+  --header-height: 56px;
+}
+:root:lang(ja) {
+  --font-ui: 'Segoe UI Variable Text', 'Yu Gothic UI', 'Hiragino Sans', 'Noto Sans CJK JP', 'Microsoft YaHei UI', sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-width: 1100px;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text-primary);
+  font: 14px/1.5 var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color var(--motion-standard) var(--ease-standard), color var(--motion-standard) var(--ease-standard);
+}
+button { font: inherit; color: inherit; }
+img { display: block; }
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+/* 主题切换的圆形扩散由 theme.ts 驱动，关掉默认交叉淡化 */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
+.skip-link { position: absolute; left: -9999px; top: 8px; z-index: 100; padding: 8px 14px; border-radius: 999px; background: var(--nav-island); color: var(--text-on-nav-island); }
+.skip-link:focus { left: 16px; }
+
+/* ---------- 文字 ---------- */
+.page-title { font-size: 26px; font-weight: 700; line-height: 29px; margin: 0; }
+.parent-title { font-size: 12px; font-weight: 600; letter-spacing: 1px; color: var(--accent-text); }
+.card-title { font-size: 15px; font-weight: 700; margin: 0; }
+.caption { font-size: 12px; color: var(--text-muted); }
+.aux { font-size: 13px; }
+.secondary { color: var(--text-secondary); }
+.muted { color: var(--text-muted); }
+.mono { font-family: var(--font-mono); }
+
+/* ---------- 卡片 ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--card-padding);
+}
+.mini { background: var(--surface-raised); border-radius: var(--radius-inner); }
+
+/* 动效「卡片依次浮入」：每张 420ms，间隔 70ms，上移 16 */
+@keyframes card-in { from { opacity: 0; transform: translateY(16px); } }
+.stagger > .card, .stagger .card.stagger-item {
+  animation: card-in var(--motion-relaxed) var(--ease-standard) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* ---------- 胶囊 ---------- */
+.chip {
+  height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--track); color: var(--text-secondary);
+  transition: background-color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+}
+.chip:hover { background: var(--surface-raised); border-color: var(--accent-line); color: var(--text-primary); }
+.chip[aria-pressed='true'], .chip[aria-checked='true'] { background: var(--accent-container); border-color: var(--accent-line); color: var(--accent-text); font-weight: 700; }
+.chip.small { height: 28px; padding: 0 12px; font-size: 12px; border: 0; background: var(--divider); }
+.chip.small[aria-pressed='true'], .chip.small[aria-checked='true'] { background: var(--text-primary); color: var(--surface); }
+
+/* ---------- 按钮 ---------- */
+.btn {
+  height: 36px; padding: 0 16px; border-radius: var(--radius-control); cursor: pointer; font-weight: 600;
+  background: var(--surface-raised); border: 1px solid var(--border); color: var(--text-primary);
+  transition: background-color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard);
+}
+.btn:hover { border-color: var(--accent-line); }
+.btn.primary { background: var(--accent); border-color: transparent; color: var(--text-on-accent); }
+.btn.primary:hover { background: var(--accent-hover); }
+.btn.primary:active { background: var(--accent-pressed); }
+
+/* ---------- 标签 ---------- */
+.ntag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: var(--accent-container); color: var(--accent-text); }
+.ntag.update { background: var(--info-container); color: var(--info); }
+.ntag.event { background: var(--success-container); color: var(--success); }
+.ntag.muted-tag { background: var(--divider); color: var(--text-muted); }
+
+/* ---------- 滚动条 ---------- */
+* { scrollbar-width: thin; scrollbar-color: var(--track) transparent; }
+
+/* ---------- 减少动画：位移与缩放降为短淡入淡出，循环动画停止 ---------- */
+@keyframes fade-in { from { opacity: 0; } }
+.reduced-motion .stagger > .card, .reduced-motion .stagger .card.stagger-item { animation: fade-in var(--motion-fast) linear both; animation-delay: 0ms; }
+.reduced-motion *, .reduced-motion *::before, .reduced-motion *::after { animation-iteration-count: 1 !important; }
+
+/* ---------- 表单 ---------- */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field-label { font-size: 12px; color: var(--text-muted); }
+.input {
+  width: 100%; height: 38px; padding: 0 12px; border-radius: var(--radius-control); font: inherit; color: var(--text-primary);
+  background: var(--input-background); border: 1px solid var(--input-border);
+  transition: border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard);
+}
+textarea.input { height: auto; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-container); }
+.field-hint { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+.form-error { color: var(--danger); font-size: 13px; margin: 0 0 10px; }
+.check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.check input { margin-top: 3px; accent-color: var(--accent); }
+
+.btn.danger { background: var(--surface); border-color: var(--danger-line); color: var(--danger); }
+.btn.danger:hover { background: var(--danger-soft); border-color: var(--danger); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn.small { height: 30px; padding: 0 12px; font-size: 12px; }
+.btn.link { background: transparent; border-color: transparent; color: var(--accent-text); padding: 0 6px; }
+.btn.link:hover { border-color: transparent; text-decoration: underline; }
+
+.tag { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--divider); color: var(--text-secondary); }
+.tag.accent { background: var(--accent-container); color: var(--accent-text); }
+.tag.red { background: var(--danger-soft); color: var(--danger); }
+.tag.green { background: var(--success-container); color: var(--success); }
+
+.section-title { font-size: 15px; font-weight: 700; margin: 0; }
+.kv { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--divider); font-size: 13px; }
+.kv > :first-child { color: var(--text-muted); }
+.kv > :last-child { font-weight: 600; }
+.code-box { font-family: var(--font-mono); font-size: 11.5px; line-height: 1.6; padding: 10px 12px; border-radius: var(--radius-control); background: var(--surface-sunken); border: 1px solid var(--border); max-height: 120px; overflow: auto; word-break: break-all; white-space: pre-wrap; user-select: all; }
+
+/* 未知头像：暖色斜纹底 + 问号（PullsStyles.axaml 的 unknown-face） */
+.unknown-face { display: grid; place-items: center; border-radius: 50%; color: var(--text-muted); font-weight: 700;
+  background: repeating-linear-gradient(135deg, var(--surface-muted) 0 6px, var(--surface-raised) 6px 12px); }
+
+/* ---------- 首页角标 ---------- */
+/* 卡片左上与右下的金色角标：14 × 2 横线与 2 × 14 竖线，距边 10（HomeOrnaments.CornerMarks） */
+.corner-marks { position: absolute; inset: 0; pointer-events: none; }
+.corner-marks::before, .corner-marks::after { content: ''; position: absolute; width: 14px; height: 14px; border: 0 solid var(--accent-line); }
+.corner-marks::before { left: 10px; top: 10px; border-left-width: 2px; border-top-width: 2px; }
+.corner-marks::after { right: 10px; bottom: 10px; border-right-width: 2px; border-bottom-width: 2px; }

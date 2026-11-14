@@ -115,7 +115,7 @@ public sealed class PullsService(
     /// <summary>
     /// 与 1.x 统计页相同的计算链：各卡池 OrganizeData → 角色活动池的赢/歪/限定计数进入全局统计 → 全部记录计算图表数据。
     /// </summary>
-    internal static PullsSnapshot Calculate(
+    public static PullsSnapshot Calculate(
         string uid,
         IReadOnlyDictionary<CardPoolType, IReadOnlyList<GachaPull>> recordsByPool,
         IGachaStatisticsService statistics,

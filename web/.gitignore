@@ -1,0 +1,6 @@
+node_modules/
+# 由 scripts/gen-assets.mjs 从 src/UI 与 src/Core 生成，不手改、不提交
+src/generated/
+public/icons/
+public/catalog/
+public/favicon.ico

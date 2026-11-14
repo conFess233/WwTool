@@ -16,3 +16,6 @@ publish/
 
 # DecryptLog.bat 的输出
 /scripts/Decrypt/
+
+# Web 前端构建产物（web/ 用 vite build 输出）
+/src/Web/wwwroot/
