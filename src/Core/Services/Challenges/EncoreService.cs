@@ -92,6 +92,25 @@ public sealed class EncoreService(IHttpClientFactory factory, IConfigService con
         _ => EncoreParser.ParseMatrix(id, body),
     };
 
+    // ── 角色详情 ──────────────────────────────────────────
+
+    /// <summary>缓存的角色详情（角色 ID 与游戏资料、抽卡记录里的 ID 相同）。</summary>
+    public EncoreData<EncoreCharacter>? LoadCharacter(int id, string uiLanguage) =>
+        Parse(ReadEntry(CharacterPath(id, RequestLanguage(uiLanguage))), false, body => EncoreCharacterParser.Parse(body));
+
+    public async Task<EncoreData<EncoreCharacter>?> RefreshCharacterAsync(int id, string uiLanguage, CancellationToken token = default)
+    {
+        string language = RequestLanguage(uiLanguage);
+        string path = string.Create(CultureInfo.InvariantCulture, $"/{language}/character/{id}");
+        (CacheEntry? entry, bool changed) = await FetchAsync(path, CharacterPath(id, language), token).ConfigureAwait(false);
+        if (Interlocked.Exchange(ref _cleaned, 1) == 0) _ = Task.Run(CleanUp, CancellationToken.None);
+        return Parse(entry, changed, body => EncoreCharacterParser.Parse(body));
+    }
+
+    /// <summary>encore.moe 上的角色页面。</summary>
+    public string CharacterPageUrl(int id, string uiLanguage) =>
+        string.Format(CultureInfo.InvariantCulture, config.Api.Urls.EncorePageUrl, "character/" + id.ToString(CultureInfo.InvariantCulture), RequestLanguage(uiLanguage));
+
     private EncoreData<T>? Parse<T>(CacheEntry? entry, bool changed, Func<string, T> parse)
     {
         if (entry?.Body is null) return null;
@@ -162,6 +181,9 @@ public sealed class EncoreService(IHttpClientFactory factory, IConfigService con
 
     private string DetailPath(ChallengeKind kind, int id, string language) =>
         Path.Combine(CacheDirectory, language, string.Create(CultureInfo.InvariantCulture, $"{PathName(kind)}-{id}.json"));
+
+    private string CharacterPath(int id, string language) =>
+        Path.Combine(CacheDirectory, language, string.Create(CultureInfo.InvariantCulture, $"character-{id}.json"));
 
     private static CacheEntry? ReadEntry(string path)
     {

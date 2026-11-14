@@ -1,6 +1,6 @@
-## encore.moe（逆境深塔 / 冥歌海墟 / 终焉矩阵）
+## encore.moe（逆境深塔 / 冥歌海墟 / 终焉矩阵 / 角色详情）
 
-[encore.moe](https://encore.moe) 是第三方的鸣潮资料站，数据来自游戏解包。本文只记录活动页要用的三个玩法：逆境深塔、冥歌海墟、终焉矩阵。每个玩法都有两个接口：一个列出各期，一个返回某一期的详情，包括敌人、增益和评分规则。
+[encore.moe](https://encore.moe) 是第三方的鸣潮资料站，数据来自游戏解包。本文记录两部分：活动页要用的三个玩法（逆境深塔、冥歌海墟、终焉矩阵），每个玩法有一个列出各期、一个返回某一期详情的接口；以及角色详情弹窗用的[角色详情](#角色详情)接口。
 
 - 官方文档：OpenAPI 3 规范，`https://api-v2.encore.moe/openapi.json`（`info.version` 为 `2.0.0`）
 - 公开接口，`GET` 即可，无需登录
@@ -49,6 +49,7 @@
 | [海墟详情](#海墟详情) | `/{lang}/whiwa/{seasonId}` | `https://api-v2.encore.moe/api/zh-Hans/whiwa/23`   |
 | [矩阵各期](#矩阵各期) | `/{lang}/dpmatrix`         | `https://api-v2.encore.moe/api/zh-Hans/dpmatrix`   |
 | [矩阵详情](#矩阵详情) | `/{lang}/dpmatrix/{id}`    | `https://api-v2.encore.moe/api/zh-Hans/dpmatrix/9` |
+| [角色详情](#角色详情) | `/{lang}/character/{id}`   | `https://api-v2.encore.moe/api/zh-Hans/character/1413` |
 
 #### 路径参数
 
@@ -57,6 +58,7 @@
 | `lang`     | 语言 | 上面 13 种之一，写法与[游戏语言](WW_API.md#语言)相同（`zh-Hans`、`en`、`ja` …）           |
 | `seasonId` | 期数 | 深塔、海墟用，取各期列表里的 `id` / `Season`                                              |
 | `id`       | 期数 | 矩阵用，取各期列表里的 `Season`（不是 `SeasonId`，也不是 `LevelIds`）；填关卡 ID 返回 500 |
+| `id`       | 角色 ID | 角色详情用，与游戏资料、抽卡记录里的角色 ID 相同（如 `1413` 清宵）                        |
 
 网站请求时会在末尾加 `?v={数据版本}`，用来看测试服数据；正式数据不加，客户端也不用加。
 
@@ -87,6 +89,7 @@
 | `toa/42`     | 约 239 KB           |
 | `whiwa/23`   | 约 932 KB           |
 | `dpmatrix/9` | 约 89 KB            |
+| `character/1413` | 约 410 KB       |
 
 #### 错误
 
@@ -443,3 +446,68 @@
 - 洛瑟菈：「角色拥有额外疲劳值（限S2第4阶段）」
 - 今汐：「角色最终伤害提升25%」
 
+---
+
+## 角色详情
+
+`GET /{lang}/character/{id}`
+
+返回一名角色的全部解包资料，约 410 KB，其中大半是 3D 模型和动作列表（`Model3D`、`Model3DEquips`），工具箱不用。角色资料在版本更新时才会变，可以长期缓存，打开详情时先显示缓存再后台刷新。
+
+很多文字字段是 `{Title, Content}` 对象，取 `Content`；`Title` 多为占位文字 `No Description Available`。
+
+### 基本资料
+
+| 字段                                    | 类型   | 说明                                                                       |
+| --------------------------------------- | ------ | -------------------------------------------------------------------------- |
+| `Id`                                    | int    | 角色 ID                                                                    |
+| `Name` / `NickName` / `Introduction`    | object | 名称、昵称、简介（取 `Content`，简介含 `
+`）                              |
+| `QualityId`                             | int    | 星级（4 / 5）                                                              |
+| `ElementId` / `ElementName`             | int / string | [元素 ID](#元素-id) 与名称                                           |
+| `WeaponTypeName`                        | string | 武器类型，如 `迅刀`                                                        |
+| `Tags`                                  | list   | 定位标签 `{TagName, TagDesc, TagNameColor, TagIcon}`，颜色为 `RRGGBB`       |
+| `FormationRoleCard`                     | string | 编队立绘（半身像，带透明背景的 webp，约 700×960），网站默认显示这张        |
+| `RolePortrait` / `Card` / `RoleHeadIcon*` | string | 活动立绘、方形头像等                                                     |
+| `Skins`                                 | list   | 皮肤 `{Id, Name, FormationRoleCard, PreviewRoleCard, …}`；网站取 `Id` 最小的作为默认 |
+
+### 档案 `favorRole`
+
+`Birthday`、`Sex`、`Country`（出身）、`Influence`（所属）、`CVNameCn` / `CVNameJp` / `CVNameEn` / `CVNameKo`（四语声优），都是 `{Title, Content}`。另有 `Info`、`TalentName`、`TalentDoc`、`TalentCertification` 等长文本。
+
+### 基础属性 `Properties`
+
+`[{Name, Icon, BaseValue, GrowthValues}]`，`GrowthValues` 为 `[{growthId, level, value}]`：
+
+- 每个等级一项，突破等级（20、40、50、60、70、80）出现两次，后一项是突破后的值。
+- `value` 多数是数字（可带小数，如攻击 `462.5`，游戏面板显示时截去小数），暴击等为文字，如 `"5%"`。
+- `Icon` 是虚幻引擎对象路径（`…/T_Icon.T_Icon_UI`），没有对应的图片文件。
+
+### 技能 `Skills`
+
+10 项左右，顺序为常态攻击、共鸣技能、共鸣解放、固有技能……
+
+| 字段              | 类型   | 说明                                                                      |
+| ----------------- | ------ | ------------------------------------------------------------------------- |
+| `SkillType`       | string | 常态攻击、共鸣技能、共鸣解放、共鸣回路、变奏技能、延奏技能、谐度破坏、固有技能 |
+| `SkillName`       | string | 技能名                                                                    |
+| `SkillDescribe`   | string | 富文本描述（数值已填好，没有 `{0}` 占位符）                               |
+| `Icon`            | string | 技能图标 URL                                                              |
+| `SkillMedia`      | string | 技能演示视频（mp4）                                                       |
+| `SkillAttributes` | list   | 倍率表 `{attributeId, attributeName, values}`，`values` 为 1–20 级的文字，如 `"15.16%*2"`；玩家可升到 10 级 |
+| `SkillTree` / `Consumes` / `DamageList` | list | 技能树节点、升级材料、伤害明细，工具箱不用              |
+
+### 共鸣链 `ResonantChain`
+
+6 项 `{GroupIndex, NodeName, AttributesDescription, NodeIcon, …}`。`GroupIndex` 为 1–6；`AttributesDescription` 是数值已填好的富文本；`NodeIcon` 是以 `/Game/` 开头的路径，拼在 `https://api-v2.encore.moe/resource/Data` 后面即为图片地址。
+
+### 故事与语音
+
+| 字段      | 说明                                                                                                          |
+| --------- | ------------------------------------------------------------------------------------------------------------- |
+| `Stories` | 角色故事 `{Sort, Title, Content}`，`Content` 含 `<br>` 和游戏内链接标签 `<te href=…>`（只取文字）              |
+| `Words`   | 语音 `{Sort, Title, Content, VoiceZh, VoiceJa, VoiceEn, VoiceKo}`；`Content` 是台词，`Voice*` 是 mp3 地址       |
+
+### 资源路径
+
+以 `/Game/` 开头的字段（`NodeIcon`、`Tags[].TagIcon`、`FormationSpineAtlas` 等）不是完整 URL。网站的处理：拼到 `https://api-v2.encore.moe/resource/Data` 后面，并把路径里的 `UiResources` 改成 `UIResources`。只有带图片扩展名（`.webp`、`.png`）的才是文件。
