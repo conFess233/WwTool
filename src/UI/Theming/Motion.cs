@@ -47,10 +47,34 @@ public static class Motion
             if (_reduced == value) return;
             _reduced = value;
             ReducedChanged?.Invoke(null, EventArgs.Empty);
+            LoopsChanged?.Invoke(null, EventArgs.Empty);
         }
     }
 
     public static event EventHandler? ReducedChanged;
+
+    private static bool _paused;
+
+    /// <summary>窗口不在前台或已最小化：循环动画暂停，回到前台后继续（由主窗口维护）。</summary>
+    public static bool Paused
+    {
+        get => _paused;
+        set
+        {
+            if (_paused == value) return;
+            _paused = value;
+            LoopsChanged?.Invoke(null, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
+    /// 能否播放循环动画（呼吸、像素动图、轮播进度）。任何一个在跑的动画都会让整个窗口按帧重绘
+    /// （实测首页空闲时约占一个核心的 40%），所以只在需要时播放：减少动画或窗口在后台时停下。
+    /// </summary>
+    public static bool LoopsAllowed => !_reduced && !_paused;
+
+    /// <summary><see cref="LoopsAllowed"/> 可能变化（减少动画或前台状态改变）。</summary>
+    public static event EventHandler? LoopsChanged;
 
     /// <summary>
     /// 错误抖动（动效「错误抖动」）：左右轻摆 10 / 9 / 6 / 4 / 2，共 400ms。减少动画时不摆动。

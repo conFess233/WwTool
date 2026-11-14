@@ -171,7 +171,7 @@ public partial class MainWindow : Window
             return;
         }
 #if DEBUG
-        if (Environment.GetEnvironmentVariable("WWTOOL_DUMP_SNAPSHOT") is { Length: > 0 } dump) snapshot.Save(dump);
+        if (Environment.GetEnvironmentVariable("WWTOOL_DUMP_SNAPSHOT") is { Length: > 0 } dump) snapshot.Save(dump, Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
 #endif
         _themeSnapshot?.Dispose();
         _themeSnapshot = snapshot;
@@ -252,7 +252,6 @@ public partial class MainWindow : Window
     public MainWindow(ShellViewModel viewModel) : this()
     {
         DataContext = viewModel;
-        ApplyGlass(viewModel.IsGlassEnabled);
         viewModel.PropertyChanged += OnViewModelChanged;
         RegisterShortcuts(viewModel);
         viewModel.Accounts.PropertyChanged += (_, e) =>
@@ -288,9 +287,6 @@ public partial class MainWindow : Window
         if (sender is not ShellViewModel viewModel) return;
         switch (e.PropertyName)
         {
-            case nameof(ShellViewModel.IsGlassEnabled):
-                ApplyGlass(viewModel.IsGlassEnabled);
-                break;
             case nameof(ShellViewModel.IsReady) when viewModel.IsReady:
                 Dispatcher.UIThread.Post(() => _ = DismissSplashAsync(), DispatcherPriority.Loaded);
                 break;
@@ -365,11 +361,6 @@ public partial class MainWindow : Window
         }
     }
 
-    // 系统不支持模糊材质时退回不透明，背景层仍按不透明度绘制。
-    private void ApplyGlass(bool enabled) => TransparencyLevelHint = enabled
-        ? [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur, WindowTransparencyLevel.None]
-        : [WindowTransparencyLevel.None];
-
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -381,13 +372,14 @@ public partial class MainWindow : Window
         if (change.Property == WindowStateProperty || change.Property == IsVisibleProperty || change.Property == IsActiveProperty) UpdateVideoPlayback();
     }
 
-    /// <summary>
-    /// 动态背景只在窗口可见、未最小化、处于前台（获得焦点）且未开启「减少动画」时播放，否则暂停在当前画面。
-    /// 窗口被其他窗口完全挡住时它通常也已失去焦点，因此同样暂停。
-    /// </summary>
     /// <summary>窗口是否在前台（最近一次激活 / 失活事件）。</summary>
     private bool _foreground;
 
+    /// <summary>
+    /// 动态背景与循环动画只在窗口可见、未最小化、处于前台（获得焦点）时播放，否则暂停在当前画面
+    /// （窗口类 <c>inactive</c> 与 <see cref="Motion.Paused"/>）。窗口被其他窗口完全挡住时它通常也已失去焦点，因此同样暂停。
+    /// 动画再小也会让整个窗口按帧重绘，在后台（比如玩游戏时）没有必要。
+    /// </summary>
     private void UpdateVideoPlayback()
     {
         bool foreground = _foreground;
@@ -395,7 +387,10 @@ public partial class MainWindow : Window
         // 离屏截图验证时窗口不抢焦点，允许忽略焦点条件。
         if (Environment.GetEnvironmentVariable("WWTOOL_VIDEO_IGNORE_FOCUS") == "1") foreground = true;
 #endif
-        BackdropVideo.IsPlaying = IsVisible && WindowState != WindowState.Minimized && foreground && !Motion.Reduced;
+        bool active = IsVisible && WindowState != WindowState.Minimized && foreground;
+        Classes.Set("inactive", !active);
+        Motion.Paused = !active;
+        BackdropVideo.IsPlaying = active && !Motion.Reduced;
     }
 
     private void OnMinimizeClick(object? sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;

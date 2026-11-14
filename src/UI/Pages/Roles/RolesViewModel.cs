@@ -41,26 +41,16 @@ public abstract partial class GuideTile : ObservableObject, IGuideCard
 
 public sealed class RoleTile : GuideTile
 {
+    public required int RoleId { get; init; }
     public required int Sequence { get; init; }
     public required string SequenceText { get; init; }
-    public string? PortraitPath { get; init; }
-    public IReadOnlyList<GuideHoverAttribute> Attributes { get; init; } = [];
-    public GuideHoverWeapon? Weapon { get; init; }
-
-    public bool HasAttributes => Attributes.Count > 0;
-    public bool HasWeapon => Weapon is not null;
-    public string WeaponStarsText => Weapon is null ? string.Empty : Weapon.Star + "★";
+    public GuideRoleHoverDetails Details { get; init; } = new([], null);
+    public GuideRoleBuild Build { get; init; } = GuideRoleBuild.Empty;
 
     /// <summary>三至五链用浅强调色，六链用强调色实底。</summary>
     public bool IsMidSequence => Sequence is >= 3 and <= 5;
     public bool IsFullSequence => Sequence >= 6;
-
-    /// <summary>悬停卡内容：只是数据，控件树由模板在悬停卡打开时才创建。</summary>
-    public RoleHover Hover => new(this);
 }
-
-/// <summary>角色悬停卡的数据。</summary>
-public sealed record RoleHover(RoleTile Tile);
 
 /// <summary>武器悬停提示的数据。</summary>
 public sealed record WeaponHover(string Text);
@@ -107,6 +97,7 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware,
     private readonly ILoggerService _logger;
     private readonly AvaloniaCatalogImageService _images;
     private readonly AccountActions _actions;
+    private readonly CharacterDetails _details;
 
     private CancellationTokenSource _cts = new();
     private int _loadVersion;
@@ -134,9 +125,11 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware,
         ILoggerService logger,
         AvaloniaCatalogImageService images,
         AccountActions actions,
+        CharacterDetails details,
         INavigationService navigation)
     {
         _actions = actions;
+        _details = details;
         // 悬浮按钮：收起态加号，展开为「刷新数据」（主，从攻略站同步）与「返回上一页」。
         FabActions =
         [
@@ -190,6 +183,27 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware,
     }
 
     public void OnNavigatedFrom() => _isActive = false;
+
+    /// <summary>点击角色卡：打开角色详情弹窗，停在「我的养成」。</summary>
+    [RelayCommand]
+    private async Task OpenDetail(RoleTile tile)
+    {
+        tile.IsSelected = true;
+        try
+        {
+            await _details.ShowAsync(new CharacterDetailRequest(tile.RoleId, tile.Name, tile.IconPath, tile.Star)
+            {
+                Tab = CharacterDetailTab.Build,
+                Sequence = tile.Sequence,
+                SequenceText = tile.SequenceText,
+                Build = CharacterBuild.From(SyncInfo, tile.Details, tile.Build),
+            });
+        }
+        finally
+        {
+            tile.IsSelected = false;
+        }
+    }
 
     [RelayCommand]
     private void SelectTab(ChipOption tab)
@@ -369,12 +383,13 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware,
             snapshot.Weapons.FirstOrDefault(x => x.OwnerRoleGbId == role.RoleGbId),
             _catalog, language, key => _localization[key], ex => _logger.Warn("角色悬浮详情快照无法解析。", ex));
         int sequence = GuideRoleHoverMapper.ResolveSequence(role, (message, ex) => _logger.Warn(message, ex));
+        GuideRoleBuild build = GuideRoleHoverMapper.MapBuild(role.DetailJson, language, ex => _logger.Warn("角色养成快照无法解析。", ex));
         return new RoleTile
         {
+            RoleId = id,
             Id = role.RoleGbId,
             Name = ItemName(role.RoleGbId, language),
             IconPath = $"Local/Icons/{role.RoleGbId}.png",
-            PortraitPath = CatalogJson.IsImageUrl(role.IllustrationPictureUrl) ? role.IllustrationPictureUrl : null,
             Star = role.Star,
             IsLimitedFiveStar = limited,
             FirstAcquiredAt = acquired,
@@ -382,8 +397,8 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware,
             AcquiredText = AcquiredText(acquired),
             Sequence = sequence,
             SequenceText = SequenceText(sequence),
-            Attributes = hover.Attributes,
-            Weapon = hover.Weapon,
+            Details = hover,
+            Build = build,
         };
     }
 
@@ -453,7 +468,7 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware,
     // 浮层只读缓存；进入页面时预载立绘和武器图，浮层显示时不再触发下载。
     private async Task PrepareHoverImagesAsync(CancellationToken token)
     {
-        string[] paths = _roles.SelectMany(x => new[] { x.PortraitPath, x.Weapon?.ImagePath }).OfType<string>().ToArray();
+        string[] paths = _roles.Select(x => x.Details.Weapon?.ImagePath).OfType<string>().ToArray();
         try
         {
             await Task.Run(() => _images.PrepareHoverImagesAsync(paths, token), token);

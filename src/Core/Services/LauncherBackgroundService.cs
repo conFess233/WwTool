@@ -171,7 +171,7 @@ public sealed class LauncherBackgroundService(IHttpClientFactory factory, IConfi
 
         Directory.CreateDirectory(CacheDirectory);
         Manifest? old = ReadManifest();
-        string imageFile = await EnsureFileAsync(client, imageUrl!, "bg-", old?.ImageUrl == imageUrl ? old.ImageFile : null, token).ConfigureAwait(false);
+        string imageFile = await EnsureFileAsync(client, imageUrl!, "bg-", old is not null && old.ImageUrl == imageUrl ? old.ImageFile : null, token).ConfigureAwait(false);
         string? sloganFile = null;
         if (sloganUrl is not null)
         {

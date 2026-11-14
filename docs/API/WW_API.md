@@ -16,7 +16,7 @@
 - [游戏内公告](GameNotice.md)（活动 / 唤取 / 版本日历） `https://aki-gm-resources-back.aki-game.com/gamenotice/{appCode}/{服务器ID}/{language}.json`（国际服域名为 `.net`）
 - [库街区帖子搜索](KuroBBS_Post.md#帖子搜索) `https://api.kurobbs.com/forum/search/v2/post`
 - [库街区帖子详情](KuroBBS_Post.md#帖子详情)（前瞻兑换码） `https://api.kurobbs.com/forum/getPostDetail`
-- [encore.moe 深塔 / 海墟 / 矩阵](Encore.md)（第三方解包数据） `https://api-v2.encore.moe/api/{lang}/toa`、`/whiwa`、`/dpmatrix`
+- [encore.moe 深塔 / 海墟 / 矩阵 / 角色详情](Encore.md)（第三方解包数据） `https://api-v2.encore.moe/api/{lang}/toa`、`/whiwa`、`/dpmatrix`、`/character/{id}`
 
 #### 服务器ID
 

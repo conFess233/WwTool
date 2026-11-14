@@ -167,6 +167,17 @@ public sealed class GuideAttributeItem
     public bool IsFinished { get; set; }
 }
 
+/// <summary>
+/// 资源名称（技能、声骸、属性、套装等）：只保留语言与名称，不保存攻略站的长说明，快照不会因此明显变大。
+/// </summary>
+public sealed class GuideNameText
+{
+    [JsonPropertyName("language")]
+    public string? Language { get; set; }
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+}
+
 public sealed class GuideRoleSkill
 {
     [JsonPropertyName("fixedSkills")]
@@ -187,6 +198,8 @@ public sealed class GuideSkillItem
     public string? PictureUrl { get; set; }
     [JsonPropertyName("skillType")]
     public GuideAsset? SkillType { get; set; }
+    [JsonPropertyName("texts")]
+    public List<GuideNameText> Texts { get; set; } = [];
     [JsonPropertyName("recommendLevel")]
     public int? RecommendLevel { get; set; }
     [JsonPropertyName("currentLevel")]
@@ -244,8 +257,8 @@ public sealed class GuideWeapon
     public int Star { get; set; }
     [JsonPropertyName("weaponType")]
     public GuideAsset? WeaponType { get; set; }
-    [JsonIgnore]
-    public List<GuideText> Texts { get; set; } = [];
+    [JsonPropertyName("texts")]
+    public List<GuideNameText> Texts { get; set; } = [];
 }
 
 public class GuideAsset
@@ -256,8 +269,8 @@ public class GuideAsset
     public string? PictureUrl { get; set; }
     [JsonPropertyName("secondPictureUrl")]
     public string? SecondPictureUrl { get; set; }
-    [JsonIgnore]
-    public List<GuideText> Texts { get; set; } = [];
+    [JsonPropertyName("texts")]
+    public List<GuideNameText> Texts { get; set; } = [];
 }
 
 public sealed class GuideRoleAsset

@@ -12,7 +12,7 @@ internal static class Program
     public static void Main(string[] args)
     {
         WaitForPreviousInstance(args);
-        BuildAvaloniaApp().UseGlassAwareRendering().StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp().UseConfiguredRendering().StartWithClassicDesktopLifetime(args);
     }
 
     /// <summary>程序内更新后的重启：等旧进程退出（最多 20 秒）再启动，避免两个实例同时读写设置与数据库。</summary>

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using SkiaSharp;
 using WwTool.UI.Theming;
 
@@ -10,7 +11,8 @@ namespace WwTool.UI.Controls;
 
 /// <summary>
 /// 加载形象（像素风 GIF）：逐帧播放，放大时用最近邻采样保持像素颗粒。
-/// 所有加载状态统一用它，不用转圈图标。减少动画时停在第一帧。
+/// 所有加载状态统一用它，不用转圈图标。减少动画时停在第一帧，窗口在后台时停在当前帧。
+/// 按每帧时长定时翻帧（不逐帧请求重绘），所在面板隐藏时不翻帧。
 /// </summary>
 /// <remarks>帧按资源地址缓存，多个控件共用同一组位图。</remarks>
 public sealed class PixelGif : Control
@@ -27,11 +29,12 @@ public sealed class PixelGif : Control
 
     private static readonly Dictionary<string, Frame[]> Cache = new(StringComparer.Ordinal);
 
+    /// <summary>不可见（所在面板隐藏）时隔这么久再看一次，不翻帧也不重绘。</summary>
+    private static readonly TimeSpan HiddenPoll = TimeSpan.FromMilliseconds(500);
+
     private Frame[] _frames = [];
-    private TimeSpan _start;
-    private bool _startSet;
-    private bool _frameRequested;
     private int _index;
+    private DispatcherTimer? _timer;
 
     static PixelGif()
     {
@@ -53,17 +56,27 @@ public sealed class PixelGif : Control
             _index = 0;
             InvalidateMeasure();
             InvalidateVisual();
+            Schedule();
         }
-        else if (change.Property == IsPlayingProperty) RequestFrame();
+        else if (change.Property == IsPlayingProperty) Schedule();
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         if (_frames.Length == 0) _frames = Load(Source);
-        _startSet = false;
-        RequestFrame();
+        Motion.LoopsChanged += OnLoopsChanged;
+        Schedule();
     }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        Motion.LoopsChanged -= OnLoopsChanged;
+        _timer?.Stop();
+    }
+
+    private void OnLoopsChanged(object? sender, EventArgs e) => Schedule();
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -72,32 +85,38 @@ public sealed class PixelGif : Control
         return new Size(size.Width, size.Height);
     }
 
-    private void RequestFrame()
+    /// <summary>按当前帧的时长安排下一次翻帧；不该播放时停下（减少动画时回到第一帧）。</summary>
+    private void Schedule()
     {
-        if (_frameRequested || !IsPlaying || _frames.Length < 2 || Motion.Reduced) return;
-        if (TopLevel.GetTopLevel(this) is not { } top) return;
-        _frameRequested = true;
-        top.RequestAnimationFrame(OnFrame);
+        if (!IsPlaying || _frames.Length < 2 || !Motion.LoopsAllowed || TopLevel.GetTopLevel(this) is null)
+        {
+            _timer?.Stop();
+            if (Motion.Reduced && _index != 0)
+            {
+                _index = 0;
+                InvalidateVisual();
+            }
+            return;
+        }
+        if (_timer is null)
+        {
+            _timer = new DispatcherTimer(DispatcherPriority.Render);
+            _timer.Tick += OnTick;
+        }
+        if (_timer.IsEnabled) return;
+        _timer.Interval = IsEffectivelyVisible ? _frames[Math.Min(_index, _frames.Length - 1)].Duration : HiddenPoll;
+        _timer.Start();
     }
 
-    private void OnFrame(TimeSpan time)
+    private void OnTick(object? sender, EventArgs e)
     {
-        _frameRequested = false;
-        if (!_startSet) { _start = time; _startSet = true; }
-        double total = _frames.Sum(f => f.Duration.TotalMilliseconds);
-        double t = total <= 0 ? 0 : (time - _start).TotalMilliseconds % total;
-        int index = 0;
-        for (; index < _frames.Length - 1; index++)
+        _timer!.Stop();
+        if (IsEffectivelyVisible && _frames.Length > 1)
         {
-            t -= _frames[index].Duration.TotalMilliseconds;
-            if (t < 0) break;
-        }
-        if (index != _index)
-        {
-            _index = index;
+            _index = (_index + 1) % _frames.Length;
             InvalidateVisual();
         }
-        if (TopLevel.GetTopLevel(this) is not null) RequestFrame();
+        Schedule();
     }
 
     public override void Render(DrawingContext context)

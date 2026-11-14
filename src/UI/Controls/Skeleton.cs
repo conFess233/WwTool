@@ -36,12 +36,22 @@ public sealed class Skeleton : Control
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        Motion.LoopsChanged += OnLoopsChanged;
         RequestFrame();
     }
 
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        Motion.LoopsChanged -= OnLoopsChanged;
+    }
+
+    /// <summary>窗口在后台时光带停在原处，回到前台继续。</summary>
+    private void OnLoopsChanged(object? sender, EventArgs e) => RequestFrame();
+
     private void RequestFrame()
     {
-        if (_frameRequested || Motion.Reduced || TopLevel.GetTopLevel(this) is not { } top) return;
+        if (_frameRequested || !Motion.LoopsAllowed || TopLevel.GetTopLevel(this) is not { } top) return;
         _frameRequested = true;
         top.RequestAnimationFrame(time =>
         {

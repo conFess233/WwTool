@@ -19,6 +19,10 @@
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="Border#Card">
+      <Setter Property="MaxWidth" Value="640" />
+      <Setter Property="MinWidth" Value="420" />
+      <Setter Property="Margin" Value="24" />
+      <Setter Property="Padding" Value="30,28" />
       <Setter Property="Opacity" Value="0" />
       <Setter Property="RenderTransform" Value="translateY(8px)" />
       <Setter Property="Transitions">
@@ -27,6 +31,14 @@
           <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.42" Easing="0.2,0.8,0.2,1" />
         </Transitions>
       </Setter>
+    </Style>
+    <!-- 大尺寸对话框：内容自带排版，卡片只负责底色、圆角与阴影 -->
+    <Style Selector="Border#Card.large">
+      <Setter Property="MaxWidth" Value="1100" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="32" />
+      <Setter Property="ClipToBounds" Value="True" />
     </Style>
     <Style Selector="Window.reduced Border#Card">
       <Setter Property="RenderTransform" Value="none" />
@@ -62,10 +74,10 @@
 
   <Grid>
     <Border x:Name="Scrim" Background="{DynamicResource ScrimBrush}" PointerPressed="OnScrimPressed" />
-    <Border x:Name="Card" MaxWidth="640" MinWidth="420" Margin="24" Padding="30,28"
+    <Border x:Name="Card"
             HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="16"
             Background="{DynamicResource SurfaceBrush}" BoxShadow="{DynamicResource ShadowDialog}"
-            KeyboardNavigation.TabNavigation="Cycle"
+            KeyboardNavigation.TabNavigation="Cycle" Classes.large="{Binding IsLarge}"
             AutomationProperties.AutomationId="dialog-card">
       <ContentControl Content="{Binding Current}" />
     </Border>

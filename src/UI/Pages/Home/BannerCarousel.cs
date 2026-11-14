@@ -11,7 +11,9 @@ namespace WwTool.UI.Pages.Home;
 
 /// <summary>
 /// 公告横幅（动效「公告轮播」）：高 168（启动器轮播图为整张图片时按 16:9 显示完整画面）、圆角 10；每 4 秒交叉淡入下一张，新一张从 102% 缩小到 100%。
-/// 左下角圆点：当前点拉长为 26，并从左到右填充金色表示本张剩余时间。不可见时暂停。
+/// 左下角圆点：当前点拉长为 26，并从左到右填充金色表示本张剩余时间。不可见时暂停，窗口在后台时停在当前进度。
+/// 只有交叉淡入的 480ms 逐帧更新；其余时间每 100ms 更新一次进度（填充 26 宽、4 秒走完，看不出差别），
+/// 逐帧重绘会让整个窗口一直按帧刷新（实测约占一个核心的 35%）。
 /// </summary>
 public sealed class BannerCarousel : Panel
 {
@@ -29,8 +31,14 @@ public sealed class BannerCarousel : Panel
     private readonly Dots _dots = new();
     private int _index;
     private int _previous = -1;
+    /// <summary>非淡入期间更新进度的间隔。</summary>
+    private static readonly TimeSpan ProgressInterval = TimeSpan.FromMilliseconds(100);
+
+    /// <summary>本张开始的时间（<see cref="_watch"/> 计时）；窗口在后台的时间不计入。</summary>
     private TimeSpan? _slideStart;
-    private TimeSpan _now;
+    private TimeSpan? _pausedAt;
+    private readonly System.Diagnostics.Stopwatch _watch = System.Diagnostics.Stopwatch.StartNew();
+    private readonly Avalonia.Threading.DispatcherTimer _progressTimer = new() { Interval = ProgressInterval };
     private bool _frameRequested;
 
     private readonly List<AnnouncementBanner> _banners = [];
@@ -42,6 +50,11 @@ public sealed class BannerCarousel : Panel
         ClipToBounds = true;
         Background = new SolidColorBrush(Color.Parse("#2B2620"));
         _dots.Owner = this;
+        _progressTimer.Tick += (_, _) =>
+        {
+            _progressTimer.Stop();
+            Step();
+        };
     }
 
     public IReadOnlyList<AnnouncementBanner>? Banners { get => GetValue(BannersProperty); set => SetValue(BannersProperty, value); }
@@ -184,29 +197,66 @@ public sealed class BannerCarousel : Panel
     {
         base.OnAttachedToVisualTree(e);
         _slideStart = null;
+        _pausedAt = null;
+        Motion.LoopsChanged += OnLoopsChanged;
         RequestFrame();
     }
 
-    private void RequestFrame()
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
-        if (_frameRequested || _slides.Count == 0 || TopLevel.GetTopLevel(this) is not { } top) return;
-        _frameRequested = true;
-        top.RequestAnimationFrame(OnFrame);
+        base.OnDetachedFromVisualTree(e);
+        Motion.LoopsChanged -= OnLoopsChanged;
+        _progressTimer.Stop();
     }
 
-    private void OnFrame(TimeSpan time)
+    /// <summary>窗口回到前台：后台停留的时间不计入本张的显示时间。</summary>
+    private void OnLoopsChanged(object? sender, EventArgs e)
     {
-        _frameRequested = false;
-        _now = time;
+        if (Motion.Paused)
+        {
+            _pausedAt ??= _watch.Elapsed;
+            _progressTimer.Stop();
+            return;
+        }
+        if (_pausedAt is { } at && _slideStart is { } start) _slideStart = start + (_watch.Elapsed - at);
+        _pausedAt = null;
+        RequestFrame();
+    }
+
+    private bool Fading => _previous >= 0 && _slideStart is { } start && _watch.Elapsed - start < FadeTime;
+
+    /// <summary>安排下一次更新：淡入期间逐帧，其余时间按 <see cref="ProgressInterval"/>；只有一张时没有进度可走，不再更新。</summary>
+    private void RequestFrame()
+    {
+        if (_slides.Count == 0 || Motion.Paused || TopLevel.GetTopLevel(this) is not { } top) return;
+        if (_slideStart is null || Fading)
+        {
+            if (_frameRequested) return;
+            _frameRequested = true;
+            top.RequestAnimationFrame(_ =>
+            {
+                _frameRequested = false;
+                Step();
+            });
+        }
+        else if (_slides.Count > 1 && !_progressTimer.IsEnabled)
+        {
+            _progressTimer.Start();
+        }
+    }
+
+    private void Step()
+    {
         if (_slides.Count == 0) return;
-        _slideStart ??= time;
-        TimeSpan elapsed = time - _slideStart.Value;
+        TimeSpan now = _watch.Elapsed;
+        _slideStart ??= now;
+        TimeSpan elapsed = now - _slideStart.Value;
 
         if (_slides.Count > 1 && elapsed >= SlideTime)
         {
             _previous = _index;
             _index = (_index + 1) % _slides.Count;
-            _slideStart = time;
+            _slideStart = now;
             elapsed = TimeSpan.Zero;
             UpdateCursor();
         }
@@ -220,7 +270,9 @@ public sealed class BannerCarousel : Panel
             {
                 slide.Opacity = _previous < 0 ? 1 : eased;
                 double scale = Motion.Reduced || _previous < 0 ? 1 : 1.02 - 0.02 * eased;
-                slide.RenderTransform = new ScaleTransform(scale, scale);
+                // 只在数值变化时换变换对象，淡入结束后不再触发重绘。
+                if (slide.RenderTransform is not ScaleTransform current || current.ScaleX != scale)
+                    slide.RenderTransform = new ScaleTransform(scale, scale);
                 slide.ZIndex = 1;
             }
             else if (i == _previous)
@@ -234,8 +286,12 @@ public sealed class BannerCarousel : Panel
             }
         }
 
-        _dots.Progress = Math.Clamp(elapsed.TotalMilliseconds / SlideTime.TotalMilliseconds, 0, 1);
-        _dots.InvalidateVisual();
+        double progress = Math.Clamp(elapsed.TotalMilliseconds / SlideTime.TotalMilliseconds, 0, 1);
+        if (_slides.Count > 1 && progress != _dots.Progress)
+        {
+            _dots.Progress = progress;
+            _dots.InvalidateVisual();
+        }
         if (IsEffectivelyVisible) RequestFrame();
     }
 

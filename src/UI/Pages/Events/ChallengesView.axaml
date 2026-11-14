@@ -19,6 +19,9 @@
       <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
+    <Style Selector="Border.avatar.ink">
+      <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
+    </Style>
     <Style Selector="Border.avatar.gold">
       <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
       <Setter Property="BorderThickness" Value="2" />
@@ -91,11 +94,11 @@
       <Border Classes="card" Padding="20,14" Margin="0,0,4,0" AutomationProperties.AutomationId="challenge-header">
         <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="12">
           <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-            <RadioButton Classes="ann-chip" GroupName="challenge-kind" Content="{loc:Tr Challenge_Tower}" IsChecked="{Binding IsTower}"
+            <RadioButton Classes="ann-chip" Content="{loc:Tr Challenge_Tower}" IsChecked="{Binding IsTower}"
                          AutomationProperties.AutomationId="challenge-tower" />
-            <RadioButton Classes="ann-chip" GroupName="challenge-kind" Content="{loc:Tr Challenge_Wastes}" IsChecked="{Binding IsWastes}"
+            <RadioButton Classes="ann-chip" Content="{loc:Tr Challenge_Wastes}" IsChecked="{Binding IsWastes}"
                          AutomationProperties.AutomationId="challenge-wastes" />
-            <RadioButton Classes="ann-chip" GroupName="challenge-kind" Content="{loc:Tr Challenge_Matrix}" IsChecked="{Binding IsMatrix}"
+            <RadioButton Classes="ann-chip" Content="{loc:Tr Challenge_Matrix}" IsChecked="{Binding IsMatrix}"
                          AutomationProperties.AutomationId="challenge-matrix" />
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" IsVisible="{Binding Season, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -300,8 +303,8 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="events:MatrixBuffItem">
                       <Grid ColumnDefinitions="30,*" ColumnSpacing="10">
-                        <!-- 增益图标是白色线稿，垫深色底 -->
-                        <Border Classes="avatar" Width="30" Height="30" VerticalAlignment="Top" Background="{DynamicResource NavIslandBrush}">
+                        <!-- 增益图标是白色线稿，垫深色底（用样式类设置：模板里的动态资源会被样式覆盖） -->
+                        <Border Classes="avatar ink" Width="30" Height="30" VerticalAlignment="Top">
                           <Image Source="{Binding Image}" Stretch="Uniform" Margin="3" />
                         </Border>
                         <StackPanel Grid.Column="1" Spacing="2">

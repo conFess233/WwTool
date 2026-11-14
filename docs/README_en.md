@@ -6,7 +6,7 @@
 
 A Wuthering Waves toolbox · Account data, Resonators and Convene statistics
 
-![Version 2.1.0](https://img.shields.io/badge/version-2.1.0-blue)
+![Version 2.2.0](https://img.shields.io/badge/version-2.2.0-blue)
 ![Windows x64](https://img.shields.io/badge/platform-Windows%2010%2B%20x64-0078D4)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512BD4)
 [![MIT License](https://img.shields.io/badge/license-MIT-green)](../LICENSE.txt)
@@ -28,13 +28,13 @@ A Windows desktop tool for Wuthering Waves: view your account and Resonators, an
 | --- | --- |
 | Home | Nickname, UID (one-click copy), level and SOL3 Phase; live progress of Waveplate, Crystal Solvent, Activity, Pioneer Podcast and weekly rewards; quick actions such as launching the game, opening the screenshot / game / log folders and copying the gacha link; game announcements (China / International switch) |
 | Events | Current version and time left; a timeline of banners and events, the in-game version calendar, and every in-game notice with its full text; featured 5-stars; one-click copy of China livestream codes; this season of Tower of Adversity, Whimpering Wastes and Endstate Matrix with enemies, buffs and scoring |
-| Convene Statistics | Finds the Convene link in the game log automatically, then fetches and saves your records. The overview shows pulls, 5-stars, average pulls per 5-star, 50/50 win rate and current pity for each banner, in list or compact view. Each banner also has its own full record list |
+| Convene Statistics | Finds the Convene link in the game log automatically, then fetches and saves your records. The overview shows pulls, 5-stars, average pulls per 5-star, 50/50 win rate and current pity for each banner, in list, compact or timeline view (5-stars in time order, colored by how lucky each pull was). Each banner also has its own full record list |
 | Detailed charts | 5-star pity distribution, share of pulls by banner, pulls spent on each 5-star, rarity breakdown with 50/50 win rate, and a daily pull heatmap |
 | Account Data | Every locally saved account: switch, refresh, log in again or delete |
-| Character Data | Owned Resonators and weapons, Resonance Chains and current equipment; click a card for half-body art and attributes |
+| Character Data | Owned Resonators and weapons, Resonance Chains and current equipment; click a card for Resonator details: art, skill multipliers, Resonance Chain, stories and voice lines, plus your own build and pull history |
 | Exploration Data | Collected chests and Tidal Remnants by tier |
 | Vehicle Data | Vehicle level, and unlocked skins, stickers, ornaments, frames and in-vehicle music |
-| Settings | Theme and accent color, launcher background / animated background / custom image, glass effect, language, notification level, reduced motion, logging and network options |
+| Settings | Theme and accent color, launcher background / animated background / custom image, language, notification level, reduced motion, logging and network options |
 
 > [!NOTE]
 > Account data (Home, Character, Exploration and Vehicle) currently supports the **International** server only, and requires logging in with email and password. Convene statistics support both the China and International servers and work without logging in.
@@ -117,7 +117,7 @@ The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,s
 - **Network access**:
   - Login and account data use Kuro Games' services; Convene records use the gacha API of the matching server.
   - Game data and missing icons are synced from this repository; Resonator art comes from the official guide site.
-  - The background and announcements on Home come from the game launcher's public API. The in-game notices and version calendar on Events come from the game's notice API, and livestream codes come from the official Kuro BBS post. Tower / Wastes / Matrix data comes from the third-party site encore.moe (datamined).
+  - The background and announcements on Home come from the game launcher's public API. The in-game notices and version calendar on Events come from the game's notice API, and livestream codes come from the official Kuro BBS post. Tower / Wastes / Matrix data and Resonator details come from the third-party site encore.moe (datamined).
 - **Your Convene link contains authentication data.** When reporting an issue, remove your password, the full Convene link and other personal details.
 
 <a id="limitations"></a>

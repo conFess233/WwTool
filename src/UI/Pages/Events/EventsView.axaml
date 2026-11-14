@@ -226,9 +226,9 @@
               <Panel>
                 <Border Classes="region-thumb" Classes.right="{Binding IsGlobalRegion}" />
                 <UniformGrid Columns="2">
-                  <RadioButton Classes="region-opt" GroupName="events-region" Content="{loc:Tr Home_RegionCN}"
+                  <RadioButton Classes="region-opt" Content="{loc:Tr Home_RegionCN}"
                                IsChecked="{Binding IsChinaRegion}" AutomationProperties.AutomationId="events-region-cn" />
-                  <RadioButton Classes="region-opt" GroupName="events-region" Content="{loc:Tr Home_RegionGlobal}"
+                  <RadioButton Classes="region-opt" Content="{loc:Tr Home_RegionGlobal}"
                                IsChecked="{Binding IsGlobalRegion}" AutomationProperties.AutomationId="events-region-global" />
                 </UniformGrid>
               </Panel>
@@ -245,13 +245,13 @@
       <!-- ── 视图胶囊与更新时间 ── -->
       <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
         <StackPanel Orientation="Horizontal" Spacing="6">
-          <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewTimeline}" IsChecked="{Binding IsTimelineView}"
+          <RadioButton Classes="ann-chip" Content="{loc:Tr Events_ViewTimeline}" IsChecked="{Binding IsTimelineView}"
                        AutomationProperties.AutomationId="events-view-timeline" />
-          <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewCalendar}" IsChecked="{Binding IsCalendarView}"
+          <RadioButton Classes="ann-chip" Content="{loc:Tr Events_ViewCalendar}" IsChecked="{Binding IsCalendarView}"
                        AutomationProperties.AutomationId="events-view-calendar" />
-          <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewNotices}" IsChecked="{Binding IsNoticesView}"
+          <RadioButton Classes="ann-chip" Content="{loc:Tr Events_ViewNotices}" IsChecked="{Binding IsNoticesView}"
                        AutomationProperties.AutomationId="events-view-notices" />
-          <RadioButton Classes="ann-chip" GroupName="events-view" Content="{loc:Tr Events_ViewChallenges}" IsChecked="{Binding IsChallengesView}"
+          <RadioButton Classes="ann-chip" Content="{loc:Tr Events_ViewChallenges}" IsChecked="{Binding IsChallengesView}"
                        AutomationProperties.AutomationId="events-view-challenges" />
         </StackPanel>
         <!-- 更新时间压在背景图上，垫一块胶囊底保证看得清 -->

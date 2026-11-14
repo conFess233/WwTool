@@ -1,0 +1,196 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:pulls="using:WwTool.UI.Pages.Pulls"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Pulls.PullsTimelineView"
+             x:DataType="pulls:PullsTimeline">
+  <!--
+    五星时间线（设计稿「抽卡统计 · 时间线视图」）：每个五星一列，头像上下交替，最新在右、打开时滚到最右；滚轮横向滚动。
+    外圈、连线与轨道点按抽数评价着色（欧皇 / 平稳 / 偏非 / 非酋）；标签与列表视图一致。点击角色头像打开角色详情弹窗。
+  -->
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://WwTool/Pages/Pulls/PullsResources.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    <!-- 节点内容：头像（外圈按评价着色）、名称、抽数与评价、保底标签 -->
+    <DataTemplate x:Key="NodeBody" x:DataType="pulls:TimelineNode">
+      <StackPanel Spacing="3" HorizontalAlignment="Center">
+        <Button Classes="tl-face" Classes.clickable="{Binding IsCharacter}"
+                Command="{Binding $parent[pulls:PullsTimelineView].((pulls:PullsTimeline)DataContext).OpenDetailCommand}" CommandParameter="{Binding}"
+                AutomationProperties.Name="{Binding Card.Name, FallbackValue=''}"
+                AutomationProperties.AutomationId="{Binding Card.ResourceId, StringFormat='pulls-timeline-{0}', FallbackValue='pulls-timeline-pending'}"
+                ToolTip.ShowDelay="250" ToolTip.ServiceEnabled="{Binding IsRecord}">
+          <ToolTip.Tip>
+            <StackPanel Spacing="6" MaxWidth="300">
+              <TextBlock Text="{Binding Tip}" TextWrapping="Wrap" />
+              <TextBlock Classes="caption" Text="{loc:Tr Pulls_FourStarsDuring}" IsVisible="{Binding Card.HasFourStars, FallbackValue=False}" />
+              <ItemsControl ItemsSource="{Binding Card.FourStars, FallbackValue={x:Null}}" ItemTemplate="{StaticResource ChipNamed}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemSpacing="4" LineSpacing="4" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              </ItemsControl>
+            </StackPanel>
+          </ToolTip.Tip>
+          <Border Width="62" Height="62" CornerRadius="16" BorderThickness="3" BorderBrush="{Binding Brush}" Padding="2" Background="{DynamicResource SurfaceBrush}">
+            <Panel>
+              <Border CornerRadius="12" ClipToBounds="True" Background="{DynamicResource SurfaceMutedBrush}" IsVisible="{Binding IsRecord}">
+                <c:CatalogImage Path="{Binding Card.IconPath, FallbackValue={x:Null}}" DecodeWidth="112" Stretch="UniformToFill" />
+              </Border>
+              <Border CornerRadius="12" Background="{DynamicResource HighlightBrush}" IsVisible="{Binding IsPending}">
+                <TextBlock Text="?" FontSize="24" FontWeight="Bold" Foreground="{Binding Brush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Border>
+            </Panel>
+          </Border>
+        </Button>
+        <TextBlock Classes="tl-name" Text="{Binding Card.Name, FallbackValue=''}" IsVisible="{Binding IsRecord}" />
+        <TextBlock Classes="tl-name" Text="{loc:Tr Pulls_NoFiveStarYet}" IsVisible="{Binding IsPending}" />
+        <StackPanel Orientation="Horizontal" Spacing="3" HorizontalAlignment="Center">
+          <TextBlock FontSize="18" FontWeight="Bold" Foreground="{Binding Brush}" Text="{Binding Pity}" />
+          <TextBlock Classes="caption" FontSize="11" Text="{loc:Tr Pulls_PullUnit}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+          <TextBlock FontSize="11" FontWeight="Bold" Foreground="{Binding Brush}" Text="{Binding RatingText}" VerticalAlignment="Bottom" Margin="3,0,0,3" />
+        </StackPanel>
+        <WrapPanel HorizontalAlignment="Center" ItemSpacing="4" LineSpacing="4">
+          <Border Classes="tag sm ink" IsVisible="{Binding Card.IsGuaranteed, FallbackValue=False}"><TextBlock Text="{loc:Tr Pulls_Guaranteed}" /></Border>
+          <Border Classes="tag sm" IsVisible="{Binding Card.IsSoftPity, FallbackValue=False}"><TextBlock Text="{loc:Tr Pulls_SoftPity}" /></Border>
+          <Border Classes="tag sm gray" IsVisible="{Binding Card.IsStandardPool, FallbackValue=False}"><TextBlock Text="{loc:Tr Pulls_StandardPool}" /></Border>
+          <Border Classes="tag sm red" IsVisible="{Binding Card.IsLost, FallbackValue=False}"><TextBlock Text="{loc:Tr Pulls_Lost}" /></Border>
+          <Border Classes="tag sm" IsVisible="{Binding IsPending}"><TextBlock Text="{Binding PendingText}" /></Border>
+        </WrapPanel>
+      </StackPanel>
+    </DataTemplate>
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="Button.tl-face">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="Cursor" Value="Arrow" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.16" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.tl-face:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.tl-face:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.tl-face.clickable">
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.tl-face.clickable:pointerover">
+      <Setter Property="RenderTransform" Value="scale(1.06)" />
+    </Style>
+    <Style Selector="TextBlock.tl-name">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+      <Setter Property="MaxWidth" Value="104" />
+    </Style>
+    <Style Selector="TextBlock.tl-date">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.tl-legend">
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Height" Value="10" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
+
+  <Border Classes="card" Padding="0">
+    <Grid RowDefinitions="Auto,*,Auto">
+      <!-- 标题行：标题 + （总览）角色 / 武器 -->
+      <StackPanel Orientation="Horizontal" Spacing="12" Margin="22,14,22,0">
+        <TextBlock FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Text="{loc:Tr Pulls_TimelineTitle}" />
+        <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding IsOverview}">
+          <ToggleButton Classes="chip" Height="30" Padding="12,0" IsChecked="{Binding ShowsRoles, Mode=OneWay}" Command="{Binding ShowRolesCommand}"
+                        AutomationProperties.AutomationId="pulls-timeline-roles">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{loc:Tr Pulls_TimelineRoles}" />
+              <TextBlock Classes="count" Text="{Binding RoleCount}" />
+            </StackPanel>
+          </ToggleButton>
+          <ToggleButton Classes="chip" Height="30" Padding="12,0" IsChecked="{Binding ShowsWeapons, Mode=OneWay}" Command="{Binding ShowWeaponsCommand}"
+                        AutomationProperties.AutomationId="pulls-timeline-weapons">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{loc:Tr Pulls_TimelineWeapons}" />
+              <TextBlock Classes="count" Text="{Binding WeaponCount}" />
+            </StackPanel>
+          </ToggleButton>
+        </StackPanel>
+      </StackPanel>
+
+      <TextBlock Grid.Row="1" Classes="caption" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{loc:Tr Pulls_TimelineEmpty}"
+                 IsVisible="{Binding IsEmpty}" />
+
+      <ScrollViewer Grid.Row="1" x:Name="TrackScroller" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                    IsVisible="{Binding !IsEmpty}" Margin="0,6,0,0">
+        <Panel VerticalAlignment="Center" Margin="20,0,20,8">
+          <!-- 轨道：位于各列的圆点中线 -->
+          <Border Height="2" CornerRadius="1" Background="{DynamicResource TrackBrush}" VerticalAlignment="Top" Margin="0,177,0,0" />
+          <ItemsControl ItemsSource="{Binding Nodes}">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="pulls:TimelineNode">
+                <Panel Width="112">
+                  <!-- 月份分隔 -->
+                  <Rectangle Width="1" HorizontalAlignment="Left" Stroke="{DynamicResource BorderBrush}" StrokeThickness="1" StrokeDashArray="3,3"
+                             IsVisible="{Binding HasMonth}" />
+                  <Grid RowDefinitions="16,138,18,12,18,138">
+                    <TextBlock Classes="caption" FontSize="11" Margin="6,0,0,0" Text="{Binding MonthLabel}" IsVisible="{Binding HasMonth}" />
+
+                    <ContentControl Grid.Row="1" Content="{Binding}" ContentTemplate="{StaticResource NodeBody}" VerticalAlignment="Bottom" IsVisible="{Binding IsUp}" />
+                    <Border Grid.Row="2" Width="2" Background="{Binding Brush}" Opacity="0.55" IsVisible="{Binding IsUp}" />
+                    <TextBlock Grid.Row="2" Classes="tl-date" VerticalAlignment="Center" Text="{Binding DateText}" IsVisible="{Binding IsDown}" />
+
+                    <Ellipse Grid.Row="3" Width="12" Height="12" Fill="{Binding Brush}" Stroke="{DynamicResource SurfaceBrush}" StrokeThickness="2"
+                             IsVisible="{Binding IsRecord}" />
+                    <Ellipse Grid.Row="3" Width="12" Height="12" Fill="{DynamicResource SurfaceBrush}" Stroke="{Binding Brush}" StrokeThickness="2"
+                             StrokeDashArray="2,1.5" IsVisible="{Binding IsPending}" />
+
+                    <Border Grid.Row="4" Width="2" Background="{Binding Brush}" Opacity="0.55" IsVisible="{Binding IsDown}" />
+                    <TextBlock Grid.Row="4" Classes="tl-date" VerticalAlignment="Center" Text="{Binding DateText}" IsVisible="{Binding IsUp}" />
+                    <ContentControl Grid.Row="5" Content="{Binding}" ContentTemplate="{StaticResource NodeBody}" VerticalAlignment="Top" IsVisible="{Binding IsDown}" />
+                  </Grid>
+                </Panel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </Panel>
+      </ScrollViewer>
+
+      <!-- 图例：从欧到非，悬停显示抽数范围 -->
+      <Border Grid.Row="2" BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="22,9">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <StackPanel Orientation="Horizontal" Spacing="6" Background="Transparent" ToolTip.Tip="1–40">
+            <Border Classes="tl-legend" Background="#3E8E5A" />
+            <TextBlock FontSize="12" FontWeight="Bold" Foreground="#3E8E5A" Text="{loc:Tr Pulls_Rating_Lucky}" />
+          </StackPanel>
+          <TextBlock Classes="caption" Text="›" />
+          <StackPanel Orientation="Horizontal" Spacing="6" Background="Transparent" ToolTip.Tip="41–60">
+            <Border Classes="tl-legend" Background="#C0902E" />
+            <TextBlock FontSize="12" FontWeight="Bold" Foreground="#A87A22" Text="{loc:Tr Pulls_Rating_Steady}" />
+          </StackPanel>
+          <TextBlock Classes="caption" Text="›" />
+          <StackPanel Orientation="Horizontal" Spacing="6" Background="Transparent" ToolTip.Tip="61–70">
+            <Border Classes="tl-legend" Background="#D2702E" />
+            <TextBlock FontSize="12" FontWeight="Bold" Foreground="#C0632A" Text="{loc:Tr Pulls_Rating_Unlucky}" />
+          </StackPanel>
+          <TextBlock Classes="caption" Text="›" />
+          <StackPanel Orientation="Horizontal" Spacing="6" Background="Transparent" ToolTip.Tip="71–80">
+            <Border Classes="tl-legend" Background="#C24A36" />
+            <TextBlock FontSize="12" FontWeight="Bold" Foreground="#C24A36" Text="{loc:Tr Pulls_Rating_Worst}" />
+          </StackPanel>
+          <TextBlock Classes="caption" Margin="14,0,0,0" Text="{loc:Tr Pulls_TimelineHint}" />
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Border>
+</UserControl>

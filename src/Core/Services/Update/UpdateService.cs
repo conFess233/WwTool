@@ -83,9 +83,11 @@ public sealed class UpdateService(IHttpClientFactory factory, IConfigService con
             catch (Exception ex) when (IsRecoverable(ex, token))
             {
                 logger.Warn($"检查更新失败：{ex.GetType().Name} {ex.Message}");
-                return cache?.Release is { } stale
-                    ? Result(current, ToRelease(stale), cache.CheckedAtUtc)
-                    : new UpdateCheckResult(UpdateCheckStatus.Failed, null, cache?.CheckedAtUtc);
+                // 上次已知有新版本时沿用（仍然值得提示）；否则不能凭旧结果说「已是最新」，报告失败。
+                UpdateCheckResult? stale = cache?.Release is { } cached ? Result(current, ToRelease(cached), cache.CheckedAtUtc) : null;
+                return stale is { Status: UpdateCheckStatus.UpdateAvailable }
+                    ? stale
+                    : new UpdateCheckResult(UpdateCheckStatus.Failed, stale?.Latest, cache?.CheckedAtUtc);
             }
 
             // 304：沿用缓存的发布，只刷新检查时间。

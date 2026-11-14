@@ -9,10 +9,15 @@
   <!--
     抽卡统计（定稿 FinalPulls / FinalPullsAll）：顶部筛选栏（五个视图共用，滚动时吸顶、下方阴影渐显）、五张指标卡；
     「总览」为长页面：各卡池最近五星 + 未出金进度、每日活跃 / 五星分布 / 两个环形图；
-    单卡池视图为「抽卡记录」卡，列表内部滚动。底部留 96 给悬浮按钮。
+    单卡池视图（列表 / 精简）为一行统计条 + 记录卡，记录卡延伸到页面底部，列表内部滚动并在末尾给悬浮按钮留空。
   -->
   <UserControl.Styles>
     <StyleInclude Source="avares://WwTool/Pages/Pulls/PullsStyles.axaml" />
+
+    <!-- 筛选栏的卡池标签稍收紧，常见窗口宽度下所有卡池都放得下 -->
+    <Style Selector="Grid#FilterBar ToggleButton.chip">
+      <Setter Property="Padding" Value="13,0" />
+    </Style>
 
     <!-- 拖拽导入：拖入时暖色底 + 金色流动虚线；导入完成转绿、画出对勾 -->
     <Style Selector="Panel.drop c|MarchingAnts">
@@ -100,7 +105,60 @@
         <ResourceInclude Source="avares://WwTool/Pages/Pulls/PullsResources.axaml" />
       </ResourceDictionary.MergedDictionaries>
 
-    <!-- 五张指标卡 -->
+    <!-- 单卡池的一行统计条（列表与精简视图共用） -->
+    <DataTemplate x:Key="StatStrip" x:DataType="pulls:PullsOverviewViewModel">
+      <Border Classes="card gs">
+        <UniformGrid Columns="6">
+          <Border Classes="gs-cell first">
+            <StackPanel>
+              <TextBlock Classes="gs-label" Text="{loc:Tr Stat_TotalTides}" />
+              <c:RollingText Classes="gs-value" Text="{Binding TotalPulls}" />
+            </StackPanel>
+          </Border>
+          <Border Classes="gs-cell">
+            <StackPanel>
+              <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_FiveStarShort}" />
+              <c:RollingText Classes="gs-value" Text="{Binding FiveStars}" />
+            </StackPanel>
+          </Border>
+          <Border Classes="gs-cell">
+            <StackPanel>
+              <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_AvgPerFiveStar}" />
+              <StackPanel Orientation="Horizontal">
+                <c:RollingText Classes="gs-value" Text="{Binding AveragePerFiveStar}" />
+                <TextBlock Classes="gs-unit" Text="{loc:Tr Pulls_PullUnit}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Border Classes="gs-cell">
+            <StackPanel>
+              <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_AvgPerUp}" />
+              <StackPanel Orientation="Horizontal">
+                <c:RollingText Classes="gs-value" Text="{Binding AveragePerUp}" />
+                <TextBlock Classes="gs-unit" Text="{loc:Tr Pulls_PullUnit}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Border Classes="gs-cell">
+            <StackPanel>
+              <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_WinRate}" />
+              <StackPanel Orientation="Horizontal">
+                <c:RollingText Classes="gs-value" Text="{Binding WinRate}" />
+                <TextBlock Classes="gs-unit" Text="{Binding WinRatio}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Border Classes="gs-cell">
+            <StackPanel>
+              <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_Astrites}" />
+              <c:RollingText Classes="gs-value" Text="{Binding Astrites}" />
+            </StackPanel>
+          </Border>
+        </UniformGrid>
+      </Border>
+    </DataTemplate>
+
+    <!-- 五张指标卡（总览） -->
     <DataTemplate x:Key="Metrics" x:DataType="pulls:PullsOverviewViewModel">
       <UniformGrid Columns="5" ColumnSpacing="18">
         <Border Classes="card metric" AutomationProperties.AutomationId="pulls-card-total">
@@ -185,8 +243,6 @@
       </StackPanel>
 
       <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-        <!-- 选「其他卡池」时子卡池标签占位，隐藏存储条数 -->
-        <TextBlock Classes="caption" Text="{Binding StoredSummary}" VerticalAlignment="Center" Margin="0,0,8,0" IsVisible="{Binding !IsOtherSelected}" />
         <ComboBox Classes="filter" Tag="{loc:Tr Stat_Filter_DateRange}"
                   ItemsSource="{Binding Records.TimeRanges}" SelectedItem="{Binding Records.SelectedTimeRange}"
                   AutomationProperties.Name="{loc:Tr Stat_Filter_DateRange}" AutomationProperties.AutomationId="pulls-time-range">
@@ -217,30 +273,29 @@
             <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
           </ComboBox.ItemTemplate>
         </ComboBox>
-        <!-- 视图切换（定稿 FinalPullsGrid）：列表 / 精简，仅单卡池视图显示 -->
-        <Border Classes="vt" IsVisible="{Binding IsPoolView}">
+        <!-- 视图切换（定稿 FinalPullsGrid）：列表 / 精简（仅单卡池）/ 时间线；只用图标，悬停显示名称 -->
+        <Border Classes="vt">
           <StackPanel Orientation="Horizontal" Spacing="2">
             <ToggleButton Classes="vt" IsChecked="{Binding IsListView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="list"
+                          ToolTip.Tip="{loc:Tr Pulls_ViewList}" AutomationProperties.Name="{loc:Tr Pulls_ViewList}"
                           AutomationProperties.AutomationId="pulls-view-list">
-              <StackPanel Orientation="Horizontal" Spacing="6">
-                <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.ViewList}" />
-                <TextBlock Text="{loc:Tr Pulls_ViewList}" VerticalAlignment="Center" />
-              </StackPanel>
+              <c:StrokeIcon Width="15" Height="15" Data="{StaticResource Icon.ViewList}" />
             </ToggleButton>
-            <ToggleButton Classes="vt" IsChecked="{Binding IsCompactView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="compact"
-                          AutomationProperties.AutomationId="pulls-view-compact">
-              <StackPanel Orientation="Horizontal" Spacing="6">
-                <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.ViewGrid}" />
-                <TextBlock Text="{loc:Tr Pulls_ViewCompact}" VerticalAlignment="Center" />
-              </StackPanel>
+            <ToggleButton Classes="vt" IsChecked="{Binding IsCompactChecked, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="compact"
+                          ToolTip.Tip="{loc:Tr Pulls_ViewCompact}" AutomationProperties.Name="{loc:Tr Pulls_ViewCompact}"
+                          IsVisible="{Binding IsPoolView}" AutomationProperties.AutomationId="pulls-view-compact">
+              <c:StrokeIcon Width="15" Height="15" Data="{StaticResource Icon.ViewGrid}" />
+            </ToggleButton>
+            <ToggleButton Classes="vt" IsChecked="{Binding IsTimelineView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="timeline"
+                          ToolTip.Tip="{loc:Tr Pulls_ViewTimeline}" AutomationProperties.Name="{loc:Tr Pulls_ViewTimeline}"
+                          AutomationProperties.AutomationId="pulls-view-timeline">
+              <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.Timeline}" />
             </ToggleButton>
           </StackPanel>
         </Border>
-        <Button Classes="btn" Command="{Binding OpenChartsCommand}" AutomationProperties.AutomationId="pulls-open-charts">
-          <StackPanel Orientation="Horizontal" Spacing="8">
-            <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.Chart}" />
-            <TextBlock Text="{loc:Tr Pulls_DetailedCharts}" VerticalAlignment="Center" />
-          </StackPanel>
+        <Button Classes="btn icon" Command="{Binding OpenChartsCommand}" ToolTip.Tip="{loc:Tr Pulls_DetailedCharts}"
+                AutomationProperties.Name="{loc:Tr Pulls_DetailedCharts}" AutomationProperties.AutomationId="pulls-open-charts">
+          <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.Chart}" />
         </Button>
       </StackPanel>
     </Grid>
@@ -296,13 +351,7 @@
       </StackPanel>
 
       <!-- ── 总览：长页面 ── -->
-      <ScrollViewer x:Name="OverviewScroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
-        <ScrollViewer.IsVisible>
-          <MultiBinding Converter="{x:Static BoolConverters.And}">
-            <Binding Path="ShowContent" />
-            <Binding Path="IsOverview" />
-          </MultiBinding>
-        </ScrollViewer.IsVisible>
+      <ScrollViewer x:Name="OverviewScroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding ShowOverviewPage}">
         <StackPanel Spacing="18" Margin="0,18,0,96">
           <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Metrics}" />
 
@@ -462,70 +511,30 @@
         </StackPanel>
       </ScrollViewer>
 
-      <!-- ── 单卡池：指标卡 + 抽卡记录（列表内部滚动） ── -->
-      <Grid RowDefinitions="Auto,*" RowSpacing="18" Margin="0,18,0,96" IsVisible="{Binding ShowListPool}">
-        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Metrics}" />
+      <!-- ── 时间线（设计稿「抽卡统计 · 时间线视图」）：统计条 + 五星时间线，横向滚动、最新在右 ── -->
+      <Grid RowDefinitions="Auto,*" RowSpacing="14" Margin="0,18,0,26" IsVisible="{Binding ShowTimeline}"
+            AutomationProperties.AutomationId="pulls-timeline">
+        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StatStrip}" />
+        <pulls:PullsTimelineView Grid.Row="1" DataContext="{Binding Timeline}" />
+      </Grid>
+
+      <!-- ── 单卡池：统计条 + 抽卡记录（延伸到底部，列表内部滚动） ── -->
+      <Grid RowDefinitions="Auto,*" RowSpacing="14" Margin="0,18,0,26" IsVisible="{Binding ShowListPool}">
+        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StatStrip}" />
         <pulls:PoolRecordsView Grid.Row="1" x:Name="RecordsView" DataContext="{Binding Records}" />
       </Grid>
 
       <!-- ── 单卡池·精简视图（定稿 FinalPullsGrid）：一行统计条 + 五星头像网格（最新在前，底部渐隐） ── -->
-      <Grid RowDefinitions="Auto,*" RowSpacing="18" Margin="0,18,0,96" IsVisible="{Binding ShowCompactPool}"
+      <Grid RowDefinitions="Auto,*" RowSpacing="14" Margin="0,18,0,26" IsVisible="{Binding ShowCompactPool}"
             AutomationProperties.AutomationId="pulls-compact">
-        <Border Classes="card gs">
-          <UniformGrid Columns="6">
-            <Border Classes="gs-cell first">
-              <StackPanel>
-                <TextBlock Classes="gs-label" Text="{loc:Tr Stat_TotalTides}" />
-                <c:RollingText Classes="gs-value" Text="{Binding TotalPulls}" />
-              </StackPanel>
-            </Border>
-            <Border Classes="gs-cell">
-              <StackPanel>
-                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_FiveStarShort}" />
-                <c:RollingText Classes="gs-value" Text="{Binding FiveStars}" />
-              </StackPanel>
-            </Border>
-            <Border Classes="gs-cell">
-              <StackPanel>
-                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_AvgPerFiveStar}" />
-                <StackPanel Orientation="Horizontal">
-                  <c:RollingText Classes="gs-value" Text="{Binding AveragePerFiveStar}" />
-                  <TextBlock Classes="gs-unit" Text="{loc:Tr Pulls_PullUnit}" />
-                </StackPanel>
-              </StackPanel>
-            </Border>
-            <Border Classes="gs-cell">
-              <StackPanel>
-                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_AvgPerUp}" />
-                <StackPanel Orientation="Horizontal">
-                  <c:RollingText Classes="gs-value" Text="{Binding AveragePerUp}" />
-                  <TextBlock Classes="gs-unit" Text="{loc:Tr Pulls_PullUnit}" />
-                </StackPanel>
-              </StackPanel>
-            </Border>
-            <Border Classes="gs-cell">
-              <StackPanel>
-                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_WinRate}" />
-                <StackPanel Orientation="Horizontal">
-                  <c:RollingText Classes="gs-value" Text="{Binding WinRate}" />
-                  <TextBlock Classes="gs-unit" Text="{Binding WinRatio}" />
-                </StackPanel>
-              </StackPanel>
-            </Border>
-            <Border Classes="gs-cell">
-              <StackPanel>
-                <TextBlock Classes="gs-label" Text="{loc:Tr Pulls_Astrites}" />
-                <c:RollingText Classes="gs-value" Text="{Binding Astrites}" />
-              </StackPanel>
-            </Border>
-          </UniformGrid>
-        </Border>
+        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StatStrip}" />
 
         <Border Grid.Row="1" Classes="card" Padding="22,18,22,0">
           <Grid RowDefinitions="Auto,*" RowSpacing="14">
             <TextBlock FontSize="17" FontWeight="Bold" VerticalAlignment="Center" Text="{loc:Tr Pulls_FiveStarRecords}" />
             <ScrollViewer Grid.Row="1" x:Name="CompactScroller" HorizontalScrollBarVisibility="Disabled" Margin="-8,0,-14,0">
-              <ItemsControl x:Name="CompactGrid" Margin="8,5,7,36" ItemsSource="{Binding Records.CompactTiles}">
+              <!-- 底部多留 64，最后一行能滚到悬浮按钮上方 -->
+              <ItemsControl x:Name="CompactGrid" Margin="8,5,7,100" ItemsSource="{Binding Records.CompactTiles}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate><UniformGrid ColumnSpacing="5" RowSpacing="7" Columns="8" /></ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>

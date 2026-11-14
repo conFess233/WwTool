@@ -77,9 +77,10 @@
       <Setter Property="FontWeight" Value="Bold" />
       <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
     </Style>
-    <Style Selector="Window:not(.reduced) Border.full-tag">
+    <!-- 提醒类循环（脉动、光圈、心跳、发光）只播 3 轮：一直播会让整个窗口按帧重绘。窗口在后台（.inactive）时不播，回到前台再播 3 轮。 -->
+    <Style Selector="Window:not(.reduced):not(.inactive) Border.full-tag[IsVisible=True]">
       <Style.Animations>
-        <Animation Duration="0:0:1.2" IterationCount="Infinite" Easing="0.45,0,0.55,1">
+        <Animation Duration="0:0:1.2" IterationCount="3" Easing="0.45,0,0.55,1">
           <KeyFrame Cue="0%"><Setter Property="Opacity" Value="1" /></KeyFrame>
           <KeyFrame Cue="50%"><Setter Property="Opacity" Value="0.35" /></KeyFrame>
           <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1" /></KeyFrame>
@@ -289,7 +290,7 @@
     <Style Selector="Button.quick.busy.primary /template/ Border#PART_Shimmer">
       <Setter Property="IsVisible" Value="True" />
     </Style>
-    <Style Selector="Window:not(.reduced) Button.quick.busy.primary /template/ Border#PART_Shimmer">
+    <Style Selector="Window:not(.reduced):not(.inactive) Button.quick.busy.primary /template/ Border#PART_Shimmer">
       <Style.Animations>
         <Animation Duration="0:0:1.6" IterationCount="Infinite" Easing="0.45,0,0.55,1">
           <KeyFrame Cue="0%"><Setter Property="TranslateTransform.X" Value="-100" /></KeyFrame>
@@ -316,7 +317,8 @@
       <Setter Property="Fill" Value="#6FD08C" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
-    <Style Selector="Window:not(.reduced) Ellipse.live">
+    <!-- 游戏运行中的指示灯：持续闪烁，但窗口在后台（多半正在玩游戏）时不播。 -->
+    <Style Selector="Window:not(.reduced):not(.inactive) Ellipse.live[IsVisible=True]">
       <Style.Animations>
         <Animation Duration="0:0:1.2" IterationCount="Infinite" Easing="0.45,0,0.55,1">
           <KeyFrame Cue="0%"><Setter Property="Opacity" Value="1" /></KeyFrame>
@@ -587,9 +589,9 @@
                 <Panel>
                   <Border Classes="region-thumb" Classes.right="{Binding IsGlobalRegion}" />
                   <UniformGrid Columns="2">
-                    <RadioButton Classes="region-opt" GroupName="home-ann-region" Content="{loc:Tr Home_RegionCN}"
+                    <RadioButton Classes="region-opt" Content="{loc:Tr Home_RegionCN}"
                                  IsChecked="{Binding IsChinaRegion}" AutomationProperties.AutomationId="home-ann-region-cn" />
-                    <RadioButton Classes="region-opt" GroupName="home-ann-region" Content="{loc:Tr Home_RegionGlobal}"
+                    <RadioButton Classes="region-opt" Content="{loc:Tr Home_RegionGlobal}"
                                  IsChecked="{Binding IsGlobalRegion}" AutomationProperties.AutomationId="home-ann-region-global" />
                   </UniformGrid>
                 </Panel>
@@ -601,7 +603,7 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="home:AnnouncementFilter">
-                  <RadioButton Classes="ann-chip" GroupName="home-ann" Content="{Binding Title}" IsChecked="{Binding IsSelected}" />
+                  <RadioButton Classes="ann-chip" Content="{Binding Title}" IsChecked="{Binding IsSelected}" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>

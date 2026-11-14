@@ -90,8 +90,8 @@
   </Window.Styles>
 
   <Panel>
-    <!-- 背景：主题背景色（开启毛玻璃时半透明）+ 默认底纹 -->
-    <Border Background="{DynamicResource BackgroundBrush}" Opacity="{Binding BackdropOpacity}" IsHitTestVisible="False" />
+    <!-- 背景：主题背景色 + 默认底纹 -->
+    <Border Background="{DynamicResource BackgroundBrush}" IsHitTestVisible="False" />
     <c:BackdropTexture GridColor="{DynamicResource GridLineColor}" GridOpacity="{DynamicResource GridLineOpacity}"
                        GlowColor="{DynamicResource GlowColor}" GlowOpacity="{DynamicResource GlowOpacity}"
                        IsVisible="{Binding !HasBackgroundImage}" />

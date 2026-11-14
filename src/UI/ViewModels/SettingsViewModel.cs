@@ -127,11 +127,10 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         config.User.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(Core.Models.Config.UserConfig.GamePath)) OnPropertyChanged(nameof(GamePath));
-            if (e.PropertyName == nameof(Core.Models.Config.UserConfig.IsGlassEffectEnabled))
+            if (e.PropertyName is nameof(Core.Models.Config.UserConfig.UseDynamicBackground) or nameof(Core.Models.Config.UserConfig.UseCustomBackground))
             {
-                OnPropertyChanged(nameof(IsGlassEnabled));
-                OnPropertyChanged(nameof(GlassNeedsRestartToShow));
-                OnPropertyChanged(nameof(GlassNeedsRestartToSave));
+                OnPropertyChanged(nameof(RenderingRestartForVideo));
+                OnPropertyChanged(nameof(RenderingRestartToSave));
             }
         };
         _catalogSync.Changed += (_, _) => Dispatcher.UIThread.Post(RefreshCatalog);
@@ -231,6 +230,14 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         }
     }
 
+    private bool WantsGpu => RenderingProfile.WantsGpu(_config.User.UseDynamicBackground, _config.User.UseCustomBackground);
+
+    /// <summary>开了动态背景，但本次启动用的是软件渲染：重启后改用 GPU，播放更省 CPU（见 <see cref="RenderingProfile"/>）。</summary>
+    public bool RenderingRestartForVideo => OperatingSystem.IsWindows() && WantsGpu && !RenderingProfile.UsesGpu;
+
+    /// <summary>关了动态背景，但本次启动用的是 GPU 渲染：重启后改用软件渲染，释放显卡驱动占的内存。</summary>
+    public bool RenderingRestartToSave => OperatingSystem.IsWindows() && !WantsGpu && RenderingProfile.UsesGpu;
+
     /// <summary>空白处查看背景：界面组件变透明的程度（%）。</summary>
     public double BackgroundPeekTransparency
     {
@@ -262,38 +269,6 @@ public sealed partial class SettingsViewModel : ObservableObject, IFabProvider, 
         if (file is null) return;
         _config.User.CustomBackgroundPath = file;
     }
-
-    public bool IsGlassEnabled
-    {
-        get => _config.User.IsGlassEffectEnabled;
-        set
-        {
-            if (_config.User.IsGlassEffectEnabled == value) return;
-            _config.User.IsGlassEffectEnabled = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>本次启动用的是软件渲染，打开毛玻璃要重启才显示（见 <see cref="RenderingProfile"/>）。</summary>
-    public bool GlassNeedsRestartToShow => IsGlassEnabled && !RenderingProfile.GlassCapable;
-
-    /// <summary>本次启动用的是 GPU 渲染，关掉毛玻璃后重启才改用软件渲染、释放显卡驱动内存。</summary>
-    public bool GlassNeedsRestartToSave => !IsGlassEnabled && RenderingProfile.GlassCapable && OperatingSystem.IsWindows();
-
-    public double GlassOpacity
-    {
-        get => _config.User.GlassOpacity;
-        set
-        {
-            int rounded = (int)Math.Round(value);
-            if (_config.User.GlassOpacity == rounded) return;
-            _config.User.GlassOpacity = rounded;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(GlassOpacityText));
-        }
-    }
-
-    public string GlassOpacityText => _config.User.GlassOpacity.ToString(CultureInfo.InvariantCulture) + "%";
 
     public bool IsReducedMotion
     {

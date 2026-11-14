@@ -88,12 +88,20 @@ public sealed class EmptyWalker : Panel
     {
         base.OnAttachedToVisualTree(e);
         _start = null;
+        Motion.LoopsChanged += OnLoopsChanged;
         Start();
+    }
+
+    /// <summary>窗口回到前台时继续走（在后台时停在原地，不按帧重绘）。</summary>
+    private void OnLoopsChanged(object? sender, EventArgs e)
+    {
+        if (!Motion.Paused && IsVisible) Start();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
+        Motion.LoopsChanged -= OnLoopsChanged;
         _running = false;
     }
 
@@ -117,7 +125,7 @@ public sealed class EmptyWalker : Panel
 
     private void Tick(TimeSpan now)
     {
-        if (!_running || !IsEffectivelyVisible || TopLevel.GetTopLevel(this) is not { } top)
+        if (!_running || Motion.Paused || !IsEffectivelyVisible || TopLevel.GetTopLevel(this) is not { } top)
         {
             _running = false;
             return;
