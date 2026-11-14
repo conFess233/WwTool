@@ -100,6 +100,9 @@
       <Setter Property="ClipToBounds" Value="True" />
       <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
     </Style>
+    <Style Selector="Border.icon.light">
+      <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+    </Style>
     <!-- 共鸣链节点 -->
     <Style Selector="Border.node">
       <Setter Property="CornerRadius" Value="12" />
@@ -191,7 +194,7 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="roles:BuildSkillItem">
                       <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,3" Background="Transparent" ToolTip.Tip="{Binding Tip}">
-                        <Border Classes="icon" Width="32" Height="32" CornerRadius="16">
+                        <Border Classes="icon" Classes.light="{Binding !UsesEncoreIcon}" Width="32" Height="32" CornerRadius="16">
                           <Image Source="{Binding Image}" Stretch="Uniform" Margin="3" />
                         </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="0">
@@ -218,7 +221,7 @@
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="roles:BuildSetItem">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                      <Border Classes="icon" Width="24" Height="24" CornerRadius="12"><Image Source="{Binding Image}" Stretch="Uniform" Margin="2" /></Border>
+                      <Border Classes="icon light" Width="24" Height="24" CornerRadius="12"><Image Source="{Binding Image}" Stretch="Uniform" Margin="2" /></Border>
                       <TextBlock FontSize="12" Text="{Binding Name}" VerticalAlignment="Center" IsVisible="{Binding HasName}" />
                     </StackPanel>
                   </DataTemplate>

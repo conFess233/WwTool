@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using WwTool.Core.Models.Domain;
 using WwTool.UI.Pages.Events;
 
@@ -38,8 +39,11 @@ public sealed record CharacterBuild(
         build.LacksNames);
 }
 
-public sealed class BuildSkillItem(string? imageUrl, int level, string? name, string? type) : ChallengeImageItem(imageUrl)
+public sealed partial class BuildSkillItem(string? imageUrl, int level, string? name, string? type) : ChallengeImageItem(imageUrl)
 {
+    /// <summary>图标来自 encore.moe（白色线稿，放在深色圆底上）；否则是攻略站的图标，放在浅色底上。</summary>
+    [ObservableProperty] private bool _usesEncoreIcon;
+
     public string LevelText { get; } = "Lv." + level;
     public string? Name { get; } = name;
     public string? Type { get; } = type;

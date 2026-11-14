@@ -383,12 +383,32 @@ public sealed partial class CharacterDetailViewModel : DialogViewModel<bool>, IL
 
     private void LoadIcons()
     {
-        var items = Skills.Cast<ChallengeImageItem>().Concat(Chain).Concat(Build?.ImageItems ?? [])
-            .Where(i => i.ImageUrl is not null && i.Image is null).ToList();
+        var items = Skills.Cast<ChallengeImageItem>().Concat(Chain).Concat(Build?.ImageItems ?? []).ToList();
         foreach (ChallengeImageItem item in items)
         {
-            _ = _images.LoadAsync(item.ImageUrl, IconWidth, bitmap => item.Image = bitmap, token: _cts.Token);
+            // 「我的养成」的技能优先用 encore.moe 的同一技能图标（白色线稿，和技能页一致）；攻略站的图标在深色底上看不见。
+            string? url = item.ImageUrl;
+            if (item is BuildSkillItem skill && EncoreIconFor(skill) is { } encoreIcon)
+            {
+                url = encoreIcon;
+                skill.UsesEncoreIcon = true;
+            }
+            if (url is null || item.Image is not null && item is not BuildSkillItem) continue;
+            _ = _images.LoadAsync(url, IconWidth, bitmap => item.Image = bitmap, token: _cts.Token);
         }
+    }
+
+    /// <summary>按技能名匹配 encore.moe 的技能；名称对不上时按技能类型匹配（只有一项该类型时）。</summary>
+    private string? EncoreIconFor(BuildSkillItem skill)
+    {
+        if (_character is not { } c) return null;
+        EncoreSkill? match = skill.Name is { } name ? c.Skills.FirstOrDefault(s => string.Equals(s.Name, name, StringComparison.Ordinal)) : null;
+        if (match is null && skill.Type is { } type)
+        {
+            var sameType = c.Skills.Where(s => string.Equals(s.Type, type, StringComparison.Ordinal)).Take(2).ToList();
+            if (sameType.Count == 1) match = sameType[0];
+        }
+        return match?.IconUrl;
     }
 
     /// <summary>标签文字用压暗的游戏色，浅色底上也能看清。</summary>
