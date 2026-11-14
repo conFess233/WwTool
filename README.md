@@ -13,7 +13,7 @@
 
 简体中文 | [English](docs/README_en.md) | [日本語](docs/README_ja.md)
 
-[功能](#features) · [下载](#download) · [快速上手](#quick-start) · [数据与隐私](#data) · [已知限制](#limitations) · [文档](#docs) · [更新日志](CHANGELOG.md)
+[功能](#features) · [下载](#download) · [快速上手](#quick-start) · [Web 端](#web) · [数据与隐私](#data) · [已知限制](#limitations) · [文档](#docs) · [更新日志](CHANGELOG.md)
 
 </div>
 
@@ -101,6 +101,18 @@ powershell -ExecutionPolicy Bypass -File scripts/publish.ps1
 压缩包和 `SHA256SUMS.txt` 输出到 `publish/`。只打其中几个时加 `-Only single,single-lite`。
 
 </details>
+
+<a id="web"></a>
+## Web 端（开发中）
+
+WwTool 正在开发浏览器版本，界面与桌面端一致，后端复用同一套抽卡统计与资料解析代码，目前还没有公开部署。
+
+- **游戏密码和凭据不交给服务器**：游戏登录只在浏览器内完成，密码用完即清空；用于刷新资料的 OauthCode 只加密保存在你自己的浏览器里。
+- **不登录也能用**：直接粘贴抽卡链接导入，记录只保存在当前浏览器；注册站点账号（用户名 + 密码）后可以上传到云端，换设备也能看。
+- **绑定 UID** 有两种方式：提交一次抽卡链接（链接本身不保存），或登录游戏账号自动绑定其下全部 UID。
+- 支持首页、活动、抽卡统计与图表、角色数据与角色详情、探索、摩托和账号管理，第一次进入时会弹出使用说明。角色数据来自官方攻略站，它不允许其他网站直接访问，同步时由服务器代为请求，攻略站授权只经过、不保存。
+
+本地运行方法、安全设计与配置说明见 [Web 端说明](web/README.md)。
 
 <a id="data"></a>
 ## 数据与隐私

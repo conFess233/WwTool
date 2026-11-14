@@ -21,7 +21,15 @@ public sealed class GuideRepository(
         string encrypted = secretProtector.Protect(token);
         if (string.IsNullOrWhiteSpace(encrypted))
             throw new WwToolDatabaseException("Guide 令牌加密失败。");
+        await SavePlayersCoreAsync(cUid, encrypted, players, cancellationToken);
+    }
 
+    public Task SavePlayersAsync(string cUid, IReadOnlyList<GuidePlayerIdentity> players, CancellationToken cancellationToken = default) =>
+        SavePlayersCoreAsync(cUid, null, players, cancellationToken);
+
+    /// <param name="encryptedToken">为 null 时不改动已保存的令牌（新建时为空，等同于未保存）。</param>
+    private async Task SavePlayersCoreAsync(string cUid, string? encryptedToken, IReadOnlyList<GuidePlayerIdentity> players, CancellationToken cancellationToken)
+    {
         await writeCoordinator.ExecuteAsync(async (db, ct) =>
         {
             GuideAccountCredential? credential = await db.GuideAccountCredentials.FirstOrDefaultAsync(x => x.CUid == cUid, ct);
@@ -30,7 +38,7 @@ public sealed class GuideRepository(
                 credential = new GuideAccountCredential { CUid = cUid };
                 db.GuideAccountCredentials.Add(credential);
             }
-            credential.EncryptedGuideToken = encrypted;
+            if (encryptedToken is not null) credential.EncryptedGuideToken = encryptedToken;
 
             HashSet<string> localUids = await db.UserAccounts.Select(x => x.Uid).ToHashSetAsync(ct);
             foreach (GuidePlayerIdentity player in players.Where(x => x.PlayerId.HasValue && !string.IsNullOrWhiteSpace(x.ServerId)))

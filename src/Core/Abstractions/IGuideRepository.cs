@@ -13,6 +13,8 @@ public sealed record GuideSnapshot(
 public interface IGuideRepository
 {
     Task SaveCredentialAndPlayersAsync(string cUid, string token, IReadOnlyList<GuidePlayerIdentity> players, CancellationToken cancellationToken = default);
+    /// <summary>只保存 UID 与攻略站玩家的对应关系，不保存令牌（Web 端：令牌只留在浏览器）。</summary>
+    Task SavePlayersAsync(string cUid, IReadOnlyList<GuidePlayerIdentity> players, CancellationToken cancellationToken = default);
     Task<GuideCredential?> GetCredentialAsync(string uid, CancellationToken cancellationToken = default);
     Task DeleteCredentialAsync(string cUid, CancellationToken cancellationToken = default);
     Task ReplaceSnapshotAsync(string uid, IReadOnlyList<GuideRoleData> roles, IReadOnlyList<GuideWeaponData> weapons, DateTimeOffset syncedAtUtc, CancellationToken cancellationToken = default);

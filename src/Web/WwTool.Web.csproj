@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Web 端后端：只引用 Core，不引用桌面 UI。
+       不注册任何需要游戏凭据的服务（登录、攻略站、抽卡日志定位、更新）。 -->
+  <PropertyGroup>
+    <RootNamespace>WwTool.Web</RootNamespace>
+    <AssemblyName>WwTool.Web</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\WwTool.Core.csproj" />
+  </ItemGroup>
+
+</Project>

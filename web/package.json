@@ -1,0 +1,24 @@
+{
+  "name": "wwtool-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "gen": "node scripts/gen-assets.mjs",
+    "dev": "npm run gen && node scripts/vite.mjs",
+    "build": "npm run gen && vue-tsc --noEmit && node scripts/vite.mjs build",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "dompurify": "^3.2.6",
+    "echarts": "5.6.0",
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.3",
+    "vue-tsc": "^3.0.6"
+  }
+}
