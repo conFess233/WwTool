@@ -31,19 +31,20 @@
     <Setter Property="IsHitTestVisible" Value="False" />
     <Setter Property="Opacity" Value="0" />
   </Style>
-  <Style Selector="Window:not(.reduced) Border.near-ring">
+  <!-- 提醒类循环（脉动、光圈、心跳、发光）只播 3 轮：一直播会让整个窗口按帧重绘。窗口在后台（.inactive）时不播，回到前台再播 3 轮。 -->
+  <Style Selector="Window:not(.reduced):not(.inactive) Border.near-ring">
     <Style.Animations>
-      <Animation Duration="0:0:1.2" IterationCount="Infinite" Easing="0.2,0.8,0.2,1">
+      <Animation Duration="0:0:1.2" IterationCount="3" Easing="0.2,0.8,0.2,1">
         <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.7" /><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
         <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0" /><Setter Property="ScaleTransform.ScaleX" Value="1.25" /><Setter Property="ScaleTransform.ScaleY" Value="1.6" /></KeyFrame>
       </Animation>
     </Style.Animations>
   </Style>
   <!-- 保底预警：数字心跳（放大 8% 再 4%） -->
-  <Style Selector="Window:not(.reduced) TextBlock.heartbeat">
+  <Style Selector="Window:not(.reduced):not(.inactive) TextBlock.heartbeat">
     <Setter Property="RenderTransformOrigin" Value="0%,100%" />
     <Style.Animations>
-      <Animation Duration="0:0:1.2" IterationCount="Infinite">
+      <Animation Duration="0:0:1.2" IterationCount="3">
         <KeyFrame Cue="0%"><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
         <KeyFrame Cue="14%"><Setter Property="ScaleTransform.ScaleX" Value="1.08" /><Setter Property="ScaleTransform.ScaleY" Value="1.08" /></KeyFrame>
         <KeyFrame Cue="28%"><Setter Property="ScaleTransform.ScaleX" Value="1" /><Setter Property="ScaleTransform.ScaleY" Value="1" /></KeyFrame>
@@ -60,12 +61,14 @@
     <Setter Property="Opacity" Value="0.6" />
     <Setter Property="IsHitTestVisible" Value="False" />
   </Style>
-  <Style Selector="Window:not(.reduced) Border.bar-glow">
+  <!-- 起止都是静态值 0.6，播完 3 轮后停住时不跳变。 -->
+  <Style Selector="Window:not(.reduced):not(.inactive) Border.bar-glow">
     <Style.Animations>
-      <Animation Duration="0:0:1.2" IterationCount="Infinite" Easing="0.45,0,0.55,1">
-        <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.25" /></KeyFrame>
-        <KeyFrame Cue="50%"><Setter Property="Opacity" Value="1" /></KeyFrame>
-        <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.25" /></KeyFrame>
+      <Animation Duration="0:0:1.2" IterationCount="3" Easing="0.45,0,0.55,1">
+        <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0.6" /></KeyFrame>
+        <KeyFrame Cue="25%"><Setter Property="Opacity" Value="0.25" /></KeyFrame>
+        <KeyFrame Cue="75%"><Setter Property="Opacity" Value="1" /></KeyFrame>
+        <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.6" /></KeyFrame>
       </Animation>
     </Style.Animations>
   </Style>

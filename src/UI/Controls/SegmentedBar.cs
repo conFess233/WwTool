@@ -13,10 +13,11 @@ namespace WwTool.UI.Controls;
 /// <list type="bullet">
 /// <item>标准版高 10、刻 5、隙 3；细版高 8；密版刻 5 隙 1；未出金进度刻 4 隙 1、高 14。</item>
 /// <item><see cref="IsHeat"/>：同色渐深，渐变铺满整条轨道（浅主色 → 主色）；抽数达到阈值（默认 70 / 80）整条转为浅红 → 红。</item>
-/// <item><see cref="Shimmer"/>：填充上叠加一道 60 宽暖白光带，从左到右循环扫过，越接近满扫得越快（3.2 秒到 1 秒）。</item>
+/// <item><see cref="Shimmer"/>：填充上叠加一道 60 宽暖白光带，从左到右扫过 3 次后停下，越接近满扫得越快（3.2 秒到 1 秒）；
+/// 数值变化或窗口回到前台时再扫。一直扫会让整个窗口按帧重绘（每条约占一个核心的 35%）。</item>
 /// <item><see cref="AnimateIn"/>：首次显示时从 0 逐格点亮到目标值（900ms，先快后慢）；之后数值变化平滑过渡。</item>
 /// </list>
-/// 减少动画时不扫光带、不做点亮动画。数值须另以文字显示，不只靠颜色。
+/// 减少动画时不扫光带、不做点亮动画；窗口在后台时不扫光带。数值须另以文字显示，不只靠颜色。
 /// </remarks>
 public sealed class SegmentedBar : Control
 {
@@ -76,6 +77,27 @@ public sealed class SegmentedBar : Control
     private bool _frameRequested;
     private TimeSpan _clock;
 
+    /// <summary>光带每轮扫几次。</summary>
+    private const int ShimmerSweeps = 3;
+    /// <summary>本轮光带的起点（帧时间）；<see cref="_shimmerPending"/> 时下一帧记录。</summary>
+    private TimeSpan? _shimmerFrom;
+    private bool _shimmerPending;
+
+    private double ShimmerPeriod => Math.Clamp(3.2 - 2.2 * _shown, 1, 3.2);
+
+    private bool ShimmerActive =>
+        Shimmer && Motion.LoopsAllowed && _shown > 0 && _shimmerFrom is { } from
+        && (_clock - from).TotalSeconds < ShimmerSweeps * ShimmerPeriod;
+
+    /// <summary>重新扫一轮光带。</summary>
+    private void RestartShimmer()
+    {
+        if (!Shimmer) return;
+        _shimmerFrom = null;
+        _shimmerPending = true;
+        RequestFrame();
+    }
+
     static SegmentedBar()
     {
         AffectsRender<SegmentedBar>(SegmentWidthProperty, SegmentGapProperty, FillProperty, TrackProperty, IsHeatProperty, HeatStartProperty,
@@ -125,33 +147,40 @@ public sealed class SegmentedBar : Control
         if (change.Property == ValueProperty || change.Property == MaximumProperty)
         {
             StartTransition(_hasShown ? Motion.Relaxed : TimeSpan.FromMilliseconds(900));
+            RestartShimmer();
         }
         else if (change.Property == ShimmerProperty)
         {
-            RequestFrame();
+            RestartShimmer();
         }
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        Motion.ReducedChanged += OnReducedChanged;
+        Motion.LoopsChanged += OnLoopsChanged;
         if (!_hasShown)
         {
             _shown = AnimateIn && !Motion.Reduced ? 0 : TargetRatio;
             StartTransition(TimeSpan.FromMilliseconds(900));
             _hasShown = true;
         }
+        RestartShimmer();
         RequestFrame();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
-        Motion.ReducedChanged -= OnReducedChanged;
+        Motion.LoopsChanged -= OnLoopsChanged;
     }
 
-    private void OnReducedChanged(object? sender, EventArgs e) => RequestFrame();
+    /// <summary>回到前台（或关闭减少动画）时再扫一轮；停下时下一帧去掉光带。</summary>
+    private void OnLoopsChanged(object? sender, EventArgs e)
+    {
+        if (Motion.LoopsAllowed) RestartShimmer();
+        RequestFrame();
+    }
 
     private void StartTransition(TimeSpan duration)
     {
@@ -184,6 +213,11 @@ public sealed class SegmentedBar : Control
     {
         _frameRequested = false;
         _clock = time;
+        if (_shimmerPending)
+        {
+            _shimmerFrom = time;
+            _shimmerPending = false;
+        }
         if (_animPending)
         {
             _animStart = time;
@@ -196,7 +230,7 @@ public sealed class SegmentedBar : Control
             _shown = _from + (_to - _from) * Motion.CountEasing.Ease(t);
             if (t >= 1) _animStart = null; else more = true;
         }
-        if (Shimmer && !Motion.Reduced && _shown > 0 && IsEffectivelyVisible) more = true;
+        if (ShimmerActive && IsEffectivelyVisible) more = true;
         InvalidateVisual();
         if (more && TopLevel.GetTopLevel(this) is not null) RequestFrame();
     }
@@ -227,11 +261,11 @@ public sealed class SegmentedBar : Control
             }
         }
 
-        if (Shimmer && !Motion.Reduced && filledWidth > 0)
+        if (ShimmerActive && filledWidth > 0 && _shimmerFrom is { } from)
         {
             // 越接近满扫得越快：比例 0 时 3.2 秒一圈，满格 1 秒。
-            double period = Math.Clamp(3.2 - 2.2 * _shown, 1, 3.2);
-            double phase = _clock.TotalSeconds % period / period;
+            double period = ShimmerPeriod;
+            double phase = (_clock - from).TotalSeconds % period / period;
             const double band = 60;
             double x0 = -band + (filledWidth + band) * phase;
             var brush = new LinearGradientBrush
