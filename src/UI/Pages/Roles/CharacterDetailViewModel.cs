@@ -133,8 +133,10 @@ public sealed partial class CharacterDetailViewModel : DialogViewModel<bool>, IL
             : string.Format(CultureInfo.CurrentCulture, localization["CharDetail_PullsSummary"], pulls.Count,
                 Math.Round(pulls.Average(p => p.Pity), 1).ToString("0.#", CultureInfo.InvariantCulture));
 
-        if (encore.LoadCharacter(request.RoleId, language) is { } cached) Apply(cached.Value);
-        _ = RefreshAsync();
+        EncoreData<EncoreCharacter>? cached = encore.LoadCharacter(request.RoleId, language);
+        if (cached is not null) Apply(cached.Value);
+        // 缓存还新时不联网（「重试」仍会强制刷新）。
+        if (!encore.IsCharacterFresh(cached)) _ = RefreshAsync();
     }
 
     public CharacterDetailRequest Request { get; }

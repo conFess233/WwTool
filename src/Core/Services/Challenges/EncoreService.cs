@@ -30,6 +30,12 @@ public sealed class EncoreService(IHttpClientFactory factory, IConfigService con
 
     public TimeSpan RequestTimeout { get; init; } = TimeSpan.FromSeconds(20);
 
+    /// <summary>
+    /// 角色资料只在游戏版本更新时变化：缓存不到这么久时，打开角色详情不再联网刷新
+    /// （每次刷新都要下载、比较、写入约 400 KB 的数据，产生十几 MB 的大对象）。
+    /// </summary>
+    public TimeSpan CharacterFreshFor { get; init; } = TimeSpan.FromHours(12);
+
     /// <summary>测试用：当前时间。</summary>
     public Func<DateTimeOffset> Now { get; init; } = () => DateTimeOffset.UtcNow;
 
@@ -97,6 +103,14 @@ public sealed class EncoreService(IHttpClientFactory factory, IConfigService con
     /// <summary>缓存的角色详情（角色 ID 与游戏资料、抽卡记录里的 ID 相同）。</summary>
     public EncoreData<EncoreCharacter>? LoadCharacter(int id, string uiLanguage) =>
         Parse(ReadEntry(CharacterPath(id, RequestLanguage(uiLanguage))), false, body => EncoreCharacterParser.Parse(body));
+
+    /// <summary>缓存的角色详情还新（见 <see cref="CharacterFreshFor"/>），不必联网刷新。时钟回拨导致获取时间在未来时视为过期。</summary>
+    public bool IsCharacterFresh(EncoreData<EncoreCharacter>? cached)
+    {
+        if (cached is null) return false;
+        TimeSpan age = Now() - cached.FetchedAtUtc;
+        return age >= TimeSpan.Zero && age < CharacterFreshFor;
+    }
 
     public async Task<EncoreData<EncoreCharacter>?> RefreshCharacterAsync(int id, string uiLanguage, CancellationToken token = default)
     {
