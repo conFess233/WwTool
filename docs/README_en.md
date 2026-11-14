@@ -117,7 +117,7 @@ The archives and `SHA256SUMS.txt` are written to `publish/`. Add `-Only single,s
 - **Network access**:
   - Login and account data use Kuro Games' services; Convene records use the gacha API of the matching server.
   - Game data and missing icons are synced from this repository; Resonator art comes from the official guide site.
-  - The background and announcements on Home come from the game launcher's public API. The in-game notices and version calendar on Events come from the game's notice API, and livestream codes come from the official Kuro BBS post. Tower / Wastes / Matrix data comes from the third-party site encore.moe (datamined).
+  - The background and announcements on Home come from the game launcher's public API. The in-game notices and version calendar on Events come from the game's notice API, and livestream codes come from the official Kuro BBS post. Tower / Wastes / Matrix data and Resonator details come from the third-party site encore.moe (datamined).
 - **Your Convene link contains authentication data.** When reporting an issue, remove your password, the full Convene link and other personal details.
 
 <a id="limitations"></a>
