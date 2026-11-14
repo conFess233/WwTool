@@ -171,7 +171,7 @@ public partial class MainWindow : Window
             return;
         }
 #if DEBUG
-        if (Environment.GetEnvironmentVariable("WWTOOL_DUMP_SNAPSHOT") is { Length: > 0 } dump) snapshot.Save(dump);
+        if (Environment.GetEnvironmentVariable("WWTOOL_DUMP_SNAPSHOT") is { Length: > 0 } dump) snapshot.Save(dump, Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
 #endif
         _themeSnapshot?.Dispose();
         _themeSnapshot = snapshot;

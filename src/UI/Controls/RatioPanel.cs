@@ -74,7 +74,7 @@ public sealed class RatioPanel : Panel
         {
             double width = double.IsInfinity(availableSize.Width) || (CenterPoints && GetLeft(child) == GetRight(child))
                 ? double.PositiveInfinity
-                : Width(child, availableSize.Width).Width;
+                : Span(child, availableSize.Width).Width;
             child.Measure(new Size(width, availableSize.Height));
             if (double.IsNaN(GetTop(child))) height = Math.Max(height, child.DesiredSize.Height);
         }
@@ -92,7 +92,7 @@ public sealed class RatioPanel : Panel
                 child.Arrange(new Rect(-100000, 0, child.DesiredSize.Width, child.DesiredSize.Height));
                 continue;
             }
-            (double x, double width) = Width(child, finalSize.Width);
+            (double x, double width) = Span(child, finalSize.Width);
             double top = GetTop(child), bottom = GetBottom(child);
             double y = 0, height = finalSize.Height;
             if (!double.IsNaN(top))
@@ -117,7 +117,7 @@ public sealed class RatioPanel : Panel
         return gap <= 0 ? 1 : Math.Max(1, (int)Math.Ceiling(widest / gap));
     }
 
-    private (double X, double Width) Width(Control child, double total)
+    private (double X, double Width) Span(Control child, double total)
     {
         double left = Math.Clamp(GetLeft(child), 0, 1), right = Math.Clamp(GetRight(child), 0, 1);
         double x = left * total;

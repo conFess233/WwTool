@@ -84,7 +84,7 @@ public class GameDataService : INotifyPropertyChanged
                 item.ResourceId = int.Parse(id);
                 items.Add(item.ResourceId, item);
             }
-            if (skipped > 0) _logger.Warn($"资料 {category} 保留了 {skipped} 条无名称记录，暂不显示，等待后续补全。");
+            if (skipped > 0) _logger.Debug($"资料 {category} 保留了 {skipped} 条无名称记录，暂不显示，等待后续补全。");
         }
         _documents = documents;
         Items = items;
