@@ -168,6 +168,8 @@ public sealed partial class CharacterDetailViewModel : DialogViewModel<bool>, IL
     public ObservableCollection<CharacterSkinItem> Skins { get; } = [];
     public bool HasSkinChoice => Skins.Count > 1;
 
+    [ObservableProperty] private string? _skinName;
+
     public bool ShowError => !IsLoading && !HasData;
     public bool ShowContent => HasData;
 
@@ -267,6 +269,7 @@ public sealed partial class CharacterDetailViewModel : DialogViewModel<bool>, IL
     private void PickSkin(CharacterSkinItem skin)
     {
         foreach (CharacterSkinItem s in Skins) s.IsSelected = s == skin;
+        SkinName = skin.Name;
         LoadPortrait(skin.Skin.PortraitUrl ?? _character?.PortraitUrl);
     }
 
@@ -321,6 +324,7 @@ public sealed partial class CharacterDetailViewModel : DialogViewModel<bool>, IL
         Skins.Clear();
         foreach (EncoreSkin s in c.Skins) Skins.Add(new CharacterSkinItem(s));
         if (Skins.Count > 0) Skins[0].IsSelected = true;
+        SkinName = Skins.FirstOrDefault()?.Name;
         OnPropertyChanged(nameof(HasSkinChoice));
 
         Profile.Clear();

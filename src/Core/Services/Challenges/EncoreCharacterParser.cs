@@ -91,7 +91,7 @@ public static partial class EncoreCharacterParser
         return new EncoreCharacter(
             id,
             Content(r, "Name") ?? id.ToString(CultureInfo.InvariantCulture),
-            Plain(Content(r, "NickName")),
+            NickName(Content(r, "NickName")),
             Plain(Content(r, "Introduction")),
             Int(r, "QualityId") ?? 0,
             Int(r, "ElementId") ?? -1,
@@ -146,6 +146,14 @@ public static partial class EncoreCharacterParser
     /// <summary>只显示纯文字的字段（简介、档案）：去掉 &lt;te href&gt; 等游戏内链接标签。</summary>
     public static string? Plain(string? html) =>
         string.IsNullOrWhiteSpace(html) ? null : NullIfEmpty(NoticeHtml.ToPlainText(Rich(html)!.Replace("\n", "<br>")).Trim());
+
+    /// <summary>
+    /// 昵称：个别角色的数据是「存在异常，如有疑问请联系官方客服」（英文为「An error occurred. Please contact …」）这类占位文字，不显示。
+    /// </summary>
+    private static string? NickName(string? html) =>
+        Plain(html) is { } nick && !PlaceholderWords.Any(w => nick.Contains(w, StringComparison.OrdinalIgnoreCase)) ? nick : null;
+
+    private static readonly string[] PlaceholderWords = ["异常", "客服", "異常", "エラー", "error occurred", "contact"];
 
     /// <summary>数值截去小数（与游戏面板一致）；百分比等文字原样。</summary>
     private static string? StatText(JsonElement v) => v.ValueKind switch

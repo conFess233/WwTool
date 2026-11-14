@@ -260,7 +260,7 @@
           <Button Classes="btn" Height="32" Padding="10,0" Margin="14" HorizontalAlignment="Right" VerticalAlignment="Top"
                   IsVisible="{Binding HasSkinChoice}" AutomationProperties.AutomationId="character-detail-skin">
             <StackPanel Orientation="Horizontal" Spacing="6">
-              <TextBlock FontSize="12" Text="{Binding Skins[0].Name, FallbackValue=''}" VerticalAlignment="Center" />
+              <TextBlock FontSize="12" Text="{Binding SkinName}" VerticalAlignment="Center" />
               <c:StrokeIcon Width="10" Height="10" Data="{StaticResource Icon.ChevronDown}" />
             </StackPanel>
             <Button.Flyout>
