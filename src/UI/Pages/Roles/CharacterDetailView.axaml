@@ -143,6 +143,7 @@
     <DataTemplate x:Key="BuildTemplate" DataType="roles:CharacterBuild">
       <StackPanel Spacing="14">
         <TextBlock Classes="caption" Text="{Binding SyncInfo}" />
+        <TextBlock Classes="caption" Foreground="{DynamicResource AccentTextBrush}" Text="{loc:Tr CharDetail_BuildNeedsSync}" IsVisible="{Binding LacksNames}" />
         <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
           <Border Classes="block" VerticalAlignment="Top">
             <StackPanel Spacing="8">
@@ -187,15 +188,18 @@
               <StackPanel Spacing="10">
                 <TextBlock Classes="head" Text="{loc:Tr CharDetail_SkillLevels}" />
                 <ItemsControl ItemsSource="{Binding Skills}">
-                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5" ColumnSpacing="6" RowSpacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="roles:BuildSkillItem">
-                      <StackPanel Spacing="4" HorizontalAlignment="Center">
-                        <Border Classes="icon" Width="40" Height="40" CornerRadius="20" HorizontalAlignment="Center">
+                      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" Margin="0,3" Background="Transparent" ToolTip.Tip="{Binding Tip}">
+                        <Border Classes="icon" Width="32" Height="32" CornerRadius="16">
                           <Image Source="{Binding Image}" Stretch="Uniform" Margin="3" />
                         </Border>
-                        <TextBlock Classes="value" FontSize="12" Text="{Binding LevelText}" HorizontalAlignment="Center" />
-                      </StackPanel>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="0">
+                          <TextBlock Classes="caption" FontSize="11" Text="{Binding Type}" IsVisible="{Binding Type, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                          <TextBlock FontSize="13" Text="{Binding Name}" TextTrimming="CharacterEllipsis" IsVisible="{Binding HasName}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="2" Classes="value" Text="{Binding LevelText}" VerticalAlignment="Center" />
+                      </Grid>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -205,13 +209,18 @@
         </Grid>
         <Border Classes="block" IsVisible="{Binding HasEchoes}">
           <StackPanel Spacing="10">
-            <Grid ColumnDefinitions="*,Auto">
-              <TextBlock Classes="head" Text="{loc:Tr CharDetail_Echoes}" />
-              <ItemsControl Grid.Column="1" ItemsSource="{Binding EchoSets}" IsVisible="{Binding HasEchoSets}">
-                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+              <TextBlock Classes="head" Text="{loc:Tr CharDetail_Echoes}" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Classes="caption" VerticalAlignment="Center" IsVisible="{Binding HasMainEcho}"
+                         Text="{Binding MainEchoName, StringFormat='· {0}'}" TextTrimming="CharacterEllipsis" />
+              <ItemsControl Grid.Column="2" ItemsSource="{Binding EchoSets}" IsVisible="{Binding HasEchoSets}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="12" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="roles:BuildSetItem">
-                    <Border Classes="icon" Width="26" Height="26" CornerRadius="13"><Image Source="{Binding Image}" Stretch="Uniform" Margin="2" /></Border>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Border Classes="icon" Width="24" Height="24" CornerRadius="12"><Image Source="{Binding Image}" Stretch="Uniform" Margin="2" /></Border>
+                      <TextBlock FontSize="12" Text="{Binding Name}" VerticalAlignment="Center" IsVisible="{Binding HasName}" />
+                    </StackPanel>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
@@ -221,9 +230,15 @@
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="roles:BuildEchoItem">
                   <Border CornerRadius="10" Padding="10" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                    <StackPanel Spacing="2" HorizontalAlignment="Center">
-                      <TextBlock Classes="caption" FontSize="11" Text="{Binding CostText}" HorizontalAlignment="Center" />
-                      <TextBlock Classes="value" FontSize="15" Text="{Binding LevelText}" HorizontalAlignment="Center" />
+                    <StackPanel Spacing="2">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="caption" FontSize="11" Text="{Binding CostText}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Classes="value" FontSize="13" Text="{Binding LevelText}" />
+                      </Grid>
+                      <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentTextBrush}" Text="{Binding MainStat}"
+                                 TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding MainStat}" IsVisible="{Binding HasMainStat}" />
+                      <TextBlock Classes="caption" FontSize="11" Text="{Binding SubStat}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding SubStat}"
+                                 IsVisible="{Binding HasSubStat}" />
                     </StackPanel>
                   </Border>
                 </DataTemplate>

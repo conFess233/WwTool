@@ -65,8 +65,9 @@ public static class GuideRoleHoverMapper
     /// <summary>
     /// 「我的养成」用的技能等级与当前声骸：只读 <c>roleSkill.addPointTarget[].currentLevel</c> 与
     /// <c>echo.current</c>，不读推荐方案（<c>main</c> / <c>spare</c> / <c>recommendLevel</c>）。
+    /// 名称按 <paramref name="language"/> 取，快照里没有该语言时取任一语言（快照按同步时的界面语言保存）。
     /// </summary>
-    public static GuideRoleBuild MapBuild(string? json, Action<JsonException> onInvalidJson)
+    public static GuideRoleBuild MapBuild(string? json, string language, Action<JsonException> onInvalidJson)
     {
         if (string.IsNullOrWhiteSpace(json)) return GuideRoleBuild.Empty;
         try
@@ -80,12 +81,12 @@ public static class GuideRoleHoverMapper
                 foreach (JsonElement item in targets.EnumerateArray())
                 {
                     if (Child(item, "currentLevel") is { ValueKind: JsonValueKind.Number } level && level.TryGetInt32(out int value))
-                        skills.Add(new(HttpUrl(Scalar(Child(item, "pictureUrl"))), value));
+                        skills.Add(new(HttpUrl(Scalar(Child(item, "pictureUrl"))), value, AnyName(item, language), AnyName(Child(item, "skillType"), language)));
                 }
             }
 
             var echoes = new List<GuideEchoSlot>();
-            var sets = new List<string>();
+            var sets = new List<GuideEchoSet>();
             JsonElement current = Child(Child(root, "echo"), "current");
             JsonElement slots = Child(current, "echoAttributes");
             if (slots.ValueKind == JsonValueKind.Array)
@@ -94,7 +95,7 @@ public static class GuideRoleHoverMapper
                 {
                     if (Child(slot, "cost") is not { ValueKind: JsonValueKind.Number } cost || !cost.TryGetInt32(out int c)) continue;
                     int? level = Child(slot, "currentLevel") is { ValueKind: JsonValueKind.Number } l && l.TryGetInt32(out int lv) ? lv : null;
-                    echoes.Add(new(c, level));
+                    echoes.Add(new(c, level, AnyName(Child(slot, "attribute"), language), AnyName(Child(slot, "attribute2"), language)));
                 }
             }
             JsonElement effects = Child(current, "echoSetEffects");
@@ -102,16 +103,30 @@ public static class GuideRoleHoverMapper
             {
                 foreach (JsonElement effect in effects.EnumerateArray())
                 {
-                    if (HttpUrl(Scalar(Child(effect, "pictureUrl"))) is { } url && !sets.Contains(url)) sets.Add(url);
+                    var set = new GuideEchoSet(HttpUrl(Scalar(Child(effect, "pictureUrl"))), AnyName(effect, language));
+                    if ((set.ImageUrl ?? set.Name) is not null && !sets.Contains(set)) sets.Add(set);
                 }
             }
-            return new(skills, echoes, sets);
+            return new(skills, echoes, sets, AnyName(Child(current, "echoProps"), language));
         }
         catch (JsonException ex)
         {
             onInvalidJson(ex);
             return GuideRoleBuild.Empty;
         }
+    }
+
+    /// <summary><c>texts[]</c> 里当前语言的名称；没有时取第一个非空名称。</summary>
+    private static string? AnyName(JsonElement value, string language)
+    {
+        if (TextName(value, language) is { Length: > 0 } name) return name;
+        JsonElement texts = Child(value, "texts");
+        if (texts.ValueKind != JsonValueKind.Array) return null;
+        foreach (JsonElement item in texts.EnumerateArray())
+        {
+            if (Scalar(Child(item, "name")) is { Length: > 0 } any) return any;
+        }
+        return null;
     }
 
     private static string? HttpUrl(string? url) =>

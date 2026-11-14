@@ -938,5 +938,6 @@
   "Pulls_TimelineWeapons": "武器",
   "Pulls_TimelineEmpty": "还没有五星记录",
   "Pulls_TimelineHint": "滚轮横向滚动 · 点击角色头像查看详情",
-  "Pulls_TimelineTip": "{0}\n{1} 获得，{2} 抽出金（{3}）"
+  "Pulls_TimelineTip": "{0}\n{1} 获得，{2} 抽出金（{3}）",
+  "CharDetail_BuildNeedsSync": "这份数据同步得较早，没有技能与声骸的名称；在角色页点「同步」后会补上。"
 }

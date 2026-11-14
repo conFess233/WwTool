@@ -938,5 +938,6 @@
   "Pulls_TimelineWeapons": "武器",
   "Pulls_TimelineEmpty": "星5の記録はまだありません",
   "Pulls_TimelineHint": "ホイールで横スクロール・キャラクターをクリックで詳細",
-  "Pulls_TimelineTip": "{0}\n{1} に {2} 連で獲得（{3}）"
+  "Pulls_TimelineTip": "{0}\n{1} に {2} 連で獲得（{3}）",
+  "CharDetail_BuildNeedsSync": "以前に同期したデータのため、スキルと音骸の名前がありません。キャラクターページで「同期」すると表示されます。"
 }

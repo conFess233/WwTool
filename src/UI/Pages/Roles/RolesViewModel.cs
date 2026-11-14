@@ -383,7 +383,7 @@ public sealed partial class RolesViewModel : ObservableObject, INavigationAware,
             snapshot.Weapons.FirstOrDefault(x => x.OwnerRoleGbId == role.RoleGbId),
             _catalog, language, key => _localization[key], ex => _logger.Warn("角色悬浮详情快照无法解析。", ex));
         int sequence = GuideRoleHoverMapper.ResolveSequence(role, (message, ex) => _logger.Warn(message, ex));
-        GuideRoleBuild build = GuideRoleHoverMapper.MapBuild(role.DetailJson, ex => _logger.Warn("角色养成快照无法解析。", ex));
+        GuideRoleBuild build = GuideRoleHoverMapper.MapBuild(role.DetailJson, language, ex => _logger.Warn("角色养成快照无法解析。", ex));
         return new RoleTile
         {
             RoleId = id,

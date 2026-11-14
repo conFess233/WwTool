@@ -938,5 +938,6 @@
   "Pulls_TimelineWeapons": "Weapons",
   "Pulls_TimelineEmpty": "No 5★ records yet",
   "Pulls_TimelineHint": "Scroll to move sideways · click a resonator for details",
-  "Pulls_TimelineTip": "{0}\nObtained {1} after {2} pulls ({3})"
+  "Pulls_TimelineTip": "{0}\nObtained {1} after {2} pulls ({3})",
+  "CharDetail_BuildNeedsSync": "This data was synced before names were saved. Sync again on the Character page to see skill and Echo names."
 }
