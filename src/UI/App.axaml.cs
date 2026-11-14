@@ -136,6 +136,7 @@ public partial class App : Application
         services.AddSingleton<PoolRecordsViewModel>();
         services.AddSingleton<PullsOverviewViewModel>();
         services.AddSingleton<PullsChartsViewModel>();
+        services.AddSingleton<PullsTimeline>();
         services.AddSingleton<PlayerData>();
         services.AddSingleton<CharacterDetails>();
         services.AddSingleton<AccountActions>();

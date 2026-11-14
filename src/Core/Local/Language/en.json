@@ -931,5 +931,12 @@
   "Pulls_Rating_Lucky": "Blessed",
   "Pulls_Rating_Steady": "Steady",
   "Pulls_Rating_Unlucky": "Unlucky",
-  "Pulls_Rating_Worst": "Cursed"
+  "Pulls_Rating_Worst": "Cursed",
+  "Pulls_ViewTimeline": "Timeline",
+  "Pulls_TimelineTitle": "5★ timeline",
+  "Pulls_TimelineRoles": "Resonators",
+  "Pulls_TimelineWeapons": "Weapons",
+  "Pulls_TimelineEmpty": "No 5★ records yet",
+  "Pulls_TimelineHint": "Scroll to move sideways · click a resonator for details",
+  "Pulls_TimelineTip": "{0}\nObtained {1} after {2} pulls ({3})"
 }

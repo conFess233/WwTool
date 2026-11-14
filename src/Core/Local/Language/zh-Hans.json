@@ -931,5 +931,12 @@
   "Pulls_Rating_Lucky": "欧皇",
   "Pulls_Rating_Steady": "平稳",
   "Pulls_Rating_Unlucky": "偏非",
-  "Pulls_Rating_Worst": "非酋"
+  "Pulls_Rating_Worst": "非酋",
+  "Pulls_ViewTimeline": "时间线",
+  "Pulls_TimelineTitle": "五星时间线",
+  "Pulls_TimelineRoles": "角色",
+  "Pulls_TimelineWeapons": "武器",
+  "Pulls_TimelineEmpty": "还没有五星记录",
+  "Pulls_TimelineHint": "滚轮横向滚动 · 点击角色头像查看详情",
+  "Pulls_TimelineTip": "{0}\n{1} 获得，{2} 抽出金（{3}）"
 }

@@ -82,8 +82,10 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
         IUIStateService uiState,
         ErrorReporter errors,
         GamePathPicker gamePath,
+        PullsTimeline timeline,
         WwTool.Core.Abstractions.IConfigService config)
     {
+        Timeline = timeline;
         _clipboard = clipboard;
         _uiState = uiState;
         _errors = errors;
@@ -226,6 +228,9 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
 
     public PoolRecordsViewModel Records { get; }
 
+    /// <summary>时间线视图。</summary>
+    public PullsTimeline Timeline { get; }
+
     public IReadOnlyList<FabAction> FabActions { get; }
 
     public FabTrigger? FabTrigger { get; } = new("Fab_GetRecords", "Icon.Cloud", ExecutesPrimary: false);
@@ -242,41 +247,45 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
     public ObservableCollection<PoolTab> OtherPools { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsOverview), nameof(IsPoolView), nameof(IsOtherSelected), nameof(ShowListPool), nameof(ShowCompactPool))]
+    [NotifyPropertyChangedFor(nameof(IsOverview), nameof(IsPoolView), nameof(IsOtherSelected), nameof(ShowListPool), nameof(ShowCompactPool),
+        nameof(ShowOverviewPage), nameof(IsCompactChecked))]
     private PoolTab? _selectedTab;
 
     public bool IsOverview => SelectedTab?.Pool is null && SelectedTab?.IsOther != true;
     public bool IsPoolView => !IsOverview;
 
-    // —— 单卡池视图切换：列表 / 精简（头像格子），记住上次选择 ——
+    // —— 视图切换：列表 / 精简（头像格子，仅单卡池）/ 时间线，记住上次选择 ——
 
-    public bool IsCompactView
-    {
-        get => _config.User.PullsCompactView;
-        set
-        {
-            if (_config.User.PullsCompactView == value) return;
-            _config.User.PullsCompactView = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(IsListView));
-            OnPropertyChanged(nameof(ShowListPool));
-            OnPropertyChanged(nameof(ShowCompactPool));
-        }
-    }
+    public bool IsCompactView => _config.User.PullsCompactView;
 
-    public bool IsListView => !IsCompactView;
+    public bool IsTimelineView => _config.User.PullsTimelineView;
 
-    public bool ShowListPool => ShowContent && IsPoolView && !IsCompactView;
-    public bool ShowCompactPool => ShowContent && IsPoolView && IsCompactView;
+    /// <summary>「列表」按钮的选中态：总览时为总览页面本身。</summary>
+    public bool IsListView => !IsTimelineView && (IsOverview || !IsCompactView);
+
+    public bool IsCompactChecked => !IsTimelineView && IsPoolView && IsCompactView;
+
+    public bool ShowOverviewPage => ShowContent && IsOverview && !IsTimelineView;
+    public bool ShowListPool => ShowContent && IsPoolView && !IsCompactView && !IsTimelineView;
+    public bool ShowCompactPool => ShowContent && IsPoolView && IsCompactView && !IsTimelineView;
+    public bool ShowTimeline => ShowContent && IsTimelineView;
 
     [RelayCommand]
-    private void SetViewMode(string mode) => IsCompactView = mode == "compact";
-
-    partial void OnShowContentChanged(bool value)
+    private void SetViewMode(string mode)
     {
-        OnPropertyChanged(nameof(ShowListPool));
-        OnPropertyChanged(nameof(ShowCompactPool));
+        _config.User.PullsTimelineView = mode == "timeline";
+        if (mode != "timeline") _config.User.PullsCompactView = mode == "compact";
+        NotifyViewMode();
     }
+
+    private void NotifyViewMode()
+    {
+        foreach (string name in new[] { nameof(IsCompactView), nameof(IsTimelineView), nameof(IsListView), nameof(IsCompactChecked),
+                     nameof(ShowOverviewPage), nameof(ShowListPool), nameof(ShowCompactPool), nameof(ShowTimeline) })
+            OnPropertyChanged(name);
+    }
+
+    partial void OnShowContentChanged(bool value) => NotifyViewMode();
     public bool IsOtherSelected => SelectedTab?.IsOther == true;
 
     // —— 状态 ——
@@ -396,10 +405,13 @@ public sealed partial class PullsOverviewViewModel : ObservableObject, INavigati
             DailyAxis = [];
             WinValues = [];
             FourStarValues = [];
+            Timeline.Update(null, null);
             return;
         }
 
         CardPoolType? pool = CurrentPool;
+        Timeline.Update(s, pool);
+        NotifyViewMode();
         PullsSummary summary = pool is { } p ? PullsSummaryCalculator.ForPool(s, p) : PullsSummaryCalculator.ForAll(s);
         UpdateCards(summary, pool);
         if (pool is null) UpdateOverview(s);

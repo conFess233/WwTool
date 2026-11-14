@@ -273,18 +273,23 @@
             <DataTemplate x:DataType="vm:LocalizedOption"><TextBlock Text="{Binding Title}" /></DataTemplate>
           </ComboBox.ItemTemplate>
         </ComboBox>
-        <!-- 视图切换（定稿 FinalPullsGrid）：列表 / 精简，仅单卡池视图显示；只用图标，悬停显示名称 -->
-        <Border Classes="vt" IsVisible="{Binding IsPoolView}">
+        <!-- 视图切换（定稿 FinalPullsGrid）：列表 / 精简（仅单卡池）/ 时间线；只用图标，悬停显示名称 -->
+        <Border Classes="vt">
           <StackPanel Orientation="Horizontal" Spacing="2">
             <ToggleButton Classes="vt" IsChecked="{Binding IsListView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="list"
                           ToolTip.Tip="{loc:Tr Pulls_ViewList}" AutomationProperties.Name="{loc:Tr Pulls_ViewList}"
                           AutomationProperties.AutomationId="pulls-view-list">
               <c:StrokeIcon Width="15" Height="15" Data="{StaticResource Icon.ViewList}" />
             </ToggleButton>
-            <ToggleButton Classes="vt" IsChecked="{Binding IsCompactView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="compact"
+            <ToggleButton Classes="vt" IsChecked="{Binding IsCompactChecked, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="compact"
                           ToolTip.Tip="{loc:Tr Pulls_ViewCompact}" AutomationProperties.Name="{loc:Tr Pulls_ViewCompact}"
-                          AutomationProperties.AutomationId="pulls-view-compact">
+                          IsVisible="{Binding IsPoolView}" AutomationProperties.AutomationId="pulls-view-compact">
               <c:StrokeIcon Width="15" Height="15" Data="{StaticResource Icon.ViewGrid}" />
+            </ToggleButton>
+            <ToggleButton Classes="vt" IsChecked="{Binding IsTimelineView, Mode=OneWay}" Command="{Binding SetViewModeCommand}" CommandParameter="timeline"
+                          ToolTip.Tip="{loc:Tr Pulls_ViewTimeline}" AutomationProperties.Name="{loc:Tr Pulls_ViewTimeline}"
+                          AutomationProperties.AutomationId="pulls-view-timeline">
+              <c:StrokeIcon Width="16" Height="16" Data="{StaticResource Icon.Timeline}" />
             </ToggleButton>
           </StackPanel>
         </Border>
@@ -346,13 +351,7 @@
       </StackPanel>
 
       <!-- ── 总览：长页面 ── -->
-      <ScrollViewer x:Name="OverviewScroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled">
-        <ScrollViewer.IsVisible>
-          <MultiBinding Converter="{x:Static BoolConverters.And}">
-            <Binding Path="ShowContent" />
-            <Binding Path="IsOverview" />
-          </MultiBinding>
-        </ScrollViewer.IsVisible>
+      <ScrollViewer x:Name="OverviewScroller" Classes="page-scroll" HorizontalScrollBarVisibility="Disabled" IsVisible="{Binding ShowOverviewPage}">
         <StackPanel Spacing="18" Margin="0,18,0,96">
           <ContentControl Content="{Binding}" ContentTemplate="{StaticResource Metrics}" />
 
@@ -511,6 +510,13 @@
           </Grid>
         </StackPanel>
       </ScrollViewer>
+
+      <!-- ── 时间线（设计稿「抽卡统计 · 时间线视图」）：统计条 + 五星时间线，横向滚动、最新在右 ── -->
+      <Grid RowDefinitions="Auto,*" RowSpacing="14" Margin="0,18,0,26" IsVisible="{Binding ShowTimeline}"
+            AutomationProperties.AutomationId="pulls-timeline">
+        <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StatStrip}" />
+        <pulls:PullsTimelineView Grid.Row="1" DataContext="{Binding Timeline}" />
+      </Grid>
 
       <!-- ── 单卡池：统计条 + 抽卡记录（延伸到底部，列表内部滚动） ── -->
       <Grid RowDefinitions="Auto,*" RowSpacing="14" Margin="0,18,0,26" IsVisible="{Binding ShowListPool}">

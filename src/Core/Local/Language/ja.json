@@ -931,5 +931,12 @@
   "Pulls_Rating_Lucky": "大当たり",
   "Pulls_Rating_Steady": "普通",
   "Pulls_Rating_Unlucky": "やや不運",
-  "Pulls_Rating_Worst": "不運"
+  "Pulls_Rating_Worst": "不運",
+  "Pulls_ViewTimeline": "タイムライン",
+  "Pulls_TimelineTitle": "星5タイムライン",
+  "Pulls_TimelineRoles": "キャラクター",
+  "Pulls_TimelineWeapons": "武器",
+  "Pulls_TimelineEmpty": "星5の記録はまだありません",
+  "Pulls_TimelineHint": "ホイールで横スクロール・キャラクターをクリックで詳細",
+  "Pulls_TimelineTip": "{0}\n{1} に {2} 連で獲得（{3}）"
 }

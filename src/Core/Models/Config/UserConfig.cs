@@ -30,6 +30,7 @@ namespace WwTool.Core.Models.Config
         private string? _skippedUpdateVersion;
         private string? _announcementRegion;
         private bool _pullsCompactView;
+        private bool _pullsTimelineView;
 
         public string? GamePath { get => _gamePath; set => SetProperty(ref _gamePath, value); }
         public string? LastUserId { get => _lastUserId; set => SetProperty(ref _lastUserId, value); }
@@ -86,6 +87,8 @@ namespace WwTool.Core.Models.Config
         public string? AnnouncementRegion { get => _announcementRegion; set => SetProperty(ref _announcementRegion, value); }
         /// <summary>抽卡统计单卡池记录用「精简」（头像格子）视图，否则为「列表」。</summary>
         public bool PullsCompactView { get => _pullsCompactView; set => SetProperty(ref _pullsCompactView, value); }
+        /// <summary>抽卡统计用「时间线」视图（总览与单卡池都适用）；优先于 <see cref="PullsCompactView"/>。</summary>
+        public bool PullsTimelineView { get => _pullsTimelineView; set => SetProperty(ref _pullsTimelineView, value); }
         public bool IsReducedMotionEnabled
         {
             get => _isReducedMotionEnabled;
