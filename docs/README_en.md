@@ -34,7 +34,7 @@ A Windows desktop tool for Wuthering Waves: view your account and Resonators, an
 | Character Data | Owned Resonators and weapons, Resonance Chains and current equipment; click a card for Resonator details: art, skill multipliers, Resonance Chain, stories and voice lines, plus your own build and pull history |
 | Exploration Data | Collected chests and Tidal Remnants by tier |
 | Vehicle Data | Vehicle level, and unlocked skins, stickers, ornaments, frames and in-vehicle music |
-| Settings | Theme and accent color, launcher background / animated background / custom image, glass effect, language, notification level, reduced motion, logging and network options |
+| Settings | Theme and accent color, launcher background / animated background / custom image, language, notification level, reduced motion, logging and network options |
 
 > [!NOTE]
 > Account data (Home, Character, Exploration and Vehicle) currently supports the **International** server only, and requires logging in with email and password. Convene statistics support both the China and International servers and work without logging in.
