@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
-    <Version>2.1.1</Version>
+    <Version>2.2.0</Version>
     <!-- 开发版带 -dev（不检查更新）；发布时去掉，否则正式版也不会提示更新。 -->
-    <InformationalVersion>v2.1.1-dev</InformationalVersion>
+    <InformationalVersion>v2.2.0</InformationalVersion>
   </PropertyGroup>
 </Project>
