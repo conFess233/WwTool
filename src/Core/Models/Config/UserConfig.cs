@@ -13,8 +13,6 @@ namespace WwTool.Core.Models.Config
         private string? _lastUserId;
         private string? _searchGachaApiUrl = "aki/gacha/index.html#/record?";
         private bool _autoLoadLocalData = true;
-        private bool _isGlassEffectEnabled = true;
-        private int _glassOpacity = 80;
         private string _currentTheme = "DarkTheme"; // 默认加载深色主题
         private string _baseTheme = "DeepBlue";
         private string _accentTheme = "FollowTheme";
@@ -38,19 +36,6 @@ namespace WwTool.Core.Models.Config
         public bool AutoLoadLocalData { get => _autoLoadLocalData; set => SetProperty(ref _autoLoadLocalData, value); }
         public GachaServerRegion GachaServerRegion { get => _gachaServerRegion; set => SetProperty(ref _gachaServerRegion, value); }
         public NotificationDisplayMode NotificationDisplayMode { get => _notificationDisplayMode; set => SetProperty(ref _notificationDisplayMode, value); }
-        public bool IsGlassEffectEnabled
-        {
-            get => _isGlassEffectEnabled;
-            set
-            {
-                SetProperty(ref _isGlassEffectEnabled, value);
-            }
-        }
-        public int GlassOpacity
-        {
-            get => _glassOpacity;
-            set => SetProperty(ref _glassOpacity, Math.Clamp(value, 10, 95));
-        }
         public string CurrentTheme
         {
             get => _currentTheme;

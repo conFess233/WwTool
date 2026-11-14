@@ -114,7 +114,6 @@ namespace WwTool.Core.Services
                     _ => "DeepBlue"
                 };
                 if (User.BaseTheme != migratedTheme) { User.BaseTheme = migratedTheme; changed = true; }
-                if (sourceTheme == "GlassTheme" && !User.IsGlassEffectEnabled) { User.IsGlassEffectEnabled = true; changed = true; }
 
                 if (!hasAccentTheme)
                 {
@@ -133,15 +132,12 @@ namespace WwTool.Core.Services
                 HashSet<string> validAccents = ["FollowTheme", "BlueAccent", "GreenAccent", "PurpleAccent", "RedAccent", "OrangeAccent", "YellowAccent"];
                 if (!validAccents.Contains(User.AccentTheme)) { User.AccentTheme = "FollowTheme"; changed = true; }
                 if (!sourceThemeWasRecognized && User.AccentTheme != "FollowTheme") { User.AccentTheme = "FollowTheme"; changed = true; }
-                int opacity = Math.Clamp(User.GlassOpacity, 10, 95);
-                if (User.GlassOpacity != opacity) { User.GlassOpacity = opacity; changed = true; }
             }
             catch (Exception ex)
             {
                 Trace.TraceError($"迁移旧主题配置失败，将使用安全默认值: {ex}");
                 User.BaseTheme = "DeepBlue";
                 User.AccentTheme = "FollowTheme";
-                User.GlassOpacity = 80;
                 changed = true;
             }
             return changed;
