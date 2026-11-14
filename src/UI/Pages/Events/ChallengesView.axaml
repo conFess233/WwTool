@@ -19,6 +19,9 @@
       <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
+    <Style Selector="Border.avatar.ink">
+      <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
+    </Style>
     <Style Selector="Border.avatar.gold">
       <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
       <Setter Property="BorderThickness" Value="2" />
@@ -300,8 +303,8 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="events:MatrixBuffItem">
                       <Grid ColumnDefinitions="30,*" ColumnSpacing="10">
-                        <!-- 增益图标是白色线稿，垫深色底 -->
-                        <Border Classes="avatar" Width="30" Height="30" VerticalAlignment="Top" Background="{DynamicResource NavIslandBrush}">
+                        <!-- 增益图标是白色线稿，垫深色底（用样式类设置：模板里的动态资源会被样式覆盖） -->
+                        <Border Classes="avatar ink" Width="30" Height="30" VerticalAlignment="Top">
                           <Image Source="{Binding Image}" Stretch="Uniform" Margin="3" />
                         </Border>
                         <StackPanel Grid.Column="1" Spacing="2">
