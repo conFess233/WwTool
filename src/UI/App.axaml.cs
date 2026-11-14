@@ -137,6 +137,7 @@ public partial class App : Application
         services.AddSingleton<PullsOverviewViewModel>();
         services.AddSingleton<PullsChartsViewModel>();
         services.AddSingleton<PlayerData>();
+        services.AddSingleton<CharacterDetails>();
         services.AddSingleton<AccountActions>();
         services.AddSingleton<UpdateCoordinator>();
         services.AddSingleton<AccountsViewModel>();
@@ -178,6 +179,7 @@ public partial class App : Application
             .Map<ConfirmDialogViewModel, ConfirmDialogView>()
             .Map<UpdateDialogViewModel, UpdateDialogView>()
             .Map<ImportUrlDialogViewModel, ImportUrlDialogView>()
+            .Map<CharacterDetailViewModel, CharacterDetailView>()
             .Map<SettingsViewModel, SettingsView>()
             .Map<HomeViewModel, HomeView>()
             .Map<RolesViewModel, RolesView>()

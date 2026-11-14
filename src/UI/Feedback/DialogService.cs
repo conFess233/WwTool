@@ -17,6 +17,11 @@ public interface IDialogViewModel
 }
 
 /// <summary>
+/// 大尺寸对话框（如角色详情）：覆盖层不限制宽度、不加内边距，内容自己决定尺寸与排版。
+/// </summary>
+public interface ILargeDialog;
+
+/// <summary>
 /// 有返回值的对话框视图模型。子类在合适时机调用 <see cref="Close"/>。
 /// </summary>
 public abstract class DialogViewModel<TResult> : ObservableObject, IDialogViewModel
@@ -105,9 +110,13 @@ public sealed partial class DialogService(LocalizationService localization) : Ob
     /// <summary>当前显示的对话框视图模型；为空时覆盖层隐藏。</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsOpen))]
+    [NotifyPropertyChangedFor(nameof(IsLarge))]
     private IDialogViewModel? _current;
 
     public bool IsOpen => Current is not null;
+
+    /// <summary>当前对话框是 <see cref="ILargeDialog"/>。</summary>
+    public bool IsLarge => Current is ILargeDialog;
 
     public async Task<TResult> ShowAsync<TResult>(DialogViewModel<TResult> dialog)
     {

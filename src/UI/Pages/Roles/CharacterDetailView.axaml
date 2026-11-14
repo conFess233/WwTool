@@ -1,0 +1,531 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:roles="using:WwTool.UI.Pages.Roles"
+             xmlns:domain="using:WwTool.Core.Models.Domain"
+             xmlns:c="using:WwTool.UI.Controls"
+             xmlns:loc="using:WwTool.UI.Localization"
+             x:Class="WwTool.UI.Pages.Roles.CharacterDetailView"
+             x:DataType="roles:CharacterDetailViewModel"
+             Width="1060" Height="660"
+             AutomationProperties.AutomationId="character-detail">
+  <!--
+    角色详情弹窗（设计稿「角色详情弹窗」）：左侧立绘与基本信息，右侧页签（概览 / 技能 / 共鸣链 / 我的养成 / 故事与语音）。
+    样式沿用角色页：胶囊页签、seq 共鸣链徽标、tag 标签；分区用 SurfaceSunken 底的圆角块。
+  -->
+  <UserControl.Styles>
+    <Style Selector="Border.block">
+      <Setter Property="Background" Value="{DynamicResource SurfaceSunkenBrush}" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="16,14" />
+    </Style>
+    <Style Selector="TextBlock.head">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="TextBlock.body">
+      <Setter Property="FontSize" Value="13.5" />
+      <Setter Property="LineHeight" Value="22" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{DynamicResource LabelBrush}" />
+    </Style>
+    <Style Selector="TextBlock.value">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="c|NoticeContent.desc">
+      <Setter Property="TextSize" Value="13" />
+      <Setter Property="LineSpacing" Value="1.6" />
+    </Style>
+    <Style Selector="Border.seq">
+      <Setter Property="CornerRadius" Value="999" />
+      <Setter Property="Padding" Value="9,3" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+    </Style>
+    <Style Selector="Border.seq > TextBlock">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource LabelBrush}" />
+    </Style>
+    <Style Selector="Border.seq.mid">
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+    </Style>
+    <Style Selector="Border.seq.mid > TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="Border.seq.full">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Border.seq.full > TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource TextOnAccentBrush}" />
+    </Style>
+    <Style Selector="TextBlock.stars">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="LetterSpacing" Value="2" />
+      <Setter Property="Foreground" Value="{DynamicResource FourStarBrush}" />
+    </Style>
+    <Style Selector="TextBlock.stars.five">
+      <Setter Property="Foreground" Value="#C98A1B" />
+    </Style>
+    <!-- 技能列表项 -->
+    <Style Selector="Button.skill">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Padding" Value="8,6" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.skill:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SurfaceHoverBrush}" />
+    </Style>
+    <Style Selector="Button.skill.selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentContainerBrush}" />
+    </Style>
+    <Style Selector="Button.skill.selected TextBlock.skill-name">
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+      <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+    <Style Selector="Border.icon">
+      <Setter Property="Width" Value="34" />
+      <Setter Property="Height" Value="34" />
+      <Setter Property="CornerRadius" Value="17" />
+      <Setter Property="ClipToBounds" Value="True" />
+      <Setter Property="Background" Value="{DynamicResource NavIslandBrush}" />
+    </Style>
+    <!-- 共鸣链节点 -->
+    <Style Selector="Border.node">
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="14,12" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+    </Style>
+    <Style Selector="Border.node.on">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentLineBrush}" />
+      <Setter Property="Background" Value="{DynamicResource HighlightBrush}" />
+    </Style>
+    <Style Selector="Border.node.off">
+      <Setter Property="Opacity" Value="0.72" />
+    </Style>
+    <!-- 故事 / 语音的折叠行 -->
+    <Style Selector="Button.lore">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0,9" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.lore:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.lore:pointerover TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="c|StrokeIcon.chev">
+      <Setter Property="RenderTransform" Value="rotate(-90deg)" />
+    </Style>
+    <Style Selector="c|StrokeIcon.chev.open">
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+  </UserControl.Styles>
+
+  <UserControl.Resources>
+    <!-- 我的养成：攻略站快照里的当前属性、武器、技能等级与声骸 -->
+    <DataTemplate x:Key="BuildTemplate" DataType="roles:CharacterBuild">
+      <StackPanel Spacing="14">
+        <TextBlock Classes="caption" Text="{Binding SyncInfo}" />
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+          <Border Classes="block" VerticalAlignment="Top">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="head" Text="{loc:Tr CharDetail_CurrentStats}" />
+              <TextBlock Classes="caption" Text="{loc:Tr Guide_NoAttributeData}" IsVisible="{Binding !HasAttributes}" />
+              <ItemsControl ItemsSource="{Binding Attributes}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="domain:GuideHoverAttribute">
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,3">
+                      <TextBlock Classes="label" Text="{Binding Name}" />
+                      <TextBlock Grid.Column="1" Classes="value" Text="{Binding Value}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+          <StackPanel Grid.Column="1" Spacing="14">
+            <Border Classes="block" IsVisible="{Binding HasWeapon}">
+              <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Border Width="52" Height="52" CornerRadius="12" ClipToBounds="True" Background="{DynamicResource SurfaceMutedBrush}" VerticalAlignment="Top">
+                  <c:CatalogImage Path="{Binding Weapon.ImagePath, FallbackValue={x:Null}}" DecodeWidth="104" Stretch="UniformToFill" />
+                </Border>
+                <StackPanel Grid.Column="1" Spacing="3">
+                  <TextBlock Classes="caption" FontSize="11" Text="{loc:Tr Guide_HoverWeapon}" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock FontSize="14" FontWeight="Bold" Text="{Binding Weapon.Name, FallbackValue=''}" />
+                    <TextBlock Classes="stars five" FontSize="11" Text="{Binding WeaponStarsText}" VerticalAlignment="Center" />
+                  </StackPanel>
+                  <ItemsControl ItemsSource="{Binding Weapon.Fields, FallbackValue={x:Null}}">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemSpacing="12" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="domain:GuideHoverAttribute">
+                        <TextBlock Classes="caption"><Run Text="{Binding Name}" /><Run Text=" " /><Run Text="{Binding Value}" Foreground="{DynamicResource TextPrimaryBrush}" /></TextBlock>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Grid>
+            </Border>
+            <Border Classes="block" IsVisible="{Binding HasSkills}">
+              <StackPanel Spacing="10">
+                <TextBlock Classes="head" Text="{loc:Tr CharDetail_SkillLevels}" />
+                <ItemsControl ItemsSource="{Binding Skills}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5" ColumnSpacing="6" RowSpacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="roles:BuildSkillItem">
+                      <StackPanel Spacing="4" HorizontalAlignment="Center">
+                        <Border Classes="icon" Width="40" Height="40" CornerRadius="20" HorizontalAlignment="Center">
+                          <Image Source="{Binding Image}" Stretch="Uniform" Margin="3" />
+                        </Border>
+                        <TextBlock Classes="value" FontSize="12" Text="{Binding LevelText}" HorizontalAlignment="Center" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </Grid>
+        <Border Classes="block" IsVisible="{Binding HasEchoes}">
+          <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Classes="head" Text="{loc:Tr CharDetail_Echoes}" />
+              <ItemsControl Grid.Column="1" ItemsSource="{Binding EchoSets}" IsVisible="{Binding HasEchoSets}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="roles:BuildSetItem">
+                    <Border Classes="icon" Width="26" Height="26" CornerRadius="13"><Image Source="{Binding Image}" Stretch="Uniform" Margin="2" /></Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+            <ItemsControl ItemsSource="{Binding Echoes}">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5" ColumnSpacing="10" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="roles:BuildEchoItem">
+                  <Border CornerRadius="10" Padding="10" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                    <StackPanel Spacing="2" HorizontalAlignment="Center">
+                      <TextBlock Classes="caption" FontSize="11" Text="{Binding CostText}" HorizontalAlignment="Center" />
+                      <TextBlock Classes="value" FontSize="15" Text="{Binding LevelText}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate x:Key="LoreRow" x:DataType="roles:CharacterLoreItem">
+      <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0">
+        <StackPanel>
+          <Button Classes="lore" Command="{Binding $parent[roles:CharacterDetailView].((roles:CharacterDetailViewModel)DataContext).ToggleLoreCommand}"
+                  CommandParameter="{Binding}" AutomationProperties.Name="{Binding Title}">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock FontSize="13" Text="{Binding Title}" Foreground="{DynamicResource TextPrimaryBrush}" />
+              <c:StrokeIcon Grid.Column="1" Classes="chev" Classes.open="{Binding IsExpanded}" Width="12" Height="12" Data="{StaticResource Icon.ChevronDown}" />
+            </Grid>
+          </Button>
+          <c:NoticeContent Classes="desc" Margin="0,0,0,10" Blocks="{Binding Content.Blocks}" IsVisible="{Binding IsExpanded}" />
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <Grid ColumnDefinitions="344,*">
+    <!-- ── 左：立绘与基本信息 ── -->
+    <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="430,*">
+        <Panel Background="{DynamicResource SurfaceSunkenBrush}" ClipToBounds="True">
+          <c:CatalogImage Path="{Binding IconPath}" DecodeWidth="192" Width="128" Height="128" Opacity="0.5"
+                          IsVisible="{Binding Portrait, Converter={x:Static ObjectConverters.IsNull}}" />
+          <Image Source="{Binding Portrait}" Stretch="UniformToFill" VerticalAlignment="Top" Margin="-10,0" />
+          <Button Classes="btn" Height="32" Padding="10,0" Margin="14" HorizontalAlignment="Right" VerticalAlignment="Top"
+                  IsVisible="{Binding HasSkinChoice}" AutomationProperties.AutomationId="character-detail-skin">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock FontSize="12" Text="{Binding Skins[0].Name, FallbackValue=''}" VerticalAlignment="Center" />
+              <c:StrokeIcon Width="10" Height="10" Data="{StaticResource Icon.ChevronDown}" />
+            </StackPanel>
+            <Button.Flyout>
+              <MenuFlyout ItemsSource="{Binding Skins}">
+                <MenuFlyout.ItemContainerTheme>
+                  <ControlTheme TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}" x:DataType="roles:CharacterSkinItem">
+                    <Setter Property="Header" Value="{Binding Name}" />
+                    <Setter Property="Command" Value="{Binding $parent[roles:CharacterDetailView].((roles:CharacterDetailViewModel)DataContext).PickSkinCommand}" />
+                    <Setter Property="CommandParameter" Value="{Binding}" />
+                  </ControlTheme>
+                </MenuFlyout.ItemContainerTheme>
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
+        </Panel>
+
+        <StackPanel Grid.Row="1" Margin="20,16" Spacing="8">
+          <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+            <TextBlock FontSize="24" FontWeight="Bold" Text="{Binding Name}" TextTrimming="CharacterEllipsis" MaxWidth="200" />
+            <TextBlock Grid.Column="1" Classes="caption" Text="{Binding NickName}" VerticalAlignment="Bottom" Margin="0,0,0,5" />
+            <Border Grid.Column="2" Classes="seq" Classes.mid="{Binding IsMidSequence}" Classes.full="{Binding IsFullSequence}"
+                    IsVisible="{Binding HasSequence}">
+              <TextBlock Text="{Binding SequenceText}" />
+            </Border>
+          </Grid>
+          <TextBlock Classes="stars" Classes.five="{Binding IsFiveStar}" Text="{Binding StarsText}" />
+          <WrapPanel ItemSpacing="6" LineSpacing="6">
+            <Border Classes="tag sm" Background="Transparent" BorderBrush="{Binding ElementBrush}" BorderThickness="1"
+                    IsVisible="{Binding ElementName, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <TextBlock Text="{Binding ElementName}" Foreground="{Binding ElementBrush}" />
+            </Border>
+            <Border Classes="tag sm gray" IsVisible="{Binding WeaponType, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <TextBlock Text="{Binding WeaponType}" />
+            </Border>
+            <ItemsControl ItemsSource="{Binding Tags}">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemSpacing="6" LineSpacing="6" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="roles:CharacterTagItem">
+                  <Border Classes="tag sm" Background="{Binding Background}" ToolTip.Tip="{Binding Description}">
+                    <TextBlock Text="{Binding Name}" Foreground="{Binding Foreground}" />
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </WrapPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ── 右：页签 ── -->
+    <Grid Grid.Column="1" RowDefinitions="Auto,*">
+      <Grid ColumnDefinitions="*,Auto,Auto" Margin="22,16,14,0" ColumnSpacing="6">
+        <ItemsControl ItemsSource="{Binding Tabs}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="roles:ChipOption">
+              <ToggleButton Classes="chip" Content="{Binding Title}" IsChecked="{Binding IsSelected, Mode=OneWay}"
+                            Command="{Binding $parent[roles:CharacterDetailView].((roles:CharacterDetailViewModel)DataContext).SelectTabCommand}"
+                            CommandParameter="{Binding}" AutomationProperties.AutomationId="{Binding Key, StringFormat='character-tab-{0}'}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Button Grid.Column="1" Classes="link" FontSize="12" Content="{loc:Tr Challenge_OpenSite}" Command="{Binding OpenSiteCommand}"
+                VerticalAlignment="Center" AutomationProperties.AutomationId="character-detail-site" />
+        <Button Grid.Column="2" Classes="btn icon" Command="{Binding DismissCommand}" ToolTip.Tip="{loc:Tr CharDetail_Close}"
+                AutomationProperties.Name="{loc:Tr CharDetail_Close}" AutomationProperties.AutomationId="character-detail-close">
+          <c:StrokeIcon Width="14" Height="14" Data="{StaticResource Icon.Close}" />
+        </Button>
+      </Grid>
+
+      <Panel Grid.Row="1">
+        <!-- 没有缓存时：加载中 / 失败 -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" IsVisible="{Binding !HasData}">
+          <TextBlock Classes="caption" HorizontalAlignment="Center" Text="{loc:Tr CharDetail_Loading}" IsVisible="{Binding IsLoading}" />
+          <TextBlock Classes="caption" HorizontalAlignment="Center" Text="{loc:Tr CharDetail_LoadFailed}" IsVisible="{Binding ShowError}" />
+          <Button Classes="btn" HorizontalAlignment="Center" Content="{loc:Tr Common_Retry}" Command="{Binding RetryCommand}" IsVisible="{Binding ShowError}"
+                  AutomationProperties.AutomationId="character-detail-retry" />
+        </StackPanel>
+
+        <ScrollViewer x:Name="Scroller" IsVisible="{Binding ShowContent}" HorizontalScrollBarVisibility="Disabled" Padding="22,18,22,22">
+          <Panel>
+            <!-- 概览 -->
+            <StackPanel Spacing="18" IsVisible="{Binding IsOverview}">
+              <TextBlock Classes="body" Text="{Binding Introduction}" IsVisible="{Binding Introduction, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+              <StackPanel Spacing="2">
+                <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,6">
+                  <TextBlock Classes="head" Text="{loc:Tr CharDetail_MyPulls}" />
+                  <TextBlock Classes="caption" Text="{Binding PullsSummary}" VerticalAlignment="Bottom" Margin="0,0,0,1" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Pulls}" IsVisible="{Binding HasPulls}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="roles:CharacterPullRow">
+                      <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,1,0,0" Padding="0,9">
+                        <Grid ColumnDefinitions="140,110,*,Auto" ColumnSpacing="14">
+                          <TextBlock Classes="label" Text="{Binding Time}" VerticalAlignment="Center" />
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <TextBlock FontSize="22" FontWeight="Bold" Text="{Binding Pity}" Foreground="{Binding RatingBrush}" />
+                            <TextBlock Classes="caption" Text="{loc:Tr Pulls_PullUnit}" VerticalAlignment="Bottom" Margin="0,0,0,4" />
+                            <TextBlock FontSize="11" FontWeight="Bold" Text="{Binding Rating}" Foreground="{Binding RatingBrush}" VerticalAlignment="Bottom" Margin="2,0,0,4" />
+                          </StackPanel>
+                          <Border Grid.Column="2" Height="8" CornerRadius="4" Background="{DynamicResource TrackBrush}" VerticalAlignment="Center" ClipToBounds="True">
+                            <c:RatioPanel>
+                              <Border c:RatioPanel.Left="0" c:RatioPanel.Right="{Binding Ratio}" Background="{Binding RatingBrush}" CornerRadius="4" />
+                            </c:RatioPanel>
+                          </Border>
+                          <WrapPanel Grid.Column="3" ItemSpacing="5" VerticalAlignment="Center">
+                            <Border Classes="tag sm ink" IsVisible="{Binding IsGuaranteed}"><TextBlock Text="{loc:Tr Pulls_Guaranteed}" /></Border>
+                            <Border Classes="tag sm" IsVisible="{Binding IsSoftPity}"><TextBlock Text="{loc:Tr Pulls_SoftPity}" /></Border>
+                            <Border Classes="tag sm gray" IsVisible="{Binding IsStandardPool}"><TextBlock Text="{loc:Tr Pulls_StandardPool}" /></Border>
+                            <Border Classes="tag sm red" IsVisible="{Binding IsLost}"><TextBlock Text="{loc:Tr Pulls_Lost}" /></Border>
+                            <Border Classes="tag sm gray"><TextBlock Text="{Binding PoolName}" /></Border>
+                          </WrapPanel>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+                <Border Classes="block">
+                  <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock Classes="head" Text="{loc:Tr CharDetail_BaseStats}" VerticalAlignment="Center" />
+                      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                        <TextBlock Classes="caption" Text="{loc:Tr CharDetail_Level}" VerticalAlignment="Center" />
+                        <ComboBox Classes="input" Height="28" MinHeight="28" ItemsSource="{Binding StatLevels}" SelectedItem="{Binding StatLevel}"
+                                  AutomationProperties.Name="{loc:Tr CharDetail_Level}" AutomationProperties.AutomationId="character-detail-level" />
+                      </StackPanel>
+                    </Grid>
+                    <ItemsControl ItemsSource="{Binding Stats}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="roles:LabeledValue">
+                          <Grid ColumnDefinitions="*,Auto" Margin="0,3">
+                            <TextBlock Classes="label" Text="{Binding Label}" />
+                            <TextBlock Grid.Column="1" Classes="value" Text="{Binding Value}" />
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="block" IsVisible="{Binding HasProfile}">
+                  <StackPanel Spacing="10">
+                    <TextBlock Classes="head" Text="{loc:Tr CharDetail_Profile}" />
+                    <ItemsControl ItemsSource="{Binding Profile}">
+                      <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" RowSpacing="10" ColumnSpacing="14" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="roles:LabeledValue">
+                          <StackPanel Spacing="1">
+                            <TextBlock Classes="caption" FontSize="11" Text="{Binding Label}" />
+                            <TextBlock FontSize="13" Text="{Binding Value}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Value}" />
+                          </StackPanel>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </StackPanel>
+
+            <!-- 技能 -->
+            <Grid ColumnDefinitions="210,*" ColumnSpacing="18" IsVisible="{Binding IsSkills}">
+              <ItemsControl ItemsSource="{Binding Skills}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="roles:CharacterSkillItem">
+                    <Button Classes="skill" Classes.selected="{Binding IsSelected}" Margin="0,0,0,2"
+                            Command="{Binding $parent[roles:CharacterDetailView].((roles:CharacterDetailViewModel)DataContext).PickSkillCommand}"
+                            CommandParameter="{Binding}" AutomationProperties.Name="{Binding Name}">
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Border Classes="icon"><Image Source="{Binding Image}" Stretch="Uniform" Margin="3" /></Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                          <TextBlock Classes="caption" FontSize="11" Text="{Binding Type}" />
+                          <TextBlock Classes="skill-name" FontSize="13" Text="{Binding Name}" TextTrimming="CharacterEllipsis"
+                                     Foreground="{DynamicResource TextPrimaryBrush}" />
+                        </StackPanel>
+                      </Grid>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <StackPanel Grid.Column="1" Spacing="12">
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="10">
+                  <TextBlock FontSize="18" FontWeight="Bold" Text="{Binding SelectedSkill.Name, FallbackValue=''}" VerticalAlignment="Center" />
+                  <Border Grid.Column="1" Classes="tag sm gray" VerticalAlignment="Center"><TextBlock Text="{Binding SelectedSkill.Type, FallbackValue=''}" /></Border>
+                  <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6" IsVisible="{Binding HasMultipliers}">
+                    <TextBlock Classes="caption" Text="{loc:Tr CharDetail_SkillLevel}" VerticalAlignment="Center" />
+                    <ComboBox Classes="input" Height="28" MinHeight="28" ItemsSource="{Binding SkillLevels}" SelectedItem="{Binding SkillLevel}"
+                              AutomationProperties.Name="{loc:Tr CharDetail_SkillLevel}" AutomationProperties.AutomationId="character-detail-skill-level" />
+                  </StackPanel>
+                </Grid>
+                <c:NoticeContent Classes="desc" Blocks="{Binding SkillDescription.Blocks, FallbackValue={x:Null}}" />
+                <Border Classes="block" Padding="16,4" IsVisible="{Binding HasMultipliers}">
+                  <ItemsControl ItemsSource="{Binding Multipliers}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="roles:LabeledValue">
+                        <Border BorderBrush="{DynamicResource DividerBrush}" BorderThickness="0,0,0,1" Padding="0,8">
+                          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <TextBlock Classes="label" Text="{Binding Label}" TextWrapping="Wrap" />
+                            <TextBlock Grid.Column="1" Classes="value" Text="{Binding Value}" />
+                          </Grid>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Border>
+              </StackPanel>
+            </Grid>
+
+            <!-- 共鸣链 -->
+            <StackPanel Spacing="8" IsVisible="{Binding IsChain}">
+              <TextBlock Classes="caption" Text="{Binding ChainSummary}" />
+              <ItemsControl ItemsSource="{Binding Chain}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="roles:CharacterChainItem">
+                    <Border Classes="node" Classes.on="{Binding IsUnlocked}" Classes.off="{Binding IsLocked}">
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                        <Border Classes="icon" Width="40" Height="40" CornerRadius="20" VerticalAlignment="Top">
+                          <Panel>
+                            <TextBlock Text="{Binding Index}" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       IsVisible="{Binding Image, Converter={x:Static ObjectConverters.IsNull}}" />
+                            <Image Source="{Binding Image}" Stretch="Uniform" Margin="4" />
+                          </Panel>
+                        </Border>
+                        <StackPanel Grid.Column="1" Spacing="4">
+                          <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Classes="caption" Text="{Binding Index}" VerticalAlignment="Center" />
+                            <TextBlock FontSize="14" FontWeight="Bold" Text="{Binding Name}" />
+                            <TextBlock FontSize="11" Foreground="{DynamicResource AccentTextBrush}" Text="{loc:Tr CharDetail_Unlocked}"
+                                       IsVisible="{Binding IsUnlocked}" VerticalAlignment="Center" />
+                            <TextBlock Classes="caption" FontSize="11" Text="{loc:Tr CharDetail_Locked}" IsVisible="{Binding IsLocked}" VerticalAlignment="Center" />
+                          </StackPanel>
+                          <c:NoticeContent Classes="desc" Blocks="{Binding Description.Blocks}" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+
+            <!-- 我的养成（攻略站当前数据） -->
+            <ContentControl Content="{Binding Build}" ContentTemplate="{StaticResource BuildTemplate}" IsVisible="{Binding IsBuild}" />
+
+            <!-- 故事与语音（语音只显示台词文字） -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="14" IsVisible="{Binding IsLore}">
+              <Border Classes="block" VerticalAlignment="Top">
+                <StackPanel>
+                  <TextBlock Classes="head" Text="{loc:Tr CharDetail_Stories}" Margin="0,0,0,6" />
+                  <ItemsControl ItemsSource="{Binding Stories}" ItemTemplate="{StaticResource LoreRow}" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="1" Classes="block" VerticalAlignment="Top">
+                <StackPanel>
+                  <TextBlock Classes="head" Text="{loc:Tr CharDetail_Voices}" Margin="0,0,0,6" />
+                  <ItemsControl ItemsSource="{Binding Voices}" ItemTemplate="{StaticResource LoreRow}" />
+                </StackPanel>
+              </Border>
+            </Grid>
+          </Panel>
+        </ScrollViewer>
+      </Panel>
+    </Grid>
+  </Grid>
+
+</UserControl>
