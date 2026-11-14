@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.DataProtection;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -87,7 +88,29 @@ builder.Services.ConfigureHttpJsonOptions(o =>
 // 请求体上限：默认 1 MB（账号资料最大 512 KB）；访客统计与上传记录的接口单独放宽
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 1024 * 1024);
 
+// 反向代理（Caddy、Nginx、Cloudflare Tunnel 等）：只信任配置里的代理地址发来的转发头，
+// 据此取得访客真实 IP（限流按 IP 分区）与原始协议（https 时会话 Cookie 才带 Secure）。未开启时忽略转发头，防止直连时伪造。
+var proxy = builder.Configuration.GetSection("WwTool:ReverseProxy");
+bool behindProxy = proxy.GetValue<bool>("Enabled");
+if (behindProxy)
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(o =>
+    {
+        o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        o.ForwardLimit = proxy.GetValue("ForwardLimit", 1);
+        // 默认只信任本机（127.0.0.0/8 与 ::1）；代理在其他机器或容器网络里时在 KnownNetworks 里写它的网段
+        foreach (string cidr in proxy.GetSection("KnownNetworks").Get<string[]>() ?? [])
+            o.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(cidr));
+        // 例如 Cloudflare 的 CF-Connecting-IP：只含访客 IP，不受客户端自带的 X-Forwarded-For 影响
+        if (proxy["ClientIpHeader"] is { Length: > 0 } header) o.ForwardedForHeaderName = header;
+    });
+}
+
 var app = builder.Build();
+
+if (behindProxy) app.UseForwardedHeaders();
+// 只在 https 请求上发送；本机 http 开发不受影响
+if (!app.Environment.IsDevelopment()) app.UseHsts();
 
 // 启动初始化：配置 → Core 数据库迁移 → 静态资料 → Web 数据库
 app.Services.GetRequiredService<IConfigService>().LoadAll();

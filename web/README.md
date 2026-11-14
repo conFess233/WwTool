@@ -79,6 +79,10 @@ dotnet run --project src/Web
 
   正式环境不会注册这两个接口。
 
+## 部署
+
+部署到自己的电脑或云服务器的步骤见 [部署说明](DEPLOY.md)。
+
 ## 配置
 
 `src/Web/appsettings.json` 中的 `WwTool` 节：
@@ -87,6 +91,7 @@ dotnet run --project src/Web
 | --- | --- |
 | `DataRoot` | 数据目录（相对程序目录），存放站点库 `WebSite.db`、抽卡与资料库、登录 Cookie 的加密密钥 |
 | `ContentSecurityPolicy` | 响应的 CSP 头；已放行游戏登录的安全验证与库洛接口、外部 https 图片与视频（启动器背景、公告、encore.moe、资料图标）、`blob:` 图片（自选背景），以及从 `raw.githubusercontent.com` 与备用的 `cdn.jsdelivr.net` 读取资料数据 |
+| `ReverseProxy` | 放在反向代理（Caddy、Nginx、Cloudflare Tunnel 等）后面时打开，按代理转发的访客 IP 限流、按原始协议设置 Cookie；默认关闭 |
 
 所有非 GET 的 `/api` 请求都需要带 `X-WwTool: 1` 请求头；抽卡导入、资料上传、导出、访客统计和登录接口有频率限制。
 
