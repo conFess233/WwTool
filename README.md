@@ -19,6 +19,8 @@
 
 《鸣潮》的 Windows 桌面工具：查看账号资料和角色，整理并统计抽卡记录，所有数据保存在本地。支持多账号、多 UID，界面有简体中文、英文和日文。
 
+[在线使用](https://wwtool.confess233.me)
+
 ![首页](docs/Img/home.png)
 
 <a id="features"></a>
