@@ -45,6 +45,7 @@ WwTool 的浏览器版本：界面、主题和动画与桌面端保持一致，�
 
 - **角色数据经服务器转发**：角色、武器数据来自官方攻略站，它只允许自己的域名跨域访问，浏览器无法直连。游戏登录时浏览器把 access_token 交给后端换一次 Guide Token（后端不保存、不记录），令牌加密保存在浏览器；之后每次同步时随请求带给后端转发，只有角色快照落库。
 - 角色详情的资料来自 encore.moe，由后端缓存后转发（只接受游戏资料里的角色 ID）。
+- **图片与视频由浏览器直接加载**：启动器背景、标语图、动态背景视频和公告轮播图，后端只读取启动器的配置、返回原始链接；物品与角色图标、资料数据直接从 GitHub 上的资料仓库（`catalog/`，与桌面端「同步游戏资料」同源）加载；GitHub 请求失败或超过 6 秒时自动改用 jsDelivr 镜像，本次会话内后续都走镜像。本站服务器只提供页面本身、界面小图标和接口数据。
 - 抽卡链接需要手动粘贴。账号页提供一行 PowerShell 命令，可从本机游戏日志中取出最新链接并复制到剪贴板（只读、不联网）。
 - 启动游戏、打开目录、程序更新等桌面专属功能已移除，首页的便捷操作换成站内跳转；暂不支持手机等窄屏布局。
 
@@ -66,7 +67,7 @@ dotnet run --project src/Web
 开发前端时可以用热更新：先启动后端，再在 `web/` 下运行 `npm run dev`，打开 `http://localhost:5173`（`/api` 会代理到 5180）。
 
 - 请用 `npm run dev` / `npm run build` 启动 Vite，不要直接运行 `npx vite`：仓库路径含 `#`（如 `C#`）时 Vite 无法解析模块，`scripts/vite.mjs` 会在临时目录建一个目录联接再启动。
-- `npm run gen`（dev / build 时自动执行）从桌面端的主题、动效、语言文件和图标生成 `src/generated` 与 `public/` 下的资源，两者都不提交。
+- `npm run gen`（dev / build 时自动执行）从桌面端的主题、动效、语言文件和界面图片生成 `src/generated` 与 `public/` 下的资源，两者都不提交。资料图标与资料数据不打包进站点，运行时从 GitHub 加载。
 - 后端启动时 `wwwroot` 不存在就不会托管页面，第一次构建前端后需要重启后端。
 - **开发预览**：Development 环境下（`appsettings.Development.json` 已打开 `WwTool:EnableDevTools`），本机可以不用密码登录一个开发账号并写入样例数据。在浏览器控制台执行：
 
@@ -85,7 +86,7 @@ dotnet run --project src/Web
 | 键 | 说明 |
 | --- | --- |
 | `DataRoot` | 数据目录（相对程序目录），存放站点库 `WebSite.db`、抽卡与资料库、登录 Cookie 的加密密钥 |
-| `ContentSecurityPolicy` | 响应的 CSP 头；已放行游戏登录的安全验证与库洛接口、外部 https 图片（公告、encore.moe）、`blob:` 图片（自选背景）与同源视频（动态背景） |
+| `ContentSecurityPolicy` | 响应的 CSP 头；已放行游戏登录的安全验证与库洛接口、外部 https 图片与视频（启动器背景、公告、encore.moe、资料图标）、`blob:` 图片（自选背景），以及从 `raw.githubusercontent.com` 与备用的 `cdn.jsdelivr.net` 读取资料数据 |
 
 所有非 GET 的 `/api` 请求都需要带 `X-WwTool: 1` 请求头；抽卡导入、资料上传、导出、访客统计和登录接口有频率限制。
 

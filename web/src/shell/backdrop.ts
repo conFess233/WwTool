@@ -4,7 +4,7 @@ import { get } from '../http';
 import { language } from '../i18n';
 
 // 窗口背景（与桌面端设置页「窗口背景」一致）：默认取游戏启动器背景，或使用自选图片；可选动态背景视频。
-// 自选图片只存在本浏览器的 IndexedDB 中，不会上传。
+// 自选图片只存在本浏览器的 IndexedDB 中，不会上传。启动器背景、标语图与视频由浏览器直接从启动器 CDN 加载，后端只给链接。
 export type BackdropMode = 'default' | 'custom';
 
 export const backdropMode = ref<BackdropMode>(readPref('bg.mode') === 'custom' ? 'custom' : 'default');
@@ -75,7 +75,7 @@ export async function setCustomImage(file: File) {
 }
 
 // ---------- 启动器背景 ----------
-interface BackgroundDto { image: string | null; slogan: string | null }
+interface BackgroundDto { image: string | null; slogan: string | null; video: string | null }
 let launcher: BackgroundDto | null = null;
 let launcherLang = '';
 
@@ -88,16 +88,6 @@ async function loadLauncher(): Promise<BackgroundDto | null> {
     launcher = null;
   }
   return launcher;
-}
-
-async function loadVideo() {
-  if (!backdropVideo.value || backdropMode.value !== 'default') return (backdropVideoUrl.value = null);
-  try {
-    const r = await get<{ video: string }>('/api/public/background/video');
-    backdropVideoUrl.value = r.video;
-  } catch {
-    backdropVideoUrl.value = null;
-  }
 }
 
 export async function reloadBackdrop() {
@@ -113,7 +103,7 @@ export async function reloadBackdrop() {
   const l = await loadLauncher();
   backdropImage.value = l?.image ?? null;
   backdropSlogan.value = l?.slogan ?? null;
-  await loadVideo();
+  backdropVideoUrl.value = backdropVideo.value ? l?.video ?? null : null;
 }
 
 watch([backdropMode, backdropVideo, language], () => reloadBackdrop());
