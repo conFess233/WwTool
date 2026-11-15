@@ -263,4 +263,21 @@ useFab(() => (gachaSource.value ? {
 .rarity-row.four :deep(.fill) { background: var(--four-star); }
 .rarity-row.muted :deep(.fill) { background: var(--text-secondary); }
 .rarity hr { border: 0; border-top: 1px solid var(--divider); margin: 4px 0; width: 100%; }
+
+/* 手机：图表单列，筛选与返回按钮换行 */
+@media (max-width: 768px) {
+  .charts { gap: 12px; padding-bottom: 12px; }
+  .filter { flex-direction: column; align-items: stretch; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .chip { flex: none; height: 38px; padding: 0 14px; font-size: 14px; }
+  .tools { justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .tools .pill-select { flex: 1 1 auto; min-width: 0; }
+  .back { height: 38px; font-size: 14px; }
+  .grid, .row { gap: 12px; }
+  .row.top, .row.bottom { grid-template-columns: minmax(0, 1fr); }
+  .head { flex-wrap: wrap; gap: 4px 10px; }
+  .share-body { height: auto; padding: 6px 0; }
+  .cost-list { min-height: 0; }
+  .cost-row { grid-template-columns: 84px 1fr 30px; }
+}
 </style>

@@ -218,4 +218,21 @@ const acquiredText = (at?: string) => (at ? t('Guide_FirstAcquired', dateTime(at
 .seq.mid { background: var(--accent-container); color: var(--accent-text); }
 .seq.full { background: var(--accent); color: var(--text-on-accent); }
 
+
+/* 手机：工具栏换行，角色两列 */
+@media (max-width: 768px) {
+  .roles { padding-bottom: 12px; }
+  .toolbar { flex-wrap: wrap; height: auto; gap: 8px 10px; }
+  .toolbar .chip:not(.small) { height: 38px; padding: 0 14px; font-size: 14px; }
+  .toolbar .chip.small { height: 32px; padding: 0 12px; font-size: 13px; }
+  .sorts { margin-left: 0; }
+  .spacer { display: none; }
+  .sync-info { width: 100%; }
+  .groups { gap: 16px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .tile { height: 64px; gap: 8px; padding: 0 8px; }
+  .avatar { width: 44px; height: 44px; border-radius: 10px; }
+  .name { font-size: 13px; }
+  .seq { padding: 2px 6px; }
+}
 </style>

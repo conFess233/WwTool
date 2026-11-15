@@ -380,4 +380,16 @@ const hideImage = (e: Event) => ((e.target as HTMLImageElement).style.visibility
 .enemy { display: flex; gap: 12px; padding: 10px 12px; border-radius: var(--radius-inner); background: var(--surface-raised); }
 .enemy-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .enemy-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* 手机：卡片单列，赛季切换单独占一行 */
+@media (max-width: 768px) {
+  .challenges { padding-bottom: 12px; gap: 12px; }
+  .head { padding: 12px 14px; gap: 10px; }
+  .kinds { flex-wrap: wrap; }
+  .season { margin-left: 0; width: 100%; justify-content: space-between; }
+  .season-text { min-width: 0; }
+  .floors, .matrix-buffs { grid-template-columns: minmax(0, 1fr); }
+  .monster { width: 64px; }
+  .avatar { width: 48px; height: 48px; }
+}
 </style>

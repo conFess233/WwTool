@@ -141,3 +141,20 @@ textarea.input { height: auto; padding: 10px 12px; resize: vertical; line-height
 .corner-marks::before, .corner-marks::after { content: ''; position: absolute; width: 14px; height: 14px; border: 0 solid var(--accent-line); }
 .corner-marks::before { left: 10px; top: 10px; border-left-width: 2px; border-top-width: 2px; }
 .corner-marks::after { right: 10px; bottom: 10px; border-right-width: 2px; border-bottom-width: 2px; }
+
+/* ---------- 手机（≤ 768）：取消桌面最小宽度，收紧间距；各组件在自己的样式里按同一断点调整布局 ---------- */
+@media (max-width: 768px) {
+  :root {
+    --page-padding-x: 14px;
+    --page-padding-top: 12px;
+    --card-gap: 12px;
+    --card-padding: 14px 16px;
+    --header-height: 52px;
+    /* 底部导航栏占用的高度（含刘海屏的安全区） */
+    --mobile-nav-space: calc(72px + env(safe-area-inset-bottom));
+  }
+  body { min-width: 0; -webkit-text-size-adjust: 100%; }
+  .page-title { font-size: 20px; line-height: 24px; }
+  /* 触屏上没有悬停：去掉点按后残留的高亮 */
+  * { -webkit-tap-highlight-color: transparent; }
+}

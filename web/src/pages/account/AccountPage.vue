@@ -407,4 +407,19 @@ useFab(() => (sessionState.value === 'signed-in' ? {
 .row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .spacer { flex: 1; }
 .site .caption { display: block; margin: 6px 0; line-height: 1.6; }
+
+/* 手机：账号卡片铺满宽度 */
+@media (max-width: 768px) {
+  .account-page { gap: 12px; padding-bottom: 12px; }
+  .toolbar { height: auto; flex-wrap: wrap; gap: 8px; }
+  .notice { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .account:hover { transform: none; }
+  .avatar { width: 84px; height: 84px; }
+  .add-card { min-height: 240px; }
+  .site-head { flex-direction: column; gap: 10px; }
+  .rename { flex-wrap: wrap; }
+  .rename .input { width: auto; flex: 1; min-width: 0; }
+  .row { flex-wrap: wrap; }
+}
 </style>

@@ -140,4 +140,18 @@ const year = new Date().getFullYear();
 
 :global(.reduced-motion) .page-slide-enter-from, :global(.reduced-motion) .page-slide-leave-to,
 :global(.reduced-motion) .title-swap-enter-from, :global(.reduced-motion) .title-swap-leave-to { transform: none; }
+
+/* 手机：页头只留 Logo、页名与账号胶囊，悬浮岛移到屏幕底部；页脚给底部导航让出位置 */
+@media (max-width: 768px) {
+  .header { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+  .brand { gap: 10px; }
+  .logo { width: 36px; height: 36px; }
+  .title-host { height: 24px; }
+  .parent-title { margin-bottom: 0; font-size: 11px; }
+  .page-host { margin-top: 12px; padding-bottom: 18px; }
+  .footer { padding: 14px 0 calc(var(--mobile-nav-space) + 14px); }
+  .footer-links { gap: 4px 8px; }
+  .page-slide-enter-from { transform: translateX(12px); }
+  .page-slide-leave-to { transform: translateX(-12px); }
+}
 </style>

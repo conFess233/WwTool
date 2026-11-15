@@ -445,4 +445,32 @@ useFab(() => ({
 .ann-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; }
 .ann-links { display: flex; justify-content: center; gap: 20px; }
 .ann-links .btn { font-size: 15px; font-weight: 600; text-decoration: none; }
+
+/* 手机：单栏，公告排在账号卡片之后；统计与资源改为两列 */
+@media (max-width: 768px) {
+  .home { grid-template-columns: minmax(0, 1fr); gap: 12px; padding-bottom: 12px; }
+  .left { gap: 12px; }
+  .profile, .quick-card { padding: 14px 16px 16px; }
+  .head { gap: 12px; padding-bottom: 14px; }
+  .avatar { width: 52px; height: 52px; }
+  .name { font-size: 20px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 0; padding: 14px 0; margin-bottom: 14px; }
+  .stat, .stat:first-child { padding: 0 4px 0 12px; border-left: 0; }
+  .stat:nth-child(odd) { padding-left: 0; }
+  .stat:nth-child(even) { border-left: 1px solid var(--border); }
+  .stat strong { font-size: 18px; }
+  .resources { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .res { padding: 12px 12px 10px; }
+  .res.full { padding: 11px 11px 9px; }
+  .res-value { margin-top: 10px; }
+  .res-value strong { font-size: 26px; }
+  .kvs { margin-top: 12px; }
+  .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .quick { height: 96px; }
+  .ann { min-height: 0; padding: 14px 16px; }
+  .ann-head { flex-wrap: wrap; gap: 8px; }
+  .ann-chips { flex-wrap: wrap; }
+  .region button { padding: 0 14px; }
+  .dots-nav { left: 14px; bottom: 10px; }
+}
 </style>

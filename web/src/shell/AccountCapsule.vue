@@ -47,6 +47,12 @@ const name = computed(() => (currentUid.value ? currentUid.value.name || maskUid
 .muted { color: var(--text-muted); }
 .level { font-size: 13px; font-weight: 600; color: var(--accent-text); }
 .chevron { width: 14px; height: 14px; fill: none; stroke: var(--text-muted); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+/* 手机：胶囊收窄，昵称过长时省略 */
+@media (max-width: 768px) {
+  .capsule { gap: 8px; height: 40px; padding: 0 10px 0 4px; }
+  .roll { max-width: 92px; }
+  .level, .chevron { display: none; }
+}
 .roll-enter-active, .roll-leave-active { transition: transform 480ms var(--ease-standard), opacity 480ms var(--ease-standard); }
 .roll-enter-from { transform: translateY(100%); opacity: 0; }
 .roll-leave-to { transform: translateY(-100%); opacity: 0; }

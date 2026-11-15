@@ -447,4 +447,34 @@ onBeforeUnmount(() => {
 .chev { transform: rotate(-90deg); transition: transform var(--motion-standard) var(--ease-standard); }
 .chev.open { transform: none; }
 .lore-body { padding: 0 0 12px; color: var(--text-secondary); }
+
+/* 手机：铺满屏幕、整体上下滚动；立绘缩短放在最上方，页签吸顶，关闭按钮固定在右上角 */
+@media (max-width: 768px) {
+  .dialog {
+    display: block; width: 100%; height: 100dvh; max-width: none; max-height: none; overflow-y: auto;
+    border: 0; border-radius: 0; padding-bottom: env(safe-area-inset-bottom);
+  }
+  .side { border-right: 0; border-bottom: 1px solid var(--divider); }
+  .portrait { height: 300px; }
+  .portrait .fallback { margin: 80px auto; }
+  .skin { right: 60px; }
+  .card-info { overflow: visible; padding: 4px 16px 14px; }
+  .name { font-size: 22px; }
+  .head { position: sticky; top: 0; z-index: 3; padding: 10px 14px; background: var(--surface-elevated); border-bottom: 1px solid var(--divider); flex-wrap: wrap; gap: 6px 10px; }
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; flex: 1 1 100%; }
+  .tabs .chip { flex: none; height: 34px; padding: 0 14px; }
+  .close { position: fixed; top: calc(10px + env(safe-area-inset-top)); right: 10px; z-index: 5; width: 40px; height: 40px; border-radius: 50%; box-shadow: var(--shadow-pill); }
+  .body { overflow: visible; padding: 12px 14px 20px; }
+  .two, .profile { grid-template-columns: minmax(0, 1fr); }
+  .box { padding: 12px 14px; }
+  .pull { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; }
+  .pull .ratio, .pull .pull-tags { grid-column: 1 / -1; }
+  .echoes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .echo-head { flex-wrap: wrap; }
+  .skills { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .skill-list { flex-direction: row; overflow-x: auto; scrollbar-width: none; }
+  .skill-list button { width: auto; flex: none; }
+  .skill-head { flex-wrap: wrap; }
+  .chain .node { padding: 12px; gap: 10px; }
+}
 </style>

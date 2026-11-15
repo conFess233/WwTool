@@ -7,6 +7,7 @@ import SegmentedBar from '../../components/SegmentedBar.vue';
 import TimelineView from './TimelineView.vue';
 import ChallengesView from './ChallengesView.vue';
 import NoticeContent from '../../components/NoticeContent.vue';
+import StrokeIcon from '../../components/StrokeIcon.vue';
 import { range, stamp, duration, statusText, dateText, kindText, isActive, isEnded, groupKeys } from './eventsText';
 
 // 活动页（src/UI/Pages/Events/EventsView.axaml）：版本卡、视图胶囊、主体（版本日历 / 全部公告）与右侧 440 宽详情。
@@ -102,8 +103,12 @@ const hotspots = computed(() => {
   });
 });
 
+// 手机上详情以底部面板覆盖显示：只有点选公告时才打开（默认选中项不弹出）
+const sheetOpen = ref(false);
 function select(id?: string) {
-  if (id) selectedId.value = id;
+  if (!id) return;
+  selectedId.value = id;
+  sheetOpen.value = true;
 }
 </script>
 
@@ -189,7 +194,9 @@ function select(id?: string) {
       </div>
 
       <!-- 详情 -->
-      <aside class="card detail">
+      <div v-if="sheetOpen" class="sheet-scrim" aria-hidden="true" @click="sheetOpen = false" />
+      <aside class="card detail" :class="{ 'sheet-open': sheetOpen }">
+        <button class="sheet-close" :aria-label="t('Action_Close')" @click="sheetOpen = false"><StrokeIcon name="Close" :size="18" /></button>
         <span v-if="!selected" class="caption select-hint">{{ t('Events_SelectHint') }}</span>
         <div v-else :key="selected.id" class="detail-scroll">
           <img v-if="selected.banner" class="banner" :src="selected.banner" alt="" referrerpolicy="no-referrer" />
@@ -275,4 +282,34 @@ function select(id?: string) {
 .featured { padding: 8px 12px; display: flex; gap: 6px; align-items: baseline; }
 .featured strong { color: var(--accent-text); }
 .divider { border: 0; border-top: 1px solid var(--divider); margin: 0; width: 100%; }
+.sheet-close, .sheet-scrim { display: none; }
+
+/* 手机：单栏；公告详情改为点选后从底部弹出的面板 */
+@media (max-width: 768px) {
+  .events { min-height: 0; gap: 12px; }
+  .version { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 14px 16px; }
+  .version-title { white-space: normal; }
+  .version-side { width: auto; }
+  .region { align-self: flex-start; }
+  .toolbar { flex-wrap: wrap; }
+  .views { flex-wrap: wrap; }
+  .body { grid-template-columns: minmax(0, 1fr); }
+  .thumb { width: 72px; height: 34px; }
+  .notice-row { gap: 10px; padding: 8px 6px; }
+  .notice-row .status { display: none; }
+  .detail { display: none; }
+  .detail.sheet-open {
+    display: flex; position: fixed; z-index: 48; left: 0; right: 0; bottom: 0; top: auto; margin: 0;
+    max-height: 82dvh; min-height: 0; border-radius: var(--radius-dialog) var(--radius-dialog) 0 0;
+    padding-bottom: env(safe-area-inset-bottom); box-shadow: var(--shadow-dialog);
+    animation: sheet-in var(--motion-relaxed) var(--ease-standard);
+  }
+  .sheet-scrim { display: block; position: fixed; inset: 0; z-index: 47; background: var(--scrim); animation: fade-in var(--motion-standard) var(--ease-standard); }
+  .sheet-close {
+    display: grid; place-items: center; position: absolute; right: 10px; top: 10px; z-index: 2; width: 34px; height: 34px; padding: 0;
+    border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text-primary); cursor: pointer;
+  }
+  .detail-body { padding: 14px 16px 20px; }
+}
+@keyframes sheet-in { from { transform: translateY(40px); opacity: 0; } }
 </style>

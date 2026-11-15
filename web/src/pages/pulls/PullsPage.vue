@@ -458,4 +458,36 @@ useFab(() => (gachaSource.value ? {
 .tile-bar { position: absolute; left: 4px; bottom: 3px; height: 3px; border-radius: 2px; background: var(--accent); }
 .tile.near .tile-bar { background: var(--danger); }
 .lost-badge { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--surface); color: var(--danger); border: 1.5px solid var(--danger); }
+
+/* 手机：卡池按钮横向滑动；指标两列；各行卡片单列 */
+@media (max-width: 768px) {
+  .pulls { gap: 12px; padding-bottom: 12px; }
+  .filter { flex-direction: column; align-items: stretch; gap: 10px; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .chips.sub { margin-top: -4px; }
+  .chip { flex: none; height: 38px; padding: 0 14px; font-size: 14px; }
+  .chip .count { margin-left: 8px; }
+  .tools { flex-wrap: wrap; gap: 8px; }
+  .tools .pill-select { flex: 1 1 calc(50% - 4px); min-width: 0; }
+  .views { margin-right: auto; }
+  .views button { height: 30px; }
+  .icon-btn { width: 40px; height: 40px; }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .metric { min-height: 96px; }
+  .metric-value { font-size: 32px; }
+  .strip { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 0; padding: 12px 4px; }
+  .cell { padding: 0 12px; }
+  .cell:nth-child(3n + 1) { border-left: 0; }
+  .cell strong { font-size: 24px; }
+  .overview { gap: 12px; }
+  .row-2, .row-3 { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .donut-row { gap: 16px; }
+  .donut { width: 112px; }
+  .tl-head { flex-wrap: wrap; }
+  .pending-row { grid-template-columns: 56px minmax(0, 1fr); gap: 10px 14px; margin: 0 0 6px; }
+  .pending-row .unknown { width: 56px; height: 56px; font-size: 26px; }
+  .pending-mid, .pending-hard { grid-column: 1 / -1; }
+  .unknown { width: 56px; height: 56px; font-size: 26px; }
+  .tiles { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+}
 </style>

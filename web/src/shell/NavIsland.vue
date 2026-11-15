@@ -94,4 +94,16 @@ function go(page: PageDescriptor) {
 }
 .tip::before { content: ''; position: absolute; top: -6px; left: 50%; translate: -50% 0; border: 6px solid transparent; border-top: 0; border-bottom-color: var(--nav-island); }
 .item:hover .tip, .item:focus-visible .tip { opacity: 1; translate: -50% 0; transition-delay: 300ms; }
+
+/* 手机：固定在屏幕底部，各项平分宽度、只显示图标（选中项也不展开文字），不显示悬停提示 */
+@media (max-width: 768px) {
+  .island {
+    position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 45;
+    justify-content: space-between; gap: 2px;
+  }
+  .separator { margin: 0 2px; }
+  .item, .item.selected { flex: 1 1 0; min-width: 0; padding: 0; }
+  .label, .tip { display: none; }
+  .item:hover:not(.selected) { background: transparent; }
+}
 </style>
