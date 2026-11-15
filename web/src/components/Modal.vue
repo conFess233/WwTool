@@ -53,5 +53,11 @@ onBeforeUnmount(() => {
 }
 .dialog-title { font-size: 18px; font-weight: 700; margin: 0 0 12px; }
 .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+/* 手机：对话框几乎铺满宽度，内边距收紧，按钮放不下时换行 */
+@media (max-width: 768px) {
+  .scrim { padding: 12px; }
+  .dialog { max-width: 100%; max-height: calc(100dvh - 24px); padding: 18px 16px; }
+  .actions { flex-wrap: wrap; }
+}
 :global(.reduced-motion) .dialog { animation: fade-in var(--motion-fast) linear; }
 </style>

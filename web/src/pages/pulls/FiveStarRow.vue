@@ -80,4 +80,16 @@ const near = () => props.card.pity >= 70;
 .open .chevron { transform: rotate(180deg); }
 .detail { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 6px 16px 96px; }
 .chip4.named { font-weight: 600; }
+
+/* 手机：头像与名称一行，抽数与四星换到下方 */
+@media (max-width: 768px) {
+  .row-main, .row-main.no-chips { grid-template-columns: 56px minmax(0, 1fr) 16px; gap: 8px 12px; padding: 12px 4px; }
+  .face { width: 56px; height: 56px; border-radius: 12px; }
+  .name { font-size: 16px; }
+  .pity-box, .chips { grid-column: 1 / -1; }
+  .pity-box { grid-row: 2; }
+  .chevron { grid-column: 3; grid-row: 1; }
+  .pity { font-size: 28px; }
+  .detail { padding: 0 4px 14px; }
+}
 </style>

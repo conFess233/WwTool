@@ -95,4 +95,26 @@ const phantoms = computed(() => phantomKinds.map(([k, title, icon]) => ({ k, tit
 .phantom-text { display: flex; flex-direction: column; gap: 4px; }
 .phantom-text strong { font-size: 48px; line-height: 1; }
 .plain { width: 72px; height: 72px; object-fit: contain; }
+
+/* 手机：总览单列，宝箱两列，潮汐之遗单列 */
+@media (max-width: 768px) {
+  .explore { padding-bottom: 12px; }
+  .col { gap: 12px; }
+  .overview { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .ov { min-height: 0; gap: 14px; }
+  .ov-head img, .dark { width: 44px; height: 44px; }
+  .dark img { width: 34px; height: 34px; }
+  .big strong { font-size: 40px; letter-spacing: -1px; }
+  .kinds { gap: 10px; }
+  .kinds.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kinds.three { grid-template-columns: minmax(0, 1fr); }
+  .kind { min-height: 0; gap: 12px; }
+  .kind-head { gap: 10px; }
+  .kind-head .dark { width: 52px; height: 52px; border-radius: 12px; }
+  .kind-head .dark img { width: 36px; height: 36px; }
+  .kind-title { font-size: 15px; }
+  .phantom { min-height: 0; gap: 18px; padding-left: 20px; }
+  .phantom-text strong { font-size: 36px; }
+  .plain { width: 56px; height: 56px; }
+}
 </style>

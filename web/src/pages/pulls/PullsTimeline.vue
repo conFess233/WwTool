@@ -126,4 +126,14 @@ const tip = (n: Node) => n.card ? t('Pulls_TimelineTip', t(poolTitleKey(n.card.p
 .lg { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--c); }
 .lg i { width: 10px; height: 10px; border-radius: 2px; background: var(--c); }
 .hint { margin-left: 20px; }
+
+/* 手机：节点收窄，图例换行 */
+@media (max-width: 768px) {
+  .track-row { height: 400px; padding: 0 8px; }
+  .col { width: 112px; }
+  .avatar { width: 60px; height: 60px; border-radius: 13px; }
+  .name { max-width: 104px; font-size: 13px; }
+  .legend { flex-wrap: wrap; gap: 6px 10px; }
+  .hint { margin-left: 0; width: 100%; }
+}
 </style>

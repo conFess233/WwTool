@@ -125,4 +125,27 @@ useProfileFab();
 .item img { width: 120px; height: 84px; object-fit: contain; }
 .mask.big { width: 96px; height: 84px; }
 .item-name { font-size: 17px; font-weight: 700; margin-top: 8px; }
+
+/* 手机：单栏；统计两列，条目自适应列数 */
+@media (max-width: 768px) {
+  .motor { padding-bottom: 12px; }
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .side { padding: 16px; }
+  .hero { height: 180px; margin-bottom: 10px; }
+  .hero-mask { width: 160px; height: 100px; }
+  .level-text strong { font-size: 30px; }
+  .equip-title { margin-top: 10px; }
+  .main { gap: 12px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .stat { gap: 12px; padding: 14px; }
+  .stat-icon { width: 32px; height: 32px; }
+  .stat-text strong { font-size: 28px; }
+  .tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .tabs .chip { flex: none; height: 38px; padding: 0 14px; font-size: 14px; }
+  .chip .count { margin-left: 8px; }
+  .items { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .item { min-height: 0; padding: 18px 10px 14px; }
+  .item img { width: 96px; height: 68px; }
+  .item-name { font-size: 15px; }
+}
 </style>

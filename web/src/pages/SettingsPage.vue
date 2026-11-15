@@ -210,4 +210,16 @@ const version = __APP_VERSION__;
 .about-head { display: flex; align-items: baseline; gap: 14px; }
 .about-head .ti { margin: 0; flex: 1; }
 .about-text { line-height: 1.9; margin: 14px 0 0; }
+
+/* 手机：单列；设置项的控件放不下时换到下一行 */
+@media (max-width: 768px) {
+  .settings { grid-template-columns: minmax(0, 1fr); }
+  .set { padding: 16px; }
+  .sr.row { flex-wrap: wrap; gap: 8px 12px; }
+  .swatches { flex-wrap: wrap; gap: 8px 12px; }
+  .accents { flex-wrap: wrap; }
+  .bg-opts { flex: 1 1 100%; flex-wrap: wrap; }
+  .select { min-width: 0; flex: 1; max-width: 220px; }
+  .about-head { flex-wrap: wrap; gap: 6px 12px; }
+}
 </style>

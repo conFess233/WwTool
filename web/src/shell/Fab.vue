@@ -87,6 +87,12 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 .fab.open .plus { transform: rotate(45deg); }
 .spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* 手机：贴近右边缘，放在底部导航上方 */
+@media (max-width: 768px) {
+  .fab { right: 16px; bottom: calc(var(--mobile-nav-space) + 12px); }
+  .trigger { height: 50px; min-width: 50px; }
+  .trigger.extended { padding: 0 20px 0 16px; font-size: 15px; }
+}
 .fab-item-enter-active { transition: opacity var(--motion-fast) var(--ease-standard), transform var(--motion-standard) var(--ease-bounce); transition-delay: calc(var(--i) * 30ms); }
 .fab-item-leave-active { transition: opacity 120ms linear; }
 .fab-item-enter-from { opacity: 0; transform: translateY(10px) scale(0.96); }

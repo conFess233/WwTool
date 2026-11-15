@@ -25,4 +25,10 @@ import { toasts } from './toast';
 .toast-leave-active { transition: opacity var(--motion-fast) linear; }
 .toast-enter-from { opacity: 0; transform: translateX(24px); }
 .toast-leave-to { opacity: 0; }
+
+/* 手机：在页头下方居中 */
+@media (max-width: 768px) {
+  .toast-host { top: calc(68px + env(safe-area-inset-top)); left: 12px; right: 12px; align-items: center; }
+  .toast { max-width: 100%; border-radius: 18px; }
+}
 </style>

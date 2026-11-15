@@ -112,7 +112,7 @@ A browser version of WwTool is in development. It looks the same as the desktop 
 - **Your game password and credentials never reach the server**: game login happens entirely in the browser and the password is cleared right after use; the OauthCode used to refresh your data is stored only in your own browser, encrypted.
 - **No sign-in required**: paste a Convene link to import your records, which are then stored only in this browser. Create a site account (username + password) to upload them to the cloud and see them on any device.
 - **Linking a UID** works in two ways: submit one Convene link (the link itself is not stored), or sign in to your game account to link all of its UIDs.
-- Home, Events, Convene statistics and charts, Character Data with character details, Exploration Data, Vehicle Data and account management are supported, and a short guide opens on your first visit. Character data comes from the official guide site, which does not allow other sites to call it directly, so the server relays the requests; the guide-site authorization only passes through and is never stored.
+- Home, Events, Convene statistics and charts, Character Data with character details, Exploration Data, Vehicle Data and account management are supported, and a short guide opens on your first visit. It also works in phone browsers. Character data comes from the official guide site, which does not allow other sites to call it directly, so the server relays the requests; the guide-site authorization only passes through and is never stored.
 
 See the [Web version guide](../web/README.md) (Chinese) for how to run it locally, the security design and configuration.
 

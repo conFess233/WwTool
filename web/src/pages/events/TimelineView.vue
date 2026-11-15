@@ -262,4 +262,16 @@ const isBar = (r: Row): r is Bar => 'id' in r;
 .tl-bar.recurring { background: var(--text-muted); }
 .tl-bar.upcoming { opacity: 0.55; }
 .tl-bar.ended { opacity: 0.3; }
+
+/* 手机：名称与右侧列收窄，时间轴整体可左右滑动 */
+@media (max-width: 768px) {
+  .live { padding: 12px 14px; }
+  .live-row { flex-wrap: wrap; }
+  .tl { overflow-x: auto; }
+  .tl-head { padding: 12px 14px; }
+  .tl-grid { --name-w: 150px; --right-w: 96px; min-width: 620px; }
+  .tl-row .name { padding: 0 10px 0 14px; }
+  .tl-row .right { padding-right: 14px; }
+  .group-head { margin-left: 14px; }
+}
 </style>

@@ -64,4 +64,13 @@ onBeforeUnmount(() => { document.removeEventListener('mousedown', onDoc); docume
 .menu [aria-selected='true'] button { color: var(--accent-text); font-weight: 700; background: var(--accent-container); }
 .pop-enter-active, .pop-leave-active { transition: opacity var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard); }
 .pop-enter-from, .pop-leave-to { opacity: 0; transform: translateY(-4px); }
+
+/* 手机：撑满父容器给的宽度，文字不折行 */
+@media (max-width: 768px) {
+  .pill { width: 100%; height: 38px; gap: 6px; padding: 0 10px 0 12px; }
+  .label, .value { font-size: 13px; white-space: nowrap; }
+  .value { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .chev { margin-left: auto; flex: none; }
+  .menu { left: 0; right: auto; }
+}
 </style>

@@ -54,4 +54,9 @@ function privacy() {
 .points strong { font-size: 14px; }
 .points p { margin: 2px 0 0; font-size: 13px; line-height: 1.65; color: var(--text-secondary); }
 .disclaimer { margin: 0; line-height: 1.7; }
+
+@media (max-width: 768px) {
+  .points li { grid-template-columns: 32px 1fr; gap: 10px; padding: 10px 12px; }
+  .disc { width: 32px; height: 32px; }
+}
 </style>
